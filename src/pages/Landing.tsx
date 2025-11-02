@@ -1,18 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
-import { getRandomWelcomeMessage, APP_CONFIG } from '@/constants';
+import { 
+  getRandomWelcomeMessage, 
+  getRandomWelcomeBackMessage, 
+  getRandomAcknowledgeMessage,
+  getRandomCheckingEmailMessage,
+  getRandomWrongEmailMessage,
+  APP_CONFIG 
+} from '@/constants';
 
 export default function Landing() {
-  // Get random welcome message on load
-  const [aiMessage, setAiMessage] = useState(getRandomWelcomeMessage());
+  // Check if user has visited during this session
+  const [aiMessage, setAiMessage] = useState('');
 
-  const handleMessage = (message: string) => {
+  useEffect(() => {
+    // Check sessionStorage to see if user has been here before in this session
+    const hasVisitedThisSession = sessionStorage.getItem('hasVisitedLanding');
+    
+    if (hasVisitedThisSession) {
+      // Returning user - show welcome back message
+      setAiMessage(getRandomWelcomeBackMessage());
+    } else {
+      // First time visitor this session - show welcome message
+      setAiMessage(getRandomWelcomeMessage());
+      // Mark that they've visited
+      sessionStorage.setItem('hasVisitedLanding', 'true');
+    }
+  }, []);
+
+  // Email validation regex
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
+
+  const handleMessage = async (message: string) => {
     console.log('User message:', message);
-    // Handle the message here
-    setAiMessage(`You entered: ${message}`);
+    
+    // Step 1: Show acknowledge message immediately
+    setAiMessage(getRandomAcknowledgeMessage());
+    
+    // Step 2: Wait a bit (simulate checking) then validate email
+    setTimeout(() => {
+      if (!isValidEmail(message)) {
+        // Invalid email format
+        setAiMessage(getRandomWrongEmailMessage());
+      } else {
+        // Valid email - show checking message with actual email
+        setAiMessage(getRandomCheckingEmailMessage(message));
+        // TODO: Call API to check if user exists
+      }
+    }, 1500); // 1.5 second delay for natural feel
   };
 
   return (

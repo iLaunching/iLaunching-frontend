@@ -4,6 +4,74 @@
  */
 
 
+/**Axknowledge message */
+
+export const ACKNOWLEDGE_MESSAGE = [
+  "Thank you! Just a moment while I check that.",
+  
+  "Got it! Give me a second to look you up.",
+  
+  "Perfect! Let me see what we have here.",
+  
+  "Thanks! Checking our system now.",
+  
+  "Excellent! One moment while I pull up your info.",
+  
+  "Got it! Let me check if we've met before.",
+  
+  "Thank you! Searching for you now.",
+  
+  "Perfect! Give me just a second.",
+  
+  "Thanks! Let me see if you're already in the system.",
+  
+  "Got it! Checking our records now.",
+  
+  "Awesome! One moment while I look that up.",
+  
+  "Thank you! Let me find you in here.",
+  
+  "Perfect! Searching now, won't be long.",
+  
+  "Got it! Give me a sec to check.",
+  
+  "Thanks! Let me pull up your account.",
+  
+  "Excellent! Checking the database now.",
+  
+  "Perfect! One moment while I verify that.",
+  
+  "Got it! Let me see what I can find.",
+  
+  "Thank you! Checking if we know each other.",
+  
+  "Awesome! Give me just a moment.",
+  
+  "Perfect! Let me look you up real quick.",
+  
+  "Got it! Searching our system now.",
+  
+  "Thanks! One second while I check that.",
+  
+  "Excellent! Let me find your profile.",
+  
+  "Perfect! Checking now, hang tight.",
+  
+  "Got it! Let me see if you're already with us.",
+  
+  "Thank you! Pulling up the records now.",
+  
+  "Awesome! One moment while I search.",
+  
+  "Perfect! Let me check our database.",
+  
+  "Got it! Give me a second to verify that."
+] as const;
+
+
+
+
+
 /**
  * page load welcome Messages
  */
@@ -99,7 +167,7 @@ export const WELCOME_MESSAGES = [
 /**
  * welcome page refresh Messages
  */
-export const WELCOME_REFRESH_MESSAGE = [
+export const WELCOM_BACK_MESSAGE = [
   "Back already? I like your energy. I'm i, and I'm right here waiting. What's your email again?",
   
   "You're back! Good. That means you're serious. I'm i. Drop your email and let's pick up where we left off.",
@@ -163,6 +231,147 @@ export const WELCOME_REFRESH_MESSAGE = [
 
 
 
+
+/**
+ * Valid email checking system Messages
+ */
+export const CHECKING_EMAIL_MESSAGES = [
+  "Perfect! Let me check if {email} is in our system.",
+  
+  "Got it! Looking up {email} now.",
+  
+  "Excellent! Searching for {email} in our records.",
+  
+  "Thanks! Let me see if {email} is already with us.",
+  
+  "Great! Checking {email} in the database.",
+  
+  "Perfect! One moment while I look up {email}.",
+  
+  "Got it! Searching for {email} now, won't take long.",
+  
+  "Awesome! Let me find {email} in here.",
+  
+  "Thanks! Checking if {email} is registered.",
+  
+  "Excellent! Looking up {email} in our system.",
+  
+  "Perfect! Let me see if {email} rings a bell.",
+  
+  "Got it! Searching our records for {email}.",
+  
+  "Great! Checking if we know {email} already.",
+  
+  "Perfect! Let me pull up {email} real quick.",
+  
+  "Thanks! Looking for {email} in the database.",
+  
+  "Awesome! Checking if {email} is in our network.",
+  
+  "Got it! Let me verify {email} in the system.",
+  
+  "Excellent! Searching for {email} now.",
+  
+  "Perfect! Looking up {email}, just a sec.",
+  
+  "Thanks! Checking if {email} is already here.",
+  
+  "Got it! Let me see if {email} is registered.",
+  
+  "Great! Searching for {email} in our records.",
+  
+  "Perfect! Checking {email} now, hang tight.",
+  
+  "Awesome! Let me look up {email} real quick.",
+  
+  "Thanks! Verifying {email} in the system.",
+  
+  "Got it! Let me find {email} in here.",
+  
+  "Excellent! Checking if {email} is in the database.",
+  
+  "Perfect! Looking up {email} now.",
+  
+  "Thanks! Searching for {email}, one moment.",
+  
+  "Got it! Let me check if {email} is with us already."
+] as const;
+
+
+
+
+/**
+ * Email wrong email format Messages
+ */
+export const WRONG_EMAIL_FORMAT = [
+  "Oops! That doesn't look like a valid email address. Give it another shot?",
+  
+  "Hmm, I need a proper email address to continue. Mind checking that for me?",
+  
+  "Looks like there's an issue with the email format. Try again?",
+  
+  "That email doesn't look quite right. Can you double-check it?",
+  
+  "Almost! But that's not a valid email format. Give it another go.",
+  
+  "I'm not seeing a proper email there. Mind trying again?",
+  
+  "That one's not working for me. Check the format and try again?",
+  
+  "Hmm, something's off with that email. Can you recheck it?",
+  
+  "Not quite! I need a valid email address to move forward.",
+  
+  "That doesn't look like an email I can work with. Try again?",
+  
+  "I'm seeing some issues with that email format. Want to give it another shot?",
+  
+  "That's not quite right. Double-check that email for me?",
+  
+  "Email format looks a bit off. Mind trying that again?",
+  
+  "I need a proper email to continue. Can you check that one?",
+  
+  "That one's not passing the test. Try the email again?",
+  
+  "Hmm, that doesn't look like a valid email. Give it another try?",
+  
+  "Something's not right with that format. Check your email again?",
+  
+  "Not quite there! I need a valid email address to proceed.",
+  
+  "That email's not working. Mind double-checking it?",
+  
+  "I can't work with that format. Try entering your email again?",
+  
+  "That's not a valid email address. Want to give it another shot?",
+  
+  "Email format's off. Can you check and try again?",
+  
+  "That one didn't work. Double-check your email?",
+  
+  "Not quite! I need a proper email format to continue.",
+  
+  "Something's not clicking with that email. Try again?",
+  
+  "That doesn't look right to me. Check that email format?",
+  
+  "I'm not seeing a valid email there. Want to try again?",
+  
+  "Email's not quite right. Give it another go?",
+  
+  "That format's not working. Can you recheck your email?",
+  
+  "Not a valid email format. Mind trying that again?"
+] as const;
+
+
+
+
+
+
+
+
 /**
  * Email Prompt Messages
  */
@@ -201,6 +410,13 @@ export function getRandomMessage<T extends readonly string[]>(messages: T): T[nu
  * Convenience functions for each message type
  */
 export const getRandomWelcomeMessage = () => getRandomMessage(WELCOME_MESSAGES);
+export const getRandomWelcomeBackMessage = () => getRandomMessage(WELCOM_BACK_MESSAGE);
+export const getRandomAcknowledgeMessage = () => getRandomMessage(ACKNOWLEDGE_MESSAGE);
+export const getRandomCheckingEmailMessage = (email: string) => {
+  const message = getRandomMessage(CHECKING_EMAIL_MESSAGES);
+  return message.replace('{email}', email);
+};
+export const getRandomWrongEmailMessage = () => getRandomMessage(WRONG_EMAIL_FORMAT);
 export const getRandomEmailPrompt = () => getRandomMessage(EMAIL_PROMPTS);
 export const getRandomPasswordPrompt = () => getRandomMessage(PASSWORD_PROMPTS);
 export const getRandomTourMessage = () => getRandomMessage(TOUR_MESSAGES);
