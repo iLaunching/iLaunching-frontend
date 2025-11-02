@@ -11,10 +11,12 @@ import {
   getRandomWrongEmailMessage,
   APP_CONFIG 
 } from '@/constants';
+import { authApi } from '@/api/auth';
 
 export default function Landing() {
   // Check if user has visited during this session
   const [aiMessage, setAiMessage] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // Check sessionStorage to see if user has been here before in this session
@@ -40,20 +42,52 @@ export default function Landing() {
   const handleMessage = async (message: string) => {
     console.log('User message:', message);
     
-    // Step 1: Show acknowledge message immediately
-    setAiMessage(getRandomAcknowledgeMessage());
+    // Prevent multiple submissions
+    if (isProcessing) return;
+    setIsProcessing(true);
     
-    // Step 2: Wait a bit (simulate checking) then validate email
-    setTimeout(() => {
+    try {
+      // Step 1: Show acknowledge message immediately
+      setAiMessage(getRandomAcknowledgeMessage());
+      
+      // Step 2: Wait a bit (simulate checking) then validate email
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       if (!isValidEmail(message)) {
         // Invalid email format
         setAiMessage(getRandomWrongEmailMessage());
-      } else {
-        // Valid email - show checking message with actual email
-        setAiMessage(getRandomCheckingEmailMessage(message));
-        // TODO: Call API to check if user exists
+        setIsProcessing(false);
+        return;
       }
-    }, 1500); // 1.5 second delay for natural feel
+      
+      // Step 3: Valid email - show checking message
+      setAiMessage(getRandomCheckingEmailMessage(message));
+      
+      // Step 4: Check if email exists in database
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const result = await authApi.checkEmail(message);
+      
+      // Step 5: Show result
+      if (result.exists) {
+        // User exists - prompt for password
+        setAiMessage(`Welcome back! I found your account. Please enter your password to continue.`);
+        // TODO: Change input to password mode
+      } else {
+        // New user - proceed to signup
+        setAiMessage(`Great! I don't see an account with ${message} yet. Let's create one! What should I call you? (Your name)`);
+        // TODO: Store email and move to name input
+      }
+      
+    } catch (error: any) {
+      console.error('Email check error:', error);
+      
+      // Handle error gracefully
+      const errorMessage = error.response?.data?.detail || 'Something went wrong. Please try again.';
+      setAiMessage(`Oops! ${errorMessage}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
