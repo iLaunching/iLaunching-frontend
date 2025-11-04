@@ -9,6 +9,8 @@ import {
   getRandomAcknowledgeMessage,
   getRandomCheckingEmailMessage,
   getRandomWrongEmailMessage,
+  getRandomMessage,
+  USER_NOT_REGISTERED_MESSAGES,
   APP_CONFIG 
 } from '@/constants';
 import { authApi } from '@/api/auth';
@@ -75,7 +77,7 @@ export default function Landing() {
         // TODO: Change input to password mode
       } else {
         // New user - proceed to signup
-        setAiMessage(`Great! I don't see an account with ${message} yet. Let's create one! What should I call you? (Your name)`);
+        setAiMessage(getRandomMessage(USER_NOT_REGISTERED_MESSAGES));
         // TODO: Store email and move to name input
       }
       
