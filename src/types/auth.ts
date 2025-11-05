@@ -15,6 +15,8 @@ export interface AuthState {
   stage: AuthStage;
   email: string;
   name: string;
+  message: string;
+  user: User | null;
   isProcessing: boolean;
   error: string | null;
 }

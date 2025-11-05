@@ -84,13 +84,19 @@ export default function Landing() {
       return authState.error;
     }
     
+    // If we have a message in state, use it
+    if (authState.message) {
+      return authState.message;
+    }
+    
     // Show appropriate message based on stage
     const hasVisited = sessionStorage.getItem('hasVisitedLanding');
-    if (authState.stage === 'email_input' && authState.message === '') {
+    if (authState.stage === 'email_input') {
       return hasVisited ? getRandomWelcomeBackMessage() : getRandomWelcomeMessage();
     }
     
-    return authState.message;
+    // Default fallback
+    return '';
   };
 
   return (

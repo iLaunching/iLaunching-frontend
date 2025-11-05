@@ -5,9 +5,8 @@
 
 import { useState } from 'react';
 import { authApi } from '@/api/auth';
-import type { AuthStage, AuthState, User } from '@/types/auth';
+import type { AuthState } from '@/types/auth';
 import {
-  getRandomCheckingEmailMessage,
   getRandomWrongEmailMessage,
   getRandomMessage,
   USER_NOT_REGISTERED_MESSAGES,
@@ -18,11 +17,11 @@ export function useLandingAuth() {
     stage: 'email_input',
     email: '',
     name: '',
+    message: '',
+    user: null,
     isProcessing: false,
     error: null,
   });
-
-  const [user, setUser] = useState<User | null>(null);
 
   /**
    * Reset to initial state
@@ -32,10 +31,11 @@ export function useLandingAuth() {
       stage: 'email_input',
       email: '',
       name: '',
+      message: '',
+      user: null,
       isProcessing: false,
       error: null,
     });
-    setUser(null);
   };
 
   /**
@@ -48,20 +48,24 @@ export function useLandingAuth() {
 
   /**
    * Handle email submission
-   * Returns the AI message to display
    */
-  const handleEmailSubmit = async (email: string): Promise<string> => {
+  const handleEmailSubmit = async (email: string): Promise<void> => {
     // Validate format
     if (!isValidEmail(email)) {
-      setAuthState(prev => ({ ...prev, error: 'Invalid email format' }));
-      return getRandomWrongEmailMessage();
+      setAuthState((prev: AuthState) => ({ 
+        ...prev, 
+        message: getRandomWrongEmailMessage(),
+        error: 'Invalid email format' 
+      }));
+      return;
     }
 
     // Update state to checking
-    setAuthState(prev => ({
+    setAuthState((prev: AuthState) => ({
       ...prev,
       email,
       stage: 'email_checking',
+      message: `Let me check if ${email} is in our system...`,
       isProcessing: true,
       error: null,
     }));
@@ -72,121 +76,134 @@ export function useLandingAuth() {
 
       if (result.exists) {
         // Existing user - move to password input
-        setAuthState(prev => ({
+        setAuthState((prev: AuthState) => ({
           ...prev,
           stage: 'password_input',
+          message: "Welcome back! I found your account. Please enter your password to continue.",
           isProcessing: false,
         }));
-        return "Welcome back! I found your account. Please enter your password to continue.";
       } else {
         // New user - move to name input
-        setAuthState(prev => ({
+        setAuthState((prev: AuthState) => ({
           ...prev,
           stage: 'name_input',
+          message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
           isProcessing: false,
         }));
-        return getRandomMessage(USER_NOT_REGISTERED_MESSAGES);
       }
     } catch (error: any) {
       console.error('Email check error:', error);
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'email_input',
+        message: `Oops! ${error.response?.data?.detail || 'Something went wrong. Please try again.'}`,
         isProcessing: false,
         error: error.message || 'Failed to check email',
       }));
-      return `Oops! ${error.response?.data?.detail || 'Something went wrong. Please try again.'}`;
     }
   };
 
   /**
    * Handle name submission (new user)
    */
-  const handleNameSubmit = (name: string): string => {
+  const handleNameSubmit = (name: string): void => {
     if (!name.trim()) {
-      return "I'll need your name to continue. What should I call you?";
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        message: "I'll need your name to continue. What should I call you?",
+      }));
+      return;
     }
 
-    setAuthState(prev => ({
+    setAuthState((prev: AuthState) => ({
       ...prev,
       name: name.trim(),
       stage: 'password_create',
+      message: `Great to meet you, ${name.trim()}! Now let's secure your account. Please create a password (at least 8 characters).`,
     }));
-
-    return `Great to meet you, ${name.trim()}! Now let's secure your account. Please create a password (at least 8 characters).`;
   };
 
   /**
    * Handle password creation (new user signup)
    */
-  const handlePasswordCreate = async (password: string): Promise<string> => {
+  const handlePasswordCreate = async (password: string): Promise<void> => {
     if (password.length < 8) {
-      return "Your password needs to be at least 8 characters long. Try again?";
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        message: "Your password needs to be at least 8 characters long. Try again?",
+      }));
+      return;
     }
 
-    setAuthState(prev => ({
+    setAuthState((prev: AuthState) => ({
       ...prev,
       stage: 'authenticating',
+      message: "Creating your account...",
       isProcessing: true,
     }));
 
     try {
       const result = await authApi.signup(authState.email, password, authState.name);
       
-      setUser(result.user);
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'authenticated',
+        user: result.user,
+        message: `🎉 Welcome to iLaunching, ${result.user.name}! Your account is all set. Let's get started!`,
         isProcessing: false,
+        error: null,
       }));
-
-      return `🎉 Welcome to iLaunching, ${result.user.name}! Your account is all set. Let's get started!`;
     } catch (error: any) {
       console.error('Signup error:', error);
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'password_create',
+        message: `Oops! ${error.response?.data?.detail || 'Failed to create account. Please try again.'}`,
         isProcessing: false,
         error: error.message,
       }));
-      return `Oops! ${error.response?.data?.detail || 'Failed to create account. Please try again.'}`;
     }
   };
 
   /**
    * Handle password submission (existing user login)
    */
-  const handlePasswordLogin = async (password: string): Promise<string> => {
+  const handlePasswordLogin = async (password: string): Promise<void> => {
     if (!password) {
-      return "Please enter your password to continue.";
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        message: "Please enter your password to continue.",
+      }));
+      return;
     }
 
-    setAuthState(prev => ({
+    setAuthState((prev: AuthState) => ({
       ...prev,
       stage: 'authenticating',
+      message: "Logging you in...",
       isProcessing: true,
     }));
 
     try {
       const result = await authApi.login(authState.email, password);
       
-      setUser(result.user);
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'authenticated',
+        user: result.user,
+        message: `Welcome back, ${result.user.name}! Great to see you again. Let's pick up where we left off!`,
         isProcessing: false,
+        error: null,
       }));
-
-      return `Welcome back, ${result.user.name}! Great to see you again. Let's pick up where we left off!`;
     } catch (error: any) {
       console.error('Login error:', error);
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'password_input',
+        message: `Hmm, that password doesn't match. Want to try again?`,
         isProcessing: false,
         error: error.message,
       }));
-      return `Hmm, that password doesn't match. Want to try again?`;
     }
   };
 
@@ -201,7 +218,6 @@ export function useLandingAuth() {
 
   return {
     authState,
-    user,
     isAuthenticated: authState.stage === 'authenticated',
     handleEmailSubmit,
     handleNameSubmit,

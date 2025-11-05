@@ -33,7 +33,7 @@ export default function TiptapTypewriter({
   });
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || !text) return;
 
     // Clear and restart typing when text changes
     setTypedText('');
