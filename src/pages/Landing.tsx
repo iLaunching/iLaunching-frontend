@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
@@ -6,90 +6,91 @@ import TiptapTypewriter from '@/components/TiptapTypewriter';
 import { 
   getRandomWelcomeMessage, 
   getRandomWelcomeBackMessage, 
-  getRandomAcknowledgeMessage,
-  getRandomCheckingEmailMessage,
-  getRandomWrongEmailMessage,
-  getRandomMessage,
-  USER_NOT_REGISTERED_MESSAGES,
   APP_CONFIG 
 } from '@/constants';
-import { authApi } from '@/api/auth';
+import { useLandingAuth } from '@/hooks/useLandingAuth';
 
 export default function Landing() {
-  // Check if user has visited during this session
-  const [aiMessage, setAiMessage] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-
+  // Use the auth hook for state management
+  const {
+    authState,
+    handleEmailSubmit,
+    handleNameSubmit,
+    handlePasswordCreate,
+    handlePasswordLogin,
+  } = useLandingAuth();
+  
+  // Initialize with welcome message on first load
   useEffect(() => {
-    // Check sessionStorage to see if user has been here before in this session
     const hasVisitedThisSession = sessionStorage.getItem('hasVisitedLanding');
     
-    if (hasVisitedThisSession) {
-      // Returning user - show welcome back message
-      setAiMessage(getRandomWelcomeBackMessage());
-    } else {
-      // First time visitor this session - show welcome message
-      setAiMessage(getRandomWelcomeMessage());
-      // Mark that they've visited
+    if (!hasVisitedThisSession) {
       sessionStorage.setItem('hasVisitedLanding', 'true');
     }
   }, []);
-
-  // Email validation regex
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
-  };
-
+  
+  // Handle user input based on current stage
   const handleMessage = async (message: string) => {
-    console.log('User message:', message);
+    if (authState.isProcessing) return;
     
-    // Prevent multiple submissions
-    if (isProcessing) return;
-    setIsProcessing(true);
-    
-    try {
-      // Step 1: Show acknowledge message immediately
-      setAiMessage(getRandomAcknowledgeMessage());
-      
-      // Step 2: Wait a bit (simulate checking) then validate email
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      if (!isValidEmail(message)) {
-        // Invalid email format
-        setAiMessage(getRandomWrongEmailMessage());
-        setIsProcessing(false);
-        return;
-      }
-      
-      // Step 3: Valid email - show checking message
-      setAiMessage(getRandomCheckingEmailMessage(message));
-      
-      // Step 4: Check if email exists in database
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const result = await authApi.checkEmail(message);
-      
-      // Step 5: Show result
-      if (result.exists) {
-        // User exists - prompt for password
-        setAiMessage(`Welcome back! I found your account. Please enter your password to continue.`);
-        // TODO: Change input to password mode
-      } else {
-        // New user - proceed to signup
-        setAiMessage(getRandomMessage(USER_NOT_REGISTERED_MESSAGES));
-        // TODO: Store email and move to name input
-      }
-      
-    } catch (error: any) {
-      console.error('Email check error:', error);
-      
-      // Handle error gracefully
-      const errorMessage = error.response?.data?.detail || 'Something went wrong. Please try again.';
-      setAiMessage(`Oops! ${errorMessage}`);
-    } finally {
-      setIsProcessing(false);
+    switch (authState.stage) {
+      case 'email_input':
+        await handleEmailSubmit(message);
+        break;
+      case 'name_input':
+        handleNameSubmit(message);
+        break;
+      case 'password_create':
+        await handlePasswordCreate(message);
+        break;
+      case 'password_input':
+        await handlePasswordLogin(message);
+        break;
+      default:
+        break;
     }
+  };
+  
+  // Get placeholder based on current stage
+  const getPlaceholder = () => {
+    switch (authState.stage) {
+      case 'email_input':
+        return APP_CONFIG.placeholders.email;
+      case 'name_input':
+        return 'Enter your name...';
+      case 'password_create':
+        return 'Create a password...';
+      case 'password_input':
+        return 'Enter your password...';
+      default:
+        return APP_CONFIG.placeholders.email;
+    }
+  };
+  
+  // Get input type based on current stage
+  const getInputType = () => {
+    return (authState.stage === 'password_create' || authState.stage === 'password_input') 
+      ? 'password' 
+      : 'text';
+  };
+  
+  // Determine if chat should be visible
+  const shouldShowChat = authState.stage !== 'authenticated';
+  
+  // Get current display message
+  const getCurrentMessage = () => {
+    // Show error if exists
+    if (authState.error) {
+      return authState.error;
+    }
+    
+    // Show appropriate message based on stage
+    const hasVisited = sessionStorage.getItem('hasVisitedLanding');
+    if (authState.stage === 'email_input' && authState.message === '') {
+      return hasVisited ? getRandomWelcomeBackMessage() : getRandomWelcomeMessage();
+    }
+    
+    return authState.message;
   };
 
   return (
@@ -105,7 +106,7 @@ export default function Landing() {
           <div className="w-full max-w-[800px] flex flex-col" style={{ gap: '10px' }}>
             {/* Tiptap Typewriter - Fixed container that scrolls */}
             <TiptapTypewriter 
-              text={aiMessage}
+              text={getCurrentMessage()}
               speed={APP_CONFIG.typewriterSpeed}
               className="text-gray-900"
               style={{ 
@@ -115,11 +116,26 @@ export default function Landing() {
             }}
             />
             
-            {/* Chat Prompt - Stays below typewriter */}
-            <ChatPrompt 
-              onSubmit={handleMessage}
-              placeholder={APP_CONFIG.placeholders.email}
-            />
+            {/* Chat Prompt - Only show when not authenticated */}
+            {shouldShowChat && (
+              <ChatPrompt 
+                onSubmit={handleMessage}
+                placeholder={getPlaceholder()}
+                type={getInputType()}
+              />
+            )}
+            
+            {/* Show user info when authenticated */}
+            {authState.stage === 'authenticated' && authState.user && (
+              <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                <p className="text-white text-lg">
+                  Welcome, {authState.user.name}! 🎉
+                </p>
+                <p className="text-white/70 text-sm">
+                  {authState.user.email}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

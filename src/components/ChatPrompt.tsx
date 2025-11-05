@@ -4,6 +4,7 @@ import { Send } from 'lucide-react';
 interface ChatPromptProps {
   onSubmit: (message: string) => void;
   placeholder?: string;
+  type?: 'text' | 'password' | 'email';
   className?: string;
   containerStyle?: React.CSSProperties;
   inputClassName?: string;
@@ -14,6 +15,7 @@ interface ChatPromptProps {
 export default function ChatPrompt({ 
   onSubmit, 
   placeholder = "Type your email here...",
+  type = "text",
   className = "",
   containerStyle = {borderColor: '#2563EB', borderWidth: '1px', borderRadius: '12px', backgroundColor: '#FFFFFF', marginBottom: '250px'},
   inputClassName = "",
@@ -46,7 +48,7 @@ export default function ChatPrompt({
           <div className="relative flex items-center gap-3 p-4">
             {/* Input Field */}
             <input
-              type="text"
+              type={type}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={placeholder}
