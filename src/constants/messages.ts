@@ -304,65 +304,66 @@ export const CHECKING_EMAIL_MESSAGES = [
  * Email wrong email format Messages
  */
 export const WRONG_EMAIL_FORMAT = [
-  "Oops! That doesn't look like a valid email address. Give it another shot?",
+  "That's not an email. Try again with something that looks like one.",
   
-  "Hmm, I need a proper email address to continue. Mind checking that for me?",
+  "I need a real email to move forward. Check the format.",
   
-  "Looks like there's an issue with the email format. Try again?",
+  "That doesn't work. Use a proper email address.",
   
-  "That email doesn't look quite right. Can you double-check it?",
+  "Not quite. Make sure it's a valid email format.",
   
-  "Almost! But that's not a valid email format. Give it another go.",
+  "I can't process that. Give me a real email address.",
   
-  "I'm not seeing a proper email there. Mind trying again?",
+  "That's not going to work. Try a valid email.",
   
-  "That one's not working for me. Check the format and try again?",
+  "Close, but no. I need an actual email format.",
   
-  "Hmm, something's off with that email. Can you recheck it?",
+  "That's not it. Double-check and enter a real email.",
   
-  "Not quite! I need a valid email address to move forward.",
+  "I need something like name@domain.com. Try again.",
   
-  "That doesn't look like an email I can work with. Try again?",
+  "That's not cutting it. Enter a valid email address.",
   
-  "I'm seeing some issues with that email format. Want to give it another shot?",
+  "Not happening with that format. Give me a proper email.",
   
-  "That's not quite right. Double-check that email for me?",
+  "That won't fly. I need a legitimate email address.",
   
-  "Email format looks a bit off. Mind trying that again?",
+  "Try again. That's not a valid email format.",
   
-  "I need a proper email to continue. Can you check that one?",
+  "I'm not seeing an email there. Check it and retry.",
   
-  "That one's not passing the test. Try the email again?",
+  "That's not what I need. Enter a real email address.",
   
-  "Hmm, that doesn't look like a valid email. Give it another try?",
+  "Doesn't look like an email to me. Try again.",
   
-  "Something's not right with that format. Check your email again?",
+  "I need better than that. Use a valid email format.",
   
-  "Not quite there! I need a valid email address to proceed.",
+  "That's not working. Make sure it's a real email.",
   
-  "That email's not working. Mind double-checking it?",
+  "Not quite there. I need an actual email address.",
   
-  "I can't work with that format. Try entering your email again?",
+  "That format's off. Give me a proper email.",
   
-  "That's not a valid email address. Want to give it another shot?",
+  "I can't use that. Try entering a valid email.",
   
-  "Email format's off. Can you check and try again?",
+  "That's not it. Check the format and try again.",
   
-  "That one didn't work. Double-check your email?",
+  "Not going to work. I need a real email address.",
   
-  "Not quite! I need a proper email format to continue.",
+  "That doesn't match email format. Try again.",
   
-  "Something's not clicking with that email. Try again?",
+  "I need an actual email. Check what you entered.",
   
-  "That doesn't look right to me. Check that email format?",
+  "That's not passing. Use a valid email format.",
   
-  "I'm not seeing a valid email there. Want to try again?",
+  "Try again. That's not a legitimate email address.",
   
-  "Email's not quite right. Give it another go?",
+  "I'm not getting an email from that. Retry with the right format.",
   
-  "That format's not working. Can you recheck your email?",
+  "That won't do. Give me something like user@email.com.",
   
-  "Not a valid email format. Mind trying that again?"
+  "Not working. I need a proper email address to continue.",
+  
 ] as const;
 
 
