@@ -8,6 +8,7 @@ import { authApi } from '@/api/auth';
 import type { AuthState } from '@/types/auth';
 import {
   getRandomWrongEmailMessage,
+  getRandomCheckingEmailMessage,
   getRandomMessage,
   USER_NOT_REGISTERED_MESSAGES,
 } from '@/constants';
@@ -60,12 +61,12 @@ export function useLandingAuth() {
       return;
     }
 
-    // Update state to checking
+    // Update state to checking with random checking message
     setAuthState((prev: AuthState) => ({
       ...prev,
       email,
       stage: 'email_checking',
-      message: `Let me check if ${email} is in our system...`,
+      message: getRandomCheckingEmailMessage(email),
       isProcessing: true,
       error: null,
     }));
@@ -83,10 +84,10 @@ export function useLandingAuth() {
           isProcessing: false,
         }));
       } else {
-        // New user - show signup/login options
+        // New user - move to user_not_found stage to show the "not registered" message
         setAuthState((prev: AuthState) => ({
           ...prev,
-          stage: 'new_user',
+          stage: 'user_not_found',
           message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
           isProcessing: false,
         }));
@@ -99,6 +100,18 @@ export function useLandingAuth() {
         message: `Oops! ${error.response?.data?.detail || 'Something went wrong. Please try again.'}`,
         isProcessing: false,
         error: error.message || 'Failed to check email',
+      }));
+    }
+  };
+
+  /**
+   * Transition from user_not_found to new_user stage (called after typewriter completes)
+   */
+  const transitionToNewUser = (): void => {
+    if (authState.stage === 'user_not_found') {
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        stage: 'new_user',
       }));
     }
   };
@@ -242,6 +255,7 @@ export function useLandingAuth() {
     authState,
     isAuthenticated: authState.stage === 'authenticated',
     handleEmailSubmit,
+    transitionToNewUser,
     handleSignupChoice,
     handleLoginChoice,
     handleNameSubmit,

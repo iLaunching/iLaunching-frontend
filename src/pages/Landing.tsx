@@ -16,6 +16,7 @@ export default function Landing() {
   const {
     authState,
     handleEmailSubmit,
+    transitionToNewUser,
     handleSignupChoice,
     handleLoginChoice,
     handleNameSubmit,
@@ -37,7 +38,7 @@ export default function Landing() {
   
   // Reset button visibility when stage changes
   useEffect(() => {
-    if (authState.stage === 'new_user') {
+    if (authState.stage === 'new_user' || authState.stage === 'email_checking' || authState.stage === 'user_not_found') {
       setShowButtons(false);
     }
   }, [authState.stage]);
@@ -88,15 +89,23 @@ export default function Landing() {
   };
   
   // Determine if chat should be visible
-  const shouldShowChat = authState.stage !== 'authenticated' && authState.stage !== 'new_user';
+  const shouldShowChat = authState.stage !== 'authenticated' && 
+                         authState.stage !== 'new_user' && 
+                         authState.stage !== 'email_checking' &&
+                         authState.stage !== 'user_not_found';
   
   // Determine if we should show the signup/login buttons
   const shouldShowButtons = authState.stage === 'new_user';
   
   // Handle typewriter completion
   const handleTypewriterComplete = () => {
-    if (authState.stage === 'new_user') {
-      setShowButtons(true);
+    if (authState.stage === 'user_not_found') {
+      // When the "not registered" message completes, transition to new_user and show buttons
+      transitionToNewUser();
+      // Small delay before fading in buttons
+      setTimeout(() => {
+        setShowButtons(true);
+      }, 100);
     }
   };
   

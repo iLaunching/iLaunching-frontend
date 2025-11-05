@@ -3,14 +3,15 @@
  */
 
 export type AuthStage = 
-  | 'email_input'        // Initial state - asking for email
-  | 'email_checking'     // Validating and checking email
-  | 'new_user'           // New user - showing signup/login options
-  | 'password_input'     // Existing user - asking for password
-  | 'name_input'         // New user - asking for name
-  | 'password_create'    // New user - creating password
-  | 'authenticating'     // Processing login/signup
-  | 'authenticated';     // Successfully logged in
+  | 'email_input'           // Initial state - asking for email
+  | 'email_checking'        // Validating and checking email
+  | 'user_not_found'        // Showing "not registered" message
+  | 'new_user'              // New user - showing signup/login options
+  | 'password_input'        // Existing user - asking for password
+  | 'name_input'            // New user - asking for name
+  | 'password_create'       // New user - creating password
+  | 'authenticating'        // Processing login/signup
+  | 'authenticated';        // Successfully logged in
 
 export interface AuthState {
   stage: AuthStage;
