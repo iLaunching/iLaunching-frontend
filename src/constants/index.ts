@@ -14,6 +14,7 @@ export {
   CHECKING_EMAIL_MESSAGES,
   WRONG_EMAIL_FORMAT,
   USER_NOT_REGISTERED_MESSAGES,
+  LOGIN_MESSAGES,
   EMAIL_PROMPTS,
   PASSWORD_PROMPTS,
   TOUR_MESSAGES,
@@ -26,6 +27,7 @@ export {
   getRandomEmailPrompt,
   getRandomPasswordPrompt,
   getRandomTourMessage,
+  getRandomLoginMessage,
 } from './messages';
 
 // App Constants

@@ -453,6 +453,80 @@ export const USER_NOT_REGISTERED_MESSAGES = [
   "Looks like this is your first visit! Ready to join iLaunching?"
 ] as const;
 
+
+
+/**
+ * log me in Messages
+ */
+export const LOGIN_MESSAGES = [
+  "Perfect! Let's get you logged in. What's your email address?",
+  
+  "Got it! Logging you in now. What's your email?",
+  
+  "Absolutely! Let's get you back in. Share your email address.",
+  
+  "Sure thing! I'll log you in. What's your email?",
+  
+  "On it! Let's get you logged in. Drop your email address.",
+  
+  "Perfect! Let me get you in. What's your email?",
+  
+  "You got it! Logging you in. What's your email address?",
+  
+  "Absolutely! Let's log you in. Share your email.",
+  
+  "Sure! Getting you logged in now. What's your email?",
+  
+  "Perfect! Let me pull up your account. What's your email address?",
+  
+  "Got it! Let's get you back in there. What's your email?",
+  
+  "On it! Logging you in right now. Drop your email address.",
+  
+  "Absolutely! Let me get you logged in. What's your email?",
+  
+  "Sure thing! Let's log you in. Share your email address.",
+  
+  "Perfect! Getting you back in. What's your email?",
+  
+  "You got it! Let me log you in. What's your email address?",
+  
+  "On it! Let's get you logged in. What's your email?",
+  
+  "Absolutely! Logging you in now. Drop your email address.",
+  
+  "Sure! Let me get you back in. What's your email?",
+  
+  "Perfect! Let's log you in right away. Share your email address.",
+  
+  "Got it! Getting you logged in. What's your email?",
+  
+  "On it! Let me pull up your account. What's your email address?",
+  
+  "Absolutely! Let's get you in. What's your email?",
+  
+  "Sure thing! Logging you in now. Drop your email address.",
+  
+  "Perfect! Let me get you back in there. What's your email?",
+  
+  "You got it! Let's log you in. Share your email address.",
+  
+  "On it! Getting you logged in right now. What's your email?",
+  
+  "Absolutely! Let me log you in. Drop your email address.",
+  
+  "Sure! Let's get you back in. What's your email?",
+  
+  "Perfect! Logging you in now. Share your email address."
+] as const;
+
+
+
+
+
+
+
+
 /**
  * Email Prompt Messages
  */
@@ -501,3 +575,4 @@ export const getRandomWrongEmailMessage = () => getRandomMessage(WRONG_EMAIL_FOR
 export const getRandomEmailPrompt = () => getRandomMessage(EMAIL_PROMPTS);
 export const getRandomPasswordPrompt = () => getRandomMessage(PASSWORD_PROMPTS);
 export const getRandomTourMessage = () => getRandomMessage(TOUR_MESSAGES);
+export const getRandomLoginMessage = () => getRandomMessage(LOGIN_MESSAGES);

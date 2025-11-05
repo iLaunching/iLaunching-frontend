@@ -163,31 +163,36 @@ export default function Landing() {
             {/* New User Buttons - Show container when user not found or new user */}
             {shouldShowButtonContainer && (
               <div 
-                className="flex gap-4 justify-center mt-6"
+                className="flex gap-8 justify-center mt-6"
                 style={{ marginBottom: '200px', minHeight: '60px' }}
               >
-                <button
-                  onClick={handleSignupChoice}
-                  className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
-                    showButtons ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ maxHeight: '48px' }}
-                >
-                  <UserPlus className="w-5 h-5" />
-                  Yes Please
-                </button>
-                
+               
                 <button
                   onClick={handleLoginChoice}
                   className={`flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 hover:scale-105 transition-all duration-500 shadow-md ${
                     showButtons ? 'opacity-100' : 'opacity-0'
                   }`}
-                  style={{ maxHeight: '48px' }}
+                  style={{ maxHeight: '45px' }}
                 >
                   <LogIn className="w-5 h-5" />
                   Log Me In
                 </button>
-              </div>
+              
+
+
+                <button
+                  onClick={handleSignupChoice}
+                  className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
+                    showButtons ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ maxHeight: '45px',minWidth: '300px',maxWidth: '350px', justifyContent: 'center'    }}
+                >
+                  <UserPlus className="w-5 h-5" />
+                  Yes Please
+                </button>
+                </div>
+
+
             )}
             
             {/* Show user info when authenticated */}

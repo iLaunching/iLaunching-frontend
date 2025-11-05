@@ -11,6 +11,7 @@ import {
   getRandomCheckingEmailMessage,
   getRandomMessage,
   getRandomPasswordPrompt,
+  getRandomLoginMessage,
   USER_NOT_REGISTERED_MESSAGES,
 } from '../constants';
 
@@ -130,13 +131,14 @@ export function useLandingAuth() {
   };
 
   /**
-   * Handle "Log Me In" button - go to login
+   * Handle "Log Me In" button - reset to email input with login message
    */
   const handleLoginChoice = (): void => {
     setAuthState((prev: AuthState) => ({
       ...prev,
-      stage: 'password_input',
-      message: "Alright, let's get you logged in. Enter your password.",
+      stage: 'email_input',
+      email: '', // Clear the email so they can enter it again
+      message: getRandomLoginMessage(),
     }));
   };
 

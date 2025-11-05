@@ -81,6 +81,7 @@ export default function TiptapTypewriter({
         overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
+       
         
       }}
     >
