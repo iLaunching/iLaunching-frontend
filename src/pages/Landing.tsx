@@ -94,13 +94,13 @@ export default function Landing() {
                          authState.stage !== 'email_checking' &&
                          authState.stage !== 'user_not_found';
   
-  // Determine if we should show the signup/login buttons
-  const shouldShowButtons = authState.stage === 'new_user';
+  // Determine if we should show the button container (visible during user_not_found and new_user)
+  const shouldShowButtonContainer = authState.stage === 'user_not_found' || authState.stage === 'new_user';
   
   // Handle typewriter completion
   const handleTypewriterComplete = () => {
     if (authState.stage === 'user_not_found') {
-      // When the "not registered" message completes, transition to new_user and show buttons
+      // When the "not registered" message completes, transition to new_user
       transitionToNewUser();
       // Small delay before fading in buttons
       setTimeout(() => {
@@ -164,8 +164,8 @@ export default function Landing() {
               />
             )}
             
-            {/* New User Buttons - Show when user is not registered */}
-            {shouldShowButtons && (
+            {/* New User Buttons - Show container when user not found or new user */}
+            {shouldShowButtonContainer && (
               <div 
                 className="flex gap-4 justify-center mt-6"
                 style={{ marginBottom: '200px', minHeight: '60px' }}
