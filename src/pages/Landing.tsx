@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
@@ -23,6 +23,9 @@ export default function Landing() {
     handlePasswordLogin,
   } = useLandingAuth();
   
+  // State to control button visibility after typewriter completes
+  const [showButtons, setShowButtons] = useState(false);
+  
   // Initialize with welcome message on first load
   useEffect(() => {
     const hasVisitedThisSession = sessionStorage.getItem('hasVisitedLanding');
@@ -31,6 +34,13 @@ export default function Landing() {
       sessionStorage.setItem('hasVisitedLanding', 'true');
     }
   }, []);
+  
+  // Reset button visibility when stage changes
+  useEffect(() => {
+    if (authState.stage === 'new_user') {
+      setShowButtons(false);
+    }
+  }, [authState.stage]);
   
   // Handle user input based on current stage
   const handleMessage = async (message: string) => {
@@ -83,6 +93,13 @@ export default function Landing() {
   // Determine if we should show the signup/login buttons
   const shouldShowButtons = authState.stage === 'new_user';
   
+  // Handle typewriter completion
+  const handleTypewriterComplete = () => {
+    if (authState.stage === 'new_user') {
+      setShowButtons(true);
+    }
+  };
+  
   // Get current display message
   const getCurrentMessage = () => {
     // If we have a message in state, use it (includes error messages formatted nicely)
@@ -120,6 +137,7 @@ export default function Landing() {
             <TiptapTypewriter 
               text={getCurrentMessage()}
               speed={APP_CONFIG.typewriterSpeed}
+              onComplete={handleTypewriterComplete}
               className="text-gray-900"
               style={{ 
                 fontFamily: APP_CONFIG.fonts.primary,
@@ -139,10 +157,16 @@ export default function Landing() {
             
             {/* New User Buttons - Show when user is not registered */}
             {shouldShowButtons && (
-              <div className="flex gap-4 justify-center mt-6">
+              <div 
+                className="flex gap-4 justify-center mt-6"
+                style={{ marginBottom: '200px', minHeight: '60px' }}
+              >
                 <button
                   onClick={handleSignupChoice}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+                  className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
+                    showButtons ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ maxHeight: '48px' }}
                 >
                   <UserPlus className="w-5 h-5" />
                   Yes Please
@@ -150,7 +174,10 @@ export default function Landing() {
                 
                 <button
                   onClick={handleLoginChoice}
-                  className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 hover:scale-105 transition-all duration-200 shadow-md"
+                  className={`flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 hover:scale-105 transition-all duration-500 shadow-md ${
+                    showButtons ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ maxHeight: '48px' }}
                 >
                   <LogIn className="w-5 h-5" />
                   Log Me In
