@@ -55,7 +55,7 @@ export function useLandingAuth() {
       setAuthState((prev: AuthState) => ({ 
         ...prev, 
         message: getRandomWrongEmailMessage(),
-        error: 'Invalid email format' 
+        error: null,
       }));
       return;
     }

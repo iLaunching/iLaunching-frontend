@@ -79,14 +79,14 @@ export default function Landing() {
   
   // Get current display message
   const getCurrentMessage = () => {
-    // Show error if exists
-    if (authState.error) {
-      return authState.error;
-    }
-    
-    // If we have a message in state, use it
+    // If we have a message in state, use it (includes error messages formatted nicely)
     if (authState.message) {
       return authState.message;
+    }
+    
+    // Show raw error as fallback
+    if (authState.error) {
+      return authState.error;
     }
     
     // Show appropriate message based on stage
