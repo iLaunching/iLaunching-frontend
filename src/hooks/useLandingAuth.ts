@@ -12,6 +12,7 @@ import {
   getRandomMessage,
   getRandomPasswordPrompt,
   getRandomLoginMessage,
+  getRandomAskNameMessage,
   USER_NOT_REGISTERED_MESSAGES,
 } from '../constants';
 
@@ -120,14 +121,23 @@ export function useLandingAuth() {
 
 
   /**
-   * Handle "Yes Please" button - start signup flow
+   * Handle "Yes Please" button - start signup flow with name
    */
   const handleSignupChoice = (): void => {
+    // Clear message first, then set stage to name_input
     setAuthState((prev: AuthState) => ({
       ...prev,
       stage: 'name_input',
-      message: "Perfect! Let's get you set up. What's your name?",
+      message: '', // Clear message first
     }));
+    
+    // Add delay before showing the ask name message
+    setTimeout(() => {
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        message: getRandomAskNameMessage(),
+      }));
+    }, 500); // 500ms delay before showing name prompt message
   };
 
   /**

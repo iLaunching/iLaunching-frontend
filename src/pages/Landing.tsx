@@ -25,6 +25,8 @@ export default function Landing() {
   
   // State to control button visibility after typewriter completes
   const [showButtons, setShowButtons] = useState(false);
+  // State to control when to show name input prompt after message completes
+  const [showNameInput, setShowNameInput] = useState(false);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -39,6 +41,13 @@ export default function Landing() {
   useEffect(() => {
     if (authState.stage === 'new_user' || authState.stage === 'email_checking') {
       setShowButtons(false);
+    }
+  }, [authState.stage]);
+  
+  // Reset name input visibility when stage changes to name_input
+  useEffect(() => {
+    if (authState.stage === 'name_input') {
+      setShowNameInput(false);
     }
   }, [authState.stage]);
   
@@ -91,6 +100,9 @@ export default function Landing() {
   const shouldShowChat = authState.stage !== 'authenticated' && 
                          authState.stage !== 'new_user';
   
+  // Should show chat container during name_input but with opacity control
+  const isNameInputStage = authState.stage === 'name_input';
+  
   // Determine if we should show the button container (visible during new_user)
   const shouldShowButtonContainer = authState.stage === 'new_user';
   
@@ -100,6 +112,11 @@ export default function Landing() {
       // When the "not registered" message completes, fade in buttons
       setTimeout(() => {
         setShowButtons(true);
+      }, 100);
+    } else if (authState.stage === 'name_input') {
+      // When the "ask name" message completes, fade in the name input
+      setTimeout(() => {
+        setShowNameInput(true);
       }, 100);
     }
   }, [authState.stage]);
@@ -151,13 +168,17 @@ export default function Landing() {
             }}
             />
             
-            {/* Chat Prompt - Only show when not authenticated and not showing buttons */}
+            {/* Chat Prompt - Show container but control visibility with opacity */}
             {shouldShowChat && (
-              <ChatPrompt 
-                onSubmit={handleMessage}
-                placeholder={getPlaceholder()}
-                type={getInputType()}
-              />
+              <div className={`transition-opacity duration-500 ${
+                isNameInputStage && !showNameInput ? 'opacity-0' : 'opacity-100'
+              }`}>
+                <ChatPrompt 
+                  onSubmit={handleMessage}
+                  placeholder={getPlaceholder()}
+                  type={getInputType()}
+                />
+              </div>
             )}
             
             {/* New User Buttons - Show container when user not found or new user */}

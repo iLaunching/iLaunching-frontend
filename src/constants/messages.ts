@@ -372,86 +372,263 @@ export const WRONG_EMAIL_FORMAT = [
 /** new user not found Messages
  */
 export const USER_NOT_REGISTERED_MESSAGES = [
-  "I don't see you in the system yet. That's exciting! Want to create an account or try logging in anyway?",
+  "I don't see you in the system yet, but that's about to change! You're one step away from turning your idea into reality. Want me to help you get started?",
   
-  "No account found. Ready to join iLaunching, or do you want to try logging in with a different email?",
+  "No account found, which means you're standing at the beginning of something big! Ready to let me help you go from idea to launch?",
   
-  "You're not registered yet. Perfect timing to join! Want to sign up or log in?",
+  "You're not registered yet, and honestly? Perfect timing. I help founders like you validate ideas and scale fast. Want to join?",
   
-  "I couldn't find that email in our records. Ready to create your account?",
+  "I couldn't find that email, but I found an opportunity! Let me help you take your idea from concept to real business. Ready to start?",
   
-  "No existing account for that email. Want to start fresh with a new account?",
+  "No existing account for that email. Here's what that means: you're about to unlock a system that takes you from idea to validated to launched. Want in?",
   
-  "You're new here! Ready to get started? You can create an account or try logging in.",
+  "You're new here! That's exciting because I specialize in helping founders move fast. From idea to scale, I've got you. Want to join?",
   
-  "I don't have you in the system yet. Want to create an account now?",
+  "I don't have you in the system yet, but I want to! Let me help you validate your idea and turn it into something real. Ready?",
   
-  "No account detected. Ready to join iLaunching?",
+  "No account detected. Listen, I help people just like you go from 'I have an idea' to 'I have a business.' Want me to show you how?",
   
-  "Looks like you're brand new! Want to create your account?",
+  "Looks like you're brand new! Perfect. I'm here to help you validate, launch, and scale. Ready to make it happen?",
   
-  "I couldn't locate an account with that email. Ready to sign up?",
+  "I couldn't locate an account with that email. But here's what I can do: help you turn your idea into a validated, scalable business. Want that?",
   
-  "You're not in our system yet. Want to create your account and get started?",
+  "You're not in our system yet, which means you haven't experienced what we do! From idea to launch to scale, I'm your partner. Ready to join?",
   
-  "No account found. Ready to join us?",
+  "No account found. Great! That means you get to start with a system designed to take you from concept to customer. Want in?",
   
-  "I don't see that email registered. Want to create your account?",
+  "I don't see that email registered. Here's the thing: I help founders validate ideas fast and launch faster. Want me to help you?",
   
-  "Looks like you're new to iLaunching! Ready to sign up?",
+  "Looks like you're new to iLaunching! I help people go from 'maybe this could work' to 'this is working.' Ready to start?",
   
-  "No existing account. Want to create one now?",
+  "No existing account. Perfect timing! Let me help you validate your idea and build something that scales. Want to join?",
   
-  "I couldn't find you in our records. Ready to get started?",
+  "I couldn't find you in our records. But I found something better: an opportunity to help you launch. From idea to reality. Ready?",
   
-  "You're not registered yet. Want to join now?",
+  "You're not registered yet, but you should be! I help founders validate fast, launch smart, and scale with confidence. Want that?",
   
-  "No account matches that email. Ready to create one?",
+  "No account matches that email. Listen, I take ideas and turn them into businesses people actually want. Ready to let me help?",
   
-  "I don't have you on file yet. Want to sign up?",
+  "I don't have you on file yet, but I want to change that! Let me help you go from idea to validated to launched. Ready to join?",
   
-  "Looks like you're brand new here! Ready to create your account?",
+  "Looks like you're brand new here! I help founders like you move from thinking to building to scaling. Want in?",
   
-  "No account found for that email. Want to join iLaunching?",
+  "No account found for that email. Here's what you're missing: a system that helps you validate ideas and launch faster. Want to join?",
   
-  "You're not in the system yet. Ready to create your account?",
+  "You're not in the system yet. That means you haven't seen what's possible! From idea to scale, I'm here for it. Ready?",
   
-  "I couldn't locate that email. Want to sign up now?",
+  "I couldn't locate that email. But I can help you build something real. Idea to validation to launch. Want me to show you?",
   
-  "No existing account detected. Ready to get started?",
+  "No existing account detected. Perfect! Let me help you turn your idea into something people will pay for. Ready to start?",
   
-  "Looks like this is your first time! Want to create your account?",
+  "Looks like this is your first time! I help founders validate ideas fast and scale smart. Want to experience that?",
   
-  "I don't see you registered yet. Ready to join?",
+  "I don't see you registered yet. Here's what you're about to unlock: a partner that takes you from idea to real business. Ready?",
   
-  "No account for that email. Want to sign up?",
+  "No account for that email. Great! That means you get to join a platform that helps you validate, launch, and scale. Want in?",
   
-  "You're not in our records yet. Ready to create your account?",
+  "You're not in our records yet. I help people go from 'I think this could work' to 'this is working.' Ready to join?",
   
-  "I couldn't find an account with that email. Want to join us?",
+  "I couldn't find an account with that email. But I found your next move: let me help you validate and launch your idea. Ready?",
   
-  "Looks like you're new to the platform! Ready to sign up?",
+  "Looks like you're new to the platform! I help founders move fast, from idea to validated to scaling. Want that?",
   
-  "No account found. Want to create one and get started?",
+  "No account found. Perfect timing! I'm here to help you turn your idea into a real, validated business. Ready to start?",
   
-  "You're not registered yet. Ready to join iLaunching?",
+  "You're not registered yet. Here's what that means: you're about to join founders who validate ideas and launch faster. Want in?",
   
-  "I don't have that email on file. Want to create your account?",
+  "I don't have that email on file. But I have something for you: a system that helps you go from idea to launch to scale. Ready?",
   
-  "No existing account. Ready to sign up?",
+  "No existing account. Great! Let me help you validate your idea and build something that actually works. Want to join?",
   
-  "Looks like you're brand new here! Want to get started?",
+  "Looks like you're brand new here! I'm built to help you go from concept to customer. From idea to scale. Ready to start?",
   
-  "I couldn't find you in the system. Ready to create your account?",
+  "I couldn't find you in the system. Here's what you're missing: help validating your idea and launching it fast. Want that?",
   
-  "You're not registered yet. Want to join now?",
+  "You're not registered yet. I help founders like you validate fast, launch smart, and scale with purpose. Ready to join?",
   
-  "No account matches that email. Ready to sign up?",
+  "No account matches that email. Listen, I take ideas and turn them into businesses that scale. Want me to help you do that?",
   
-  "I don't see you in our records. Want to create your account?",
+  "I don't see you in our records. But I see potential! Let me help you validate your idea and launch it. Ready?",
   
-  "Looks like this is your first visit! Ready to join iLaunching?"
+  "Looks like this is your first visit! I'm here to help you go from idea to validated to launched to scaling. Want in?"
 ] as const;
+
+
+
+
+/** * Ask name Messages
+ */
+
+export const ASK_NAME_MESSAGES = [
+  "Awesome! Let's make this personal. What's your name? I'll use it to tailor everything specifically for you.",
+  
+  "Perfect! To create your personalized experience, I need to know what to call you. What's your name?",
+  
+  "Love it! Let's get you set up properly. What's your name? I want to make sure everything feels custom-built for you.",
+  
+  "Great choice! First things first, what's your name? I'll use it to personalize your entire journey from idea to launch.",
+  
+  "Excellent! To make this experience truly yours, what should I call you? Your name helps me customize everything.",
+  
+  "Perfect! Let's start building your profile. What's your name? I want to make this feel personal, not generic.",
+  
+  "Awesome! To tailor everything around you and your goals, what's your name?",
+  
+  "Love the energy! Let's get personal. What's your name? I'll use it to customize your path forward.",
+  
+  "Great! To make sure this feels like it's built just for you, what's your name?",
+  
+  "Perfect! Let's create something personal. What should I call you? Your name helps me shape everything around you.",
+  
+  "Excellent choice! To personalize your experience from the start, what's your name?",
+  
+  "Awesome! Let's make this yours. What's your name? I'll tailor everything to fit you perfectly.",
+  
+  "Love it! To build your custom experience, I need to know your name. What is it?",
+  
+  "Perfect! Let's get personal right away. What's your name? It helps me customize every interaction.",
+  
+  "Great! To make this journey feel personal and intentional, what should I call you?",
+  
+  "Excellent! Let's start with the basics. What's your name? I want everything to feel tailored to you.",
+  
+  "Awesome! To personalize your path from idea to launch, what's your name?",
+  
+  "Love the commitment! Let's make this personal. What's your name? I'll customize everything around it.",
+  
+  "Perfect! To create your personalized profile, what should I call you?",
+  
+  "Great choice! Let's get you set up. What's your name? I use it to make everything feel uniquely yours.",
+  
+  "Excellent! To tailor your experience and make it personal, what's your name?",
+  
+  "Awesome! Let's build this around you. What's your name? It helps me personalize every step.",
+  
+  "Love it! To make sure this feels custom-made for you, what should I call you?",
+  
+  "Perfect! Let's get personal from the start. What's your name? I'll use it to customize your journey.",
+  
+  "Great! To create your personalized experience, I need your name. What is it?",
+  
+  "Excellent choice! Let's make this yours. What's your name? I want to tailor everything for you.",
+  
+  "Awesome! To personalize everything from here on out, what should I call you?",
+  
+  "Love the energy! Let's get you set up properly. What's your name? I'll make everything personal.",
+  
+  "Perfect! To build your custom profile and personalize your path, what's your name?",
+  
+  "Great! Let's make this experience uniquely yours. What should I call you?",
+  
+  "Excellent! I'm excited to work with you. What's your name? I'll personalize everything around it.",
+  
+  "Awesome! Let's start strong. What's your name? It helps me tailor your entire experience.",
+  
+  "Love it! To make this feel personal from day one, what should I call you?",
+  
+  "Perfect! Let's get you in the system. What's your name? I use it to customize everything you see.",
+  
+  "Great choice! To personalize your journey, what's your name?",
+  
+  "Excellent! Let's make this about you. What should I call you? Your name shapes the experience.",
+  
+  "Awesome! To create your custom profile, what's your name?",
+  
+  "Love the decision! Let's get personal. What's your name? I'll tailor everything for you.",
+  
+  "Perfect! To make this yours from the start, what should I call you?",
+  
+  "Great! Let's build your personalized experience. What's your name?",
+  
+  "Excellent choice! To customize everything around you, what's your name?",
+  
+  "Awesome! Let's make this personal and powerful. What should I call you?",
+  
+  "Love it! To tailor your path forward, what's your name?",
+  
+  "Perfect! Let's get you set up right. What's your name? I'll personalize every interaction.",
+  
+  "Great! To create a custom experience just for you, what should I call you?",
+  
+  "Excellent! Let's start building. What's your name? I use it to personalize everything.",
+  
+  "Awesome! To make sure this feels uniquely yours, what's your name?",
+  
+  "Love the energy! Let's get personal right away. What should I call you?",
+  
+  "Perfect! To tailor everything to your goals, what's your name?",
+  
+  "Great choice! Let's make this about you. What's your name?",
+  
+  "Excellent! To personalize your entire journey, what should I call you?",
+  
+  "Awesome! Let's create your profile. What's your name? I'll customize everything around it.",
+  
+  "Love it! To make this experience personal, what's your name?",
+  
+  "Perfect! Let's get started the right way. What should I call you?",
+  
+  "Great! To build something tailored just for you, what's your name?",
+  
+  "Excellent choice! Let's make it personal. What's your name?",
+  
+  "Awesome! To customize your path from idea to scale, what should I call you?",
+  
+  "Love the commitment! Let's get personal. What's your name?",
+  
+  "Perfect! To create your personalized journey, what's your name?",
+  
+  "Great! Let's make this yours. What should I call you? Your name helps me personalize everything.",
+  
+  "Excellent! To tailor every step to you, what's your name?",
+  
+  "Awesome! Let's build your custom experience. What should I call you?",
+  
+  "Love it! To personalize everything from here, what's your name?",
+  
+  "Perfect! Let's get you in. What's your name? I'll make everything feel personal.",
+  
+  "Great choice! To create something uniquely yours, what should I call you?",
+  
+  "Excellent! Let's start with your name. It helps me personalize your entire experience.",
+  
+  "Awesome! To make this about you and your goals, what's your name?",
+  
+  "Love the energy! Let's get personal from the start. What should I call you?",
+  
+  "Perfect! To build your tailored experience, what's your name?",
+  
+  "Great! Let's make this personal and effective. What should I call you?",
+  
+  "Excellent choice! To customize everything for you, what's your name?",
+  
+  "Awesome! Let's create your profile and personalize your journey. What's your name?",
+  
+  "Love it! To make sure everything feels made for you, what should I call you?",
+  
+  "Perfect! Let's get started right. What's your name? I'll tailor everything around it.",
+  
+  "Great! To personalize your path to launch, what's your name?",
+  
+  "Excellent! Let's make this yours from the beginning. What should I call you?",
+  
+  "Awesome! To create a custom experience, what's your name?",
+  
+  "Love the decision! Let's get personal. What's your name? I'll customize everything for you.",
+  
+  "Perfect! To tailor your journey from idea to scale, what should I call you?",
+  
+  "Great choice! Let's build something personal. What's your name?"
+] as const;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -576,3 +753,4 @@ export const getRandomEmailPrompt = () => getRandomMessage(EMAIL_PROMPTS);
 export const getRandomPasswordPrompt = () => getRandomMessage(PASSWORD_PROMPTS);
 export const getRandomTourMessage = () => getRandomMessage(TOUR_MESSAGES);
 export const getRandomLoginMessage = () => getRandomMessage(LOGIN_MESSAGES);
+export const getRandomAskNameMessage = () => getRandomMessage(ASK_NAME_MESSAGES);
