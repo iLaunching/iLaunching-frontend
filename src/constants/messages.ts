@@ -372,85 +372,85 @@ export const WRONG_EMAIL_FORMAT = [
 /** new user not found Messages
  */
 export const USER_NOT_REGISTERED_MESSAGES = [
-  "I don't see you in the system yet. That's exciting! We're starting fresh. What's your name? I'll use it to personalize everything for you.",
+  "I don't see you in the system yet. That's exciting! Want to create an account or try logging in anyway?",
   
-  "No account found, which means you're about to be the newest member. Let's start with your name so I can make this experience yours.",
+  "No account found. Ready to join iLaunching, or do you want to try logging in with a different email?",
   
-  "You're not registered yet. Perfect timing to join! What's your name? I need it to tailor your journey.",
+  "You're not registered yet. Perfect timing to join! Want to sign up or log in?",
   
-  "I couldn't find that email in our records. Great! That means we get to build this together from scratch. What should I call you?",
+  "I couldn't find that email in our records. Ready to create your account?",
   
-  "No existing account for that email. This is your fresh start! Give me your name and I'll customize everything around you.",
+  "No existing account for that email. Want to start fresh with a new account?",
   
-  "You're new here! I love that. To get you set up properly, what's your name? It helps me shape your experience.",
+  "You're new here! Ready to get started? You can create an account or try logging in.",
   
-  "I don't have you in the system yet, but that's about to change. What's your name? I'll make sure everything feels personal.",
+  "I don't have you in the system yet. Want to create an account now?",
   
-  "No account detected. That means you're first in line for a fresh experience! What's your name so I can get started?",
+  "No account detected. Ready to join iLaunching?",
   
-  "Looks like you're brand new! Exciting. To personalize your path forward, what's your name?",
+  "Looks like you're brand new! Want to create your account?",
   
-  "I couldn't locate an account with that email. No worries! Let's create one. Start by telling me your name.",
+  "I couldn't locate an account with that email. Ready to sign up?",
   
-  "You're not in our system yet, which means we get to do this right from the beginning. What's your name?",
+  "You're not in our system yet. Want to create your account and get started?",
   
-  "No account found. Perfect! We're building yours from the ground up. What's your name so I can personalize things?",
+  "No account found. Ready to join us?",
   
-  "I don't see that email registered. Great! You're about to join something special. What's your name?",
+  "I don't see that email registered. Want to create your account?",
   
-  "Looks like you're new to iLaunching! To get you set up and personalized, what should I call you?",
+  "Looks like you're new to iLaunching! Ready to sign up?",
   
-  "No existing account. That's actually perfect timing! What's your name? I'll use it to customize your entire experience.",
+  "No existing account. Want to create one now?",
   
-  "I couldn't find you in our records. Excellent! Fresh start it is. What's your name so I can tailor everything?",
+  "I couldn't find you in our records. Ready to get started?",
   
-  "You're not registered yet, but that's easy to fix! What's your name? I need it to make this experience uniquely yours.",
+  "You're not registered yet. Want to join now?",
   
-  "No account matches that email. All good! Let's get you started. What's your name?",
+  "No account matches that email. Ready to create one?",
   
-  "I don't have you on file yet. That means you're about to be part of something new! What's your name so I can personalize this?",
+  "I don't have you on file yet. Want to sign up?",
   
-  "Looks like you're brand new here! Welcome. To customize your journey, what's your name?",
+  "Looks like you're brand new here! Ready to create your account?",
   
-  "No account found for that email. Perfect! We get to start fresh together. What should I call you?",
+  "No account found for that email. Want to join iLaunching?",
   
-  "You're not in the system yet, which is actually exciting! What's your name? I'll use it to shape everything around you.",
+  "You're not in the system yet. Ready to create your account?",
   
-  "I couldn't locate that email. No problem! Let's create your account. Start with your name.",
+  "I couldn't locate that email. Want to sign up now?",
   
-  "No existing account detected. Great! You're the newest founder here. What's your name so I can personalize things?",
+  "No existing account detected. Ready to get started?",
   
-  "Looks like this is your first time! To make sure everything's tailored to you, what's your name?",
+  "Looks like this is your first time! Want to create your account?",
   
-  "I don't see you registered yet. That's about to change! What's your name? I'll customize everything for you.",
+  "I don't see you registered yet. Ready to join?",
   
-  "No account for that email. Excellent! Fresh starts are the best. What's your name?",
+  "No account for that email. Want to sign up?",
   
-  "You're not in our records yet. Perfect! Let's build your profile. What should I call you?",
+  "You're not in our records yet. Ready to create your account?",
   
-  "I couldn't find an account with that email. All good! We're starting fresh. What's your name so I can personalize this?",
+  "I couldn't find an account with that email. Want to join us?",
   
-  "Looks like you're new to the platform! To get you set up right, what's your name?",
+  "Looks like you're new to the platform! Ready to sign up?",
   
-  "No account found. That means you're about to join! What's your name so I can tailor your experience?",
+  "No account found. Want to create one and get started?",
   
-  "You're not registered yet, but you will be in a moment! What's your name? I need it to customize everything.",
+  "You're not registered yet. Ready to join iLaunching?",
   
-  "I don't have that email on file. Great! New beginning. What's your name so I can make this personal?",
+  "I don't have that email on file. Want to create your account?",
   
-  "No existing account. Perfect timing to create one! What's your name?",
+  "No existing account. Ready to sign up?",
   
-  "Looks like you're brand new here! To personalize your journey from the start, what's your name?",
+  "Looks like you're brand new here! Want to get started?",
   
-  "I couldn't find you in the system. Excellent! Fresh slate. What should I call you?",
+  "I couldn't find you in the system. Ready to create your account?",
   
-  "You're not registered yet. That's exciting! What's your name? I'll use it to customize your experience.",
+  "You're not registered yet. Want to join now?",
   
-  "No account matches that email. All good! Let's get you started right. What's your name?",
+  "No account matches that email. Ready to sign up?",
   
-  "I don't see you in our records. Perfect! You're about to be. What's your name so I can personalize things?",
+  "I don't see you in our records. Want to create your account?",
   
-  "Looks like this is your first visit! To tailor everything for you, what's your name?"
+  "Looks like this is your first visit! Ready to join iLaunching?"
 ] as const;
 
 /**

@@ -10,8 +10,9 @@ import {
   getRandomWrongEmailMessage,
   getRandomCheckingEmailMessage,
   getRandomMessage,
+  getRandomPasswordPrompt,
   USER_NOT_REGISTERED_MESSAGES,
-} from '@/constants';
+} from '../constants';
 
 export function useLandingAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -72,6 +73,9 @@ export function useLandingAuth() {
     }));
 
     try {
+      // Wait for checking message to type out (add minimum delay for UX)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       // Check if email exists
       const result = await authApi.checkEmail(email);
 
@@ -80,17 +84,25 @@ export function useLandingAuth() {
         setAuthState((prev: AuthState) => ({
           ...prev,
           stage: 'password_input',
-          message: "Welcome back! I found your account. Please enter your password to continue.",
+          message: getRandomPasswordPrompt(),
           isProcessing: false,
         }));
       } else {
-        // New user - move to user_not_found stage to show the "not registered" message
+        // New user - clear message and change stage to show button container
         setAuthState((prev: AuthState) => ({
           ...prev,
-          stage: 'user_not_found',
-          message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
+          stage: 'new_user',
+          message: '', // Clear message first
           isProcessing: false,
         }));
+        
+        // Add conversational delay before typing the "not registered" message
+        setTimeout(() => {
+          setAuthState((prev: AuthState) => ({
+            ...prev,
+            message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
+          }));
+        }, 800); // 800ms delay for natural conversational flow
       }
     } catch (error: any) {
       console.error('Email check error:', error);
@@ -104,17 +116,7 @@ export function useLandingAuth() {
     }
   };
 
-  /**
-   * Transition from user_not_found to new_user stage (called after typewriter completes)
-   */
-  const transitionToNewUser = (): void => {
-    if (authState.stage === 'user_not_found') {
-      setAuthState((prev: AuthState) => ({
-        ...prev,
-        stage: 'new_user',
-      }));
-    }
-  };
+
 
   /**
    * Handle "Yes Please" button - start signup flow
@@ -255,7 +257,6 @@ export function useLandingAuth() {
     authState,
     isAuthenticated: authState.stage === 'authenticated',
     handleEmailSubmit,
-    transitionToNewUser,
     handleSignupChoice,
     handleLoginChoice,
     handleNameSubmit,

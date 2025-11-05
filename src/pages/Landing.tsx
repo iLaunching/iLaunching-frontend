@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
@@ -16,7 +16,6 @@ export default function Landing() {
   const {
     authState,
     handleEmailSubmit,
-    transitionToNewUser,
     handleSignupChoice,
     handleLoginChoice,
     handleNameSubmit,
@@ -36,9 +35,9 @@ export default function Landing() {
     }
   }, []);
   
-  // Reset button visibility when stage changes
+  // Reset button visibility when stage changes to new_user or email_checking
   useEffect(() => {
-    if (authState.stage === 'new_user' || authState.stage === 'email_checking' || authState.stage === 'user_not_found') {
+    if (authState.stage === 'new_user' || authState.stage === 'email_checking') {
       setShowButtons(false);
     }
   }, [authState.stage]);
@@ -90,24 +89,20 @@ export default function Landing() {
   
   // Determine if chat should be visible
   const shouldShowChat = authState.stage !== 'authenticated' && 
-                         authState.stage !== 'new_user' && 
-                         authState.stage !== 'email_checking' &&
-                         authState.stage !== 'user_not_found';
+                         authState.stage !== 'new_user';
   
-  // Determine if we should show the button container (visible during user_not_found and new_user)
-  const shouldShowButtonContainer = authState.stage === 'user_not_found' || authState.stage === 'new_user';
+  // Determine if we should show the button container (visible during new_user)
+  const shouldShowButtonContainer = authState.stage === 'new_user';
   
-  // Handle typewriter completion
-  const handleTypewriterComplete = () => {
-    if (authState.stage === 'user_not_found') {
-      // When the "not registered" message completes, transition to new_user
-      transitionToNewUser();
-      // Small delay before fading in buttons
+  // Handle typewriter completion - memoized to prevent re-renders
+  const handleTypewriterComplete = useCallback(() => {
+    if (authState.stage === 'new_user') {
+      // When the "not registered" message completes, fade in buttons
       setTimeout(() => {
         setShowButtons(true);
       }, 100);
     }
-  };
+  }, [authState.stage]);
   
   // Get current display message
   const getCurrentMessage = () => {
@@ -144,6 +139,7 @@ export default function Landing() {
           <div className="w-full max-w-[800px] flex flex-col" style={{ gap: '10px' }}>
             {/* Tiptap Typewriter - Fixed container that scrolls */}
             <TiptapTypewriter 
+              key={authState.message} // Force remount when message changes
               text={getCurrentMessage()}
               speed={APP_CONFIG.typewriterSpeed}
               onComplete={handleTypewriterComplete}
