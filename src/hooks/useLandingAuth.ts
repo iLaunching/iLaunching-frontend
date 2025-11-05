@@ -83,10 +83,10 @@ export function useLandingAuth() {
           isProcessing: false,
         }));
       } else {
-        // New user - move to name input
+        // New user - show signup/login options
         setAuthState((prev: AuthState) => ({
           ...prev,
-          stage: 'name_input',
+          stage: 'new_user',
           message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
           isProcessing: false,
         }));
@@ -101,6 +101,28 @@ export function useLandingAuth() {
         error: error.message || 'Failed to check email',
       }));
     }
+  };
+
+  /**
+   * Handle "Yes Please" button - start signup flow
+   */
+  const handleSignupChoice = (): void => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'name_input',
+      message: "Perfect! Let's get you set up. What's your name?",
+    }));
+  };
+
+  /**
+   * Handle "Log Me In" button - go to login
+   */
+  const handleLoginChoice = (): void => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'password_input',
+      message: "Alright, let's get you logged in. Enter your password.",
+    }));
   };
 
   /**
@@ -220,6 +242,8 @@ export function useLandingAuth() {
     authState,
     isAuthenticated: authState.stage === 'authenticated',
     handleEmailSubmit,
+    handleSignupChoice,
+    handleLoginChoice,
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,

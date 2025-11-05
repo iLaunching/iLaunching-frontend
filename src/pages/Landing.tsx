@@ -3,6 +3,7 @@ import AIBackground from '@/components/layout/AIBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
+import { UserPlus, LogIn } from 'lucide-react';
 import { 
   getRandomWelcomeMessage, 
   getRandomWelcomeBackMessage, 
@@ -15,6 +16,8 @@ export default function Landing() {
   const {
     authState,
     handleEmailSubmit,
+    handleSignupChoice,
+    handleLoginChoice,
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
@@ -75,7 +78,10 @@ export default function Landing() {
   };
   
   // Determine if chat should be visible
-  const shouldShowChat = authState.stage !== 'authenticated';
+  const shouldShowChat = authState.stage !== 'authenticated' && authState.stage !== 'new_user';
+  
+  // Determine if we should show the signup/login buttons
+  const shouldShowButtons = authState.stage === 'new_user';
   
   // Get current display message
   const getCurrentMessage = () => {
@@ -122,13 +128,34 @@ export default function Landing() {
             }}
             />
             
-            {/* Chat Prompt - Only show when not authenticated */}
+            {/* Chat Prompt - Only show when not authenticated and not showing buttons */}
             {shouldShowChat && (
               <ChatPrompt 
                 onSubmit={handleMessage}
                 placeholder={getPlaceholder()}
                 type={getInputType()}
               />
+            )}
+            
+            {/* New User Buttons - Show when user is not registered */}
+            {shouldShowButtons && (
+              <div className="flex gap-4 justify-center mt-6">
+                <button
+                  onClick={handleSignupChoice}
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  Yes Please
+                </button>
+                
+                <button
+                  onClick={handleLoginChoice}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg font-medium hover:bg-white/20 hover:scale-105 transition-all duration-200"
+                >
+                  <LogIn className="w-5 h-5" />
+                  Log Me In
+                </button>
+              </div>
             )}
             
             {/* Show user info when authenticated */}
