@@ -13,6 +13,8 @@ interface TiptapTypewriterProps {
   className?: string;
   style?: React.CSSProperties;
   onComplete?: () => void;
+  /** Whether to scroll within a container instead of the window (for ChatWindow usage) */
+  scrollContainer?: boolean;
 }
 
 export default function TiptapTypewriter({ 
@@ -20,48 +22,43 @@ export default function TiptapTypewriter({
   speed = 30,
   className = "",
   style = {},
-  onComplete 
+  onComplete,
+  scrollContainer = false
 }: TiptapTypewriterProps) {
-  const [typedText, setTypedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        // Disable the default list items since we're using custom ones
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
-      }),
+      StarterKit,
       BulletList.configure({
         HTMLAttributes: {
-          class: 'tiptap-bullet-list',
+          class: 'bullet-list',
         },
       }),
       OrderedList.configure({
         HTMLAttributes: {
-          class: 'tiptap-ordered-list',
+          class: 'ordered-list',
         },
       }),
       ListItem.configure({
         HTMLAttributes: {
-          class: 'tiptap-list-item',
+          class: 'list-item',
         },
       }),
       TaskList.configure({
         HTMLAttributes: {
-          class: 'tiptap-task-list',
+          class: 'task-list',
         },
       }),
       TaskItem.configure({
         HTMLAttributes: {
-          class: 'tiptap-task-item',
+          class: 'task-item',
         },
         nested: true,
       }),
     ],
-    content: typedText,
+    content: '',
     editable: false,
     parseOptions: {
       preserveWhitespace: 'full',
@@ -101,19 +98,21 @@ export default function TiptapTypewriter({
       }
     };
 
-    const editorElement = editor.view.dom;
-    editorElement.addEventListener('click', handleClick);
-    
-    return () => {
-      editorElement.removeEventListener('click', handleClick);
-    };
+    // Add click listeners to the editor container
+    const editorElement = containerRef.current?.querySelector('.ProseMirror');
+    if (editorElement) {
+      editorElement.addEventListener('click', handleClick);
+      
+      return () => {
+        editorElement.removeEventListener('click', handleClick);
+      };
+    }
   }, [editor]);
 
   useEffect(() => {
     if (!editor || !text) return;
 
     // Clear and restart typing when text changes
-    setTypedText('');
     setIsTyping(true);
     editor.commands.setContent('');
 
@@ -219,7 +218,6 @@ export default function TiptapTypewriter({
             
             // Update editor content
             editor.commands.setContent(currentHTML);
-            setTypedText(currentHTML);
             
             // Debug: Log when we encounter task list elements
             if (element.content.includes('taskList') || element.content.includes('taskItem')) {
@@ -233,9 +231,30 @@ export default function TiptapTypewriter({
             
             currentIndex++;
             
-            // Auto-scroll
+            // Auto-scroll to follow content
             if (containerRef.current) {
-              containerRef.current.scrollTop = containerRef.current.scrollHeight;
+              if (scrollContainer) {
+                // Scroll within container (for ChatWindow)
+                const scrollableParent = containerRef.current.closest('.message-area') || containerRef.current.parentElement;
+                if (scrollableParent && scrollableParent.scrollHeight > scrollableParent.clientHeight) {
+                  scrollableParent.scrollTo({
+                    top: scrollableParent.scrollHeight,
+                    behavior: 'smooth'
+                  });
+                }
+              } else {
+                // Scroll window (for main page)
+                const rect = containerRef.current.getBoundingClientRect();
+                const elementBottom = rect.bottom;
+                const windowHeight = window.innerHeight;
+                
+                if (elementBottom > windowHeight - 100) {
+                  window.scrollTo({
+                    top: window.scrollY + (elementBottom - windowHeight + 150),
+                    behavior: 'smooth'
+                  });
+                }
+              }
             }
           } else {
             clearInterval(typeInterval);
@@ -260,13 +279,33 @@ export default function TiptapTypewriter({
       const typeInterval = setInterval(() => {
         if (currentIndex < words.length) {
           currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
-          setTypedText(currentText);
           editor.commands.setContent(currentText);
           currentIndex++;
           
-          // Auto-scroll to bottom as text appears
+          // Auto-scroll to follow text as it appears
           if (containerRef.current) {
-            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+            if (scrollContainer) {
+              // Scroll within container (for ChatWindow)
+              const scrollableParent = containerRef.current.closest('.message-area') || containerRef.current.parentElement;
+              if (scrollableParent && scrollableParent.scrollHeight > scrollableParent.clientHeight) {
+                scrollableParent.scrollTo({
+                  top: scrollableParent.scrollHeight,
+                  behavior: 'smooth'
+                });
+              }
+            } else {
+              // Scroll window (for main page)
+              const rect = containerRef.current.getBoundingClientRect();
+              const elementBottom = rect.bottom;
+              const windowHeight = window.innerHeight;
+              
+              if (elementBottom > windowHeight - 100) {
+                window.scrollTo({
+                  top: window.scrollY + (elementBottom - windowHeight + 150),
+                  behavior: 'smooth'
+                });
+              }
+            }
           }
         } else {
           // Final text without cursor
@@ -298,9 +337,7 @@ export default function TiptapTypewriter({
         const isChecked = taskItem.getAttribute('data-checked') === 'true';
         taskItem.setAttribute('data-checked', (!isChecked).toString());
         
-        // Update the editor content to reflect the change
-        const currentContent = editor.getHTML();
-        setTypedText(currentContent);
+        // The editor content is automatically updated by Tiptap
       }
     };
 
@@ -322,7 +359,7 @@ export default function TiptapTypewriter({
       style={{
         ...style,
         minHeight: '200px',
-        maxHeight: '600px',
+        height: 'auto',
         overflowY: 'auto',
         overflowX: 'hidden',
         display: 'flex',

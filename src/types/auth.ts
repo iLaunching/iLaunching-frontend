@@ -11,7 +11,8 @@ export type AuthStage =
   | 'introduction'          // New user - showing personalized introduction
   | 'password_create'       // New user - creating password
   | 'authenticating'        // Processing login/signup
-  | 'authenticated';        // Successfully logged in
+  | 'authenticated'         // Successfully logged in
+  | 'sales';                // Sales consultation mode
 
 export interface AuthState {
   stage: AuthStage;

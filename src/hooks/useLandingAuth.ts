@@ -277,6 +277,19 @@ export function useLandingAuth() {
   };
 
   /**
+   * Transition to sales consultation mode
+   */
+  const enterSalesMode = () => {
+    setAuthState(prev => ({
+      ...prev,
+      stage: 'sales',
+      message: '',
+      isProcessing: false,
+      error: null,
+    }));
+  };
+
+  /**
    * Logout user
    */
   const logout = () => {
@@ -294,6 +307,7 @@ export function useLandingAuth() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
+    enterSalesMode,
     logout,
     reset,
   };

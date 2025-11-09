@@ -59,12 +59,15 @@ export default function AIBackground() {
 
       <style>{`
         .ai-background-container {
-          position: relative;
+          position: fixed;
+          top: 0;
+          left: 0;
           width: 100%;
-          height: 100vh;
+          height: 100%;
           background: linear-gradient(135deg, #f8fafc 0%, #f4f6ff 50%, #f0f4ff 100%);
           overflow: hidden;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          z-index: -1;
         }
 
         .floating-shape {

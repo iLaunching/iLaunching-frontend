@@ -1,13 +1,14 @@
 export default function Header() {
   return (
     <header 
-      className="w-full"
+      className="w-full fixed top-0 left-0 right-0"
       style={{
         paddingLeft: '50px',
         paddingRight: '50px',
         paddingTop: '30px',
         paddingBottom: '20px',
         backgroundColor: 'transparent',
+        zIndex: 10000,
       }}
     >
        

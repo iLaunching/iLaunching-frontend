@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
+import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
+import ChatWindow from '@/components/ChatWindow';
 import { UserPlus, LogIn } from 'lucide-react';
 import { 
   getRandomWelcomeMessage, 
@@ -21,6 +23,7 @@ export default function Landing() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
+    enterSalesMode,
   } = useLandingAuth();
   
   // State to control button visibility after typewriter completes
@@ -29,6 +32,12 @@ export default function Landing() {
   const [showNameInput, setShowNameInput] = useState(false);
   // State to show "Yes Please" button after introduction completes
   const [showYesPleaseButton, setShowYesPleaseButton] = useState(false);
+  // State for background transition
+  const [backgroundType, setBackgroundType] = useState<'ai' | 'connected'>('ai');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  // State for chat window
+  const [showChatWindow, setShowChatWindow] = useState(false);
+  const [chatMessage, setChatMessage] = useState("Great choice! I'm here to help you find the perfect solution for your business. What challenges are you facing that we could solve together?");
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -153,31 +162,71 @@ export default function Landing() {
 
   return (
     <div className="relative min-h-screen">
-      <AIBackground />
+      {/* Background with smooth transition */}
+      <div className={`background-transition ${isTransitioning ? 'transitioning' : ''}`}>
+        <div className={`background-layer ${backgroundType === 'ai' ? 'active' : 'inactive'}`}>
+          <AIBackground />
+        </div>
+        <div className={`background-layer ${backgroundType === 'connected' ? 'active' : 'inactive'}`}>
+          <ConnectedMindsBackground />
+        </div>
+      </div>
+      
+      {/* Sticky Chat Window - Show in sales stage */}
+      {(showChatWindow || authState.stage === 'sales') && (
+        <div className="chat-window-sticky">
+          <ChatWindow
+            message={chatMessage}
+            placeholder="Tell me about your business challenge..."
+            onSubmit={(message) => {
+              // Handle user input for consultation
+              console.log('User consultation input:', message);
+              // You can add logic here to process user queries
+              setChatMessage(`Thanks for sharing: "${message}". Based on what you've told me, here are some ways iLaunching can help you...`);
+            }}
+            onVoiceClick={() => {
+              // Handle voice input
+              console.log('Voice input requested');
+              // You can add voice recording logic here
+              alert('Voice input feature coming soon!');
+            }}
+            onTypewriterComplete={() => {
+              console.log('Chat message complete');
+            }}
+          />
+        </div>
+      )}
       
       {/* Content overlay */}
-      <div className="absolute inset-0 flex flex-col">
+      <div className="relative flex flex-col min-h-screen">
         <Header />
         
-        {/* Center the chat interface */}
-        <div className="flex-1 flex items-center justify-center p-8">
+        {/* Center the chat interface - Add top padding for sticky header */}
+        <div 
+          className={`flex-1 flex items-center justify-center p-8 transition-opacity duration-1000 ${
+            authState.stage === 'sales' ? 'opacity-0' : 'opacity-100'
+          }`} 
+          style={{ paddingTop: '140px' }}
+        >
           <div className="w-full max-w-[800px] flex flex-col" style={{ gap: '10px' }}>
-            {/* Tiptap Typewriter - Fixed container that scrolls */}
-            <TiptapTypewriter 
-              key={authState.message} // Force remount when message changes
-              text={getCurrentMessage()}
-              speed={APP_CONFIG.typewriterSpeed}
-              onComplete={handleTypewriterComplete}
-              className="text-gray-900"
-              style={{ 
-                fontFamily: APP_CONFIG.fonts.primary,
-                fontSize: '26px',
-                color: APP_CONFIG.colors.text,
-            }}
-            />
+            {/* Tiptap Typewriter - Hide when in sales stage */}
+            {authState.stage !== 'sales' && (
+              <TiptapTypewriter 
+                key={authState.message} // Force remount when message changes
+                text={getCurrentMessage()}
+                speed={APP_CONFIG.typewriterSpeed}
+                onComplete={handleTypewriterComplete}
+                className="text-gray-900"
+                style={{ 
+                  fontFamily: APP_CONFIG.fonts.primary,
+                  fontSize: '26px',
+                  color: APP_CONFIG.colors.text,
+              }}
+              />
+            )}
             
-            {/* Chat Prompt - Show container but control visibility with opacity */}
-            {shouldShowChat && (
+            {/* Chat Prompt - Hide when in sales stage */}
+            {shouldShowChat && authState.stage !== 'sales' && (
               <div className={`transition-opacity duration-500 ${
                 isNameInputStage && !showNameInput ? 'opacity-0' : 'opacity-100'
               }`}>
@@ -189,8 +238,8 @@ export default function Landing() {
               </div>
             )}
             
-            {/* New User Buttons - Show container when user not found or new user */}
-            {shouldShowButtonContainer && (
+            {/* New User Buttons - Hide when in sales stage */}
+            {shouldShowButtonContainer && authState.stage !== 'sales' && (
               <div 
                 className="flex gap-8 justify-center mt-6"
                 style={{ marginBottom: '200px', minHeight: '60px' }}
@@ -224,7 +273,7 @@ export default function Landing() {
 
             )}
             
-            {/* Introduction "Continue" Button - Show after introduction completes */}
+            {/* Introduction "Continue" Button - Hide when in sales stage */}
             {authState.stage === 'introduction' && (
               <div 
                 className="flex justify-center mt-6"
@@ -232,8 +281,26 @@ export default function Landing() {
               >
                 <button
                   onClick={() => {
-                    // Move to password creation after introduction
-                    handleNameSubmit('continue-to-password');
+                    // Transition to sales mode - this will clear all content
+                    enterSalesMode();
+                    
+                    // Start background transition
+                    setIsTransitioning(true);
+                    
+                    // Change background after brief delay
+                    setTimeout(() => {
+                      setBackgroundType('connected');
+                    }, 200);
+                    
+                    // Complete transition after animation
+                    setTimeout(() => {
+                      setIsTransitioning(false);
+                    }, 1000);
+                    
+                    // Show chat window for consultation
+                    setTimeout(() => {
+                      setShowChatWindow(true);
+                    }, 1200);
                   }}
                   className={`flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
                     showYesPleaseButton ? 'opacity-100' : 'opacity-0'
@@ -259,6 +326,105 @@ export default function Landing() {
           </div>
         </div>
       </div>
+      
+      {/* Background transition styles */}
+      <style>{`
+        .background-transition {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+        }
+        
+        .background-layer {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .background-layer.active {
+          opacity: 1;
+        }
+        
+        .background-layer.inactive {
+          opacity: 0;
+        }
+        
+        .background-transition.transitioning .background-layer {
+          transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* Sticky Chat Window Styles */
+        .chat-window-sticky {
+          position: fixed;
+          left: 20px;
+          top: 0;
+          bottom: 0;
+          z-index: 1000;
+          width: 500px;
+          height: 100vh;
+          padding: 0;
+          margin: 0;
+          overflow: hidden;
+          animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        @keyframes slideInLeft {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        /* Responsive chat window */
+        @media (max-width: 1200px) {
+          .chat-window-sticky {
+            left: 10px;
+            width: 450px;
+          }
+        }
+        
+        @media (max-width: 1024px) {
+          .chat-window-sticky {
+            left: 10px;
+            width: 400px;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .chat-window-sticky {
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            top: auto;
+            bottom: 20px;
+            transform: none;
+            width: auto;
+            max-height: 60vh;
+            animation: slideInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+        }
+        
+        @keyframes slideInUp {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
