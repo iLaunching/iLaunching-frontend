@@ -14,6 +14,7 @@ import {
   getRandomLoginMessage,
   getRandomAskNameMessage,
   USER_NOT_REGISTERED_MESSAGES,
+  INTRODUCTION_MESSAGES,
 } from '../constants';
 
 export function useLandingAuth() {
@@ -153,9 +154,19 @@ export function useLandingAuth() {
   };
 
   /**
-   * Handle name submission (new user)
+   * Handle name submission (new user) - Start sales flow with introduction
    */
   const handleNameSubmit = (name: string): void => {
+    // Handle continue action after introduction
+    if (name === 'continue-to-password') {
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        stage: 'password_create',
+        message: "Perfect! Now let's secure your account. Create a password (at least 8 characters):",
+      }));
+      return;
+    }
+
     if (!name.trim()) {
       setAuthState((prev: AuthState) => ({
         ...prev,
@@ -164,12 +175,21 @@ export function useLandingAuth() {
       return;
     }
 
+    // Store name and move to introduction stage
     setAuthState((prev: AuthState) => ({
       ...prev,
       name: name.trim(),
-      stage: 'password_create',
-      message: `Great to meet you, ${name.trim()}! Now let's secure your account. Please create a password (at least 8 characters).`,
+      stage: 'introduction',
+      message: '', // Clear message first
     }));
+    
+    // Add delay before showing personalized introduction
+    setTimeout(() => {
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        message: getRandomMessage(INTRODUCTION_MESSAGES).replace('{name}', name.trim()),
+      }));
+    }, 500); // 500ms delay before showing introduction
   };
 
   /**

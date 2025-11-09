@@ -8,6 +8,7 @@ export type AuthStage =
   | 'new_user'              // New user - showing signup/login options
   | 'password_input'        // Existing user - asking for password
   | 'name_input'            // New user - asking for name
+  | 'introduction'          // New user - showing personalized introduction
   | 'password_create'       // New user - creating password
   | 'authenticating'        // Processing login/signup
   | 'authenticated';        // Successfully logged in

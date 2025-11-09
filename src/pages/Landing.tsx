@@ -27,6 +27,8 @@ export default function Landing() {
   const [showButtons, setShowButtons] = useState(false);
   // State to control when to show name input prompt after message completes
   const [showNameInput, setShowNameInput] = useState(false);
+  // State to show "Yes Please" button after introduction completes
+  const [showYesPleaseButton, setShowYesPleaseButton] = useState(false);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -98,7 +100,8 @@ export default function Landing() {
   
   // Determine if chat should be visible
   const shouldShowChat = authState.stage !== 'authenticated' && 
-                         authState.stage !== 'new_user';
+                         authState.stage !== 'new_user' &&
+                         authState.stage !== 'introduction';
   
   // Should show chat container during name_input but with opacity control
   const isNameInputStage = authState.stage === 'name_input';
@@ -117,6 +120,11 @@ export default function Landing() {
       // When the "ask name" message completes, fade in the name input
       setTimeout(() => {
         setShowNameInput(true);
+      }, 100);
+    } else if (authState.stage === 'introduction') {
+      // When the introduction message completes, show "Yes Please" button
+      setTimeout(() => {
+        setShowYesPleaseButton(true);
       }, 100);
     }
   }, [authState.stage]);
@@ -216,6 +224,27 @@ export default function Landing() {
 
             )}
             
+            {/* Introduction "Continue" Button - Show after introduction completes */}
+            {authState.stage === 'introduction' && (
+              <div 
+                className="flex justify-center mt-6"
+                style={{ marginBottom: '200px', minHeight: '60px' }}
+              >
+                <button
+                  onClick={() => {
+                    // Move to password creation after introduction
+                    handleNameSubmit('continue-to-password');
+                  }}
+                  className={`flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
+                    showYesPleaseButton ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ maxHeight: '45px', minWidth: '200px', justifyContent: 'center' }}
+                >
+                  Let's Do This! 
+                </button>
+              </div>
+            )}
+
             {/* Show user info when authenticated */}
             {authState.stage === 'authenticated' && authState.user && (
               <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
