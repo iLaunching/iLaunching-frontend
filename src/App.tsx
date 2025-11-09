@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import Dashboard from '@/pages/Dashboard';
+import FormattingDemo from '@/components/FormattingDemo';
 
 // ========================
 // REACT QUERY CLIENT
@@ -30,6 +31,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
+          <Route path="/demo" element={<FormattingDemo />} />
           <Route
             path="/login"
             element={

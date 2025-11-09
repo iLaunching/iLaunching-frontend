@@ -187,7 +187,7 @@ export function useLandingAuth() {
     setTimeout(() => {
       setAuthState((prev: AuthState) => ({
         ...prev,
-        message: getRandomMessage(INTRODUCTION_MESSAGES).replace('{name}', name.trim()),
+        message: getRandomMessage(INTRODUCTION_MESSAGES).replaceAll('{name}', name.trim()),
       }));
     }, 500); // 500ms delay before showing introduction
   };
