@@ -13,6 +13,8 @@ interface ChatWindowProps {
   onSubmit?: (message: string) => void;
   /** Callback when voice button is clicked */
   onVoiceClick?: () => void;
+  /** Callback when plus button is clicked */
+  onPlusClick?: () => void;
   /** Callback when typewriter animation completes */
   onTypewriterComplete?: () => void;
   /** Custom styling for the container */
@@ -27,6 +29,7 @@ export default function ChatWindow({
   disabled = false,
   onSubmit,
   onVoiceClick,
+  onPlusClick,
   onTypewriterComplete,
   className = "",
   showChatPrompt = true
@@ -47,7 +50,8 @@ export default function ChatWindow({
     <div 
       className={`chat-window-container ${className}`}
       style={{
-        maxWidth: '700px',
+        maxWidth: '45vw', // 45% of viewport width
+        minWidth: '400px', // Minimum width for usability
         width: '100%',
         height: '100%', // Fill parent container completely
         position: 'relative',
@@ -114,7 +118,7 @@ export default function ChatWindow({
 
       {/* Chat Input Area - Absolutely positioned at bottom */}
       {showChatPrompt && (
-        <div 
+          <div 
           className="chat-input-area"
           style={{
             position: 'absolute',
@@ -130,14 +134,17 @@ export default function ChatWindow({
             display: 'flex',
             alignItems: 'flex-end',
             boxSizing: 'border-box',
+            overflow: 'visible',
+            zIndex: 100,
           }}
         >
           <RichTextInput
             onSubmit={handleSubmit}
             onVoiceClick={onVoiceClick}
+            onPlusClick={onPlusClick}
             placeholder={placeholder}
             disabled={disabled}
-            maxHeight={150}
+            maxHeight={600}
           />
         </div>
       )}
@@ -164,11 +171,18 @@ export default function ChatWindow({
         }
 
         /* Responsive design */
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
+          .chat-window-container {
+            max-width: 60vw;
+            min-width: 350px;
+          }
+        }
+        
+        @media (max-width: 768px) {
           .chat-window-container {
             max-width: calc(100vw - 40px) !important;
+            min-width: 300px !important;
             margin: 0 20px !important;
-            padding: 16px !important;
           }
           
           .chat-window-container .message-area {

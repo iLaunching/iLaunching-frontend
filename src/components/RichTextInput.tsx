@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Send, Mic } from 'lucide-react';
+import Placeholder from '@tiptap/extension-placeholder';
+import { Send, Mic, Plus, X, UploadCloud, LayoutDashboard, Monitor } from 'lucide-react';
+import DropdownMenu, { type MenuOption } from './DropdownMenu';
 
 interface RichTextInputProps {
   onSubmit: (content: string) => void;
@@ -10,6 +12,7 @@ interface RichTextInputProps {
   className?: string;
   maxHeight?: number;
   onVoiceClick?: () => void;
+  onPlusClick?: () => void;
 }
 
 export default function RichTextInput({
@@ -18,9 +21,11 @@ export default function RichTextInput({
   disabled = false,
   className = "",
   maxHeight = 200,
-  onVoiceClick
+  onVoiceClick,
+  onPlusClick
 }: RichTextInputProps) {
   const [isEmpty, setIsEmpty] = useState(true);
+  const [currentMenu, setCurrentMenu] = useState<'main' | 'import'>('main');
   const editorRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
@@ -29,6 +34,10 @@ export default function RichTextInput({
         // Configure which features to include
         heading: false, // Disable headings for chat
         codeBlock: false, // Disable code blocks for simplicity
+      }),
+      Placeholder.configure({
+        placeholder: placeholder || 'Type your message...',
+        emptyEditorClass: 'is-editor-empty',
       }),
     ],
     content: '',
@@ -67,6 +76,103 @@ export default function RichTextInput({
     }
   };
 
+  const handlePlusClick = () => {
+    if (onPlusClick) {
+      onPlusClick();
+    }
+  };
+
+  // Define menu options for the plus button
+  const plusMenuOptions: MenuOption[] = [
+    {
+      id: 'upload-file',
+      label: 'Upload',
+      icon: <UploadCloud size={22} />,
+      onClick: () => {
+        console.log('Upload file clicked');
+        // Add your file upload logic here
+      },
+    },
+    {
+      id: 'import-dashboard',
+      label: 'Import', 
+      icon: <LayoutDashboard size={22} />,
+      className: 'import-menu-item',
+      keepMenuOpen: true,
+      onClick: () => {
+        setCurrentMenu('import');
+        console.log('Navigated to import menu');
+      },
+    },
+    {
+      id: 'take-screenshot',
+      label: 'Take Screenshot',
+      icon: <Monitor size={22} />,
+      onClick: () => {
+        console.log('Take screenshot clicked');
+        // Add your screenshot capture logic here
+      },
+    },
+  ];
+
+  const importMenuOptions: MenuOption[] = [
+    {
+      id: 'back-to-main',
+      label: 'Import',
+      icon: <></>,
+      keepMenuOpen: true,
+      onClick: () => {
+        setCurrentMenu('main');
+        console.log('Back to main menu');
+      },
+    },
+    {
+      id: 'google-drive',
+      label: 'Google Drive',
+      icon: (
+        <img 
+          src="/google-drive-logo.svg" 
+          alt="Google Drive" 
+          style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+        />
+      ),
+      onClick: () => {
+        console.log('Google Drive clicked');
+        // Add your Google Drive integration logic here
+      },
+    },
+    {
+      id: 'dropbox',
+      label: 'Dropbox',
+      icon: (
+        <img 
+          src="/dropbox-logo.svg" 
+          alt="Dropbox" 
+          style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+        />
+      ),
+      onClick: () => {
+        console.log('Dropbox clicked');
+        // Add your Dropbox integration logic here
+      },
+    },
+    {
+      id: 'onedrive',
+      label: 'OneDrive',
+      icon: (
+        <img 
+          src="/onedrive-logo.svg" 
+          alt="OneDrive" 
+          style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+        />
+      ),
+      onClick: () => {
+        console.log('OneDrive clicked');
+        // Add your OneDrive integration logic here
+      },
+    },
+  ];
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -100,13 +206,37 @@ export default function RichTextInput({
           
           {/* Submit Area - Below the input */}
           <div className="rich-text-submit-area">
+            {/* Plus Button with Dropdown Menu - Left side */}
+            <DropdownMenu
+              trigger={(isOpen) => (
+                <div className="rich-text-plus-btn-content">
+                  <div className={`icon-container ${isOpen ? 'icon-open' : ''}`}>
+                    {isOpen ? (
+                      <X className="w-5 h-5" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                  </div>
+                </div>
+              )}
+              options={currentMenu === 'main' ? plusMenuOptions : importMenuOptions}
+              position="top"
+              triggerClassName="rich-text-plus-btn-dropdown tooltip-trigger tooltip-right"
+              className={currentMenu === 'main' ? "plus-button-menu" : "import-button-menu"}
+              disabled={disabled}
+              tooltip="Insert files for reference"
+            />
+            
+            {/* Spacer to push voice and send buttons to the right */}
+            <div className="rich-text-spacer" />
+            
             {/* Voice Button */}
             <button
               type="button"
               onClick={handleVoiceClick}
               disabled={disabled}
-              className="rich-text-voice-btn"
-              title="Voice message"
+              className="rich-text-voice-btn tooltip-trigger"
+              data-tooltip="Chat using voice"
             >
               <Mic className="w-4 h-4" />
             </button>
@@ -115,11 +245,18 @@ export default function RichTextInput({
             <button
               type="submit"
               disabled={isEmpty || disabled}
-              className="rich-text-submit-btn"
-              title="Send message (Enter)"
+              className="rich-text-submit-btn tooltip-trigger"
+              data-tooltip="Submit"
             >
               <Send className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Additional Button Section with Gradient Overlay Background */}
+          <div className="rich-text-additional-section">
+            <div className="rich-text-additional-buttons">
+              {/* Add your buttons here */}
+            </div>
           </div>
         </div>
       </form>
@@ -127,11 +264,16 @@ export default function RichTextInput({
       <style>{`
         .rich-text-input-container {
           width: 100%;
+          position: relative;
+          z-index: 10;
         }
 
         .rich-text-input-wrapper {
           background: white;
-          border: 1px solid #e5e7eb;
+          border-left: 1px solid #9333EA;
+          border-right: 1px solid #2563EB;
+          border-top: 1px solid #9333EA;
+          border-bottom: 1px solid #2563EB;
           border-radius: 12px;
           overflow: hidden;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -157,9 +299,20 @@ export default function RichTextInput({
           font-size: 16px;
           line-height: 1.5;
           color: #374151;
+          width: 100%;
+          min-height: 60px;
+          resize: none;
         }
 
-        .rich-text-input-editor p {
+        /* Placeholder styles for empty editor */
+        .rich-text-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+          content: attr(data-placeholder);
+          color: #9ca3af;
+          pointer-events: none;
+          font-style: italic;
+          float: left;
+          height: 0;
+        }        .rich-text-input-editor p {
           margin: 0;
           line-height: 1.5;
         }
@@ -193,19 +346,98 @@ export default function RichTextInput({
         .rich-text-submit-area {
           padding: 12px 16px;
           border-top: 1px solid #f3f4f6;
-          background: #f9fafb;
+          background: transparent;
           display: flex;
           align-items: center;
-          justify-content: flex-end;
+          justify-content: space-between;
           gap: 8px;
+          position: relative;
+          overflow: visible;
+        }
+
+        .rich-text-spacer {
+          flex: 1;
+        }
+
+        .rich-text-plus-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid #e5e7eb;
+          background: white;
+          color: #6b7280;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .rich-text-plus-btn-dropdown {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: 40px !important;
+          height: 40px !important;
+          border-radius: 50% !important;
+          border: 1px solid #e5e7eb !important;
+          background: white !important;
+          color: #6b7280 !important;
+          cursor: pointer !important;
+          transition: all 0.2s ease !important;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+          padding: 0 !important;
+        }
+
+        .rich-text-plus-btn-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+        }
+
+        .icon-container {
+          transition: transform 0.3s ease-in-out;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .icon-container.icon-open {
+          transform: rotate(180deg) scale(1.1);
+        }
+
+        .rich-text-plus-btn:hover:not(:disabled) {
+          background: #f9fafb;
+          color: #374151;
+          border-color: #d1d5db;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .rich-text-plus-btn-dropdown:hover:not(:disabled),
+        .rich-text-plus-btn-dropdown.active:not(:disabled) {
+          background: #f9fafb !important;
+          color: #374151 !important;
+          border-color: #d1d5db !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .rich-text-plus-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          transform: none;
         }
 
         .rich-text-voice-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 32px;
-          height: 32px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           border: 1px solid #e5e7eb;
           background: white;
@@ -233,8 +465,8 @@ export default function RichTextInput({
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 32px;
-          height: 32px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           border: none;
           background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
@@ -273,6 +505,226 @@ export default function RichTextInput({
         .rich-text-editor-content::-webkit-scrollbar-thumb:hover {
           background: #94a3b8;
         }
+
+        /* Modern Dark Tooltips with Speech Bubble Design */
+        .tooltip-trigger {
+          position: relative;
+        }
+
+        .tooltip-trigger::before {
+          content: attr(data-tooltip);
+          position: absolute;
+          bottom: calc(100% + 18px);
+          left: 50%;
+          transform: translateX(-50%) translateY(0);
+          background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+          color: #f9fafb;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.025em;
+          white-space: nowrap;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          z-index: 99999;
+          box-shadow: 
+            0 4px 12px rgba(0, 0, 0, 0.15),
+            0 2px 6px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tooltip-trigger::after {
+          content: '';
+          position: absolute;
+          bottom: calc(100% + 13px);
+          left: 50%;
+          transform: translateX(-50%) translateY(0);
+          width: 12px;
+          height: 12px;
+          background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          box-shadow: 
+            0 2px 6px rgba(0, 0, 0, 0.2),
+            0px 14px 0 -2.5px #111827;
+          z-index: 99997;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+        }
+
+        .tooltip-trigger:hover::before,
+        .tooltip-trigger:hover::after {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .tooltip-trigger:disabled:hover::before,
+        .tooltip-trigger:disabled:hover::after {
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        /* Hide tooltips when dropdown is active */
+        .tooltip-trigger.active:hover::before,
+        .tooltip-trigger.active:hover::after {
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        /* Right-positioned tooltip for plus button */
+        .tooltip-right::before {
+          bottom: auto;
+          left: calc(100% + 18px);
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .tooltip-right::after {
+          bottom: auto;
+          left: calc(100% + 13px);
+          top: 50%;
+          transform: translateY(-50%);
+          box-shadow: 
+            0 2px 6px rgba(0, 0, 0, 0.2),
+            -14px 0px 0 -2.5px #111827;
+        }
+
+        /* Submit button tooltip always shows, even when disabled */
+        .rich-text-submit-btn.tooltip-trigger:disabled:hover::before,
+        .rich-text-submit-btn.tooltip-trigger:disabled:hover::after {
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+
+        /* Plus button specific positioning - center right */
+        .rich-text-plus-btn.tooltip-trigger::before {
+          bottom: 50% !important;
+          left: calc(100% + 18px) !important;
+          transform: translateY(50%) translateX(0) !important;
+        }
+
+        .rich-text-plus-btn.tooltip-trigger::after {
+          bottom: 50% !important;
+          left: calc(100% + 13px) !important;
+          transform: translateY(50%) translateX(0) !important;
+          box-shadow: 
+            0 2px 6px rgba(0, 0, 0, 0.2),
+            -14px 0px 0 -2.5px #111827 !important;
+        }
+
+        /* Voice button specific positioning - center left */
+        .rich-text-voice-btn.tooltip-trigger::before {
+          bottom: 50% !important;
+          right: calc(100% + 18px) !important;
+          left: auto !important;
+          transform: translateY(50%) translateX(0) !important;
+        }
+
+        .rich-text-voice-btn.tooltip-trigger::after {
+          bottom: 50% !important;
+          right: calc(100% + 13px) !important;
+          left: auto !important;
+          transform: translateY(50%) translateX(0) !important;
+          box-shadow: 
+            0 2px 6px rgba(0, 0, 0, 0.2),
+            14px 0px 0 -2.5px #111827 !important;
+        }
+
+        /* Additional Button Section with White Background and Gradient Overlay */
+        .rich-text-additional-section {
+          background: white;
+          background: linear-gradient(90deg, rgba(147, 51, 234, 0.1) 30%, rgba(37, 99, 235, 0.1) 76%);
+          border-radius: 0 0 8px 8px;
+        }
+
+        .rich-text-additional-buttons {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          justify-content: center;
+          min-height: 5px;
+        }
+
+        /* Plus Button Menu Specific Styling */
+        .plus-button-menu .dropdown-menu {
+          background: #ffffff !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 12px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+          backdrop-filter: blur(10px) !important;
+          min-width: 300px !important;
+          max-width: 320px !important;
+          width: 100% !important;
+        }
+
+        .plus-button-menu .dropdown-option {
+          color: #000000 !important;
+          border-radius: 0px !important;
+          margin: 0px !important;
+          padding: 10px 16px !important;
+          font-weight: 400 !important;
+          font-size: 15px !important;
+        }
+
+        .plus-button-menu .dropdown-option:hover:not(.disabled) {
+          background: #d6d6d630 !important;
+          /* transform: translateX(2px) !important; */
+          /* transition: all 0.2s ease !important; */
+        }
+
+        .plus-button-menu .option-icon {
+          filter: brightness(1.2) !important;
+        }
+
+        .plus-button-menu .import-menu-item::after {
+          content: '›' !important;
+          position: absolute !important;
+          right: 16px !important;
+          font-size: 18px !important;
+          color: #666666 !important;
+          font-weight: bold !important;
+        }
+
+        .plus-button-menu .import-menu-item {
+          position: relative !important;
+        }
+
+        /* Import Button Menu Specific Styling */
+        .import-button-menu .dropdown-menu {
+          background: #ffffff !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 12px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+          backdrop-filter: blur(10px) !important;
+          min-width: 300px !important;
+          max-width: 320px !important;
+          width: 100% !important;
+        }
+
+        .import-button-menu .dropdown-option {
+          color: #000000 !important;
+          border-radius: 0px !important;
+          margin: 0px !important;
+          padding: 8px 16px !important;
+          font-weight: 400 !important;
+          font-size: 15px !important;
+        }
+
+        .import-button-menu .dropdown-option:hover:not(.disabled) {
+          background: #d6d6d630 !important;
+          /* transform: translateX(2px) !important; */
+          /* transition: all 0.2s ease !important; */
+        }
+
+        .import-button-menu .option-icon {
+          filter: brightness(1.2) !important;
+        }
+
+
       `}</style>
     </div>
   );

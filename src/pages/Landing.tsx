@@ -366,7 +366,9 @@ export default function Landing() {
           top: 0;
           bottom: 0;
           z-index: 1000;
-          width: 500px;
+          width: 45vw; /* 45% of viewport width */
+          min-width: 420px; /* Minimum width for usability */
+          max-width: 800px; /* Maximum width for very large screens */
           height: 100vh;
           padding: 0;
           margin: 0;
@@ -386,17 +388,27 @@ export default function Landing() {
         }
         
         /* Responsive chat window */
+        @media (max-width: 1400px) {
+          .chat-window-sticky {
+            left: 10px;
+            width: 50vw; /* 50% of viewport on medium-large screens */
+            max-width: 700px;
+          }
+        }
+        
         @media (max-width: 1200px) {
           .chat-window-sticky {
             left: 10px;
-            width: 450px;
+            width: 55vw; /* 55% of viewport on medium screens */
+            max-width: 600px;
           }
         }
         
         @media (max-width: 1024px) {
           .chat-window-sticky {
             left: 10px;
-            width: 400px;
+            width: 60vw; /* 60% of viewport on smaller screens */
+            max-width: 500px;
           }
         }
         
