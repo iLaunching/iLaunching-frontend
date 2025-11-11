@@ -21,6 +21,12 @@ interface ChatWindowProps {
   className?: string;
   /** Whether to show the chat prompt */
   showChatPrompt?: boolean;
+  /** Whether to use AI indicator instead of plain typewriter */
+  useAiIndicator?: boolean;
+  /** AI name for the indicator */
+  aiName?: string;
+  /** AI acknowledgment text */
+  aiAcknowledge?: string;
 }
 
 export default function ChatWindow({
@@ -32,7 +38,10 @@ export default function ChatWindow({
   onPlusClick,
   onTypewriterComplete,
   className = "",
-  showChatPrompt = true
+  showChatPrompt = true,
+  useAiIndicator = false,
+  aiName = "iLaunching AI",
+  aiAcknowledge = ""
 }: ChatWindowProps) {
   const handleSubmit = (userMessage: string) => {
     if (onSubmit && !disabled) {
@@ -50,7 +59,7 @@ export default function ChatWindow({
     <div 
       className={`chat-window-container ${className}`}
       style={{
-        maxWidth: '45vw', // 45% of viewport width
+        maxWidth: '40vw', // 45% of viewport width
         minWidth: '400px', // Minimum width for usability
         width: '100%',
         height: '100%', // Fill parent container completely
@@ -98,6 +107,7 @@ export default function ChatWindow({
             alignItems: 'flex-start',
           }}
         >
+          {/* Typewriter with optional AI indicator as part of document structure */}
           <TiptapTypewriter
             key={message} // Force remount when message changes
             text={message}
@@ -112,6 +122,11 @@ export default function ChatWindow({
               lineHeight: '1.6',
               width: '100%',
             }}
+            aiIndicator={useAiIndicator ? {
+              show: true,
+              aiName: aiName,
+              aiAcknowledge: aiAcknowledge
+            } : undefined}
           />
         </div>
       </div>

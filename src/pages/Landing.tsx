@@ -12,6 +12,7 @@ import {
   APP_CONFIG 
 } from '@/constants';
 import { useLandingAuth } from '@/hooks/useLandingAuth';
+import { salesApi } from '@/api/sales';
 
 export default function Landing() {
   // Use the auth hook for state management
@@ -37,7 +38,11 @@ export default function Landing() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   // State for chat window
   const [showChatWindow, setShowChatWindow] = useState(false);
-  const [chatMessage, setChatMessage] = useState("Great choice! I'm here to help you find the perfect solution for your business. What challenges are you facing that we could solve together?");
+  const [chatMessage, setChatMessage] = useState("");
+  
+  // State for sales conversation
+  const [salesSessionId, setSalesSessionId] = useState<string | null>(null);
+  const [isStreamingResponse, setIsStreamingResponse] = useState(false);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -105,6 +110,91 @@ export default function Landing() {
     return (authState.stage === 'password_create' || authState.stage === 'password_input') 
       ? 'password' 
       : 'text';
+  };
+
+  // Initialize sales conversation and start streaming
+  const initializeSalesConversation = async () => {
+    try {
+      // Generate session ID
+      const sessionId = salesApi.generateSessionId();
+      setSalesSessionId(sessionId);
+
+      // Get user information from authState
+      const userName = authState.user?.name || authState.name || 'there';
+
+      // Clear message initially
+      setChatMessage('');
+      setIsStreamingResponse(true);
+
+      // Send initial message to the sales API to get the real AI response
+      const initialUserMessage = `Hi! I just clicked "Let's do this" to learn more about iLaunching. I'm ${userName} and I'm interested in exploring how you can help my business.`;
+
+      // Send to sales API for real AI response
+      salesApi.createMessageStream(
+        {
+          session_id: sessionId,
+          message: initialUserMessage,
+          email: authState.user?.email || authState.email,
+          name: userName
+        },
+        (response) => {
+          // Update chat message as it streams from the API
+          setChatMessage(response.message);
+        },
+        (error) => {
+          console.error('Sales API initialization error:', error);
+          setChatMessage("Connection error. Please refresh and try again.");
+          setIsStreamingResponse(false);
+        },
+        () => {
+          // Streaming complete
+          setIsStreamingResponse(false);
+        }
+      );
+
+    } catch (error) {
+      console.error('Failed to initialize sales conversation:', error);
+      setChatMessage("Unable to connect to sales service. Please try again.");
+      setIsStreamingResponse(false);
+    }
+  };
+
+  // Handle sales conversation messages
+  const handleSalesMessage = async (message: string) => {
+    if (!salesSessionId || isStreamingResponse) return;
+
+    try {
+      setIsStreamingResponse(true);
+      setChatMessage('');
+
+      // Send message to sales API with streaming
+      salesApi.createMessageStream(
+        {
+          session_id: salesSessionId,
+          message: message,
+          email: authState.user?.email || authState.email,
+          name: authState.user?.name || authState.name
+        },
+        (response) => {
+          // Update chat message as it streams
+          setChatMessage(response.message);
+        },
+        (error) => {
+          console.error('Sales API error:', error);
+          setChatMessage("I apologize, but I'm having trouble connecting right now. Could you please try again?");
+          setIsStreamingResponse(false);
+        },
+        () => {
+          // Streaming complete
+          setIsStreamingResponse(false);
+        }
+      );
+
+    } catch (error) {
+      console.error('Failed to send sales message:', error);
+      setChatMessage("I'm here to help! Could you tell me more about your business needs?");
+      setIsStreamingResponse(false);
+    }
   };
   
   // Determine if chat should be visible
@@ -178,11 +268,17 @@ export default function Landing() {
           <ChatWindow
             message={chatMessage}
             placeholder="Tell me about your business challenge..."
+            useAiIndicator={authState.stage === 'sales'}
+            aiName="iLaunching AI"
+            aiAcknowledge={authState.user?.name ? `Speaking with ${authState.user.name}` : 'Sales Consultation'}
             onSubmit={(message) => {
-              // Handle user input for consultation
-              console.log('User consultation input:', message);
-              // You can add logic here to process user queries
-              setChatMessage(`Thanks for sharing: "${message}". Based on what you've told me, here are some ways iLaunching can help you...`);
+              if (authState.stage === 'sales' && salesSessionId) {
+                // Handle sales conversation through API
+                handleSalesMessage(message);
+              } else {
+                // In non-sales mode, we shouldn't have the chat window open
+                console.log('User consultation input (no sales session):', message);
+              }
             }}
             onVoiceClick={() => {
               // Handle voice input
@@ -199,7 +295,14 @@ export default function Landing() {
       
       {/* Content overlay */}
       <div className="relative flex flex-col min-h-screen">
-        <Header />
+        <Header 
+          showTestButton={authState.stage !== 'sales'}
+          onTestButtonClick={() => {
+            enterSalesMode();
+            setShowChatWindow(true);
+            setChatMessage("AI indicator test");
+          }}
+        />
         
         {/* Center the chat interface - Add top padding for sticky header */}
         <div 
@@ -280,7 +383,7 @@ export default function Landing() {
                 style={{ marginBottom: '200px', minHeight: '60px' }}
               >
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     // Transition to sales mode - this will clear all content
                     enterSalesMode();
                     
@@ -297,9 +400,11 @@ export default function Landing() {
                       setIsTransitioning(false);
                     }, 1000);
                     
-                    // Show chat window for consultation
-                    setTimeout(() => {
+                    // Show chat window and initialize sales conversation
+                    setTimeout(async () => {
                       setShowChatWindow(true);
+                      // Initialize the sales conversation with API
+                      await initializeSalesConversation();
                     }, 1200);
                   }}
                   className={`flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${

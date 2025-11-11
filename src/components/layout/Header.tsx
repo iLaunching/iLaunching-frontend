@@ -1,4 +1,9 @@
-export default function Header() {
+interface HeaderProps {
+  showTestButton?: boolean;
+  onTestButtonClick?: () => void;
+}
+
+export default function Header({ showTestButton = false, onTestButtonClick }: HeaderProps) {
   return (
     <header 
       className="w-full fixed top-0 left-0 right-0"
@@ -12,7 +17,8 @@ export default function Header() {
       }}
     >
        
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-4">
         {/* AI Tool Logo - 50x50px diamond with animated "i" */}
         <div className="ai-icon-container">
           <div className="ai-icon">
@@ -20,18 +26,29 @@ export default function Header() {
           </div>
         </div>
         
-        {/* Text */}
-        <h1 
-          className="text-black"
-          style={{
-            fontFamily: "'Baloo 2', sans-serif",
-            fontSize: '40px',
-            fontWeight: '600',
-            lineHeight: '1',
-          }}
-        >
-          iLaunching
-        </h1>
+          {/* Text */}
+          <h1 
+            className="text-black"
+            style={{
+              fontFamily: "'Baloo 2', sans-serif",
+              fontSize: '40px',
+              fontWeight: '600',
+              lineHeight: '1',
+            }}
+          >
+            iLaunching
+          </h1>
+        </div>
+        
+        {/* Test Button */}
+        {showTestButton && (
+          <button 
+            onClick={onTestButtonClick}
+            className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+          >
+            Test AI Indicator
+          </button>
+        )}
       </div>
 
       <style>{`

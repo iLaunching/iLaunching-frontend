@@ -6,6 +6,7 @@ import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import AiIndicator from './tiptap/AiIndicator';
 
 interface TiptapTypewriterProps {
   text: string;
@@ -15,6 +16,12 @@ interface TiptapTypewriterProps {
   onComplete?: () => void;
   /** Whether to scroll within a container instead of the window (for ChatWindow usage) */
   scrollContainer?: boolean;
+  /** AI Indicator props - if provided, will insert an AI indicator node at the start */
+  aiIndicator?: {
+    aiName?: string;
+    aiAcknowledge?: string;
+    show: boolean;
+  };
 }
 
 export default function TiptapTypewriter({ 
@@ -23,7 +30,8 @@ export default function TiptapTypewriter({
   className = "",
   style = {},
   onComplete,
-  scrollContainer = false
+  scrollContainer = false,
+  aiIndicator
 }: TiptapTypewriterProps) {
   const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,8 +65,21 @@ export default function TiptapTypewriter({
         },
         nested: true,
       }),
+      AiIndicator,
     ],
-    content: '',
+    content: aiIndicator && aiIndicator.show ? {
+      type: 'doc',
+      content: [
+        {
+          type: 'aiIndicator',
+          attrs: {
+            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiAcknowledge: aiIndicator.aiAcknowledge || '',
+            text: ''
+          }
+        }
+      ]
+    } : '',
     editable: false,
     parseOptions: {
       preserveWhitespace: 'full',
@@ -109,12 +130,70 @@ export default function TiptapTypewriter({
     }
   }, [editor]);
 
+  // Helper function to update content while preserving AI indicator
+  const updateContentWithAI = (newContent: string) => {
+    console.log('updateContentWithAI called with:', newContent, 'aiIndicator:', aiIndicator);
+    if (aiIndicator && aiIndicator.show) {
+      // If AI indicator is present, create content with it at the bottom
+      const aiIndicatorNode = {
+        type: 'aiIndicator',
+        attrs: {
+          aiName: aiIndicator.aiName || 'AI Assistant',
+          aiAcknowledge: aiIndicator.aiAcknowledge || '',
+          text: ''
+        }
+      };
+
+      // Always show AI indicator at bottom, with content above if any
+      const contentStructure = [];
+      
+      // Add text content if any
+      if (newContent.trim()) {
+        contentStructure.push({
+          type: 'paragraph',
+          content: [{ type: 'text', text: newContent }]
+        });
+      }
+      
+      // Always add AI indicator at the bottom
+      contentStructure.push(aiIndicatorNode);
+      
+      editor.commands.setContent({
+        type: 'doc',
+        content: contentStructure
+      });
+    } else {
+      // No AI indicator, just set the content normally
+      editor.commands.setContent(newContent);
+    }
+  };
+
   useEffect(() => {
     if (!editor || !text) return;
 
     // Clear and restart typing when text changes
     setIsTyping(true);
-    editor.commands.setContent('');
+    
+    // Initialize with AI indicator if needed
+    console.log('TiptapTypewriter: aiIndicator prop:', aiIndicator);
+    if (aiIndicator && aiIndicator.show) {
+      console.log('TiptapTypewriter: Setting initial content with AI indicator');
+      editor.commands.setContent({
+        type: 'doc',
+        content: [{
+          type: 'aiIndicator',
+          attrs: {
+            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiAcknowledge: aiIndicator.aiAcknowledge || '',
+            text: ''
+          }
+        }]
+      });
+      console.log('TiptapTypewriter: AI indicator content set, HTML:', editor.getHTML());
+    } else {
+      console.log('TiptapTypewriter: No AI indicator, setting empty content');
+      editor.commands.setContent('');
+    }
 
     let currentIndex = 0;
     
@@ -217,7 +296,7 @@ export default function TiptapTypewriter({
             }
             
             // Update editor content
-            editor.commands.setContent(currentHTML);
+            updateContentWithAI(currentHTML);
             
             // Debug: Log when we encounter task list elements
             if (element.content.includes('taskList') || element.content.includes('taskItem')) {
@@ -279,7 +358,7 @@ export default function TiptapTypewriter({
       const typeInterval = setInterval(() => {
         if (currentIndex < words.length) {
           currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
-          editor.commands.setContent(currentText);
+          updateContentWithAI(currentText);
           currentIndex++;
           
           // Auto-scroll to follow text as it appears
@@ -308,8 +387,9 @@ export default function TiptapTypewriter({
             }
           }
         } else {
-          // Final text without cursor
-          editor.commands.setContent(currentText);
+          // Final text without cursor (AI indicator already present)
+          updateContentWithAI(currentText);
+          
           clearInterval(typeInterval);
           setIsTyping(false);
           if (onComplete) {
