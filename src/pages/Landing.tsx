@@ -295,14 +295,7 @@ export default function Landing() {
       
       {/* Content overlay */}
       <div className="relative flex flex-col min-h-screen">
-        <Header 
-          showTestButton={authState.stage !== 'sales'}
-          onTestButtonClick={() => {
-            enterSalesMode();
-            setShowChatWindow(true);
-            setChatMessage("AI indicator test");
-          }}
-        />
+        <Header aiActive={authState.stage === 'sales'} />
         
         {/* Center the chat interface - Add top padding for sticky header */}
         <div 
@@ -390,22 +383,22 @@ export default function Landing() {
                     // Start background transition
                     setIsTransitioning(true);
                     
-                    // Change background after brief delay
+                    // Change background immediately
                     setTimeout(() => {
                       setBackgroundType('connected');
-                    }, 200);
+                    }, 50);
                     
-                    // Complete transition after animation
+                    // Complete background transition
                     setTimeout(() => {
                       setIsTransitioning(false);
-                    }, 1000);
+                    }, 800);
                     
-                    // Show chat window and initialize sales conversation
+                    // Show chat window after background is settled
                     setTimeout(async () => {
                       setShowChatWindow(true);
                       // Initialize the sales conversation with API
                       await initializeSalesConversation();
-                    }, 1200);
+                    }, 900);
                   }}
                   className={`flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
                     showYesPleaseButton ? 'opacity-100' : 'opacity-0'
@@ -478,17 +471,15 @@ export default function Landing() {
           padding: 0;
           margin: 0;
           overflow: hidden;
-          animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         @keyframes slideInLeft {
           from {
             transform: translateX(-100%);
-            opacity: 0;
           }
           to {
             transform: translateX(0);
-            opacity: 1;
           }
         }
         
@@ -527,18 +518,16 @@ export default function Landing() {
             transform: none;
             width: auto;
             max-height: 60vh;
-            animation: slideInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           }
         }
         
         @keyframes slideInUp {
           from {
             transform: translateY(100%);
-            opacity: 0;
           }
           to {
             transform: translateY(0);
-            opacity: 1;
           }
         }
       `}</style>

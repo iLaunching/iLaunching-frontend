@@ -35,6 +35,7 @@ export default function TiptapTypewriter({
 }: TiptapTypewriterProps) {
   const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const aiIndicatorNodeRef = useRef<any>(null);
 
   const editor = useEditor({
     extensions: [
@@ -130,40 +131,46 @@ export default function TiptapTypewriter({
     }
   }, [editor]);
 
+
+  
   // Helper function to update content while preserving AI indicator
   const updateContentWithAI = (newContent: string) => {
     console.log('updateContentWithAI called with:', newContent, 'aiIndicator:', aiIndicator);
     if (aiIndicator && aiIndicator.show) {
-      // If AI indicator is present, create content with it at the bottom
-      const aiIndicatorNode = {
-        type: 'aiIndicator',
-        attrs: {
-          aiName: aiIndicator.aiName || 'AI Assistant',
-          aiAcknowledge: aiIndicator.aiAcknowledge || '',
-          text: ''
-        }
-      };
-
-      // Always show AI indicator at bottom, with content above if any
-      const contentStructure = [];
+      // Create a temporary div to parse HTML and get the current content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = newContent;
       
-      // Add text content if any
-      if (newContent.trim()) {
-        contentStructure.push({
-          type: 'paragraph',
-          content: [{ type: 'text', text: newContent }]
-        });
+      // Get current editor content without the AI indicator
+      let currentDoc = editor.getJSON();
+      
+      // Filter out AI indicator to get clean content
+      if (currentDoc.content) {
+        currentDoc.content = currentDoc.content.filter((node: any) => node.type !== 'aiIndicator');
+      } else {
+        currentDoc.content = [];
       }
       
-      // Always add AI indicator at the bottom
-      contentStructure.push(aiIndicatorNode);
+      // Set the HTML content (this will parse the HTML properly)
+      editor.commands.setContent(newContent);
       
-      editor.commands.setContent({
-        type: 'doc',
-        content: contentStructure
-      });
+      // Now add the AI indicator back at the end
+      if (!aiIndicatorNodeRef.current) {
+        aiIndicatorNodeRef.current = {
+          type: 'aiIndicator',
+          attrs: {
+            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiAcknowledge: aiIndicator.aiAcknowledge || '',
+            text: '',
+            id: 'main-ai-indicator' // Stable ID
+          }
+        };
+      }
+      
+      // Insert AI indicator at the end
+      editor.commands.insertContentAt(editor.state.doc.content.size, aiIndicatorNodeRef.current);
     } else {
-      // No AI indicator, just set the content normally
+      // No AI indicator - just set the HTML content directly
       editor.commands.setContent(newContent);
     }
   };
@@ -178,21 +185,27 @@ export default function TiptapTypewriter({
     console.log('TiptapTypewriter: aiIndicator prop:', aiIndicator);
     if (aiIndicator && aiIndicator.show) {
       console.log('TiptapTypewriter: Setting initial content with AI indicator');
-      editor.commands.setContent({
-        type: 'doc',
-        content: [{
+      // Initialize the stable AI indicator ref
+      if (!aiIndicatorNodeRef.current) {
+        aiIndicatorNodeRef.current = {
           type: 'aiIndicator',
           attrs: {
             aiName: aiIndicator.aiName || 'AI Assistant',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
-            text: ''
+            text: '',
+            id: 'main-ai-indicator'
           }
-        }]
+        };
+      }
+      editor.commands.setContent({
+        type: 'doc',
+        content: [aiIndicatorNodeRef.current]
       });
       console.log('TiptapTypewriter: AI indicator content set, HTML:', editor.getHTML());
     } else {
       console.log('TiptapTypewriter: No AI indicator, setting empty content');
       editor.commands.setContent('');
+      aiIndicatorNodeRef.current = null; // Clear ref
     }
 
     let currentIndex = 0;
@@ -203,8 +216,7 @@ export default function TiptapTypewriter({
     const hasHTML = text.includes('<');
     
     if (hasHTML) {
-      // Parse HTML into structured elements for smooth animation
-      // Type HTML content progressively with wave effect
+      // Parse HTML into structured elements for smooth animation with wave effect
       const typeHTMLWithWave = () => {
         // Parse HTML and extract words while preserving structure
         const parseHTMLToWords = (htmlText: string) => {
@@ -222,14 +234,23 @@ export default function TiptapTypewriter({
             if (node.nodeType === Node.TEXT_NODE) {
               const text = node.textContent;
               if (text) {
-                // Don't trim here to preserve leading/trailing spaces
-                const words = text.split(/(\s+)/); // Capture whitespace in groups
-                words.forEach((word) => {
-                  if (word.length > 0) {
-                    wordElements.push({
-                      type: 'word',
-                      content: word
-                    });
+                // Split into words and spaces, but handle them differently
+                const parts = text.split(/(\s+)/); // Capture whitespace in groups
+                parts.forEach((part) => {
+                  if (part.length > 0) {
+                    if (/^\s+$/.test(part)) {
+                      // This is whitespace - add directly without animation
+                      wordElements.push({
+                        type: 'word',
+                        content: part
+                      });
+                    } else if (part.trim().length > 0) {
+                      // This is an actual word - mark for animation
+                      wordElements.push({
+                        type: 'word',
+                        content: part
+                      });
+                    }
                   }
                 });
               }
@@ -284,12 +305,24 @@ export default function TiptapTypewriter({
               if (insideTaskList) {
                 // Inside task list - add text directly to preserve Tiptap structure
                 currentHTML += element.content;
+                if (element.content.trim().length > 0) {
+                  wordCount++;
+                }
               } else {
-                // Outside task list - add wave animation span
-                const wordSpan = `<span class="wave-word" style="animation-delay: ${wordCount * 0.08}s">${element.content}</span>`;
-                currentHTML += wordSpan;
+                // Check if this is whitespace or actual word
+                if (/^\s+$/.test(element.content)) {
+                  // This is whitespace - add directly without animation span
+                  currentHTML += element.content;
+                } else if (element.content.trim().length > 0) {
+                  // This is an actual word - add wave animation span
+                  const wordSpan = `<span class="wave-word" style="animation-delay: ${wordCount * 0.08}s">${element.content}</span>`;
+                  currentHTML += wordSpan;
+                  wordCount++;
+                } else {
+                  // Empty or whitespace-only content
+                  currentHTML += element.content;
+                }
               }
-              wordCount++;
             } else {
               // Add HTML tags directly
               currentHTML += element.content;
@@ -402,7 +435,7 @@ export default function TiptapTypewriter({
     }
   }, [text, speed, editor, onComplete]);
 
-  // Add click functionality to checkboxes
+  // Add click functionality to checkboxes and ensure AI indicator stays at end
   useEffect(() => {
     if (!editor) return;
 

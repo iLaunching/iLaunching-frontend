@@ -4,6 +4,7 @@
  */
 
 
+import React from 'react';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 
@@ -12,8 +13,18 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
   const { aiName, aiAcknowledge, text } = node.attrs;
   console.log('AiIndicator: Rendering with attrs:', { aiName, aiAcknowledge, text });
   
+  // Track if this is first render to prevent animation restart
+  const [hasAnimated, setHasAnimated] = React.useState(false);
+  
+  React.useEffect(() => {
+    if (!hasAnimated) {
+      const timer = setTimeout(() => setHasAnimated(true), 500); // After animation completes
+      return () => clearTimeout(timer);
+    }
+  }, [hasAnimated]);
+  
   return (
-    <NodeViewWrapper className="ce-ai">
+    <NodeViewWrapper className={`ce-ai ${hasAnimated ? 'no-animate' : ''}`}>
       <div className="tiptap-ai-container">
         {/* Header section with icon, name, and acknowledge */}
         <div className="tiptap-ai-header">
@@ -49,6 +60,10 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           margin: 1em 0;
           position: relative;
           animation: tiptapAiSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ce-ai.no-animate {
+          animation: none;
         }
 
         .tiptap-ai-container {

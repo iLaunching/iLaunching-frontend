@@ -1,9 +1,8 @@
 interface HeaderProps {
-  showTestButton?: boolean;
-  onTestButtonClick?: () => void;
+  aiActive?: boolean; // Whether AI is active in sales mode
 }
 
-export default function Header({ showTestButton = false, onTestButtonClick }: HeaderProps) {
+export default function Header({ aiActive = false }: HeaderProps) {
   return (
     <header 
       className="w-full fixed top-0 left-0 right-0"
@@ -21,8 +20,8 @@ export default function Header({ showTestButton = false, onTestButtonClick }: He
         <div className="flex items-center gap-4">
         {/* AI Tool Logo - 50x50px diamond with animated "i" */}
         <div className="ai-icon-container">
-          <div className="ai-icon">
-            <span className="ai-letter">i</span>
+          <div className={`ai-icon ${aiActive ? 'ai-active' : ''}`}>
+            <span className={`ai-letter ${aiActive ? 'ai-active' : ''}`}>i</span>
           </div>
         </div>
         
@@ -39,16 +38,6 @@ export default function Header({ showTestButton = false, onTestButtonClick }: He
             iLaunching
           </h1>
         </div>
-        
-        {/* Test Button */}
-        {showTestButton && (
-          <button 
-            onClick={onTestButtonClick}
-            className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-          >
-            Test AI Indicator
-          </button>
-        )}
       </div>
 
       <style>{`
@@ -193,6 +182,40 @@ export default function Header({ showTestButton = false, onTestButtonClick }: He
           }
         }
 
+        /* AI Active State - stops animations and shows settled appearance */
+        .ai-icon.ai-active::before,
+        .ai-icon.ai-active::after {
+          animation: none !important;
+          opacity: 0.2 !important;
+          background: linear-gradient(45deg, 
+            rgba(59, 130, 246, 0.2),
+            rgba(147, 51, 234, 0.2),
+            rgba(236, 72, 153, 0.2),
+            rgba(251, 146, 60, 0.2)
+          ) !important;
+        }
+
+        .ai-icon.ai-active .ai-letter {
+          animation: none !important;
+          background: rgba(59, 130, 246, 0.6) !important;
+          background-clip: text !important;
+          -webkit-background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.2)) !important;
+        }
+
+        .ai-icon.ai-active {
+          background: linear-gradient(135deg, 
+            rgba(59, 130, 246, 0.04) 0%, 
+            rgba(147, 51, 234, 0.04) 50%,
+            rgba(236, 72, 153, 0.04) 100%
+          ) !important;
+          border: 1px solid rgba(59, 130, 246, 0.08) !important;
+          box-shadow: 
+            0 0 8px rgba(59, 130, 246, 0.05),
+            inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+        }
+
         /* Hover effects */
         .ai-icon:hover::before,
         .ai-icon:hover::after {
@@ -204,6 +227,11 @@ export default function Header({ showTestButton = false, onTestButtonClick }: He
           box-shadow: 
             0 0 30px rgba(59, 130, 246, 0.3),
             inset 0 1px 1px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Don't scale on hover when AI is active */
+        .ai-icon.ai-active:hover {
+          transform: rotate(45deg) scale(1) !important;
         }
       `}</style>
     </header>
