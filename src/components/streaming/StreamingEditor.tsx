@@ -8,6 +8,7 @@ import { TableHeader } from '@tiptap/extension-table-header';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import { StreamContent } from '../tiptap/extensions/StreamContent';
+import CodeBlockWithHighlight from '../tiptap/extensions/CodeBlockWithHighlight';
 
 interface StreamingEditorProps {
   className?: string;
@@ -27,7 +28,10 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
 }) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false, // Disable default code block
+      }),
+      CodeBlockWithHighlight,
       Table.configure({
         resizable: true,
       }),

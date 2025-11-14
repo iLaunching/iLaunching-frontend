@@ -8,6 +8,7 @@ import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import AiIndicator from './tiptap/AiIndicator';
 import Query from './tiptap/Query';
+import CodeBlockWithHighlight from './tiptap/extensions/CodeBlockWithHighlight';
 
 interface TiptapTypewriterProps {
   text: string;
@@ -43,7 +44,10 @@ export default function TiptapTypewriter({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false, // Disable default code block
+      }),
+      CodeBlockWithHighlight,
       BulletList.configure({
         HTMLAttributes: {
           class: 'bullet-list',

@@ -118,6 +118,46 @@ export default function WebSocketTestPage() {
         });
         break;
         
+      case 'javascript':
+        streaming.addToQueue('<h3>JavaScript Example</h3><pre data-language="javascript"><code class="language-javascript">function greet(name) {\n  console.log(`Hello, ${name}!`);\n  return {\n    message: `Welcome, ${name}`,\n    timestamp: Date.now()\n  };\n}\n\nconst user = { name: "Alice", age: 30 };\ngreet(user.name);</code></pre>', {
+          content_type: 'html',
+          speed: 'fast',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'python':
+        streaming.addToQueue('<h3>Python Example</h3><pre data-language="python"><code class="language-python">def calculate_fibonacci(n):\n    """Calculate Fibonacci sequence up to n terms."""\n    fib_sequence = [0, 1]\n    \n    for i in range(2, n):\n        next_fib = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_fib)\n    \n    return fib_sequence\n\nresult = calculate_fibonacci(10)\nprint(f"Fibonacci sequence: {result}")</code></pre>', {
+          content_type: 'html',
+          speed: 'fast',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'typescript':
+        streaming.addToQueue('<h3>TypeScript Example</h3><pre data-language="typescript"><code class="language-typescript">interface User {\n  id: number;\n  name: string;\n  email: string;\n}\n\nclass UserService {\n  private users: User[] = [];\n  \n  addUser(user: User): void {\n    this.users.push(user);\n    console.log(`Added user: ${user.name}`);\n  }\n  \n  getUser(id: number): User | undefined {\n    return this.users.find(u => u.id === id);\n  }\n}</code></pre>', {
+          content_type: 'html',
+          speed: 'fast',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'html':
+        streaming.addToQueue('Testing <strong>bold text</strong> and <em>italic text</em> with <code>inline code</code>.', {
+          content_type: 'html',
+          speed: 'fast',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'mixed':
+        streaming.addToQueue('<h2>Full Stack Example</h2><p>Here\'s a complete example with <strong>multiple languages</strong>:</p><h4>Frontend (React)</h4><pre data-language="jsx"><code class="language-jsx">import React, { useState } from "react";\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}</code></pre><h4>Backend (Python)</h4><pre data-language="python"><code class="language-python">from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/api/count")\nasync def get_count():\n    return {"count": 42, "status": "success"}</code></pre><p>This demonstrates <strong>syntax highlighting</strong> for multiple code blocks!</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
       case 'clear':
         editor?.commands.clearContent();
         editor?.commands.setContent('<p>Cleared! Ready for next test.</p>');
@@ -224,6 +264,34 @@ export default function WebSocketTestPage() {
                     className="px-3 py-1 bg-teal-100 text-teal-700 rounded hover:bg-teal-200 text-sm font-medium"
                   >
                     📋 Lists
+                  </button>
+                </div>
+
+                <h3 className="text-sm font-medium text-gray-700 mt-4">Code Block Tests (NEW!)</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => runTest('javascript')}
+                    className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 text-sm font-medium"
+                  >
+                    💛 JavaScript
+                  </button>
+                  <button
+                    onClick={() => runTest('python')}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 text-sm font-medium"
+                  >
+                    🐍 Python
+                  </button>
+                  <button
+                    onClick={() => runTest('typescript')}
+                    className="px-3 py-1 bg-cyan-100 text-cyan-800 rounded hover:bg-cyan-200 text-sm font-medium"
+                  >
+                    💙 TypeScript
+                  </button>
+                  <button
+                    onClick={() => runTest('mixed')}
+                    className="px-3 py-1 bg-gradient-to-r from-yellow-100 via-blue-100 to-cyan-100 text-gray-800 rounded hover:from-yellow-200 hover:via-blue-200 hover:to-cyan-200 text-sm font-medium"
+                  >
+                    🌈 Mixed Languages
                   </button>
                 </div>
 
