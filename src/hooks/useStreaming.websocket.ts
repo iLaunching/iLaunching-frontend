@@ -53,10 +53,14 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     const codeContent = match[1];
     const matchIndex = match.index || 0;
     
+    console.log('🎯 Code block match:', JSON.stringify(fullMatch.substring(0, 100)));
+    console.log('🎯 Match index:', matchIndex, 'lastIndex:', lastIndex);
+    
     // Insert any content BEFORE this code block (like headings, paragraphs)
     if (matchIndex > lastIndex) {
       const beforeContent = chunk.substring(lastIndex, matchIndex);
-      console.log('📄 Inserting content before code block:', beforeContent.substring(0, 50));
+      console.log('📄 Content before code block (full):', JSON.stringify(beforeContent));
+      console.log('📄 Length:', beforeContent.length, 'Match starts at:', matchIndex);
       editor.commands.insertStreamChunk(beforeContent, true);
       await new Promise(resolve => setTimeout(resolve, 50));
     }
@@ -192,7 +196,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           options.onStreamStart?.(message);
         },
         
-        onChunk: (chunk: StreamChunk) => {
+        onChunk: async (chunk: StreamChunk) => {
           console.log('📦 Chunk received, length:', chunk.data.length);
           console.log('📄 Full chunk content:', chunk.data);
           
@@ -206,8 +210,8 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
             if (hasCompleteCodeBlock) {
               console.log('🎯 Complete code block detected, using typewriter effect');
               // For complete code blocks, stream character-by-character with typewriter effect
-              // Use await to ensure typewriter completes before processing next chunk
-              streamCodeBlockChunk(editor, chunk.data).catch(err => {
+              // IMPORTANT: await this so stream_complete doesn't arrive before typewriter finishes
+              await streamCodeBlockChunk(editor, chunk.data).catch(err => {
                 console.error('❌ Code block streaming error:', err);
               });
             } else {
@@ -233,9 +237,9 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           options.onStreamComplete?.(message);
           
-          // Mark as not processing - useEffect will handle next queue item
-          console.log('✅ Stream done, marking as not processing');
+          // Process next in queue
           isProcessingRef.current = false;
+          processQueue();
         },
         
         onStreamPaused: () => {
@@ -292,43 +296,44 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       }
     };
 
-    console.log('🎯 addToQueue called, id:', streamRequest.id, 'isProcessing:', isProcessingRef.current);
-
+    console.log('➕ addToQueue called with ID:', streamRequest.id);
     setQueue(prev => [...prev, streamRequest]);
     
-    // Queue processing will be handled by useEffect watching queue.length
+    // Auto-process if not already streaming
+    if (!isProcessingRef.current) {
+      processQueue();
+    }
   }, []);
 
   /**
    * Process queue
    */
   const processQueue = useCallback(() => {
-    console.log('🔍 processQueue called, isProcessing:', isProcessingRef.current, 'connected:', wsServiceRef.current?.isConnected());
-    
+    console.log('🔄 processQueue called - isProcessing:', isProcessingRef.current);
     if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) {
-      console.log('⛔ Blocked: Already processing or not connected');
+      console.log('🔄 Skipping: isProcessing =', isProcessingRef.current, 'connected =', wsServiceRef.current?.isConnected());
       return;
     }
     
     setQueue(prev => {
-      console.log('📊 Queue length:', prev.length);
-      
-      // CRITICAL: Check flag again inside callback to prevent strict mode double execution
-      if (isProcessingRef.current) {
-        console.log('⛔ Blocked inside setQueue: Already processing');
-        return prev; // Don't modify queue, already being processed
-      }
-      
+      console.log('🔄 Inside setQueue - prev.length:', prev.length);
       if (prev.length === 0) {
+        console.log('🔄 Queue empty, nothing to process');
         return prev;
       }
       
       const [next, ...rest] = prev;
       
-      console.log('✅ Processing stream request:', next.id);
+      // CRITICAL: Check processing flag AFTER extracting item but BEFORE processing
+      // This prevents React Strict Mode from executing the stream request twice
+      if (isProcessingRef.current) {
+        console.log('🔄 Already processing (strict mode guard), returning REST to remove item');
+        return rest; // Remove item from queue but don't process again
+      }
       
-      // Mark as processing
       isProcessingRef.current = true;
+      console.log('🔄 Set isProcessing = true');
+      console.log('🔄 Processing item:', next.id);
       setCurrentStreamId(next.id);
       
       // Send stream request to API
@@ -392,16 +397,6 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       wsServiceRef.current.skipStream();
     }
   }, [isStreaming]);
-
-  /**
-   * Auto-process queue when items added and not currently processing
-   */
-  useEffect(() => {
-    if (queue.length > 0 && !isProcessingRef.current && wsServiceRef.current?.isConnected()) {
-      console.log('📋 Queue has items and not processing, triggering processQueue');
-      processQueue();
-    }
-  }, [queue.length, processQueue]);
 
   /**
    * Auto-connect when editor becomes available
