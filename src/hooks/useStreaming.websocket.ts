@@ -100,19 +100,21 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     
     console.log('⌨️  Starting typewriter effect...');
     
-    // Stream character-by-character
+    // Instead of character-by-character, type line-by-line for better formatting
     const lines = decodedCode.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      for (let j = 0; j < line.length; j++) {
-        editor.commands.insertContent(line[j]);
-        await new Promise(resolve => setTimeout(resolve, 20));
+      // Insert the entire line at once (preserves spacing and formatting)
+      if (line.length > 0) {
+        editor.commands.insertContent(line);
+        await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per line
       }
       
+      // Add newline if not the last line
       if (i < lines.length - 1) {
         editor.commands.insertContent('\n');
-        await new Promise(resolve => setTimeout(resolve, 20));
+        await new Promise(resolve => setTimeout(resolve, 10));
       }
     }
     
