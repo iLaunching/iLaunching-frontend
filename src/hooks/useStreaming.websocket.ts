@@ -175,18 +175,22 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
         },
         
         onChunk: (chunk: StreamChunk) => {
-          console.log('📦 Chunk received:', chunk.data.substring(0, 100) + '...');
+          console.log('📦 Chunk received, length:', chunk.data.length);
+          console.log('📄 Full chunk content:', chunk.data);
           
           // Insert chunk directly into editor
           if (editor && !editor.isDestroyed) {
             // Check if chunk contains a COMPLETE code block (both <pre> and </pre>)
             const hasCompleteCodeBlock = chunk.data.includes('<pre') && chunk.data.includes('</pre>');
             
+            console.log('🔍 Has complete code block?', hasCompleteCodeBlock);
+            
             if (hasCompleteCodeBlock) {
               console.log('🎯 Complete code block detected, using typewriter effect');
               // For complete code blocks, stream character-by-character with typewriter effect
               streamCodeBlockChunk(editor, chunk.data);
             } else {
+              console.log('📝 Regular content, using normal insertion');
               // Regular content - insert normally
               editor.commands.insertStreamChunk(chunk.data, true);
             }
