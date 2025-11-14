@@ -310,17 +310,21 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   const processQueue = useCallback(() => {
     console.log('🔍 processQueue called, isProcessing:', isProcessingRef.current, 'connected:', wsServiceRef.current?.isConnected());
     
-    if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) return;
-    
-    // Mark as processing BEFORE setQueue to prevent double execution in strict mode
-    isProcessingRef.current = true;
+    if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) {
+      console.log('⛔ Blocked: Already processing or not connected');
+      return;
+    }
     
     setQueue(prev => {
       console.log('📊 Queue length:', prev.length);
       
+      // CRITICAL: Check flag again inside callback to prevent strict mode double execution
+      if (isProcessingRef.current) {
+        console.log('⛔ Blocked inside setQueue: Already processing');
+        return prev; // Don't modify queue, already being processed
+      }
+      
       if (prev.length === 0) {
-        // Reset processing flag if queue is empty
-        isProcessingRef.current = false;
         return prev;
       }
       
@@ -328,6 +332,8 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       
       console.log('✅ Processing stream request:', next.id);
       
+      // Mark as processing
+      isProcessingRef.current = true;
       setCurrentStreamId(next.id);
       
       // Send stream request to API

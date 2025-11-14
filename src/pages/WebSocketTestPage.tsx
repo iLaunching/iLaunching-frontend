@@ -29,11 +29,6 @@ export default function WebSocketTestPage() {
   const runTest = (testName: string) => {
     addTestResult(`🧪 Running test: ${testName}`);
     
-    // Clear editor before each test to prevent duplicate content
-    if (editor && testName !== 'clear') {
-      editor.commands.clearContent();
-    }
-    
     switch(testName) {
       case 'plaintext':
         streaming.addToQueue('Hello from WebSocket! This is a simple text test with multiple words to see the streaming effect.', {
