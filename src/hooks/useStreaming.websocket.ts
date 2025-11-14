@@ -49,34 +49,33 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     
     console.log('📦 Code block detected! Language:', language, 'Content length:', codeContent.length);
     
-    // Move to end of document
+    // Get current position before inserting
     const { state } = editor;
-    const endPos = state.doc.content.size;
-    editor.chain().focus().setTextSelection(endPos).run();
+    const beforePos = state.doc.content.size;
     
-    // Insert empty code block with the detected language
-    const inserted = editor.chain()
+    // Insert empty code block with a single space (empty blocks can be problematic)
+    editor.chain()
+      .focus()
       .insertContent({
         type: 'codeBlock',
         attrs: { language },
-        content: []
+        content: [{ type: 'text', text: ' ' }]
       })
       .run();
     
-    if (!inserted) {
-      console.error('❌ Failed to insert code block');
-      editor.commands.insertStreamChunk(chunk, true);
-      return;
-    }
-    
-    console.log('✅ Empty code block created, starting typewriter effect...');
+    console.log('✅ Empty code block created');
     
     // Small delay to let the code block render
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Find the code block we just created and position cursor inside it
-    const codeBlockPos = editor.state.doc.content.size - 1;
-    editor.commands.setTextSelection(codeBlockPos);
+    // Position cursor at the space inside the code block we just created
+    // The code block starts at beforePos, and we want to be inside it (after the opening)
+    editor.commands.setTextSelection(beforePos + 1);
+    
+    // First, clear the placeholder space
+    editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
+    
+    console.log('✅ Cursor positioned inside code block, starting typewriter...');
     
     // Now stream the code content character-by-character
     const lines = codeContent.split('\n');
