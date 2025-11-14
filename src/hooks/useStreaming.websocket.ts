@@ -28,6 +28,61 @@ interface StreamRequest {
   config: Omit<StreamConfig, 'content'>;
 }
 
+/**
+ * Stream code block content character-by-character with typewriter effect
+ */
+const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
+  // Parse the chunk to extract code content
+  const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
+  const match = codeBlockRegex.exec(chunk);
+  
+  if (match) {
+    // Extract language and code content
+    const preMatch = chunk.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
+    const language = preMatch ? preMatch[1] : 'javascript';
+    const codeContent = match[1]
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    
+    // Create the code block with empty content first
+    const { state } = editor;
+    const endPos = state.doc.content.size;
+    editor.commands.setTextSelection(endPos);
+    
+    // Insert code block node
+    editor.commands.insertContent({
+      type: 'codeBlock',
+      attrs: { language },
+      content: [{ type: 'text', text: '' }]
+    });
+    
+    // Now stream the code content character-by-character
+    const lines = codeContent.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Type out each character with a small delay
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
+        editor.commands.insertContent(char);
+        await new Promise(resolve => setTimeout(resolve, 20)); // 20ms per character
+      }
+      
+      // Add newline if not the last line
+      if (i < lines.length - 1) {
+        editor.commands.insertContent('\n');
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+    }
+  } else {
+    // Not a complete code block, insert normally
+    editor.commands.insertStreamChunk(chunk, true);
+  }
+};
+
 export const useStreaming = (editor: Editor | null, options: UseStreamingOptions = {}) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -76,7 +131,17 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           // Insert chunk directly into editor
           if (editor && !editor.isDestroyed) {
-            editor.commands.insertStreamChunk(chunk.data, true);
+            // Check if chunk contains code block markers
+            const hasCodeBlockStart = chunk.data.includes('<pre') || chunk.data.includes('<code');
+            const hasCodeBlockEnd = chunk.data.includes('</pre>') || chunk.data.includes('</code>');
+            
+            if (hasCodeBlockStart || hasCodeBlockEnd) {
+              // For code blocks, stream character-by-character with typewriter effect
+              streamCodeBlockChunk(editor, chunk.data);
+            } else {
+              // Regular content - insert normally
+              editor.commands.insertStreamChunk(chunk.data, true);
+            }
           } else {
             console.error('❌ Editor not available!');
           }
