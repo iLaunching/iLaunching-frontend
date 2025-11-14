@@ -234,6 +234,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           options.onStreamComplete?.(message);
           
           // Process next in queue
+          console.log('🔄 Marking as not processing and triggering processQueue from onStreamComplete');
           isProcessingRef.current = false;
           processQueue();
         },
@@ -292,11 +293,14 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       }
     };
 
+    console.log('🎯 addToQueue called, id:', streamRequest.id, 'isProcessing:', isProcessingRef.current);
+
     setQueue(prev => [...prev, streamRequest]);
     
-    // Auto-process if not already streaming
+    // Auto-process if not already streaming - use setTimeout to ensure state update completes first
     if (!isProcessingRef.current) {
-      processQueue();
+      console.log('🚀 Auto-triggering processQueue from addToQueue (next tick)');
+      setTimeout(() => processQueue(), 0);
     }
   }, []);
 
@@ -304,12 +308,18 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
    * Process queue
    */
   const processQueue = useCallback(() => {
+    console.log('🔍 processQueue called, isProcessing:', isProcessingRef.current, 'connected:', wsServiceRef.current?.isConnected());
+    
     if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) return;
     
     setQueue(prev => {
+      console.log('📊 Queue length:', prev.length);
+      
       if (prev.length === 0) return prev;
       
       const [next, ...rest] = prev;
+      
+      console.log('✅ Processing stream request:', next.id);
       
       // Mark as processing
       isProcessingRef.current = true;
