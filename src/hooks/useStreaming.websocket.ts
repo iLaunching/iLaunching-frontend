@@ -233,19 +233,15 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           options.onStreamComplete?.(message);
           
-          // Mark as not processing - this will allow next queue item to be processed
+          // Mark as not processing
           console.log('✅ Stream done, marking as not processing');
           isProcessingRef.current = false;
           
-          // Check if there are more items in queue - use setTimeout to ensure state is clean
+          // Process next item in queue if exists - deferred to next tick
           setTimeout(() => {
-            setQueue(prev => {
-              if (prev.length > 0 && !isProcessingRef.current) {
-                console.log('📋 Queue has', prev.length, 'items remaining, processing next');
-                processQueue();
-              }
-              return prev;
-            });
+            if (!isProcessingRef.current) {
+              processQueue();
+            }
           }, 0);
         },
         
