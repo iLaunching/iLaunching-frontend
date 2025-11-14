@@ -254,6 +254,41 @@ export default function WebSocketTestPage() {
                     🗑️ Clear
                   </button>
                 </div>
+
+                {/* Stream Controls */}
+                <h3 className="text-sm font-medium text-gray-700 mt-4">Stream Controls</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      streaming.pauseStream();
+                      addTestResult('⏸️ Pause command sent');
+                    }}
+                    disabled={!streaming.isStreaming || streaming.isPaused}
+                    className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    ⏸️ Pause
+                  </button>
+                  <button
+                    onClick={() => {
+                      streaming.resumeStream();
+                      addTestResult('▶️ Resume command sent');
+                    }}
+                    disabled={!streaming.isPaused}
+                    className="px-4 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    ▶️ Resume
+                  </button>
+                  <button
+                    onClick={() => {
+                      streaming.skipStream();
+                      addTestResult('⏭️ Skip command sent');
+                    }}
+                    disabled={!streaming.isStreaming}
+                    className="px-4 py-2 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    ⏭️ Skip to End
+                  </button>
+                </div>
               </div>
             </div>
 

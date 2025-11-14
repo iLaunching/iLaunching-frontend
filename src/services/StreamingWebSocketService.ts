@@ -53,6 +53,9 @@ type StreamMessage =
   | StreamChunk
   | StreamCompleteMessage
   | StreamErrorMessage
+  | { type: 'stream_paused'; timestamp: string }
+  | { type: 'stream_resumed'; timestamp: string }
+  | { type: 'stream_skipped'; timestamp: string }
   | { type: 'pong'; timestamp: string };
 
 export interface StreamCallbacks {
@@ -60,6 +63,9 @@ export interface StreamCallbacks {
   onStreamStart?: (message: StreamStartMessage) => void;
   onChunk?: (chunk: StreamChunk) => void;
   onStreamComplete?: (message: StreamCompleteMessage) => void;
+  onStreamPaused?: () => void;
+  onStreamResumed?: () => void;
+  onStreamSkipped?: () => void;
   onError?: (error: string) => void;
   onDisconnect?: () => void;
 }
@@ -156,6 +162,18 @@ export class StreamingWebSocketService {
         this.callbacks.onStreamComplete?.(message);
         break;
       
+      case 'stream_paused':
+        this.callbacks.onStreamPaused?.();
+        break;
+      
+      case 'stream_resumed':
+        this.callbacks.onStreamResumed?.();
+        break;
+      
+      case 'stream_skipped':
+        this.callbacks.onStreamSkipped?.();
+        break;
+      
       case 'error':
         this.callbacks.onError?.(message.message);
         break;
@@ -184,6 +202,51 @@ export class StreamingWebSocketService {
     
     console.log('📤 Sending stream request:', message);
     this.ws.send(JSON.stringify(message));
+  }
+
+  /**
+   * Pause current stream
+   */
+  pauseStream(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
+    console.log('⏸️ Pausing stream');
+    this.ws.send(JSON.stringify({
+      type: 'stream_control',
+      action: 'pause'
+    }));
+  }
+
+  /**
+   * Resume paused stream
+   */
+  resumeStream(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
+    console.log('▶️ Resuming stream');
+    this.ws.send(JSON.stringify({
+      type: 'stream_control',
+      action: 'resume'
+    }));
+  }
+
+  /**
+   * Skip to end of current stream
+   */
+  skipStream(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
+    console.log('⏭️ Skipping stream');
+    this.ws.send(JSON.stringify({
+      type: 'stream_control',
+      action: 'skip'
+    }));
   }
 
   /**

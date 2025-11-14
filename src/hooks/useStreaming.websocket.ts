@@ -31,6 +31,7 @@ interface StreamRequest {
 export const useStreaming = (editor: Editor | null, options: UseStreamingOptions = {}) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentStreamId, setCurrentStreamId] = useState<string | null>(null);
   const [queue, setQueue] = useState<StreamRequest[]>([]);
   
@@ -66,6 +67,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
         onStreamStart: (message: StreamStartMessage) => {
           console.log('📡 Stream started:', message.metadata);
           setIsStreaming(true);
+          setIsPaused(false);
           options.onStreamStart?.(message);
         },
         
@@ -83,6 +85,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
         onStreamComplete: (message: StreamCompleteMessage) => {
           console.log('🏁 Stream completed');
           setIsStreaming(false);
+          setIsPaused(false);
           setCurrentStreamId(null);
           
           // Clear stream buffer
@@ -95,6 +98,21 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           // Process next in queue
           isProcessingRef.current = false;
           processQueue();
+        },
+        
+        onStreamPaused: () => {
+          console.log('⏸️ Stream paused');
+          setIsPaused(true);
+        },
+        
+        onStreamResumed: () => {
+          console.log('▶️ Stream resumed');
+          setIsPaused(false);
+        },
+        
+        onStreamSkipped: () => {
+          console.log('⏭️ Stream skipped');
+          setIsPaused(false);
         },
         
         onError: (error: string) => {
@@ -195,6 +213,33 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   }, [clearQueue]);
 
   /**
+   * Pause current stream
+   */
+  const pauseStream = useCallback(() => {
+    if (wsServiceRef.current && isStreaming) {
+      wsServiceRef.current.pauseStream();
+    }
+  }, [isStreaming]);
+
+  /**
+   * Resume paused stream
+   */
+  const resumeStream = useCallback(() => {
+    if (wsServiceRef.current && isStreaming) {
+      wsServiceRef.current.resumeStream();
+    }
+  }, [isStreaming]);
+
+  /**
+   * Skip to end of current stream
+   */
+  const skipStream = useCallback(() => {
+    if (wsServiceRef.current && isStreaming) {
+      wsServiceRef.current.skipStream();
+    }
+  }, [isStreaming]);
+
+  /**
    * Auto-connect when editor becomes available
    */
   useEffect(() => {
@@ -216,11 +261,15 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   return {
     isConnected,
     isStreaming,
+    isPaused,
     currentStreamId,
     queueLength: queue.length,
     addToQueue,
     clearQueue,
     disconnect,
-    connect
+    connect,
+    pauseStream,
+    resumeStream,
+    skipStream
   };
 };
