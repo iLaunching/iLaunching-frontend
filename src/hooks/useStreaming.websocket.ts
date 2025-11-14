@@ -36,71 +36,73 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
   const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
   const match = codeBlockRegex.exec(chunk);
   
-  if (match) {
-    // Extract language and code content
-    const preMatch = chunk.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
-    const language = preMatch ? preMatch[1] : 'javascript';
-    const codeContent = match[1]
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'");
+  if (!match) {
+    console.error('❌ Code block regex did not match despite <pre> detection');
+    return; // Don't insert anything if we can't parse it properly
+  }
+  
+  // Extract language and code content
+  const preMatch = chunk.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
+  const language = preMatch ? preMatch[1] : 'javascript';
+  const codeContent = match[1]
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  
+  console.log('📦 Code block matched! Language:', language, 'Content length:', codeContent.length);
+  
+  // Get current position before inserting
+  const { state } = editor;
+  const beforePos = state.doc.content.size;
+  
+  console.log('📍 Position before insert:', beforePos);
+  
+  // Insert empty code block with a single space (empty blocks can be problematic)
+  editor.chain()
+    .focus()
+    .insertContent({
+      type: 'codeBlock',
+      attrs: { language },
+      content: [{ type: 'text', text: ' ' }]
+    })
+    .run();
+  
+  console.log('✅ Empty code block created at position', beforePos);
+  
+  // Small delay to let the code block render
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Position cursor at the space inside the code block we just created
+  // The code block starts at beforePos, and we want to be inside it (after the opening)
+  editor.commands.setTextSelection(beforePos + 1);
+  
+  // First, clear the placeholder space
+  editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
+  
+  console.log('✅ Cursor positioned inside code block, starting typewriter...');
+  
+  // Now stream the code content character-by-character
+  const lines = codeContent.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     
-    console.log('📦 Code block detected! Language:', language, 'Content length:', codeContent.length);
-    
-    // Get current position before inserting
-    const { state } = editor;
-    const beforePos = state.doc.content.size;
-    
-    // Insert empty code block with a single space (empty blocks can be problematic)
-    editor.chain()
-      .focus()
-      .insertContent({
-        type: 'codeBlock',
-        attrs: { language },
-        content: [{ type: 'text', text: ' ' }]
-      })
-      .run();
-    
-    console.log('✅ Empty code block created');
-    
-    // Small delay to let the code block render
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Position cursor at the space inside the code block we just created
-    // The code block starts at beforePos, and we want to be inside it (after the opening)
-    editor.commands.setTextSelection(beforePos + 1);
-    
-    // First, clear the placeholder space
-    editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
-    
-    console.log('✅ Cursor positioned inside code block, starting typewriter...');
-    
-    // Now stream the code content character-by-character
-    const lines = codeContent.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      
-      // Type out each character with a small delay
-      for (let j = 0; j < line.length; j++) {
-        const char = line[j];
-        editor.commands.insertContent(char);
-        await new Promise(resolve => setTimeout(resolve, 20)); // 20ms per character
-      }
-      
-      // Add newline if not the last line
-      if (i < lines.length - 1) {
-        editor.commands.insertContent('\n');
-        await new Promise(resolve => setTimeout(resolve, 20));
-      }
+    // Type out each character with a small delay
+    for (let j = 0; j < line.length; j++) {
+      const char = line[j];
+      editor.commands.insertContent(char);
+      await new Promise(resolve => setTimeout(resolve, 20)); // 20ms per character
     }
     
-    console.log('✅ Code block typewriter complete!');
-  } else {
-    // Not a complete code block, insert normally
-    editor.commands.insertStreamChunk(chunk, true);
+    // Add newline if not the last line
+    if (i < lines.length - 1) {
+      editor.commands.insertContent('\n');
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
   }
+  
+  console.log('✅ Code block typewriter complete!');
 };
 
 export const useStreaming = (editor: Editor | null, options: UseStreamingOptions = {}) => {
@@ -147,16 +149,16 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
         },
         
         onChunk: (chunk: StreamChunk) => {
-          console.log('📦 Chunk:', chunk.data);
+          console.log('📦 Chunk received:', chunk.data.substring(0, 100) + '...');
           
           // Insert chunk directly into editor
           if (editor && !editor.isDestroyed) {
-            // Check if chunk contains code block markers
-            const hasCodeBlockStart = chunk.data.includes('<pre') || chunk.data.includes('<code');
-            const hasCodeBlockEnd = chunk.data.includes('</pre>') || chunk.data.includes('</code>');
+            // Check if chunk contains a COMPLETE code block (both <pre> and </pre>)
+            const hasCompleteCodeBlock = chunk.data.includes('<pre') && chunk.data.includes('</pre>');
             
-            if (hasCodeBlockStart || hasCodeBlockEnd) {
-              // For code blocks, stream character-by-character with typewriter effect
+            if (hasCompleteCodeBlock) {
+              console.log('🎯 Complete code block detected, using typewriter effect');
+              // For complete code blocks, stream character-by-character with typewriter effect
               streamCodeBlockChunk(editor, chunk.data);
             } else {
               // Regular content - insert normally
