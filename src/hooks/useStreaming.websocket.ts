@@ -32,18 +32,13 @@ interface StreamRequest {
  * Stream code block content character-by-character with typewriter effect
  */
 const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
-  console.log('🔍 Processing chunk for code blocks...');
-  
   // Check if chunk contains code blocks
   const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
   const matches = Array.from(chunk.matchAll(codeBlockRegex));
   
   if (matches.length === 0) {
-    console.error('❌ No code block matches found despite detection');
     return;
   }
-  
-  console.log(`📦 Found ${matches.length} code block(s) in chunk`);
   
   // Split the chunk by code blocks to handle content before/after/between
   let lastIndex = 0;
@@ -53,14 +48,9 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     const codeContent = match[1];
     const matchIndex = match.index || 0;
     
-    console.log('🎯 Code block match:', JSON.stringify(fullMatch.substring(0, 100)));
-    console.log('🎯 Match index:', matchIndex, 'lastIndex:', lastIndex);
-    
     // Insert any content BEFORE this code block (like headings, paragraphs)
     if (matchIndex > lastIndex) {
       const beforeContent = chunk.substring(lastIndex, matchIndex);
-      console.log('📄 Content before code block (full):', JSON.stringify(beforeContent));
-      console.log('📄 Length:', beforeContent.length, 'Match starts at:', matchIndex);
       editor.commands.insertStreamChunk(beforeContent, true);
       await new Promise(resolve => setTimeout(resolve, 50));
     }
@@ -77,8 +67,6 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
     
-    console.log(`💻 Processing code block - Language: ${language}, Length: ${decodedCode.length}`);
-    
     // Get current position
     const { state } = editor;
     const beforePos = state.doc.content.size;
@@ -93,8 +81,6 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
       })
       .run();
     
-    console.log('✅ Empty code block created');
-    
     // Wait longer for render to complete
     await new Promise(resolve => setTimeout(resolve, 200));
     
@@ -108,19 +94,14 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     });
     
     if (codeBlockPos === -1) {
-      console.error('❌ Could not find code block in document');
       return;
     }
-    
-    console.log('📍 Found code block at position:', codeBlockPos);
     
     // Position cursor inside the code block and delete placeholder
     editor.commands.focus();
     const insidePos = codeBlockPos + 1;
     editor.commands.setTextSelection(insidePos);
     editor.commands.deleteRange({ from: insidePos, to: insidePos + 1 });
-    
-    console.log('⌨️  Starting typewriter effect...');
     
     // Instead of character-by-character, type line-by-line for better formatting
     const lines = decodedCode.split('\n');
@@ -140,15 +121,12 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
       }
     }
     
-    console.log('✅ Code block typewriter complete!');
-    
     lastIndex = matchIndex + fullMatch.length;
   }
   
   // Insert any content AFTER the last code block
   if (lastIndex < chunk.length) {
     const afterContent = chunk.substring(lastIndex);
-    console.log('📄 Inserting content after code blocks:', afterContent.substring(0, 50));
     editor.commands.insertStreamChunk(afterContent, true);
   }
 };
@@ -215,12 +193,9 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
                 console.error('❌ Code block streaming error:', err);
               });
             } else {
-              console.log('📝 Regular content, using normal insertion');
               // Regular content - insert normally
               editor.commands.insertStreamChunk(chunk.data, true);
             }
-          } else {
-            console.error('❌ Editor not available!');
           }
         },
         
@@ -296,7 +271,6 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       }
     };
 
-    console.log('➕ addToQueue called with ID:', streamRequest.id);
     setQueue(prev => [...prev, streamRequest]);
     
     // Auto-process if not already streaming
@@ -309,16 +283,12 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
    * Process queue
    */
   const processQueue = useCallback(() => {
-    console.log('🔄 processQueue called - isProcessing:', isProcessingRef.current);
     if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) {
-      console.log('🔄 Skipping: isProcessing =', isProcessingRef.current, 'connected =', wsServiceRef.current?.isConnected());
       return;
     }
     
     setQueue(prev => {
-      console.log('🔄 Inside setQueue - prev.length:', prev.length);
       if (prev.length === 0) {
-        console.log('🔄 Queue empty, nothing to process');
         return prev;
       }
       
@@ -327,13 +297,10 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       // CRITICAL: Check processing flag AFTER extracting item but BEFORE processing
       // This prevents React Strict Mode from executing the stream request twice
       if (isProcessingRef.current) {
-        console.log('🔄 Already processing (strict mode guard), returning REST to remove item');
         return rest; // Remove item from queue but don't process again
       }
       
       isProcessingRef.current = true;
-      console.log('🔄 Set isProcessing = true');
-      console.log('🔄 Processing item:', next.id);
       setCurrentStreamId(next.id);
       
       // Send stream request to API
