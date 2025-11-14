@@ -38,7 +38,7 @@ export default function WebSocketTestPage() {
         });
         break;
         
-      case 'html':
+      case 'htmlbasic':
         streaming.addToQueue('Testing <strong>bold text</strong> and <em>italic text</em> with <code>inline code</code>.', {
           content_type: 'html',
           speed: 'fast',
@@ -216,10 +216,10 @@ export default function WebSocketTestPage() {
                     📝 Plain Text
                   </button>
                   <button
-                    onClick={() => runTest('html')}
+                    onClick={() => runTest('htmlbasic')}
                     className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm font-medium"
                   >
-                    🏷️ HTML
+                    🏷️ HTML Basic
                   </button>
                   <button
                     onClick={() => runTest('markdown')}
