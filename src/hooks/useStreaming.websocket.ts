@@ -91,12 +91,30 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     
     console.log('✅ Empty code block created');
     
-    // Wait for render
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Wait longer for render to complete
+    await new Promise(resolve => setTimeout(resolve, 200));
     
-    // Position cursor inside and delete placeholder
-    editor.commands.setTextSelection(beforePos + 1);
-    editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
+    // Find the code block we just created by searching the document
+    const updatedState = editor.state;
+    let codeBlockPos = -1;
+    updatedState.doc.descendants((node, pos) => {
+      if (node.type.name === 'codeBlock' && node.attrs.language === language) {
+        codeBlockPos = pos;
+      }
+    });
+    
+    if (codeBlockPos === -1) {
+      console.error('❌ Could not find code block in document');
+      return;
+    }
+    
+    console.log('📍 Found code block at position:', codeBlockPos);
+    
+    // Position cursor inside the code block and delete placeholder
+    editor.commands.focus();
+    const insidePos = codeBlockPos + 1;
+    editor.commands.setTextSelection(insidePos);
+    editor.commands.deleteRange({ from: insidePos, to: insidePos + 1 });
     
     console.log('⌨️  Starting typewriter effect...');
     
@@ -188,7 +206,10 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
             if (hasCompleteCodeBlock) {
               console.log('🎯 Complete code block detected, using typewriter effect');
               // For complete code blocks, stream character-by-character with typewriter effect
-              streamCodeBlockChunk(editor, chunk.data);
+              // Use await to ensure typewriter completes before processing next chunk
+              streamCodeBlockChunk(editor, chunk.data).catch(err => {
+                console.error('❌ Code block streaming error:', err);
+              });
             } else {
               console.log('📝 Regular content, using normal insertion');
               // Regular content - insert normally
