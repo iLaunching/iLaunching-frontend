@@ -1,4 +1,5 @@
-import TiptapTypewriter from '@/components/TiptapTypewriter';
+import { useState } from 'react';
+import ChatWindowEditor from '@/components/ChatWindowEditor';
 import RichTextInput from '@/components/RichTextInput';
 import { APP_CONFIG } from '@/constants';
 
@@ -43,10 +44,60 @@ export default function ChatWindow({
   aiName = "iLaunching AI",
   aiAcknowledge = ""
 }: ChatWindowProps) {
+  const [editorInstance, setEditorInstance] = useState<any>(null);
+
   const handleSubmit = (userMessage: string) => {
+    // Append Query node to the editor (insert at end, before AI indicator)
+    if (editorInstance) {
+      console.log('Submitting message:', userMessage);
+      console.log('Current editor content:', editorInstance.getJSON());
+      
+      // Create Query node with the user's message
+      const queryNode = {
+        type: 'query',
+        attrs: {
+          text: userMessage,
+          id: 'query-' + Date.now() // Unique ID
+        }
+      };
+      
+      // Check if there's an AI indicator
+      const currentDoc = editorInstance.getJSON();
+      const hasAiIndicator = currentDoc.content?.some((node: any) => node.type === 'aiIndicator');
+      
+      if (hasAiIndicator) {
+        // If AI indicator exists, insert Query node before it
+        // Get all content except AI indicator
+        const contentWithoutAI = currentDoc.content?.filter((node: any) => node.type !== 'aiIndicator') || [];
+        const aiIndicatorNode = currentDoc.content?.find((node: any) => node.type === 'aiIndicator');
+        
+        // Build new content: existing content + query + AI indicator
+        const newContent = {
+          type: 'doc',
+          content: [
+            ...contentWithoutAI,
+            queryNode,
+            ...(aiIndicatorNode ? [aiIndicatorNode] : [])
+          ]
+        };
+        
+        // Set the complete content
+        editorInstance.commands.setContent(newContent);
+      } else {
+        // No AI indicator, just append at the end
+        editorInstance.commands.insertContentAt(editorInstance.state.doc.content.size, queryNode);
+      }
+      
+      console.log('Query node inserted, new content:', editorInstance.getJSON());
+    }
+    
     if (onSubmit && !disabled) {
       onSubmit(userMessage);
     }
+  };
+
+  const handleEditorReady = (editor: any) => {
+    setEditorInstance(editor);
   };
 
   const handleTypewriterComplete = () => {
@@ -108,7 +159,7 @@ export default function ChatWindow({
           }}
         >
           {/* Typewriter with optional AI indicator as part of document structure */}
-          <TiptapTypewriter
+          <ChatWindowEditor
             key={message} // Force remount when message changes
             text={message}
             speed={APP_CONFIG.typewriterSpeed}
@@ -127,6 +178,7 @@ export default function ChatWindow({
               aiName: aiName,
               aiAcknowledge: aiAcknowledge
             } : undefined}
+            onEditorReady={handleEditorReady}
           />
         </div>
       </div>

@@ -150,12 +150,18 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           font-size: 32px;
           font-weight: 700;
           font-style: normal;
-          background: linear-gradient(45deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f59e0b 75%, #3b82f6 100%);
+          background: linear-gradient(45deg, 
+            #3b82f6 0%, 
+            #8b5cf6 25%, 
+            #ec4899 50%, 
+            #f59e0b 75%, 
+            #3b82f6 100%
+          );
           background-size: 400% 400%;
-          -webkit-background-clip: text;
           background-clip: text;
+          -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          color: transparent;
+          animation: aiColorFlow 3s ease-in-out infinite;
           filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
         }
 
@@ -197,34 +203,46 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           padding: 10px;
         }
 
+        /* Animations - exact copy from working Header */
         @keyframes aiColorFlow {
-          0% { color: #ffffff; }
-          25% { color: #ff6b6b; }
-          50% { color: #4ecdc4; }
-          75% { color: #45b7d1; }
-          100% { color: #ffffff; }
+          0% {
+            background-position: 0% 0%;
+            transform: rotate(-45deg) scale(1);
+          }
+          33% {
+            background-position: 100% 100%;
+            transform: rotate(-45deg) scale(1.05);
+          }
+          66% {
+            background-position: 0% 100%;
+            transform: rotate(-45deg) scale(1);
+          }
+          100% {
+            background-position: 0% 0%;
+            transform: rotate(-45deg) scale(1);
+          }
         }
 
         @keyframes iconBorderFlow {
-          0% { 
-            border-color: #ffffff;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+          0% {
+            background-position: 0% 0%;
+            opacity: 0;
+            transform: scale(1);
           }
-          25% { 
-            border-color: #ff6b6b;
-            box-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
+          33% {
+            background-position: 100% 100%;
+            opacity: 0.6;
+            transform: scale(1.02);
           }
-          50% { 
-            border-color: #4ecdc4;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.7);
+          66% {
+            background-position: 0% 100%;
+            opacity: 0.3;
+            transform: scale(1);
           }
-          75% { 
-            border-color: #45b7d1;
-            box-shadow: 0 0 15px rgba(69, 183, 209, 0.6);
-          }
-          100% { 
-            border-color: #ffffff;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+          100% {
+            background-position: 0% 0%;
+            opacity: 0;
+            transform: scale(1);
           }
         }
 

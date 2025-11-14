@@ -28,19 +28,25 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Get token from localStorage (Zustand persist middleware stores it there)
-    const authState = localStorage.getItem('auth-storage');
+    // Only add auth headers for our API endpoints
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const isApiRequest = config.baseURL === apiBaseUrl || config.url?.startsWith('/api/');
     
-    if (authState) {
-      try {
-        const { state } = JSON.parse(authState);
-        const token = state?.accessToken;
-        
-        if (token && config.headers) {
-          config.headers.Authorization = `Bearer ${token}`;
+    if (isApiRequest) {
+      // Get token from localStorage (Zustand persist middleware stores it there)
+      const authState = localStorage.getItem('auth-storage');
+      
+      if (authState) {
+        try {
+          const { state } = JSON.parse(authState);
+          const token = state?.accessToken;
+          
+          if (token && config.headers) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch (error) {
+          console.error('Error parsing auth state:', error);
         }
-      } catch (error) {
-        console.error('Error parsing auth state:', error);
       }
     }
     

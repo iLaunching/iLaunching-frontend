@@ -7,6 +7,7 @@ import ListItem from '@tiptap/extension-list-item';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import AiIndicator from './tiptap/AiIndicator';
+import Query from './tiptap/Query';
 
 interface TiptapTypewriterProps {
   text: string;
@@ -22,6 +23,8 @@ interface TiptapTypewriterProps {
     aiAcknowledge?: string;
     show: boolean;
   };
+  /** Callback to expose editor instance for external operations */
+  onEditorReady?: (editor: any) => void;
 }
 
 export default function TiptapTypewriter({ 
@@ -31,7 +34,8 @@ export default function TiptapTypewriter({
   style = {},
   onComplete,
   scrollContainer = false,
-  aiIndicator
+  aiIndicator,
+  onEditorReady
 }: TiptapTypewriterProps) {
   const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,6 +71,7 @@ export default function TiptapTypewriter({
         nested: true,
       }),
       AiIndicator,
+      Query,
     ],
     content: aiIndicator && aiIndicator.show ? {
       type: 'doc',
@@ -91,6 +96,13 @@ export default function TiptapTypewriter({
       },
     },
   });
+
+  // Expose editor instance when ready
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor);
+    }
+  }, [editor, onEditorReady]);
 
   // Add click handler for checkbox toggles
   useEffect(() => {
