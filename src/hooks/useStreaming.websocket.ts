@@ -233,16 +233,9 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           options.onStreamComplete?.(message);
           
-          // Mark as not processing
+          // Mark as not processing - useEffect will handle next queue item
           console.log('✅ Stream done, marking as not processing');
           isProcessingRef.current = false;
-          
-          // Process next item in queue if exists - deferred to next tick
-          setTimeout(() => {
-            if (!isProcessingRef.current) {
-              processQueue();
-            }
-          }, 0);
         },
         
         onStreamPaused: () => {
@@ -303,11 +296,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
 
     setQueue(prev => [...prev, streamRequest]);
     
-    // Auto-process if not already streaming - use setTimeout to ensure state update completes first
-    if (!isProcessingRef.current) {
-      console.log('🚀 Auto-triggering processQueue from addToQueue (next tick)');
-      setTimeout(() => processQueue(), 0);
-    }
+    // Queue processing will be handled by useEffect watching queue.length
   }, []);
 
   /**
@@ -403,6 +392,16 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       wsServiceRef.current.skipStream();
     }
   }, [isStreaming]);
+
+  /**
+   * Auto-process queue when items added and not currently processing
+   */
+  useEffect(() => {
+    if (queue.length > 0 && !isProcessingRef.current && wsServiceRef.current?.isConnected()) {
+      console.log('📋 Queue has items and not processing, triggering processQueue');
+      processQueue();
+    }
+  }, [queue.length, processQueue]);
 
   /**
    * Auto-connect when editor becomes available
