@@ -312,17 +312,22 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
     
     if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) return;
     
+    // Mark as processing BEFORE setQueue to prevent double execution in strict mode
+    isProcessingRef.current = true;
+    
     setQueue(prev => {
       console.log('📊 Queue length:', prev.length);
       
-      if (prev.length === 0) return prev;
+      if (prev.length === 0) {
+        // Reset processing flag if queue is empty
+        isProcessingRef.current = false;
+        return prev;
+      }
       
       const [next, ...rest] = prev;
       
       console.log('✅ Processing stream request:', next.id);
       
-      // Mark as processing
-      isProcessingRef.current = true;
       setCurrentStreamId(next.id);
       
       // Send stream request to API
