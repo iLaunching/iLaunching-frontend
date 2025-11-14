@@ -32,77 +32,101 @@ interface StreamRequest {
  * Stream code block content character-by-character with typewriter effect
  */
 const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
-  // Parse the chunk to extract code content
+  console.log('🔍 Processing chunk for code blocks...');
+  
+  // Check if chunk contains code blocks
   const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
-  const match = codeBlockRegex.exec(chunk);
+  const matches = Array.from(chunk.matchAll(codeBlockRegex));
   
-  if (!match) {
-    console.error('❌ Code block regex did not match despite <pre> detection');
-    return; // Don't insert anything if we can't parse it properly
+  if (matches.length === 0) {
+    console.error('❌ No code block matches found despite detection');
+    return;
   }
   
-  // Extract language and code content
-  const preMatch = chunk.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
-  const language = preMatch ? preMatch[1] : 'javascript';
-  const codeContent = match[1]
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+  console.log(`📦 Found ${matches.length} code block(s) in chunk`);
   
-  console.log('📦 Code block matched! Language:', language, 'Content length:', codeContent.length);
+  // Split the chunk by code blocks to handle content before/after/between
+  let lastIndex = 0;
   
-  // Get current position before inserting
-  const { state } = editor;
-  const beforePos = state.doc.content.size;
-  
-  console.log('📍 Position before insert:', beforePos);
-  
-  // Insert empty code block with a single space (empty blocks can be problematic)
-  editor.chain()
-    .focus()
-    .insertContent({
-      type: 'codeBlock',
-      attrs: { language },
-      content: [{ type: 'text', text: ' ' }]
-    })
-    .run();
-  
-  console.log('✅ Empty code block created at position', beforePos);
-  
-  // Small delay to let the code block render
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  // Position cursor at the space inside the code block we just created
-  // The code block starts at beforePos, and we want to be inside it (after the opening)
-  editor.commands.setTextSelection(beforePos + 1);
-  
-  // First, clear the placeholder space
-  editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
-  
-  console.log('✅ Cursor positioned inside code block, starting typewriter...');
-  
-  // Now stream the code content character-by-character
-  const lines = codeContent.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  for (const match of matches) {
+    const fullMatch = match[0];
+    const codeContent = match[1];
+    const matchIndex = match.index || 0;
     
-    // Type out each character with a small delay
-    for (let j = 0; j < line.length; j++) {
-      const char = line[j];
-      editor.commands.insertContent(char);
-      await new Promise(resolve => setTimeout(resolve, 20)); // 20ms per character
+    // Insert any content BEFORE this code block (like headings, paragraphs)
+    if (matchIndex > lastIndex) {
+      const beforeContent = chunk.substring(lastIndex, matchIndex);
+      console.log('📄 Inserting content before code block:', beforeContent.substring(0, 50));
+      editor.commands.insertStreamChunk(beforeContent, true);
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
     
-    // Add newline if not the last line
-    if (i < lines.length - 1) {
-      editor.commands.insertContent('\n');
-      await new Promise(resolve => setTimeout(resolve, 20));
+    // Extract language
+    const preMatch = fullMatch.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
+    const language = preMatch ? preMatch[1] : 'javascript';
+    
+    // Decode HTML entities
+    const decodedCode = codeContent
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    
+    console.log(`💻 Processing code block - Language: ${language}, Length: ${decodedCode.length}`);
+    
+    // Get current position
+    const { state } = editor;
+    const beforePos = state.doc.content.size;
+    
+    // Insert empty code block with placeholder
+    editor.chain()
+      .focus()
+      .insertContent({
+        type: 'codeBlock',
+        attrs: { language },
+        content: [{ type: 'text', text: ' ' }]
+      })
+      .run();
+    
+    console.log('✅ Empty code block created');
+    
+    // Wait for render
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Position cursor inside and delete placeholder
+    editor.commands.setTextSelection(beforePos + 1);
+    editor.commands.deleteRange({ from: beforePos + 1, to: beforePos + 2 });
+    
+    console.log('⌨️  Starting typewriter effect...');
+    
+    // Stream character-by-character
+    const lines = decodedCode.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      for (let j = 0; j < line.length; j++) {
+        editor.commands.insertContent(line[j]);
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      
+      if (i < lines.length - 1) {
+        editor.commands.insertContent('\n');
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
     }
+    
+    console.log('✅ Code block typewriter complete!');
+    
+    lastIndex = matchIndex + fullMatch.length;
   }
   
-  console.log('✅ Code block typewriter complete!');
+  // Insert any content AFTER the last code block
+  if (lastIndex < chunk.length) {
+    const afterContent = chunk.substring(lastIndex);
+    console.log('📄 Inserting content after code blocks:', afterContent.substring(0, 50));
+    editor.commands.insertStreamChunk(afterContent, true);
+  }
 };
 
 export const useStreaming = (editor: Editor | null, options: UseStreamingOptions = {}) => {
