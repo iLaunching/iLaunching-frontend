@@ -47,17 +47,36 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
     
-    // Create the code block with empty content first
+    console.log('📦 Code block detected! Language:', language, 'Content length:', codeContent.length);
+    
+    // Move to end of document
     const { state } = editor;
     const endPos = state.doc.content.size;
-    editor.commands.setTextSelection(endPos);
+    editor.chain().focus().setTextSelection(endPos).run();
     
-    // Insert code block node
-    editor.commands.insertContent({
-      type: 'codeBlock',
-      attrs: { language },
-      content: [{ type: 'text', text: '' }]
-    });
+    // Insert empty code block with the detected language
+    const inserted = editor.chain()
+      .insertContent({
+        type: 'codeBlock',
+        attrs: { language },
+        content: []
+      })
+      .run();
+    
+    if (!inserted) {
+      console.error('❌ Failed to insert code block');
+      editor.commands.insertStreamChunk(chunk, true);
+      return;
+    }
+    
+    console.log('✅ Empty code block created, starting typewriter effect...');
+    
+    // Small delay to let the code block render
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // Find the code block we just created and position cursor inside it
+    const codeBlockPos = editor.state.doc.content.size - 1;
+    editor.commands.setTextSelection(codeBlockPos);
     
     // Now stream the code content character-by-character
     const lines = codeContent.split('\n');
@@ -77,6 +96,8 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
         await new Promise(resolve => setTimeout(resolve, 20));
       }
     }
+    
+    console.log('✅ Code block typewriter complete!');
   } else {
     // Not a complete code block, insert normally
     editor.commands.insertStreamChunk(chunk, true);
