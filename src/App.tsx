@@ -9,9 +9,6 @@ import Dashboard from './pages/Dashboard';
 import FormattingDemo from '@/components/FormattingDemo';
 import StreamingTestPage from './pages/StreamingTestPage';
 import WebSocketTestPage from './pages/WebSocketTestPage';
-import SimpleTestPage from './pages/SimpleTestPage';
-import BasicTestPage from './pages/BasicTestPage';
-
 
 // ========================
 // REACT QUERY CLIENT
@@ -37,8 +34,6 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/demo" element={<FormattingDemo />} />
-          <Route path="/simple-test" element={<SimpleTestPage />} />
-          <Route path="/basic-test" element={<BasicTestPage />} />
           <Route path="/streaming-test" element={<StreamingTestPage />} />
           <Route path="/websocket-test" element={<WebSocketTestPage />} />
           <Route
