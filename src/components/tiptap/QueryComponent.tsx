@@ -22,10 +22,25 @@ interface QueryComponentProps {
 const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
   const { attrs } = node;
   const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleCopy = async () => {
+    if (textAreaRef.current) {
+      const textContent = textAreaRef.current.innerText;
+      try {
+        await navigator.clipboard.writeText(textContent);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
   };
 
   useEffect(() => {
@@ -94,7 +109,9 @@ const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
           {renderAvatar()}
         </div>
         <div className="msg-content-wrapper" ref={contentWrapperRef} data-expanded={isExpanded}>
-          <NodeViewContent className="msg-text-area" />
+          <div ref={textAreaRef}>
+            <NodeViewContent className="msg-text-area" />
+          </div>
           <div className="query-controls-container">
             <button 
               onClick={toggleExpanded}
@@ -111,6 +128,22 @@ const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
               {isExpanded ? 'Show Less' : 'Show More'}
             </button>
           </div>
+          <button 
+            onClick={handleCopy}
+            className="query-copy-button"
+            data-tooltip={copied ? "Copied!" : "Copy content"}
+          >
+            {copied ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </NodeViewWrapper>
