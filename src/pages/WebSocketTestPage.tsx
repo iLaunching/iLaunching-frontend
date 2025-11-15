@@ -27,8 +27,11 @@ export default function WebSocketTestPage() {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()} - ${result}`]);
   };
 
-  const handleQuerySubmit = (message: string) => {
+  const handleQuerySubmit = (content: any) => {
     if (!editor) return;
+    
+    // Extract the content nodes from the editor JSON
+    const contentNodes = content?.content || [];
     
     // Find AI Indicator position
     const { doc } = editor.state;
@@ -37,31 +40,29 @@ export default function WebSocketTestPage() {
     doc.descendants((node, pos) => {
       if (node.type.name === 'aiIndicator') {
         aiIndicatorPos = pos;
+        return false; // Stop early
       }
     });
     
     const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
     
-    // Insert Query node before AI Indicator
-    editor.chain()
-      .focus()
-      .setTextSelection(insertPos)
-      .insertContent({
-        type: 'query',
-        attrs: {
-          user_avatar_type: 'text',
-          user_avatar_text: 'U',
-          user_first_name: 'User',
-          user_surname: '',
-          user_id: 'user_' + Date.now(),
-          backgroundColor: 'none',
-          text: message,
-          query_id: 'q_' + Date.now()
-        }
-      })
-      .run();
+    // Insert Query node with rich content before AI Indicator
+    // Use insertContentAt without focus() for smoother performance
+    editor.commands.insertContentAt(insertPos, {
+      type: 'query',
+      attrs: {
+        user_avatar_type: 'text',
+        user_avatar_text: 'U',
+        user_first_name: 'User',
+        user_surname: '',
+        user_id: 'user_' + Date.now(),
+        query_id: 'q_' + Date.now()
+      },
+      content: contentNodes // Insert the rich content as children
+    });
     
-    addTestResult(`💬 Query submitted: ${message}`);
+    const textPreview = contentNodes.map((node: any) => node.content?.[0]?.text || '').join(' ').substring(0, 50);
+    addTestResult(`💬 Query submitted: ${textPreview}...`);
     
     // The LLM/backend will handle sending the response to the streaming API
     // This just inserts the user's query node

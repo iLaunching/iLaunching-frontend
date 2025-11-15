@@ -25,7 +25,7 @@ export const Query = Node.create<QueryOptions>({
 
   group: 'block',
 
-  content: '',
+  content: 'block+',
 
   draggable: true,
 
@@ -53,9 +53,6 @@ export const Query = Node.create<QueryOptions>({
       },
       user_id: {
         default: '',
-      },
-      backgroundColor: {
-        default: 'none',
       },
       text: {
         default: '',
@@ -97,7 +94,6 @@ export const Query = Node.create<QueryOptions>({
               user_first_name: '',
               user_surname: '',
               user_id: '',
-              backgroundColor: 'none',
               text: '',
               query_id: 'q_' + Date.now(),
             },

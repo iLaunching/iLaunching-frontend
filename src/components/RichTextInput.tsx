@@ -7,7 +7,7 @@ import { Send, Mic, Plus, X, UploadCloud, LayoutDashboard, Monitor } from 'lucid
 import DropdownMenu, { type MenuOption } from './DropdownMenu';
 
 interface RichTextInputProps {
-  onSubmit: (content: string) => void;
+  onSubmit: (content: any) => void; // Changed to accept JSON content
   placeholder?: string;
   disabled?: boolean;
   className?: string;
@@ -181,7 +181,7 @@ export default function RichTextInput({
     e.preventDefault();
     if (!editor || isEmpty || disabled) return;
 
-    const content = editor.getHTML();
+    const content = editor.getJSON(); // Get JSON instead of HTML for better structure
     const textContent = editor.getText().trim();
     
     if (textContent) {

@@ -147,6 +147,14 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       ]
     },
     editable: false,
+    editorProps: {
+      attributes: {
+        class: 'prose-container',
+      },
+    },
+    // Performance optimizations
+    enableInputRules: false,  // Disable input rules for better performance
+    enablePasteRules: false,  // Disable paste rules for better performance
   });
 
   useEffect(() => {
@@ -179,6 +187,9 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           min-height: 180px;
           color: #000;
           font-size: 16px;
+          /* Performance optimizations */
+          contain: layout style paint;
+          will-change: contents;
         }
         
         /* Remove selection borders on all nodes */
