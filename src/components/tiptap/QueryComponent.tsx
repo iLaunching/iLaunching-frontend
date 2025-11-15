@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 
 interface QueryComponentProps {
@@ -21,6 +21,40 @@ interface QueryComponentProps {
 
 const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
   const { attrs } = node;
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (contentWrapperRef.current) {
+        const textAreaElement = contentWrapperRef.current.querySelector('.msg-text-area');
+        if (textAreaElement) {
+          const isOverflowing = textAreaElement.scrollHeight > 600;
+          console.log('Checking overflow:', { scrollHeight: textAreaElement.scrollHeight, isOverflowing });
+          if (isOverflowing) {
+            contentWrapperRef.current.classList.add('has-overflow');
+          } else {
+            contentWrapperRef.current.classList.remove('has-overflow');
+          }
+        }
+      }
+    };
+
+    // Check on mount and after a short delay to let content render
+    checkOverflow();
+    setTimeout(checkOverflow, 100);
+    
+    const observer = new MutationObserver(checkOverflow);
+    if (contentWrapperRef.current) {
+      observer.observe(contentWrapperRef.current, { childList: true, subtree: true, characterData: true });
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   // Simple avatar rendering without useMemo (memo handles it)
   const renderAvatar = () => {
@@ -59,7 +93,25 @@ const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
         <div className="msg-avatar">
           {renderAvatar()}
         </div>
-        <NodeViewContent className="msg-text-area" />
+        <div className="msg-content-wrapper" ref={contentWrapperRef} data-expanded={isExpanded}>
+          <NodeViewContent className="msg-text-area" />
+          <div className="query-controls-container">
+            <button 
+              onClick={toggleExpanded}
+              className="query-expand-button"
+              style={{ 
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                fontSize: '12px',
+                cursor: 'pointer',
+                padding: '4px 8px'
+              }}
+            >
+              {isExpanded ? 'Show Less' : 'Show More'}
+            </button>
+          </div>
+        </div>
       </div>
     </NodeViewWrapper>
   );
