@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StreamingEditor } from '../components/streaming/StreamingEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
+import ChatWindowPrompt from '../components/ChatWindowPrompt';
 
 export default function WebSocketTestPage() {
   const [testResults, setTestResults] = useState<string[]>([]);
@@ -24,6 +25,46 @@ export default function WebSocketTestPage() {
 
   const addTestResult = (result: string) => {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()} - ${result}`]);
+  };
+
+  const handleQuerySubmit = (message: string) => {
+    if (!editor) return;
+    
+    // Find AI Indicator position
+    const { doc } = editor.state;
+    let aiIndicatorPos = -1;
+    
+    doc.descendants((node, pos) => {
+      if (node.type.name === 'aiIndicator') {
+        aiIndicatorPos = pos;
+      }
+    });
+    
+    const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+    
+    // Insert Query node before AI Indicator
+    editor.chain()
+      .focus()
+      .setTextSelection(insertPos)
+      .insertContent({
+        type: 'query',
+        attrs: {
+          user_avatar_type: 'text',
+          user_avatar_text: 'U',
+          user_first_name: 'User',
+          user_surname: '',
+          user_id: 'user_' + Date.now(),
+          backgroundColor: 'none',
+          text: message,
+          query_id: 'q_' + Date.now()
+        }
+      })
+      .run();
+    
+    addTestResult(`💬 Query submitted: ${message}`);
+    
+    // The LLM/backend will handle sending the response to the streaming API
+    // This just inserts the user's query node
   };
 
   const runTest = (testName: string) => {
@@ -158,6 +199,159 @@ export default function WebSocketTestPage() {
         });
         break;
         
+      case 'highlight':
+        streaming.addToQueue('<p>Testing <mark>highlighted text</mark> with <mark style="background-color: #bfdbfe;">blue highlight</mark> and <mark style="background-color: #fecaca;">red highlight</mark>.</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'alignment':
+        streaming.addToQueue('<p style="text-align: left;">Left aligned text</p><p style="text-align: center;">Center aligned text</p><p style="text-align: right;">Right aligned text</p><p style="text-align: justify;">Justified text with enough content to span multiple lines and demonstrate proper text justification across the entire width of the paragraph.</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'subscript':
+        streaming.addToQueue('<p>Chemical formula: H<sub>2</sub>O (water), CO<sub>2</sub> (carbon dioxide), C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> (glucose)</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'superscript':
+        streaming.addToQueue('<p>Mathematical expressions: x<sup>2</sup> + y<sup>2</sup> = z<sup>2</sup>, E = mc<sup>2</sup>, 10<sup>3</sup> = 1000</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'links':
+        streaming.addToQueue('<p>Check out <a href="https://example.com">this link</a>, or visit <a href="https://github.com">GitHub</a> and <a href="https://stackoverflow.com">Stack Overflow</a>.</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'images':
+        streaming.addToQueue('<p>Here is an embedded image:</p><img src="https://via.placeholder.com/400x200/3b82f6/ffffff?text=Streaming+Image" alt="Test Image" /><p>The image above was streamed in!</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'youtube':
+        streaming.addToQueue('<p>Embedded YouTube video:</p><iframe width="640" height="360" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe><p>Video embedded successfully!</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'tasklist':
+        streaming.addToQueue('<ul data-type="taskList"><li data-type="taskItem" data-checked="true">Complete Phase 1</li><li data-type="taskItem" data-checked="true">Complete Phase 2</li><li data-type="taskItem" data-checked="false">Complete Phase 3</li><li data-type="taskItem" data-checked="false">Deploy to production</li></ul>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'typography':
+        streaming.addToQueue('<p>Smart typography: "quoted text" with \'single quotes\', em-dash--like this, ellipsis... and more.</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'aiindicator':
+        // Append AI Indicator node before the existing AI Indicator
+        if (editor) {
+          const { doc } = editor.state;
+          let aiIndicatorPos = -1;
+          
+          doc.descendants((node, pos) => {
+            if (node.type.name === 'aiIndicator') {
+              aiIndicatorPos = pos;
+            }
+          });
+          
+          const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+          
+          editor.chain()
+            .focus()
+            .setTextSelection(insertPos)
+            .insertContent({
+              type: 'aiIndicator',
+              attrs: {
+                aiName: 'Sales AI',
+                aiAcknowledge: 'Understood!',
+                text: '<p>This is an <strong>AI response</strong> with the animated indicator node. The diamond icon has a flowing gradient animation!</p>'
+              }
+            })
+            .run();
+          addTestResult('✅ AI Indicator inserted');
+        }
+        break;
+        
+      case 'query':
+        // Append Query node before the AI Indicator
+        if (editor) {
+          const { doc } = editor.state;
+          let aiIndicatorPos = -1;
+          
+          doc.descendants((node, pos) => {
+            if (node.type.name === 'aiIndicator') {
+              aiIndicatorPos = pos;
+            }
+          });
+          
+          const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+          
+          editor.chain()
+            .focus()
+            .setTextSelection(insertPos)
+            .insertContent({
+              type: 'query',
+              attrs: {
+                user_avatar_type: 'text',
+                user_avatar_text: 'JD',
+                user_first_name: 'John',
+                user_surname: 'Doe',
+                user_id: 'user123',
+                backgroundColor: 'blue',
+                text: 'What are the best features of this streaming editor?',
+                query_id: 'q_' + Date.now()
+              }
+            })
+            .run();
+          addTestResult('✅ Query node inserted');
+        }
+        break;
+        
+      case 'allformats':
+        streaming.addToQueue('<h2>All Formatting Test</h2><p>This paragraph has <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <code>inline code</code>, <sub>subscript</sub>, <sup>superscript</sup>, and <a href="#">links</a>.</p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
+      case 'mixed-content':
+        streaming.addToQueue('<h2>🎨 Complete Feature Showcase</h2><p style="text-align: center;"><strong>Testing all extensions together!</strong></p><h3>Text Formatting</h3><p>We have <strong>bold text</strong>, <em>italic text</em>, <u>underlined text</u>, <s>strikethrough</s>, and <mark>highlighted text</mark>.</p><h3>Scientific Notation</h3><p>Water formula: H<sub>2</sub>O, Einstein\'s equation: E=mc<sup>2</sup>, Area: x<sup>2</sup></p><h3>Links and Images</h3><p>Visit <a href="https://tiptap.dev">Tiptap</a> for more information.</p><img src="https://via.placeholder.com/300x150/6366f1/ffffff?text=Feature+Demo" alt="Demo" /><h3>Task List</h3><ul data-type="taskList"><li data-type="taskItem" data-checked="true">Implement streaming</li><li data-type="taskItem" data-checked="true">Add all extensions</li><li data-type="taskItem" data-checked="false">Test everything</li></ul><h3>Code Example</h3><pre data-language="javascript"><code class="language-javascript">const test = () => {\n  console.log("All extensions working!");\n};</code></pre><p style="text-align: center;"><strong>✨ All features working together! ✨</strong></p>', {
+          content_type: 'html',
+          speed: 'normal',
+          chunk_by: 'word'
+        });
+        break;
+        
       case 'clear':
         editor?.commands.clearContent();
         editor?.commands.setContent('<p>Cleared! Ready for next test.</p>');
@@ -193,11 +387,24 @@ export default function WebSocketTestPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          {/* Left: Editor */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Streaming Editor</h2>
-            <StreamingEditor onEditorReady={setEditor} />
+        <div className="grid grid-cols-2 gap-6" style={{ overflow: 'visible' }}>
+          {/* Left: Editor with ChatPrompt */}
+          <div className="space-y-4" style={{ overflow: 'visible' }}>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Streaming Editor</h2>
+              <StreamingEditor onEditorReady={setEditor} />
+            </div>
+            
+            {/* Chat Window Prompt for submitting queries */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200" style={{ overflow: 'visible', position: 'relative', zIndex: 1 }}>
+              <h2 className="text-xl font-semibold text-gray-800 px-6 pt-6 pb-2">Submit Query</h2>
+              <ChatWindowPrompt 
+                onSubmit={handleQuerySubmit}
+                placeholder="Type your message here..."
+                onVoiceClick={() => console.log('Voice clicked')}
+                onPlusClick={() => console.log('Plus clicked')}
+              />
+            </div>
           </div>
 
           {/* Right: Tests & Results */}
@@ -324,6 +531,88 @@ export default function WebSocketTestPage() {
                 </div>
 
                 {/* Stream Controls */}
+                <h3 className="text-sm font-medium text-gray-700 mt-4">Extension Tests</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => runTest('highlight')}
+                    className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 text-sm font-medium"
+                  >
+                    🖍️ Highlight
+                  </button>
+                  <button
+                    onClick={() => runTest('alignment')}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 text-sm font-medium"
+                  >
+                    ↔️ Text Align
+                  </button>
+                  <button
+                    onClick={() => runTest('subscript')}
+                    className="px-3 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 text-sm font-medium"
+                  >
+                    ₂ Subscript
+                  </button>
+                  <button
+                    onClick={() => runTest('superscript')}
+                    className="px-3 py-1 bg-purple-100 text-purple-800 rounded hover:bg-purple-200 text-sm font-medium"
+                  >
+                    ² Superscript
+                  </button>
+                  <button
+                    onClick={() => runTest('links')}
+                    className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 text-sm font-medium"
+                  >
+                    🔗 Links
+                  </button>
+                  <button
+                    onClick={() => runTest('images')}
+                    className="px-3 py-1 bg-pink-100 text-pink-800 rounded hover:bg-pink-200 text-sm font-medium"
+                  >
+                    🖼️ Images
+                  </button>
+                  <button
+                    onClick={() => runTest('youtube')}
+                    className="px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 text-sm font-medium"
+                  >
+                    ▶️ YouTube
+                  </button>
+                  <button
+                    onClick={() => runTest('tasklist')}
+                    className="px-3 py-1 bg-teal-100 text-teal-800 rounded hover:bg-teal-200 text-sm font-medium"
+                  >
+                    ☑️ Task List
+                  </button>
+                  <button
+                    onClick={() => runTest('typography')}
+                    className="px-3 py-1 bg-orange-100 text-orange-800 rounded hover:bg-orange-200 text-sm font-medium"
+                  >
+                    📝 Typography
+                  </button>
+                  <button
+                    onClick={() => runTest('aiindicator')}
+                    className="px-3 py-1 bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 text-blue-800 rounded hover:from-blue-200 hover:via-purple-200 hover:to-pink-200 text-sm font-medium border border-blue-300"
+                  >
+                    💎 AI Indicator
+                  </button>
+                  <button
+                    onClick={() => runTest('query')}
+                    className="px-3 py-1 bg-gradient-to-r from-green-100 to-teal-100 text-green-800 rounded hover:from-green-200 hover:to-teal-200 text-sm font-medium border border-green-300"
+                  >
+                    💬 Query Node
+                  </button>
+                  <button
+                    onClick={() => runTest('allformats')}
+                    className="px-3 py-1 bg-cyan-100 text-cyan-800 rounded hover:bg-cyan-200 text-sm font-medium"
+                  >
+                    ✨ All Formats
+                  </button>
+                  <button
+                    onClick={() => runTest('mixed-content')}
+                    className="px-3 py-1 bg-gradient-to-r from-purple-100 via-pink-100 to-orange-100 text-purple-800 rounded hover:from-purple-200 hover:via-pink-200 hover:to-orange-200 text-sm font-medium border-2 border-purple-300"
+                  >
+                    🎨 Complete Showcase
+                  </button>
+                </div>
+
                 <h3 className="text-sm font-medium text-gray-700 mt-4">Stream Controls</h3>
                 <div className="flex flex-wrap gap-2">
                   <button

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import CodeBlock from '@tiptap/extension-code-block';
 import { Send, Mic, Plus, X, UploadCloud, LayoutDashboard, Monitor } from 'lucide-react';
 import DropdownMenu, { type MenuOption } from './DropdownMenu';
 
@@ -31,9 +32,21 @@ export default function RichTextInput({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Configure which features to include
         heading: false, // Disable headings for chat
-        codeBlock: false, // Disable code blocks for simplicity
+        codeBlock: false, // We'll use custom CodeBlock extension
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+      CodeBlock.configure({
+        HTMLAttributes: {
+          class: 'code-block-input',
+        },
       }),
       Placeholder.configure({
         placeholder: placeholder || 'Type your message...',
@@ -45,6 +58,114 @@ export default function RichTextInput({
       attributes: {
         class: 'rich-text-input-editor',
         'data-placeholder': placeholder,
+      },
+      handlePaste: (view, event) => {
+        const text = event.clipboardData?.getData('text/plain');
+        if (!text) return false;
+
+        const lines = text.split('\n');
+        
+        // First, check for numbered lists (lines starting with "1. ", "2. ", etc.)
+        const numberedListPattern = /^\d+\.\s+/;
+        const numberedListLines = lines.filter(line => numberedListPattern.test(line.trim()));
+        const isNumberedList = numberedListLines.length >= 2 && numberedListLines.length / lines.filter(l => l.trim()).length > 0.5;
+
+        if (isNumberedList) {
+          event.preventDefault();
+          const items = lines
+            .filter(line => line.trim() && numberedListPattern.test(line.trim()))
+            .map(line => line.replace(numberedListPattern, '').trim());
+          
+          editor?.commands.insertContent({
+            type: 'orderedList',
+            content: items.map(item => ({
+              type: 'listItem',
+              content: [{ type: 'paragraph', content: [{ type: 'text', text: item }] }],
+            })),
+          });
+          return true;
+        }
+
+        // Check for bullet lists (lines starting with "- " or "* " but NOT markdown headers)
+        const bulletListPattern = /^[-*]\s+/;
+        const bulletListLines = lines.filter(line => {
+          const trimmed = line.trim();
+          return bulletListPattern.test(trimmed) && !trimmed.startsWith('---') && !trimmed.startsWith('***');
+        });
+        const isBulletList = bulletListLines.length >= 2 && bulletListLines.length / lines.filter(l => l.trim()).length > 0.5;
+
+        if (isBulletList) {
+          event.preventDefault();
+          const items = bulletListLines.map(line => line.replace(bulletListPattern, '').trim());
+          
+          editor?.commands.insertContent({
+            type: 'bulletList',
+            content: items.map(item => ({
+              type: 'listItem',
+              content: [{ type: 'paragraph', content: [{ type: 'text', text: item }] }],
+            })),
+          });
+          return true;
+        }
+
+        // Check if content is wrapped in markdown code fence
+        const codeBlockPattern = /^```[\w]*\n([\s\S]*?)\n```$/;
+        const codeBlockMatch = text.match(codeBlockPattern);
+        
+        if (codeBlockMatch) {
+          event.preventDefault();
+          editor?.commands.insertContent({
+            type: 'codeBlock',
+            content: [{ type: 'text', text: codeBlockMatch[1] }],
+          });
+          return true;
+        }
+
+        // Detect PURE code blocks (no mixed prose)
+        // Count code-like lines vs prose-like lines
+        let codeLines = 0;
+        let proseLines = 0;
+        
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+          
+          // Code indicators
+          const isCodeLine = 
+            /^(function|const|let|var|class|interface|type|enum|def|import|export|from|async|await)\s+/.test(trimmed) ||
+            /^(if|else|for|while|return|yield|try|catch)\s*[({]/.test(trimmed) ||
+            /[{}\[\]();]$/.test(trimmed) ||
+            /^\s{4,}/.test(line) || // Indented
+            /=>/.test(trimmed) ||
+            /^\/\/|^\/\*|^\*/.test(trimmed); // Comments
+          
+          // Prose indicators (sentences with many words, no code symbols)
+          const words = trimmed.split(/\s+/).length;
+          const hasCodeSymbols = /[{}\[\]();=]/.test(trimmed);
+          const isProseLine = words >= 8 && !hasCodeSymbols;
+          
+          if (isCodeLine && !isProseLine) {
+            codeLines++;
+          } else if (isProseLine) {
+            proseLines++;
+          }
+        });
+
+        const totalSignificantLines = codeLines + proseLines;
+        const isPredomintantlyCode = totalSignificantLines > 0 && (codeLines / totalSignificantLines) > 0.7;
+
+        // Only treat as code if >70% of significant lines are code-like AND has few prose lines
+        if (isPredomintantlyCode && proseLines < 3) {
+          event.preventDefault();
+          const cleanCode = text.trim();
+          editor?.commands.insertContent({
+            type: 'codeBlock',
+            content: [{ type: 'text', text: cleanCode }],
+          });
+          return true;
+        }
+
+        return false; // Let Tiptap handle normal paste (mixed content or prose)
       },
     },
     onUpdate: ({ editor }) => {
@@ -266,6 +387,7 @@ export default function RichTextInput({
           width: 100%;
           position: relative;
           z-index: 10;
+          overflow: visible;
         }
 
         .rich-text-input-wrapper {
@@ -275,7 +397,7 @@ export default function RichTextInput({
           border-top: 1px solid #9333EA;
           border-bottom: 1px solid #2563EB;
           border-radius: 12px;
-          overflow: hidden;
+          overflow: visible;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
@@ -336,11 +458,56 @@ export default function RichTextInput({
         .rich-text-input-editor ul,
         .rich-text-input-editor ol {
           margin: 8px 0;
-          padding-left: 20px;
+          padding-left: 24px;
+        }
+
+        .rich-text-input-editor ul {
+          list-style-type: disc;
+        }
+
+        .rich-text-input-editor ol {
+          list-style-type: decimal;
         }
 
         .rich-text-input-editor li {
-          margin: 4px 0;
+          margin: 2px 0;
+          padding-left: 4px;
+        }
+
+        .rich-text-input-editor li p {
+          margin: 0;
+        }
+
+        /* Code block styling - lightweight like Claude */
+        .rich-text-input-editor pre {
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          padding: 12px;
+          margin: 8px 0;
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-size: 14px;
+          line-height: 1.5;
+          overflow-x: auto;
+          color: #1f2937;
+        }
+
+        .rich-text-input-editor pre code {
+          background: none;
+          border: none;
+          padding: 0;
+          font-size: inherit;
+          color: inherit;
+        }
+
+        .rich-text-input-editor code {
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 3px;
+          padding: 2px 6px;
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-size: 14px;
+          color: #ef4444;
         }
 
         .rich-text-submit-area {

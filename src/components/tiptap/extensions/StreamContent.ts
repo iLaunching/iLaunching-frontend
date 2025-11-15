@@ -60,8 +60,6 @@ export const StreamContent = Extension.create({
         try {
           const state = this.storage as StreamState;
           
-          console.log('📝 Inserting chunk:', chunk, 'parseAsHTML:', parseAsHTML);
-          
           // Mark as streaming
           if (!state.isStreaming) {
             state.isStreaming = true;
@@ -70,30 +68,29 @@ export const StreamContent = Extension.create({
           // Add to buffer
           state.buffer.push(chunk);
           
-          // Move cursor to end before inserting
+          // Find the AI Indicator position
           const { doc } = editor.state;
-          const endPos = doc.content.size;
-          editor.commands.setTextSelection(endPos);
+          let aiIndicatorPos = -1;
           
-          // For HTML content, accumulate until we can parse safely
-          if (parseAsHTML && (chunk.includes('<') || chunk.includes('>'))) {
-            // Try to insert as HTML, but wrap in a temporary container
-            // to handle partial tags gracefully
-            try {
-              commands.insertContent(chunk, { 
-                parseOptions: { preserveWhitespace: 'full' } 
-              });
-            } catch (error) {
-              // If HTML parsing fails, insert as text
-              console.warn('Failed to parse HTML chunk, inserting as text:', chunk);
-              commands.insertContent({ type: 'text', text: chunk });
+          doc.descendants((node, pos) => {
+            if (node.type.name === 'aiIndicator') {
+              aiIndicatorPos = pos;
+              return false;
             }
-          } else {
-            // Plain text - insert directly
-            commands.insertContent(chunk);
-          }
+          });
           
-          console.log('✅ Chunk inserted successfully');
+          // Insert before AI Indicator (it will naturally push down)
+          const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+          
+          // Use insertContentAt to insert at specific position
+          editor.chain()
+            .insertContentAt(insertPos, chunk, {
+              parseOptions: { 
+                preserveWhitespace: 'full',
+              },
+            })
+            .run();
+          
           return true;
         } catch (error) {
           console.error('StreamContent: Error inserting chunk:', error);

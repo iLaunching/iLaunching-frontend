@@ -28,12 +28,53 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
   const [copied, setCopied] = useState(false);
   const codeRef = useRef<HTMLElement>(null);
   const language = node.attrs.language || 'javascript';
+  const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (codeRef.current) {
-      // Highlight the code
-      Prism.highlightElement(codeRef.current);
-    }
+    if (!codeRef.current) return;
+
+    const highlightCode = () => {
+      if (codeRef.current) {
+        Prism.highlightElement(codeRef.current);
+      }
+    };
+
+    // Initial highlight
+    highlightCode();
+
+    // Watch for text content changes only (ignore Prism's span modifications)
+    const observer = new MutationObserver((mutations) => {
+      // Only react to text changes in text nodes, not span elements added by Prism
+      const hasTextChange = mutations.some(m => {
+        if (m.type === 'characterData') return true;
+        if (m.type === 'childList') {
+          // Check if added nodes are text nodes (not spans from Prism)
+          return Array.from(m.addedNodes).some(node => node.nodeType === Node.TEXT_NODE);
+        }
+        return false;
+      });
+      
+      if (hasTextChange) {
+        // Debounce highlighting to avoid too many calls
+        if (highlightTimeoutRef.current) {
+          clearTimeout(highlightTimeoutRef.current);
+        }
+        highlightTimeoutRef.current = setTimeout(highlightCode, 100);
+      }
+    });
+
+    observer.observe(codeRef.current, {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+    };
   }, [language]);
 
   const handleCopy = async () => {
@@ -100,106 +141,129 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         }
 
         .code-block-container {
-          background: #1e1e1e;
-          border-radius: 8px;
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .code-block-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 0.5rem 1rem;
-          background: #2d2d2d;
-          border-bottom: 1px solid #3e3e3e;
+          padding: 0.75rem 1.25rem;
+          background: rgba(0, 0, 0, 0.2);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(10px);
         }
 
         .language-selector {
-          background: #3e3e3e;
-          color: #d4d4d4;
-          border: 1px solid #4e4e4e;
-          border-radius: 4px;
-          padding: 0.25rem 0.5rem;
-          font-size: 0.875rem;
+          background: rgba(255, 255, 255, 0.05);
+          color: #a8b2d1;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 6px;
+          padding: 0.4rem 0.75rem;
+          font-size: 0.813rem;
+          font-weight: 500;
           cursor: pointer;
           outline: none;
-          transition: border-color 0.2s;
+          transition: all 0.2s ease;
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
         }
 
         .language-selector:hover {
-          border-color: #3b82f6;
+          background: rgba(255, 255, 255, 0.1);
+          border-color: #64ffda;
+          color: #64ffda;
         }
 
         .language-selector:focus {
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+          border-color: #64ffda;
+          box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
         }
 
         .copy-button {
-          background: transparent;
-          color: #9ca3af;
-          border: 1px solid #4e4e4e;
-          border-radius: 4px;
-          padding: 0.25rem 0.75rem;
-          font-size: 0.875rem;
+          background: rgba(100, 255, 218, 0.1);
+          color: #64ffda;
+          border: 1px solid rgba(100, 255, 218, 0.2);
+          border-radius: 6px;
+          padding: 0.4rem 1rem;
+          font-size: 0.813rem;
+          font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.2s ease;
           outline: none;
+          font-family: system-ui, -apple-system, sans-serif;
         }
 
         .copy-button:hover {
-          background: #3e3e3e;
-          color: #d4d4d4;
-          border-color: #3b82f6;
+          background: rgba(100, 255, 218, 0.2);
+          border-color: #64ffda;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(100, 255, 218, 0.2);
         }
 
         .copy-button:active {
-          transform: scale(0.95);
+          transform: translateY(0);
         }
 
         .copy-feedback {
-          color: #10b981;
+          color: #64ffda;
           display: flex;
           align-items: center;
-          gap: 0.25rem;
+          gap: 0.375rem;
+          font-weight: 600;
         }
 
         .code-block-content {
           margin: 0;
-          padding: 1rem;
+          padding: 1.5rem;
           overflow-x: auto;
-          background: #1e1e1e;
+          background: transparent;
         }
 
         .code-block-content code {
-          font-family: 'Courier New', Courier, monospace;
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Courier New', monospace;
           font-size: 0.875rem;
-          line-height: 1.6;
-          color: #d4d4d4;
+          line-height: 1.7;
+          color: #ccd6f6;
+          background: transparent !important;
+          font-weight: 400;
+        }
+        
+        /* Remove all background highlights from Prism tokens */
+        .code-block-content code *,
+        .code-block-content .token {
+          background: transparent !important;
         }
 
         /* Scrollbar styling */
         .code-block-content::-webkit-scrollbar {
-          height: 8px;
+          height: 10px;
         }
 
         .code-block-content::-webkit-scrollbar-track {
-          background: #2d2d2d;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 5px;
         }
 
         .code-block-content::-webkit-scrollbar-thumb {
-          background: #4e4e4e;
-          border-radius: 4px;
+          background: rgba(100, 255, 218, 0.2);
+          border-radius: 5px;
         }
 
         .code-block-content::-webkit-scrollbar-thumb:hover {
-          background: #5e5e5e;
+          background: rgba(100, 255, 218, 0.3);
         }
 
-        /* Prism theme overrides for better visibility */
-        .code-block-content .token.comment {
+        /* Modern syntax colors - VS Code Dark+ inspired */
+        .code-block-content .token.comment,
+        .code-block-content .token.prolog,
+        .code-block-content .token.doctype,
+        .code-block-content .token.cdata {
           color: #6a9955;
+          font-style: italic;
         }
 
         .code-block-content .token.string {
@@ -207,7 +271,8 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         }
 
         .code-block-content .token.keyword {
-          color: #569cd6;
+          color: #c586c0;
+          font-weight: 500;
         }
 
         .code-block-content .token.function {
@@ -225,13 +290,42 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         .code-block-content .token.punctuation {
           color: #d4d4d4;
         }
+
+        .code-block-content .token.class-name {
+          color: #4ec9b0;
+        }
+
+        .code-block-content .token.boolean {
+          color: #569cd6;
+        }
+
+        .code-block-content .token.property {
+          color: #9cdcfe;
+        }
+
+        .code-block-content .token.tag {
+          color: #569cd6;
+        }
+
+        .code-block-content .token.attr-name {
+          color: #9cdcfe;
+        }
+
+        .code-block-content .token.attr-value {
+          color: #ce9178;
+        }
+
+        .code-block-content .token.decorator,
+        .code-block-content .token.annotation {
+          color: #ffd700;
+        }
       `}</style>
     </NodeViewWrapper>
   );
 }
 
 export const CodeBlockWithHighlight = Node.create({
-  name: 'codeBlock',
+  name: 'codeBlockHighlight',
   group: 'block',
   content: 'text*',
   marks: '',
@@ -247,6 +341,16 @@ export const CodeBlockWithHighlight = Node.create({
           return {
             'data-language': attributes.language,
             class: `language-${attributes.language}`,
+          };
+        },
+      },
+      blockId: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-block-id'),
+        renderHTML: (attributes) => {
+          if (!attributes.blockId) return {};
+          return {
+            'data-block-id': attributes.blockId,
           };
         },
       },

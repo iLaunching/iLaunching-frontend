@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
 
 export interface MenuOption {
@@ -44,11 +45,17 @@ export default function DropdownMenu({
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownMenuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      // Check if click is outside both trigger and dropdown menu
+      if (
+        triggerRef.current && !triggerRef.current.contains(target) &&
+        dropdownMenuRef.current && !dropdownMenuRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -83,20 +90,22 @@ export default function DropdownMenu({
     if (!triggerRef.current) return { top: 0, left: 0 };
     
     const rect = triggerRef.current.getBoundingClientRect();
-    const menuWidth = 200; // min-width from CSS
+    const menuWidth = 320; // max-width from CSS (matches RichTextInput menu)
     // Calculate more accurate menu height: padding + (options * item height)
-    const estimatedMenuHeight = 8 + (options.length * 36); // 4px padding top/bottom + 36px per option
+    const estimatedMenuHeight = 20 + (options.length * 44); // padding + item height
     
     let top = 0;
     let left = 0;
     
     switch (position) {
       case 'top':
-        top = rect.top - estimatedMenuHeight - 20; // Menu height + 10px gap above the button
-        left = rect.left + 30; // 20px gap from the left edge of the button
+        // Original positioning: above button with offset
+        top = rect.top - estimatedMenuHeight - 20; // Menu height + 20px gap above the button
+        left = rect.left + 30; // 30px gap from the left edge of the button
         break;
       case 'bottom':
-        top = rect.bottom + 20; // 10px gap below the button
+        // Position menu directly below button
+        top = rect.bottom + 20; // 20px gap below the button
         left = rect.left + 20; // 20px gap from the left edge of the button
         break;
       case 'left':
@@ -169,8 +178,9 @@ export default function DropdownMenu({
         )}
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div 
+          ref={dropdownMenuRef}
           className="dropdown-menu" 
           style={{
             top: `${menuPosition.top}px`,
@@ -219,7 +229,8 @@ export default function DropdownMenu({
               );
             })}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <style>{`
@@ -268,13 +279,13 @@ export default function DropdownMenu({
 
         .dropdown-menu {
           position: fixed;
-          z-index: 9999;
+          z-index: 999999;
           background: white;
           border: 1px solid #e5e7eb;
-          border-radius: 0px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-          min-width: 200px;
-          max-width: 300px;
+          border-radius: 8px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+          min-width: 300px;
+          max-width: 320px;
           padding-top: 10px;
           padding-bottom: 10px;
           animation: menuFadeIn 0.15s ease-out;

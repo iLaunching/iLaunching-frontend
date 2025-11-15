@@ -32,32 +32,93 @@ interface StreamRequest {
  * Stream code block content character-by-character with typewriter effect
  */
 const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
-  // Check if chunk contains code blocks
-  const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
-  const matches = Array.from(chunk.matchAll(codeBlockRegex));
-  
-  if (matches.length === 0) {
-    return;
-  }
+  try {
+    console.log('🔍 streamCodeBlockChunk called, chunk length:', chunk.length);
+    
+    // Check if chunk contains code blocks
+    const codeBlockRegex = /<pre[^>]*>\s*<code[^>]*>([\s\S]*?)<\/code>\s*<\/pre>/g;
+    const matches = Array.from(chunk.matchAll(codeBlockRegex));
+    
+    console.log('📦 Found', matches.length, 'code block(s)');
+    
+    if (matches.length === 0) {
+      return;
+    }
   
   // Split the chunk by code blocks to handle content before/after/between
   let lastIndex = 0;
+  
+  console.log('🔄 Starting loop through', matches.length, 'code blocks');
   
   for (const match of matches) {
     const fullMatch = match[0];
     const codeContent = match[1];
     const matchIndex = match.index || 0;
     
+    console.log('🎯 Processing code block at index:', matchIndex);
+    
     // Insert any content BEFORE this code block (like headings, paragraphs)
     if (matchIndex > lastIndex) {
       const beforeContent = chunk.substring(lastIndex, matchIndex);
+      console.log('📄 Inserting before content, length:', beforeContent.length);
+      console.log('📄 Before content text:', JSON.stringify(beforeContent));
       editor.commands.insertStreamChunk(beforeContent, true);
       await new Promise(resolve => setTimeout(resolve, 50));
     }
     
     // Extract language
-    const preMatch = fullMatch.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
-    const language = preMatch ? preMatch[1] : 'javascript';
+  // Auto-detect language from code content
+  const detectLanguage = (code: string): string => {
+    if (!code || code.trim().length === 0) return 'plaintext';
+    
+    // React/JSX patterns
+    if (/import\s+.*from\s+['"]react['"]/.test(code) || /<[A-Z]\w+/.test(code) || /className=/.test(code)) {
+      return /\.tsx?/.test(code) ? 'tsx' : 'jsx';
+    }
+    
+    // TypeScript patterns
+    if (/interface\s+\w+/.test(code) || /type\s+\w+\s*=/.test(code) || /:\s*(string|number|boolean)/.test(code)) {
+      return 'typescript';
+    }
+    
+    // Python patterns
+    if (/def\s+\w+\(/.test(code) || /import\s+\w+/.test(code) || /from\s+\w+\s+import/.test(code) || /print\(/.test(code)) {
+      return 'python';
+    }
+    
+    // JavaScript patterns
+    if (/function\s+\w+\(/.test(code) || /const\s+\w+\s*=/.test(code) || /let\s+\w+\s*=/.test(code) || /var\s+\w+\s*=/.test(code)) {
+      return 'javascript';
+    }
+    
+    // JSON pattern
+    if (/^\s*[{[]/.test(code.trim()) && /[}\]]\s*$/.test(code.trim())) {
+      try {
+        JSON.parse(code);
+        return 'json';
+      } catch (e) {
+        // Not valid JSON
+      }
+    }
+    
+    // CSS patterns
+    if (/[.#]\w+\s*\{/.test(code) || /@media/.test(code) || /:\s*[\w-]+;/.test(code)) {
+      return 'css';
+    }
+    
+    // Bash/shell patterns
+    if (/^#!/.test(code) || /\$\(/.test(code) || /\|\s*grep/.test(code)) {
+      return 'bash';
+    }
+    
+    return 'plaintext';
+  };
+
+  const preMatch = fullMatch.match(/<pre[^>]*data-language="([^"]+)"[^>]*>/);
+    let language = preMatch ? preMatch[1] : '';
+    
+    console.log('💻 Initial language from API:', language, 'Code length:', codeContent.length);
+    console.log('💻 Initial language from API:', language, 'Code length:', codeContent.length);
     
     // Decode HTML entities
     const decodedCode = codeContent
@@ -67,59 +128,74 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
     
-    // Get current position
-    const { state } = editor;
-    const beforePos = state.doc.content.size;
+    // Auto-detect language if not provided or invalid
+    if (!language || language === 'unknown') {
+      language = detectLanguage(decodedCode);
+      console.log('🔍 Auto-detected language:', language);
+    }
     
-    // Insert empty code block with placeholder
-    editor.chain()
-      .focus()
-      .insertContent({
-        type: 'codeBlock',
-        attrs: { language },
-        content: [{ type: 'text', text: ' ' }]
-      })
-      .run();
+    console.log('📍 Creating code block with language:', language);
     
-    // Wait longer for render to complete
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Find the code block we just created by searching the document
-    const updatedState = editor.state;
-    let codeBlockPos = -1;
-    updatedState.doc.descendants((node, pos) => {
-      if (node.type.name === 'codeBlock' && node.attrs.language === language) {
-        codeBlockPos = pos;
+    // Find AI Indicator position
+    const { doc } = editor.state;
+    let aiIndicatorPos = -1;
+    doc.descendants((node, pos) => {
+      if (node.type.name === 'aiIndicator') {
+        aiIndicatorPos = pos;
       }
     });
     
-    if (codeBlockPos === -1) {
-      return;
-    }
+    const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+    const from = insertPos;
     
-    // Position cursor inside the code block and delete placeholder
-    editor.commands.focus();
-    const insidePos = codeBlockPos + 1;
-    editor.commands.setTextSelection(insidePos);
-    editor.commands.deleteRange({ from: insidePos, to: insidePos + 1 });
+    // Insert empty code block with a single space to ensure it has content
+    editor.chain()
+      .focus()
+      .setTextSelection(insertPos)
+      .insertContent({
+        type: 'codeBlock',
+        attrs: { language },
+        content: [{ type: 'text', text: ' ' }] // Single space to initialize
+      })
+      .run();
+    
+    console.log('✅ Code block inserted at position:', from);
+    
+    // Wait for React to render the NodeView
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Position cursor inside the code block and clear the space
+    const insidePos = from + 1;
+    editor.chain()
+      .focus()
+      .setTextSelection({ from: insidePos, to: insidePos + 1 }) // Select the space
+      .deleteSelection() // Delete it
+      .run();
+    
+    console.log('🎯 Cursor positioned at:', insidePos, 'space cleared');
+    
+    console.log('⌨️ Starting to type', decodedCode.split('\n').length, 'lines of code');
     
     // Instead of character-by-character, type line-by-line for better formatting
     const lines = decodedCode.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      // Insert the entire line at once (preserves spacing and formatting)
+      // Insert the entire line at once as PLAIN TEXT (not HTML)
       if (line.length > 0) {
-        editor.commands.insertContent(line);
+        // Use insertContent with type: 'text' to prevent HTML parsing
+        editor.commands.insertContent({ type: 'text', text: line });
         await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per line
       }
       
       // Add newline if not the last line
       if (i < lines.length - 1) {
-        editor.commands.insertContent('\n');
+        editor.commands.insertContent({ type: 'text', text: '\n' });
         await new Promise(resolve => setTimeout(resolve, 10));
       }
     }
+    
+    console.log('✅ Finished typing code');
     
     lastIndex = matchIndex + fullMatch.length;
   }
@@ -127,7 +203,179 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
   // Insert any content AFTER the last code block
   if (lastIndex < chunk.length) {
     const afterContent = chunk.substring(lastIndex);
+    console.log('📄 Inserting after content, length:', afterContent.length);
+    console.log('📄 After content text:', JSON.stringify(afterContent));
     editor.commands.insertStreamChunk(afterContent, true);
+  }
+  
+  console.log('✅ streamCodeBlockChunk completed successfully');
+  } catch (error) {
+    console.error('❌ Error in streamCodeBlockChunk:', error);
+  }
+};
+
+/**
+ * Stream HTML content word-by-word with proper tag handling
+ * Parses HTML into text nodes and tags, then streams word by word
+ */
+const streamHTMLWordByWord = async (editor: Editor, html: string) => {
+  try {
+    console.log('🎯 Starting word-by-word HTML streaming');
+    
+    // Check if this is a TaskList - needs special handling
+    if (html.includes('data-type="taskList"') || html.includes('data-type="taskItem"')) {
+      console.log('🔍 Detected TaskList, using special streaming');
+      await streamTaskList(editor, html);
+      return;
+    }
+    
+    // Simple approach: Extract text content and tags separately
+    // Parse the HTML to get a DOM structure
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Function to stream node content recursively
+    const streamNode = async (node: Node, marks: string[] = []) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        // Text node - split into words and stream
+        const text = node.textContent || '';
+        const words = text.split(/(\s+)/); // Keep whitespace
+        
+        for (const word of words) {
+          if (word.length > 0) {
+            // Build HTML with current marks wrapped from outermost to innermost
+            let content = word;
+            
+            // Wrap word with accumulated marks
+            for (const mark of marks) {
+              const tagName = mark.match(/<(\w+)/)?.[1];
+              const attrs = mark.match(/<\w+\s+(.+?)>/)?.[1] || '';
+              content = `<${tagName}${attrs ? ' ' + attrs : ''}>${content}</${tagName}>`;
+            }
+            
+            editor.commands.insertStreamChunk(content, true);
+            await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per word
+          }
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as Element;
+        const tagName = element.tagName.toLowerCase();
+        
+        // Build opening tag with attributes
+        let openTag = `<${tagName}`;
+        for (let i = 0; i < element.attributes.length; i++) {
+          const attr = element.attributes[i];
+          openTag += ` ${attr.name}="${attr.value}"`;
+        }
+        openTag += '>';
+        
+        // For inline marks (strong, em, mark, etc.), accumulate them
+        const inlineMarks = ['strong', 'em', 'u', 's', 'mark', 'code', 'a', 'span', 'sub', 'sup'];
+        if (inlineMarks.includes(tagName)) {
+          // Add this mark to the stack and process children
+          const newMarks = [...marks, openTag];
+          for (let i = 0; i < node.childNodes.length; i++) {
+            await streamNode(node.childNodes[i], newMarks);
+          }
+        } else {
+          // Block element - insert opening tag, stream children, insert closing tag
+          editor.commands.insertStreamChunk(openTag, true);
+          await new Promise(resolve => setTimeout(resolve, 20));
+          
+          for (let i = 0; i < node.childNodes.length; i++) {
+            await streamNode(node.childNodes[i], marks);
+          }
+          
+          editor.commands.insertStreamChunk(`</${tagName}>`, true);
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+      }
+    };
+    
+    // Stream the body content
+    for (let i = 0; i < doc.body.childNodes.length; i++) {
+      await streamNode(doc.body.childNodes[i]);
+    }
+    
+    console.log('✅ Word-by-word streaming completed');
+  } catch (error) {
+    console.error('❌ Error in streamHTMLWordByWord:', error);
+    // Fallback to inserting all at once
+    editor.commands.insertStreamChunk(html, true);
+  }
+};
+
+/**
+ * Stream TaskList with special handling for checked state
+ * TaskLists need to be inserted item by item with proper Tiptap commands
+ */
+const streamTaskList = async (editor: Editor, html: string) => {
+  try {
+    console.log('📋 Streaming TaskList');
+    
+    // Parse the HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const taskList = doc.querySelector('ul[data-type="taskList"]');
+    
+    if (!taskList) {
+      console.warn('⚠️ No taskList found, falling back to regular streaming');
+      editor.commands.insertStreamChunk(html, true);
+      return;
+    }
+    
+    // Get all task items
+    const items = taskList.querySelectorAll('li[data-type="taskItem"]');
+    
+    // Insert each task item using Tiptap's TaskList commands
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const isChecked = item.getAttribute('data-checked') === 'true';
+      const text = item.textContent || '';
+      
+      console.log(`📝 Inserting task item ${i + 1}:`, text, 'checked:', isChecked);
+      
+      // Find AI Indicator position for each item
+      const { doc } = editor.state;
+      let aiIndicatorPos = -1;
+      doc.descendants((node, pos) => {
+        if (node.type.name === 'aiIndicator') {
+          aiIndicatorPos = pos;
+        }
+      });
+      
+      const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+      
+      // Insert using Tiptap's proper task item structure before AI Indicator
+      editor.chain()
+        .focus()
+        .setTextSelection(insertPos)
+        .insertContent({
+        type: 'taskList',
+        content: [{
+          type: 'taskItem',
+          attrs: {
+            checked: isChecked
+          },
+          content: [{
+            type: 'paragraph',
+            content: [{
+              type: 'text',
+              text: text
+            }]
+          }]
+        }]
+      })
+        .run();
+      
+      await new Promise(resolve => setTimeout(resolve, 100)); // Delay between items
+    }
+    
+    console.log('✅ TaskList streaming completed');
+  } catch (error) {
+    console.error('❌ Error in streamTaskList:', error);
+    // Fallback
+    editor.commands.insertStreamChunk(html, true);
   }
 };
 
@@ -193,8 +441,27 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
                 console.error('❌ Code block streaming error:', err);
               });
             } else {
-              // Regular content - insert normally
-              editor.commands.insertStreamChunk(chunk.data, true);
+              // Check if this is a large HTML chunk that should be streamed word-by-word
+              // BUT: Don't try to stream complex elements like tables word-by-word
+              const hasComplexStructure = chunk.data.includes('<table') || 
+                                         chunk.data.includes('<div') ||
+                                         chunk.data.includes('<blockquote');
+              
+              const shouldStreamWords = chunk.data.length > 50 && 
+                                       chunk.data.includes('<') && 
+                                       !chunk.data.includes('<pre') &&
+                                       !hasComplexStructure;
+              
+              if (shouldStreamWords) {
+                console.log('🎯 Simple HTML chunk detected, streaming word-by-word');
+                await streamHTMLWordByWord(editor, chunk.data).catch(err => {
+                  console.error('❌ Word-by-word streaming error:', err);
+                });
+              } else {
+                // Regular content or complex HTML - insert normally
+                console.log('📝 Inserting content as-is (complex HTML or regular text)');
+                editor.commands.insertStreamChunk(chunk.data, true);
+              }
             }
           }
         },
