@@ -54,12 +54,12 @@ const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
   };
 
   return (
-    <NodeViewWrapper className="ce-query">
-      <div className="query-container">
-        <div className="query-avatar-container">
+    <NodeViewWrapper className="user-message-node">
+      <div className="msg-container">
+        <div className="msg-avatar">
           {renderAvatar()}
         </div>
-        <NodeViewContent className="query-content" />
+        <NodeViewContent className="msg-text-area" />
       </div>
     </NodeViewWrapper>
   );
