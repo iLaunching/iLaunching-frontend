@@ -40,10 +40,19 @@
 
 /* User Message Node - Fresh Build */
 .user-message-node {
-  margin: 0;
+  margin: 16px 0 !important;
   padding: 0;
   border: none;
   display: block;
+  position: relative;
+}
+
+.user-message-node:first-child {
+  margin-top: 0;
+}
+
+.user-message-node:last-child {
+  margin-bottom: 0;
 }
 
 .msg-container {
@@ -54,8 +63,10 @@
   border: none;
   align-items: flex-start;
   background: transparent;
-  width: auto;
+  width: 100%;
+  max-width: 100%;
   height: auto;
+  position: relative;
 }
 
 .msg-avatar {
@@ -88,23 +99,33 @@
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 5px 12px;
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
   color: #111827;
-  width: auto;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
   height: auto;
   min-height: 0;
   max-height: fit-content;
-  display: inline-block;
-  overflow: visible;
+  display: block;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: visible !important;
+  box-sizing: border-box;
 }
 
 .msg-text-area > * {
   display: block !important;
   line-height: 1.5 !important;
   max-height: fit-content !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  box-sizing: border-box !important;
 }
 
 .msg-text-area p {
@@ -118,19 +139,36 @@
 }
 
 .msg-text-area pre {
-  background: #f3f4f6;
-  padding: 8px;
-  border-radius: 4px;
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 6px;
   margin: 8px 0;
   overflow-x: auto;
-  line-height: 1.4;
+  line-height: 1.5;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  color: #1f2937 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.msg-text-area pre code {
+  background: none !important;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit !important;
 }
 
 .msg-text-area code {
-  background: #f3f4f6;
-  padding: 2px 4px;
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb;
+  padding: 2px 6px;
   border-radius: 3px;
-  font-size: 13px;
+  font-size: 14px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  color: #1f2937 !important;
 }
 
 .msg-text-area ul,

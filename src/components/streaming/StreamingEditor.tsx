@@ -187,8 +187,8 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           min-height: 180px;
           color: #000;
           font-size: 16px;
-          /* Performance optimizations */
-          contain: layout style paint;
+          /* Performance optimizations - removed 'paint' to allow overflow */
+          contain: layout style;
           will-change: contents;
         }
         

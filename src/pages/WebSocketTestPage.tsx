@@ -31,7 +31,29 @@ export default function WebSocketTestPage() {
     if (!editor) return;
     
     // Extract the content nodes from the editor JSON
-    const contentNodes = content?.content || [];
+    let contentNodes = content?.content || [];
+    
+    // Filter out empty paragraphs (paragraphs with no content or only empty text)
+    contentNodes = contentNodes.filter((node: any) => {
+      // Keep non-paragraph nodes
+      if (node.type !== 'paragraph') return true;
+      
+      // Filter out empty paragraphs
+      if (!node.content || node.content.length === 0) return false;
+      
+      // Filter out paragraphs with only whitespace
+      const hasContent = node.content.some((child: any) => {
+        if (child.type === 'text') {
+          return child.text && child.text.trim().length > 0;
+        }
+        return true; // Keep non-text nodes (like hard breaks, etc.)
+      });
+      
+      return hasContent;
+    });
+    
+    // Don't submit if no content after filtering
+    if (contentNodes.length === 0) return;
     
     // Find AI Indicator position
     const { doc } = editor.state;

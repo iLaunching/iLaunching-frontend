@@ -141,11 +141,11 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         }
 
         .code-block-container {
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          background: #f3f4f6;
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          border: 1px solid #e5e7eb;
         }
 
         .code-block-header {
@@ -153,15 +153,14 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
           justify-content: space-between;
           align-items: center;
           padding: 0.75rem 1.25rem;
-          background: rgba(0, 0, 0, 0.2);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(10px);
+          background: #e5e7eb;
+          border-bottom: 1px solid #d1d5db;
         }
 
         .language-selector {
-          background: rgba(255, 255, 255, 0.05);
-          color: #a8b2d1;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: white;
+          color: #374151;
+          border: 1px solid #d1d5db;
           border-radius: 6px;
           padding: 0.4rem 0.75rem;
           font-size: 0.813rem;
@@ -173,20 +172,20 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         }
 
         .language-selector:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: #64ffda;
-          color: #64ffda;
+          background: #f9fafb;
+          border-color: #9ca3af;
+          color: #111827;
         }
 
         .language-selector:focus {
-          border-color: #64ffda;
-          box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+          border-color: #6b7280;
+          box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
         }
 
         .copy-button {
-          background: rgba(100, 255, 218, 0.1);
-          color: #64ffda;
-          border: 1px solid rgba(100, 255, 218, 0.2);
+          background: white;
+          color: #374151;
+          border: 1px solid #d1d5db;
           border-radius: 6px;
           padding: 0.4rem 1rem;
           font-size: 0.813rem;
@@ -198,10 +197,10 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         }
 
         .copy-button:hover {
-          background: rgba(100, 255, 218, 0.2);
-          border-color: #64ffda;
+          background: #f9fafb;
+          border-color: #9ca3af;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(100, 255, 218, 0.2);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .copy-button:active {
