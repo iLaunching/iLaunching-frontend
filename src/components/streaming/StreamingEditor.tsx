@@ -7,21 +7,19 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
-import { Underline } from '@tiptap/extension-underline';
 import { Highlight } from '@tiptap/extension-highlight';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Image } from '@tiptap/extension-image';
-import { Link } from '@tiptap/extension-link';
 import { Youtube } from '@tiptap/extension-youtube';
-import { Mention } from '@tiptap/extension-mention';
 import { Typography } from '@tiptap/extension-typography';
 import { CharacterCount } from '@tiptap/extension-character-count';
 import { Focus } from '@tiptap/extension-focus';
 import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
+import { Mathematics } from '@tiptap/extension-mathematics';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { StreamContent } from '../tiptap/extensions/StreamContent';
 import CodeBlockWithHighlight from '../tiptap/extensions/CodeBlockWithHighlight';
@@ -51,9 +49,9 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
 }) => {
   const editor = useEditor({
     extensions: [
-      // Core editing
+      // Core editing - StarterKit includes: bold, italic, strike, code, paragraph, text, doc, etc.
       StarterKit.configure({
-        codeBlock: false, // Disable default codeBlock
+        codeBlock: false, // Using custom CodeBlockStream instead
       }),
       
       CodeBlockStream, // Enhanced codeBlock with streaming, syntax highlighting, auto-detect
@@ -64,7 +62,6 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       Response, // AI response node with streaming support (animations via CSS)
       
       // Text formatting
-      Underline,
       TextStyle,
       Color,
       Highlight.configure({
@@ -91,12 +88,6 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
         inline: true,
         allowBase64: true,
       }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline cursor-pointer',
-        },
-      }),
       Youtube.configure({
         width: 640,
         height: 480,
@@ -116,10 +107,10 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
         nested: true,
       }),
       
-      // Mentions (basic setup - can be customized)
-      Mention.configure({
-        HTMLAttributes: {
-          class: 'mention',
+      // Mathematics
+      Mathematics.configure({
+        katexOptions: {
+          throwOnError: false,
         },
       }),
       
@@ -355,6 +346,34 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
         .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] {
           margin-top: 4px;
           cursor: pointer;
+        }
+        
+        /* Blockquote */
+        .streaming-editor-wrapper .ProseMirror blockquote {
+          border-left: 4px solid #d1d5db;
+          padding-left: 16px;
+          margin: 16px 0;
+          color: #6b7280;
+          font-style: italic;
+        }
+        
+        /* Horizontal Rule */
+        .streaming-editor-wrapper .ProseMirror hr {
+          border: none;
+          border-top: 2px solid #e5e7eb;
+          margin: 24px 0;
+        }
+        
+        /* Mathematics */
+        .streaming-editor-wrapper .ProseMirror .math-node {
+          background-color: #f3f4f6;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-family: 'KaTeX_Main', 'Times New Roman', serif;
+        }
+        
+        .streaming-editor-wrapper .ProseMirror .math-node.ProseMirror-selectednode {
+          outline: 2px solid #3b82f6;
         }
         
         /* Text alignment */

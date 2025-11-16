@@ -720,7 +720,7 @@ async function processQueueWithDelay(editor: Editor, storage: any, _animationDel
               storage.nodesInserted++;
               console.log('[StreamingWS] ✅ Inserted node:', item.node.type, `(${storage.nodesInserted}/${storage.totalNodesExpected})`);
               
-              // Skip animation for code blocks, tables, and lists - identify by node type
+              // Skip animation for code blocks, tables, lists, task lists, and structured content - identify by node type
               const skipAnimation = item.node.type === 'codeBlock' || 
                                    item.node.type === 'code_block' ||
                                    item.node.type === 'code' ||
@@ -730,7 +730,14 @@ async function processQueueWithDelay(editor: Editor, storage: any, _animationDel
                                    item.node.type === 'tableHeader' ||
                                    item.node.type === 'bulletList' ||
                                    item.node.type === 'orderedList' ||
-                                   item.node.type === 'listItem';
+                                   item.node.type === 'listItem' ||
+                                   item.node.type === 'taskList' ||
+                                   item.node.type === 'taskItem' ||
+                                   item.node.type === 'blockquote' ||
+                                   item.node.type === 'horizontalRule' ||
+                                   item.node.type === 'image' ||
+                                   item.node.type === 'video' ||
+                                   item.node.type === 'mathematics';
               
               if (skipAnimation) {
                 console.log('[StreamingWS] ⏭️ Skipping animation for:', item.node.type);
