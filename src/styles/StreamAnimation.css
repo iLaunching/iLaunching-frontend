@@ -1,0 +1,105 @@
+/**
+ * StreamAnimation.css
+ * 
+ * Gemini-style streaming animations for Tiptap nodes.
+ * Applied by StreamingWebSocketExtension via ProseMirror decorations.
+ */
+
+/* Apply animations to streaming nodes - make it VERY obvious */
+.streaming-animate {
+  animation: streamFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+/* Animation keyframes - exaggerated for visibility */
+@keyframes streamFadeIn {
+  0% {
+    opacity: 0 !important;
+    transform: translateY(20px) scale(0.9) !important;
+  }
+  50% {
+    opacity: 0.5 !important;
+    transform: translateY(10px) scale(0.95) !important;
+  }
+  100% {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+  }
+}
+
+@keyframes streamSlideIn {
+  0% {
+    opacity: 0 !important;
+    transform: translateX(-30px) !important;
+  }
+  100% {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
+}
+
+@keyframes streamScaleIn {
+  0% {
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+  }
+  100% {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* Node type specific animations */
+.streaming-animate-paragraph {
+  animation-name: streamFadeIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-heading {
+  animation-name: streamSlideIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-codeBlock {
+  animation-name: streamScaleIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-bulletList,
+.streaming-animate-orderedList {
+  animation-name: streamFadeIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-listItem {
+  animation-name: streamFadeIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-blockquote {
+  animation-name: streamSlideIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-horizontalRule {
+  animation-name: streamFadeIn !important;
+  animation-duration: 0.6s !important;
+}
+
+.streaming-animate-image {
+  animation-name: streamScaleIn !important;
+  animation-duration: 0.8s !important;
+}
+
+.streaming-animate-table {
+  animation-name: streamFadeIn !important;
+  animation-duration: 1s !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .streaming-animate {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

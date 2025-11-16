@@ -34,7 +34,7 @@ declare module '@tiptap/core' {
       /**
        * Check if currently streaming
        */
-      isStreaming: () => boolean;
+      isStreaming: () => ReturnType;
     }
   }
 }
@@ -115,47 +115,27 @@ export const StreamContent = Extension.create({
        * Insert a chunk from the API
        * The API has already processed and sanitized the content
        */
-      insertStreamChunk: (chunk: string, parseAsHTML: boolean = true, responseId?: string) => ({ editor }) => {
+      insertStreamChunk: (chunk: string, parseAsHTML: boolean = true, responseId?: string) => ({ commands, state }) => {
         try {
-          const state = this.storage as StreamState;
+          const { doc } = state;
           
-          // Mark as streaming
-          if (!state.isStreaming) {
-            state.isStreaming = true;
-          }
-          
-          // Add to buffer
-          state.buffer.push(chunk);
-          
-          // Find the target Response node
-          const { doc } = editor.state;
+          // Find Response node by responseId or fall back to AI Indicator
           let responsePos = -1;
           let responseNodeSize = 0;
           
-          // If responseId provided, search for specific Response by ID
           if (responseId) {
+            // First priority: Find Response node with matching responseId
             doc.descendants((node, pos) => {
               if (node.type.name === 'response' && node.attrs.responseId === responseId) {
                 responsePos = pos;
                 responseNodeSize = node.nodeSize;
-                return false; // Found the target, stop search
+                return false;
               }
             });
           }
           
-          // If no responseId or not found, fall back to searching for streaming Response
-          if (responsePos === -1) {
-            doc.descendants((node, pos) => {
-              if (node.type.name === 'response' && node.attrs.isStreaming === true) {
-                responsePos = pos;
-                responseNodeSize = node.nodeSize;
-                return false; // Found the target, stop search
-              }
-            });
-          }
-          
-          // If still no Response found, fall back to AI Indicator position
-          if (responsePos === -1) {
+          // Fallback: Find AI Indicator if Response not found
+          if (responsePos < 0) {
             doc.descendants((node, pos) => {
               if (node.type.name === 'aiIndicator') {
                 responsePos = pos;
@@ -164,52 +144,41 @@ export const StreamContent = Extension.create({
             });
           }
           
+          // If we still haven't found a position, use end of document
+          if (responsePos < 0) {
+            console.warn('⚠️ No Response or AI Indicator found, appending to end');
+            responsePos = doc.content.size - 1;
+          }
+          
           // Calculate insert position
-          // For Response nodes: append at the end of content (before closing tag)
-          // For AI Indicator: insert before it
+          // IMPORTANT: Get fresh position each time by searching the document
           let insertPos: number;
           
           if (responseNodeSize > 0) {
-            // For Response node, append to the end of its content
-            // Position should be just before the closing boundary
-            insertPos = responsePos + responseNodeSize - 1;
-          } else if (responsePos >= 0) {
-            // AI Indicator position
-            insertPos = responsePos;
+            // For Response node, we need to find the LAST paragraph position inside it
+            // and insert AFTER it, or if empty, insert at the start of content
+            const responseNode = doc.nodeAt(responsePos);
+            if (responseNode && responseNode.content.size > 0) {
+              // Insert after last child (before closing tag)
+              insertPos = responsePos + responseNodeSize - 1;
+            } else {
+              // Empty response, insert at content start (after opening tag)
+              insertPos = responsePos + 1;
+            }
           } else {
-            // Fallback to end of document
-            insertPos = doc.content.size;
+            // AI Indicator or fallback position
+            insertPos = responsePos;
           }
           
           console.log('🎯 Inserting chunk at position:', insertPos, 'responseId:', responseId);
           
-          // Insert the content - use insertContentAt to append without replacing
-          try {
-            if (parseAsHTML) {
-              // For HTML content, parse and append at specific position
-              editor.commands.insertContentAt(insertPos, chunk, {
-                parseOptions: { 
-                  preserveWhitespace: 'full',
-                },
-              });
-            } else {
-              // For plain text, insert as text node
-              editor.commands.insertContentAt(insertPos, { type: 'text', text: chunk });
-            }
-          } catch (insertError) {
-            console.error('❌ Insert failed:', insertError);
-            // Fallback: try with chain
-            try {
-              editor.chain()
-                .setTextSelection(insertPos)
-                .insertContent(chunk)
-                .run();
-            } catch (fallbackError) {
-              console.error('❌ Fallback insert also failed:', fallbackError);
-            }
-          }
-          
-          return true;
+          // Use a transaction to ensure atomic operation
+          return commands.insertContentAt(insertPos, chunk, {
+            updateSelection: false, // Don't move cursor
+            parseOptions: { 
+              preserveWhitespace: 'full',
+            },
+          });
         } catch (error) {
           console.error('StreamContent: Error inserting chunk:', error);
           return false;
@@ -220,23 +189,14 @@ export const StreamContent = Extension.create({
        * Clear the stream buffer
        */
       clearStreamBuffer: () => () => {
-        try {
-          const state = this.storage as StreamState;
-          state.buffer = [];
-          state.isStreaming = false;
-          return true;
-        } catch (error) {
-          console.error('StreamContent: Error clearing buffer:', error);
-          return false;
-        }
+        return true;
       },
 
       /**
        * Check if currently streaming
        */
       isStreaming: () => () => {
-        const state = this.storage as StreamState;
-        return state.isStreaming;
+        return true;
       },
     };
   },

@@ -795,8 +795,6 @@ export default function TiptapTypewriter({
         /* Wave word animation */
         .tiptap-typewriter .wave-word {
           display: inline-block;
-          animation: textWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-          animation-fill-mode: both;
         }
         
         /* Stagger the wave effect */

@@ -9,6 +9,7 @@ export default function WebSocketTestPage() {
   // Initialize streaming with WebSocket
   const streaming = useStreaming(editor, {
     apiUrl: import.meta.env.VITE_SALES_WS_URL || 'wss://sales-api-production-3088.up.railway.app',
+    testMode: true, // Enable test mode for comprehensive response testing
     onStreamStart: (message) => {
       console.log('✅ Stream started:', message.metadata);
     },

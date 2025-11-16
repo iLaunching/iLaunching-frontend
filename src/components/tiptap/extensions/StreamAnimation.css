@@ -1,14 +1,18 @@
-/* Stream Animation Styles - Optimized CSS-Only Approach */
+/* Stream Animation Styles - Handles All Node Types */
 
-/* Keyframe: Wave effect for content */
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+/* Wave effect for inline content - INCREASED BOUNCE */
 @keyframes streamTextWave {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.95);
+    transform: translateY(20px) scale(0.8);
   }
   50% {
     opacity: 0.85;
-    transform: translateY(-0.5px) scale(1.005);
+    transform: translateY(-4px) scale(1.1);
   }
   100% {
     opacity: 1;
@@ -16,7 +20,7 @@
   }
 }
 
-/* Keyframe: Fade in for lines */
+/* Fade in for block-level elements */
 @keyframes streamFadeInLine {
   0% {
     opacity: 0;
@@ -29,7 +33,7 @@
   }
 }
 
-/* Keyframe: Cursor pulse */
+/* Cursor pulse */
 @keyframes cursorPulse {
   0%, 100% {
     opacity: 1;
@@ -39,64 +43,181 @@
   }
 }
 
-/* Apply animations to streaming Response content */
-.response-streaming .response-text-area > * {
-  animation: streamFadeInLine 0.5s ease-out both;
+/* Slide in for code blocks */
+@keyframes streamSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.response-streaming .response-text-area > * > * {
+/* ============================================
+   BLOCK-LEVEL ELEMENTS (Direct children)
+   ============================================ */
+
+/* Animations disabled - causing performance issues */
+
+/* Keep block elements as block */
+.response-streaming .response-text-area > p,
+.response-streaming .response-text-area > h1,
+.response-streaming .response-text-area > h2,
+.response-streaming .response-text-area > h3,
+.response-streaming .response-text-area > h4,
+.response-streaming .response-text-area > h5,
+.response-streaming .response-text-area > h6,
+.response-streaming .response-text-area > blockquote {
+  display: block;
+}
+
+/* ============================================
+   INLINE CONTENT (Text within blocks)
+   ============================================ */
+
+/* Animations disabled - causing performance issues */
+
+/* ============================================
+   LISTS
+   ============================================ */
+
+/* List items get fade animation */
+.response-streaming .response-text-area li {
+  animation: streamFadeInLine 0.5s ease-out both;
+  display: list-item;
+}
+
+/* Content within list items gets wave */
+.response-streaming .response-text-area li > * {
   display: inline-block;
   animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* Blinking cursor while streaming */
+/* Task lists */
+.response-streaming .response-text-area [data-type="taskList"],
+.response-streaming .response-text-area [data-type="taskItem"] {
+  animation: streamFadeInLine 0.5s ease-out both;
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+
+/* Code blocks get slide-in animation */
+.response-streaming .response-text-area pre,
+.response-streaming .response-text-area [data-node-type="codeBlock"],
+.response-streaming .response-text-area .code-block-container {
+  animation: streamSlideIn 0.6s ease-out both;
+}
+
+/* Code content inside should NOT wave (preserve formatting) */
+.response-streaming .response-text-area pre *,
+.response-streaming .response-text-area pre code,
+.response-streaming .response-text-area .code-block-container * {
+  animation: none !important;
+  display: inline !important;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+/* Table fade in */
+.response-streaming .response-text-area table {
+  animation: streamFadeInLine 0.5s ease-out both;
+}
+
+/* Table rows stagger slightly */
+.response-streaming .response-text-area tr {
+  animation: streamFadeInLine 0.4s ease-out both;
+}
+
+.response-streaming .response-text-area tr:nth-child(1) { animation-delay: 0s; }
+.response-streaming .response-text-area tr:nth-child(2) { animation-delay: 0.05s; }
+.response-streaming .response-text-area tr:nth-child(3) { animation-delay: 0.1s; }
+.response-streaming .response-text-area tr:nth-child(4) { animation-delay: 0.15s; }
+.response-streaming .response-text-area tr:nth-child(5) { animation-delay: 0.2s; }
+
+/* Table cells don't animate individually */
+.response-streaming .response-text-area td,
+.response-streaming .response-text-area th {
+  animation: none;
+}
+
+/* ============================================
+   MEDIA & EMBEDS
+   ============================================ */
+
+/* Images, videos, iframes get slide-in */
+.response-streaming .response-text-area img,
+.response-streaming .response-text-area video,
+.response-streaming .response-text-area iframe {
+  animation: streamSlideIn 0.6s ease-out both;
+  display: block;
+}
+
+/* ============================================
+   SPECIAL NODES (Custom Tiptap Extensions)
+   ============================================ */
+
+/* AI Indicator */
+.response-streaming .response-text-area [data-type="aiIndicator"] {
+  animation: streamFadeInLine 0.4s ease-out both;
+}
+
+/* Mentions */
+.response-streaming .response-text-area [data-type="mention"] {
+  display: inline-block;
+  animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Highlights */
+.response-streaming .response-text-area mark,
+.response-streaming .response-text-area .highlight {
+  display: inline-block;
+  animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ============================================
+   CURSOR
+   ============================================ */
+
+/* Blinking cursor at the end while streaming */
 .response-streaming .response-text-area::after {
   content: '▊';
   color: #10b981;
   animation: cursorPulse 1s ease-in-out infinite;
   margin-left: 2px;
   font-weight: bold;
-}
-
-/* Ensure proper rendering for different node types */
-.response-streaming .response-text-area p,
-.response-streaming .response-text-area h1,
-.response-streaming .response-text-area h2,
-.response-streaming .response-text-area h3,
-.response-streaming .response-text-area h4,
-.response-streaming .response-text-area h5,
-.response-streaming .response-text-area h6,
-.response-streaming .response-text-area li {
-  display: block;
-}
-
-/* Handle inline elements within animated blocks */
-.response-streaming .response-text-area strong,
-.response-streaming .response-text-area em,
-.response-streaming .response-text-area code,
-.response-streaming .response-text-area a,
-.response-streaming .response-text-area span {
   display: inline-block;
 }
 
-/* Prevent animation on non-text elements */
-.response-streaming .response-text-area img,
-.response-streaming .response-text-area video,
-.response-streaming .response-text-area iframe {
-  animation: none;
-}
+/* ============================================
+   PERFORMANCE & ACCESSIBILITY
+   ============================================ */
 
-/* Smooth transition when animation completes */
+/* GPU acceleration hint */
 .response-text-area {
   will-change: opacity, transform;
 }
 
-/* Reduce motion for users who prefer it */
+/* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .response-streaming .response-text-area > *,
-  .response-streaming .response-text-area > * > * {
+  .response-streaming .response-text-area *,
+  .response-streaming .response-text-area::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ============================================
+   OVERRIDE: No animation on completed responses
+   ============================================ */
+
+/* When streaming is done, remove all animations */
+.response-node:not(.response-streaming) .response-text-area * {
+  animation: none !important;
 }

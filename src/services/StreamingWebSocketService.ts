@@ -200,6 +200,7 @@ export class StreamingWebSocketService {
 
     const message = {
       type: 'stream_request',
+      test_mode: true,  // Enable test mode by default
       ...config
     };
     

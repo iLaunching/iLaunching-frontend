@@ -27,6 +27,7 @@ import { StreamContent } from '../tiptap/extensions/StreamContent';
 import CodeBlockWithHighlight from '../tiptap/extensions/CodeBlockWithHighlight';
 import CodeBlockStream from '../tiptap/extensions/CodeBlockStream';
 import '../tiptap/extensions/StreamAnimation.css'; // Import CSS-only animations
+import { StreamingWebSocketExtension } from '../tiptap/extensions/StreamingWebSocketExtension';
 import { AiIndicator } from '../tiptap/AiIndicator';
 import { Query } from '../tiptap/Query';
 import { AITurn } from '../tiptap/extensions/AITurn';
@@ -137,6 +138,12 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
         speed: 10,     // 10 words per second
         delay: 100,    // 100ms between words
         mode: 'word',  // Stream word-by-word (smoother)
+      }),
+      
+      // WebSocket-based Tiptap JSON streaming (Phase 1-3)
+      StreamingWebSocketExtension.configure({
+        animationDelay: 200, // 200ms between nodes
+        maxQueueSize: 1000,
       }),
     ],
     content: {
