@@ -131,7 +131,7 @@ const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
           <button 
             onClick={handleCopy}
             className="query-copy-button"
-            data-tooltip={copied ? "Copied!" : "Copy content"}
+            data-tooltip={copied ? "Copied!" : "Copy your message"}
           >
             {copied ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

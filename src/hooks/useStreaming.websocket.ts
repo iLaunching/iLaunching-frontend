@@ -15,6 +15,42 @@ import type {
   StreamCompleteMessage
 } from '../services/StreamingWebSocketService';
 
+/**
+ * Convert markdown to HTML for Tiptap rendering
+ * Handles: **bold**, *italic*, headers, paragraphs, etc.
+ */
+function convertMarkdownToHTML(markdown: string): string {
+  let html = markdown;
+  
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  
+  // Bold (**text** or __text__)
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  
+  // Italic (*text* or _text_) - but not emoji or special cases
+  html = html.replace(/\*([^\*\s][^\*]*?)\*/g, '<em>$1</em>');
+  html = html.replace(/_([^_\s][^_]*?)_/g, '<em>$1</em>');
+  
+  // Inline code
+  html = html.replace(/`(.+?)`/g, '<code>$1</code>');
+  
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
+  
+  // Paragraphs (double newline = new paragraph)
+  html = html.replace(/\n\n+/g, '</p><p>');
+  html = `<p>${html}</p>`;
+  
+  // Single newlines become <br>
+  html = html.replace(/\n/g, '<br>');
+  
+  return html;
+}
+
 interface UseStreamingOptions {
   apiUrl?: string;
   onError?: (error: string) => void;
@@ -28,9 +64,11 @@ interface StreamRequest {
   config: Omit<StreamConfig, 'content'>;
 }
 
-/**
- * Stream code block content character-by-character with typewriter effect
+/*
+ * REMOVED: streamCodeBlockChunk - Markdown streaming doesn't need special code block handling
+ * TipTap automatically parses markdown code blocks (```)
  */
+/*
 const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
   try {
     console.log('🔍 streamCodeBlockChunk called, chunk length:', chunk.length);
@@ -213,171 +251,11 @@ const streamCodeBlockChunk = async (editor: Editor, chunk: string) => {
     console.error('❌ Error in streamCodeBlockChunk:', error);
   }
 };
+*/
 
-/**
- * Stream HTML content word-by-word with proper tag handling
- * Parses HTML into text nodes and tags, then streams word by word
- */
-const streamHTMLWordByWord = async (editor: Editor, html: string) => {
-  try {
-    console.log('🎯 Starting word-by-word HTML streaming');
-    
-    // Check if this is a TaskList - needs special handling
-    if (html.includes('data-type="taskList"') || html.includes('data-type="taskItem"')) {
-      console.log('🔍 Detected TaskList, using special streaming');
-      await streamTaskList(editor, html);
-      return;
-    }
-    
-    // Simple approach: Extract text content and tags separately
-    // Parse the HTML to get a DOM structure
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    // Function to stream node content recursively
-    const streamNode = async (node: Node, marks: string[] = []) => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        // Text node - split into words and stream
-        const text = node.textContent || '';
-        const words = text.split(/(\s+)/); // Keep whitespace
-        
-        for (const word of words) {
-          if (word.length > 0) {
-            // Build HTML with current marks wrapped from outermost to innermost
-            let content = word;
-            
-            // Wrap word with accumulated marks
-            for (const mark of marks) {
-              const tagName = mark.match(/<(\w+)/)?.[1];
-              const attrs = mark.match(/<\w+\s+(.+?)>/)?.[1] || '';
-              content = `<${tagName}${attrs ? ' ' + attrs : ''}>${content}</${tagName}>`;
-            }
-            
-            editor.commands.insertStreamChunk(content, true);
-            await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per word
-          }
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as Element;
-        const tagName = element.tagName.toLowerCase();
-        
-        // Build opening tag with attributes
-        let openTag = `<${tagName}`;
-        for (let i = 0; i < element.attributes.length; i++) {
-          const attr = element.attributes[i];
-          openTag += ` ${attr.name}="${attr.value}"`;
-        }
-        openTag += '>';
-        
-        // For inline marks (strong, em, mark, etc.), accumulate them
-        const inlineMarks = ['strong', 'em', 'u', 's', 'mark', 'code', 'a', 'span', 'sub', 'sup'];
-        if (inlineMarks.includes(tagName)) {
-          // Add this mark to the stack and process children
-          const newMarks = [...marks, openTag];
-          for (let i = 0; i < node.childNodes.length; i++) {
-            await streamNode(node.childNodes[i], newMarks);
-          }
-        } else {
-          // Block element - insert opening tag, stream children, insert closing tag
-          editor.commands.insertStreamChunk(openTag, true);
-          await new Promise(resolve => setTimeout(resolve, 20));
-          
-          for (let i = 0; i < node.childNodes.length; i++) {
-            await streamNode(node.childNodes[i], marks);
-          }
-          
-          editor.commands.insertStreamChunk(`</${tagName}>`, true);
-          await new Promise(resolve => setTimeout(resolve, 20));
-        }
-      }
-    };
-    
-    // Stream the body content
-    for (let i = 0; i < doc.body.childNodes.length; i++) {
-      await streamNode(doc.body.childNodes[i]);
-    }
-    
-    console.log('✅ Word-by-word streaming completed');
-  } catch (error) {
-    console.error('❌ Error in streamHTMLWordByWord:', error);
-    // Fallback to inserting all at once
-    editor.commands.insertStreamChunk(html, true);
-  }
-};
+// Removed streamHTMLWordByWord - backend now sends markdown instead of HTML
 
-/**
- * Stream TaskList with special handling for checked state
- * TaskLists need to be inserted item by item with proper Tiptap commands
- */
-const streamTaskList = async (editor: Editor, html: string) => {
-  try {
-    console.log('📋 Streaming TaskList');
-    
-    // Parse the HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const taskList = doc.querySelector('ul[data-type="taskList"]');
-    
-    if (!taskList) {
-      console.warn('⚠️ No taskList found, falling back to regular streaming');
-      editor.commands.insertStreamChunk(html, true);
-      return;
-    }
-    
-    // Get all task items
-    const items = taskList.querySelectorAll('li[data-type="taskItem"]');
-    
-    // Insert each task item using Tiptap's TaskList commands
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const isChecked = item.getAttribute('data-checked') === 'true';
-      const text = item.textContent || '';
-      
-      console.log(`📝 Inserting task item ${i + 1}:`, text, 'checked:', isChecked);
-      
-      // Find AI Indicator position for each item
-      const { doc } = editor.state;
-      let aiIndicatorPos = -1;
-      doc.descendants((node, pos) => {
-        if (node.type.name === 'aiIndicator') {
-          aiIndicatorPos = pos;
-        }
-      });
-      
-      const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
-      
-      // Insert using Tiptap's proper task item structure before AI Indicator
-      editor.chain()
-        .focus()
-        .setTextSelection(insertPos)
-        .insertContent({
-        type: 'taskList',
-        content: [{
-          type: 'taskItem',
-          attrs: {
-            checked: isChecked
-          },
-          content: [{
-            type: 'paragraph',
-            content: [{
-              type: 'text',
-              text: text
-            }]
-          }]
-        }]
-      })
-        .run();
-      
-      await new Promise(resolve => setTimeout(resolve, 100)); // Delay between items
-    }
-    
-    console.log('✅ TaskList streaming completed');
-  } catch (error) {
-    console.error('❌ Error in streamTaskList:', error);
-    // Fallback
-    editor.commands.insertStreamChunk(html, true);
-  }
-};
+// Removed streamTaskList - backend sends markdown, not HTML TaskLists
 
 export const useStreaming = (editor: Editor | null, options: UseStreamingOptions = {}) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -388,6 +266,42 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   
   const wsServiceRef = useRef<StreamingWebSocketService | null>(null);
   const isProcessingRef = useRef(false);
+  const queueRef = useRef<StreamRequest[]>([]); // Ref to access queue in callbacks
+  
+  // Keep queueRef in sync with queue state
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+  
+  // Auto-process queue when items are added and not currently processing
+  useEffect(() => {
+    if (queue.length > 0 && !isProcessingRef.current && wsServiceRef.current?.isConnected()) {
+      console.log('🎬 Queue has items, auto-processing...');
+      
+      const next = queue[0];
+      
+      // CRITICAL: Check processing flag before processing
+      if (isProcessingRef.current) {
+        return; // Don't process again
+      }
+      
+      isProcessingRef.current = true;
+      setCurrentStreamId(next.id);
+      
+      // Send stream request to API
+      try {
+        console.log('📤 Processing queue item:', next);
+        wsServiceRef.current!.streamContent({
+          content: next.content,
+          ...next.config
+        });
+      } catch (error) {
+        console.error('Failed to send stream request:', error);
+        isProcessingRef.current = false;
+        options.onError?.('Failed to stream content');
+      }
+    }
+  }, [queue.length]); // Only trigger when queue length changes
 
   /**
    * Connect to WebSocket - only when editor is ready
@@ -419,6 +333,22 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           console.log('📡 Stream started:', message.metadata);
           setIsStreaming(true);
           setIsPaused(false);
+          
+          // Create Response node inside the AITurn
+          // Get turnId from current stream request
+          const currentRequest = queueRef.current[0];
+          console.log('🔍 Current request in queue:', currentRequest);
+          console.log('🔍 Config:', currentRequest?.config);
+          console.log('🔍 turnId:', currentRequest?.config?.turnId);
+          
+          if (currentRequest?.config?.turnId && editor && !editor.isDestroyed) {
+            const turnId = currentRequest.config.turnId;
+            console.log('🎯 Creating Response node in AITurn:', turnId);
+            editor.commands.createResponseInTurn(turnId);
+          } else {
+            console.error('❌ Cannot create Response - missing turnId or editor');
+          }
+          
           options.onStreamStart?.(message);
         },
         
@@ -428,41 +358,17 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           // Insert chunk directly into editor
           if (editor && !editor.isDestroyed) {
-            // Check if chunk contains a COMPLETE code block (both <pre> and </pre>)
-            const hasCompleteCodeBlock = chunk.data.includes('<pre') && chunk.data.includes('</pre>');
+            // Backend sends raw markdown - convert to HTML nodes for Tiptap
+            console.log('📝 Converting markdown to Tiptap nodes');
+            const htmlContent = convertMarkdownToHTML(chunk.data);
             
-            console.log('🔍 Has complete code block?', hasCompleteCodeBlock);
+            // Get turnId from current stream request to find the Response
+            const currentRequest = queueRef.current[0];
+            const responseId = currentRequest?.config?.turnId; // turnId = responseId
             
-            if (hasCompleteCodeBlock) {
-              console.log('🎯 Complete code block detected, using typewriter effect');
-              // For complete code blocks, stream character-by-character with typewriter effect
-              // IMPORTANT: await this so stream_complete doesn't arrive before typewriter finishes
-              await streamCodeBlockChunk(editor, chunk.data).catch(err => {
-                console.error('❌ Code block streaming error:', err);
-              });
-            } else {
-              // Check if this is a large HTML chunk that should be streamed word-by-word
-              // BUT: Don't try to stream complex elements like tables word-by-word
-              const hasComplexStructure = chunk.data.includes('<table') || 
-                                         chunk.data.includes('<div') ||
-                                         chunk.data.includes('<blockquote');
-              
-              const shouldStreamWords = chunk.data.length > 50 && 
-                                       chunk.data.includes('<') && 
-                                       !chunk.data.includes('<pre') &&
-                                       !hasComplexStructure;
-              
-              if (shouldStreamWords) {
-                console.log('🎯 Simple HTML chunk detected, streaming word-by-word');
-                await streamHTMLWordByWord(editor, chunk.data).catch(err => {
-                  console.error('❌ Word-by-word streaming error:', err);
-                });
-              } else {
-                // Regular content or complex HTML - insert normally
-                console.log('📝 Inserting content as-is (complex HTML or regular text)');
-                editor.commands.insertStreamChunk(chunk.data, true);
-              }
-            }
+            console.log('🔍 Current request for chunk:', currentRequest);
+            console.log('📌 Inserting into Response with responseId:', responseId);
+            editor.commands.insertStreamChunk(htmlContent, true, responseId);
           }
         },
         
@@ -479,9 +385,10 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           
           options.onStreamComplete?.(message);
           
-          // Process next in queue
+          // Remove completed item from queue and reset processing flag
+          setQueue(prev => prev.slice(1));
           isProcessingRef.current = false;
-          processQueue();
+          // useEffect will auto-process next item when queue updates
         },
         
         onStreamPaused: () => {
@@ -534,57 +441,17 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       config: {
         content_type: config.content_type || 'text',
         speed: config.speed || 'normal',
-        chunk_by: config.chunk_by || 'word'
+        chunk_by: config.chunk_by || 'word',
+        turnId: config.turnId, // Pass through turnId
+        timestamp: config.timestamp, // Pass through timestamp
+        responseId: config.responseId, // Pass through responseId
       }
     };
 
+    console.log('➕ Adding to queue:', streamRequest);
     setQueue(prev => [...prev, streamRequest]);
-    
-    // Auto-process if not already streaming
-    if (!isProcessingRef.current) {
-      processQueue();
-    }
+    // Processing will be triggered by useEffect when queue updates
   }, []);
-
-  /**
-   * Process queue
-   */
-  const processQueue = useCallback(() => {
-    if (isProcessingRef.current || !wsServiceRef.current?.isConnected()) {
-      return;
-    }
-    
-    setQueue(prev => {
-      if (prev.length === 0) {
-        return prev;
-      }
-      
-      const [next, ...rest] = prev;
-      
-      // CRITICAL: Check processing flag AFTER extracting item but BEFORE processing
-      // This prevents React Strict Mode from executing the stream request twice
-      if (isProcessingRef.current) {
-        return rest; // Remove item from queue but don't process again
-      }
-      
-      isProcessingRef.current = true;
-      setCurrentStreamId(next.id);
-      
-      // Send stream request to API
-      try {
-        wsServiceRef.current!.streamContent({
-          content: next.content,
-          ...next.config
-        });
-      } catch (error) {
-        console.error('Failed to send stream request:', error);
-        isProcessingRef.current = false;
-        options.onError?.('Failed to stream content');
-      }
-      
-      return rest;
-    });
-  }, [options]);
 
   /**
    * Clear queue

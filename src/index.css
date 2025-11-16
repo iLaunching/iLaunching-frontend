@@ -324,3 +324,135 @@
   visibility: visible;
 }
 
+/* AITurn Node Styles */
+.ai-turn-node {
+  margin: 24px 0;
+  padding: 0;
+  display: block;
+}
+
+.ai-turn-container {
+  position: relative;
+  background: transparent;
+  border-radius: 16px;
+  overflow: visible;
+}
+
+.ai-turn-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Response Node Styles */
+.response-node {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.response-container {
+  position: relative;
+  background: transparent;
+}
+
+.response-content-wrapper {
+  position: relative;
+}
+
+.response-text-area {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #111827;
+  min-height: 40px;
+}
+
+.response-text-area p {
+  margin: 0 0 0.75em 0;
+  line-height: 1.6;
+}
+
+.response-text-area p:last-child {
+  margin-bottom: 0;
+}
+
+.response-text-area ul,
+.response-text-area ol {
+  margin: 8px 0;
+  padding-left: 24px;
+  line-height: 1.6;
+}
+
+.response-text-area ul {
+  list-style-type: disc;
+}
+
+.response-text-area ol {
+  list-style-type: decimal;
+}
+
+.response-text-area li {
+  margin: 4px 0;
+  display: list-item !important;
+}
+
+.response-text-area pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+}
+
+.response-text-area code {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Streaming indicator animation */
+.response-streaming-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.streaming-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4f46e5;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.streaming-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.streaming-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+

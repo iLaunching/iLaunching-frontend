@@ -26,8 +26,11 @@ import { Placeholder } from '@tiptap/extension-placeholder';
 import { StreamContent } from '../tiptap/extensions/StreamContent';
 import CodeBlockWithHighlight from '../tiptap/extensions/CodeBlockWithHighlight';
 import CodeBlockStream from '../tiptap/extensions/CodeBlockStream';
+import '../tiptap/extensions/StreamAnimation.css'; // Import CSS-only animations
 import { AiIndicator } from '../tiptap/AiIndicator';
 import { Query } from '../tiptap/Query';
+import { AITurn } from '../tiptap/extensions/AITurn';
+import { Response } from '../tiptap/extensions/Response';
 
 interface StreamingEditorProps {
   className?: string;
@@ -51,10 +54,13 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       StarterKit.configure({
         codeBlock: false, // Disable default codeBlock
       }),
+      
       CodeBlockStream, // Enhanced codeBlock with streaming, syntax highlighting, auto-detect
       CodeBlockWithHighlight, // Custom codeBlockHighlight for manual use
       AiIndicator, // AI response indicator with animated icon
+      AITurn, // Parent node wrapping Query + Response for conversation turns
       Query, // User query node with avatar and background colors
+      Response, // AI response node with streaming support (animations via CSS)
       
       // Text formatting
       Underline,

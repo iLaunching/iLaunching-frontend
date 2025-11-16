@@ -10,6 +10,9 @@ export interface StreamConfig {
   content_type: 'text' | 'html' | 'markdown';
   speed: 'slow' | 'normal' | 'fast' | 'superfast' | 'adaptive';
   chunk_by: 'character' | 'word' | 'sentence';
+  turnId?: string;
+  timestamp?: string;
+  responseId?: string;
 }
 
 export interface StreamChunk {
