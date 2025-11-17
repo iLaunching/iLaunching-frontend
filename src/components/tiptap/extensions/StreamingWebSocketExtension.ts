@@ -1,22 +1,8 @@
 /**
- * StreamingWebSocketExtension
+ * StreamingWebSocketExtension - Phase 4 Implementation
+ * Updated: 2025-11-17 - Added callback registration debugging
  * 
- * Phase 3 Implementation: Custom Tiptap extension for streaming Tiptap JSON nodes.
- * 
- * Features:
- * - Receives Tiptap JSON nodes directly from WebSocket (no markdown parsing)
- * - Queues nodes for sequential insertion with animation timing
- * - Manages WebSocket connection lifecycle
- * - Handles stream control (pause/resume/skip)
- * - Prevents browser crashes by throttling insertions
- * 
- * Architecture:
- * Backend → WebSocket → This Extension → Animation Queue → Editor
- * 
- * Message Types:
- * - {type: "node", data: {...tiptap_node...}, index: N}
- * - {type: "stream_start", total_nodes: N}
- * - {type: "stream_complete", total_nodes: N}
+ * Handles WebSocket connection and Tiptap JSON streaming.
  */
 
 import { Extension } from '@tiptap/core';
@@ -131,6 +117,10 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
       currentTurnId: null as string | null,
       animatingNodes: 0, // Track concurrent animations
       animationsEnabled: true, // Runtime toggle
+      // Store callbacks in storage so they can be updated dynamically
+      onStreamStart: undefined as ((data: any) => void) | undefined,
+      onStreamComplete: undefined as ((data: any) => void) | undefined,
+      onError: undefined as ((error: any) => void) | undefined,
     };
   },
 
@@ -277,11 +267,15 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                     storage.lastInsertPosition = null;
                   }
                   
-                  if (this.options.onStreamStart) {
-                    this.options.onStreamStart({
+                  console.log('[StreamingWS] Checking onStreamStart callback:', !!storage.onStreamStart);
+                  if (storage.onStreamStart) {
+                    console.log('[StreamingWS] Calling onStreamStart callback');
+                    storage.onStreamStart({
                       total_nodes: message.total_nodes,
                       metadata: message.metadata,
                     });
+                  } else {
+                    console.warn('[StreamingWS] No onStreamStart callback registered');
                   }
                   break;
 
@@ -300,8 +294,8 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                 case 'stream_complete':
                   console.log('[StreamingWS] ✅ Stream complete. Received:', storage.nodesReceived, 'Inserted:', storage.nodesInserted);
                   
-                  if (this.options.onStreamComplete) {
-                    this.options.onStreamComplete({
+                  if (storage.onStreamComplete) {
+                    storage.onStreamComplete({
                       total_nodes: message.total_nodes,
                     });
                   }

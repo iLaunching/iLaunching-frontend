@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 
 interface ResponseComponentProps {
@@ -17,31 +17,69 @@ interface ResponseComponentProps {
 
 const ResponseComponent: React.FC<ResponseComponentProps> = memo(({ node }) => {
   const { attrs } = node;
+  const [copied, setCopied] = useState(false);
+  const textAreaRef = useRef<HTMLDivElement>(null);
+
+  const handleCopy = async () => {
+    if (textAreaRef.current) {
+      const textContent = textAreaRef.current.innerText;
+      try {
+        await navigator.clipboard.writeText(textContent);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  };
 
   return (
     <NodeViewWrapper className="response-node">
       <div 
         className={`response-container ${attrs.isStreaming ? 'response-streaming' : ''}`}
         style={{
-          border: '2px solid #10b981',
-          borderRadius: '6px',
-          padding: '12px',
-          marginTop: '8px',
-          backgroundColor: '#ecfdf5',
+          position: 'relative',
+          borderTop: '1px solid #3b82f660',
+          marginTop: '50px',
+          paddingTop: '35px',
           transition: 'all 0.3s ease'
         }}
       >
-        <div style={{ 
-          fontSize: '10px', 
-          color: '#10b981', 
-          fontWeight: 'bold',
-          marginBottom: '8px',
-          fontFamily: 'monospace'
+        {/* iLaunching label positioned absolutely on top border */}
+        <div style={{
+          position: 'absolute',
+          top: '-12px',
+          left: '0px',
+          backgroundColor: 'white',
+          padding: '0 8px',
+          fontSize: '12px',
+          fontWeight: '600',
+          color: '#3b82f660',
+          letterSpacing: '0.5px',
+          userSelect: 'none',
+          cursor: 'default'
         }}>
-          Response: {attrs.responseId} {attrs.isStreaming ? '(streaming...)' : ''}
+          iLaunching
         </div>
-        <div className="response-content-wrapper">
+        
+        <div className="response-content-wrapper" ref={textAreaRef}>
           <NodeViewContent className="response-text-area" />
+          <button 
+            onClick={handleCopy}
+            className="response-copy-button"
+            data-tooltip={copied ? "Copied!" : "Copy response"}
+          >
+            {copied ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            )}
+          </button>
         </div>
         
         {/* Timestamp and ID metadata at the end of response */}

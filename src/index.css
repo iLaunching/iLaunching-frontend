@@ -79,7 +79,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin: 0;
+  margin-right: 20px;
   padding: 0;
 }
 
@@ -98,10 +98,25 @@
 
 .msg-content-wrapper {
   position: relative;
-  flex: 1;
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  
+}
+
+.msg-content-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: -16px;
+  width: 0;
+  height: 0;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-right: 16px solid #e9eefb;
+  z-index: 0;
 }
 
 .query-controls-container {
@@ -131,6 +146,7 @@
   max-height: none !important;
   border-bottom: none !important;
   border-radius: 12px 12px 0 0 !important;
+ 
 }
 
 .msg-content-wrapper[data-expanded="true"] .query-controls-container {
@@ -142,16 +158,16 @@
 }
 
 .msg-text-area {
-  background: #e0e7ff50;
-  border: 1px solid #4f46e540;
-  border-radius: 12px;
-  padding: 5px 12px;
-  margin: 0;
+  background: #e9eefb;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-left:0;
   font-size: 15px;
   line-height: 1.5;
   color: #000000;
-  flex: 1;
-  min-width: 0;
+  width: fit-content;
+  min-width: 200px;
   max-width: 100%;
   height: auto;
   min-height: 0;
@@ -360,11 +376,93 @@
   position: relative;
 }
 
+.response-copy-button {
+  position: absolute;
+  bottom: -16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #3b82f640;
+  color: #3b82f6;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+}
+
+.response-copy-button:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.response-container:hover .response-copy-button {
+  display: flex;
+}
+
+/* Tooltip for response copy button */
+.response-copy-button::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  color: #f9fafb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.response-copy-button::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 13px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0px 14px 0 -2.5px #111827;
+  z-index: 99997;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.response-copy-button:hover::before,
+.response-copy-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 .response-text-area {
   background: white;
-  border: 1px solid #e5e7eb;
+ /* border: 1px solid #e5e7eb;*/
   border-radius: 12px;
-  padding: 12px 16px;
+  /* padding: 12px 16px;*/
   margin: 0;
   font-size: 15px;
   line-height: 1.6;

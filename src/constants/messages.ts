@@ -734,6 +734,57 @@ export const INTRODUCTION_MESSAGES = [
 ] as const;
 
 
+/** submit acknowlege message */
+
+export const SUBMIT_ACKNOWLEDGE_MESSAGE = [
+  "Okay, I'm on it.",
+  "Thinking... I see what you're asking.",
+  "Great question! Hold on...",
+  "Got it, {name}! Working on that.",
+  
+  "Alright, let me see...",
+  "Let me see what I can find.",
+  "I'm on it! Let me check that for you.",
+  "You got it, {name}.",
+  
+  "Yep, working on that now.",
+  "Hmm, interesting question!",
+  "Coming right up!",
+  "On it, {name}! Just a second...",
+  "Okay, I understand what you need.",
+  
+  "Sure thing! Give me a moment.",
+  "Hold on, working on it...",
+  "That's a good one. Give me a moment.",
+  "Sure thing, {name}. Let me see...",
+  "Alright, let me work on that for you.",
+  
+  "Gotcha, let me check that.",
+  "Give me a moment to pull that up.",
+  "I see what you need. Working on it...",
+  "Alright, {name}, I'm on it!",
+  "Yep, I see what you're asking.",
+  
+  "Right, I'll figure that out for you.",
+  "One sec, let me look into that.",
+  "Interesting! Let me think about that.",
+  "Good question, {name}. Hold on...",
+  "Sure thing! I'm on it.",
+  
+  "Let me think about this...",
+  "I understand. Let me get that for you.",
+  "I see what you're asking, {name}.",
+  "Gotcha, I'll figure that out.",
+  
+  "Just a second, I'm on it.",
+  "Perfect, I'll work on that now.",
+  "Let me check that for you, {name}.",
+  "Thinking about that now...",
+] as const;
+
+
+
+
 
 /**
  * Email Prompt Messages
@@ -775,6 +826,10 @@ export function getRandomMessage<T extends readonly string[]>(messages: T): T[nu
 export const getRandomWelcomeMessage = () => getRandomMessage(WELCOME_MESSAGES);
 export const getRandomWelcomeBackMessage = () => getRandomMessage(WELCOM_BACK_MESSAGE);
 export const getRandomAcknowledgeMessage = () => getRandomMessage(ACKNOWLEDGE_MESSAGE);
+export const getRandomSubmitAcknowledgeMessage = (name?: string) => {
+  const message = getRandomMessage(SUBMIT_ACKNOWLEDGE_MESSAGE);
+  return name ? message.replace('{name}', name) : message.replace(', {name}', '').replace('{name}, ', '').replace(' {name}', '').replace('{name}', '');
+};
 export const getRandomCheckingEmailMessage = (email: string) => {
   const message = getRandomMessage(CHECKING_EMAIL_MESSAGES);
   return message.replace('{email}', email);

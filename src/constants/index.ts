@@ -24,6 +24,7 @@ export {
   getRandomWelcomeMessage,
   getRandomWelcomeBackMessage,
   getRandomAcknowledgeMessage,
+  getRandomSubmitAcknowledgeMessage,
   getRandomCheckingEmailMessage,
   getRandomWrongEmailMessage,
   getRandomEmailPrompt,

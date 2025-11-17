@@ -28,18 +28,18 @@ export default function AiIndicator({
     <div className={`ai-indicator ${className}`}>
       <div className="ai-indicator-container">
         {/* AI Icon (diamond shape with animated lowercase i) */}
-        <div className="ai-icon">
-          <span className="ai-letter">i</span>
+        <div className="ai-icon" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
+          <span className="ai-letter" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>i</span>
         </div>
         
         {/* AI Name */}
-        <div className="ai-name">
+        <div className="ai-name" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
           {aiName}
         </div>
         
         {/* AI Acknowledge (only show if not empty) */}
         {aiAcknowledge && (
-          <div className="ai-acknowledge">
+          <div className="ai-acknowledge" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
             {aiAcknowledge}
           </div>
         )}
@@ -77,6 +77,8 @@ export default function AiIndicator({
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
+            user-select: none;
+            cursor: default;
           }
 
           .ai-icon::before {
@@ -103,6 +105,8 @@ export default function AiIndicator({
             animation: pulse 2s infinite;
             z-index: 10;
             position: relative;
+            user-select: none;
+            cursor: default;
           }
 
           @keyframes pulse {
@@ -115,6 +119,8 @@ export default function AiIndicator({
             font-size: 13px;
             color: #1e293b;
             white-space: nowrap;
+            user-select: none;
+            cursor: default;
           }
 
           .ai-acknowledge {
@@ -122,6 +128,8 @@ export default function AiIndicator({
             color: #64748b;
             font-style: italic;
             white-space: nowrap;
+            user-select: none;
+            cursor: default;
           }
 
           /* Responsive behavior */
@@ -129,23 +137,33 @@ export default function AiIndicator({
             .ai-indicator {
               margin-bottom: 8px;
               padding: 6px 10px;
+              user-select: none;
+              cursor: default;
             }
             
             .ai-icon {
               width: 20px;
               height: 20px;
+              user-select: none;
+              cursor: default;
             }
             
             .ai-letter {
               font-size: 12px;
+              user-select: none;
+              cursor: default;
             }
             
             .ai-name {
               font-size: 12px;
+              user-select: none;
+              cursor: default;
             }
             
             .ai-acknowledge {
               font-size: 10px;
+              user-select: none;
+              cursor: default;
             }
           }
         `

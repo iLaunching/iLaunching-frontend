@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StreamingEditor } from '../components/streaming/StreamingEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
 import ChatWindowPrompt from '../components/ChatWindowPrompt';
+import { getRandomSubmitAcknowledgeMessage } from '../constants';
 
 export default function WebSocketTestPage() {
   const [editor, setEditor] = useState<any>(null);
@@ -12,6 +13,36 @@ export default function WebSocketTestPage() {
     testMode: true, // Enable test mode for comprehensive response testing
     onStreamStart: (message) => {
       console.log('✅ Stream started:', message.metadata);
+      
+      // Clear acknowledge message when streaming starts
+      if (editor) {
+        console.log('🧹 Attempting to clear acknowledge message...');
+        const { doc } = editor.state;
+        let foundIndicator = false;
+        
+        doc.descendants((node: any, pos: any) => {
+          if (node.type.name === 'aiIndicator') {
+            foundIndicator = true;
+            console.log('📍 Found AI Indicator at pos:', pos);
+            console.log('   Current attrs:', node.attrs);
+            
+            // Update the acknowledge attribute to empty string
+            editor.chain()
+              .setNodeSelection(pos)
+              .updateAttributes('aiIndicator', {
+                aiAcknowledge: ''
+              })
+              .run();
+            
+            console.log('✅ AI Indicator acknowledge cleared');
+            return false; // Stop early
+          }
+        });
+        
+        if (!foundIndicator) {
+          console.warn('⚠️ No AI Indicator found in document');
+        }
+      }
     },
     onStreamComplete: (message) => {
       console.log('✅ Stream completed:', message.total_chunks);
@@ -103,11 +134,26 @@ export default function WebSocketTestPage() {
     
     console.log('💬 AITurn created with Query only:', { turnId, queryId });
     
+    // Update AI Indicator with random acknowledge message
+    if (editor) {
+      const { doc } = editor.state;
+      doc.descendants((node: any, pos: any) => {
+        if (node.type.name === 'aiIndicator') {
+          const randomMessage = getRandomSubmitAcknowledgeMessage();
+          editor.commands.setNodeSelection(pos);
+          editor.commands.updateAttributes('aiIndicator', {
+            aiAcknowledge: randomMessage
+          });
+          console.log('💬 Updated AI Indicator with acknowledge:', randomMessage);
+          return false; // Stop early
+        }
+      });
+    }
+    
     // Send query to LLM via streaming API
     streaming.addToQueue(queryText, {
       content_type: 'markdown',
       speed: 'normal',
-      chunk_by: 'paragraph',
       responseId: responseId,
       turnId: turnId,
       timestamp: timestamp

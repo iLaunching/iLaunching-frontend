@@ -28,6 +28,22 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   const maxRetries = 3;
   const retryDelay = 2000; // 2 seconds
 
+  // Register callbacks with extension immediately when editor is available
+  useEffect(() => {
+    if (!editor) return;
+    
+    const storage = (editor.storage as any)?.streamingWebSocket;
+    
+    if (storage) {
+      console.log('📝 Registering callbacks in StreamingWebSocketExtension storage');
+      storage.onStreamStart = options.onStreamStart;
+      storage.onStreamComplete = options.onStreamComplete;
+      storage.onError = options.onError;
+    } else {
+      console.warn('⚠️ StreamingWebSocketExtension storage not found');
+    }
+  }, [editor, options.onStreamStart, options.onStreamComplete, options.onError]);
+
   /**
    * Connect to WebSocket - only when editor is ready
    * Phase 4: Now uses StreamingWebSocketExtension commands
@@ -283,11 +299,11 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
 
   // Auto-connect when editor is ready
   useEffect(() => {
-    if (editor && !isConnected) {
+    if (editor && !isConnected && !isConnecting) {
       console.log('🔄 Auto-connecting WebSocket...');
       connect();
     }
-  }, [editor]); // Only depend on editor, not isConnected or connect
+  }, [editor, isConnected, isConnecting, connect]);
 
   // Cleanup on unmount
   useEffect(() => {

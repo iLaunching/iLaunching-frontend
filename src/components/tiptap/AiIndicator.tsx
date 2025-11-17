@@ -29,8 +29,8 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
         {/* Header section with icon, name, and acknowledge */}
         <div className="tiptap-ai-header">
           {/* AI Icon (diamond shape with animated lowercase i) */}
-          <div className="tiptap-ai-icon">
-            <span className="tiptap-ai-letter">i</span>
+          <div className="tiptap-ai-icon" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
+            <span className="tiptap-ai-letter" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>i</span>
           </div>
           
           {/* AI Name */}
@@ -194,6 +194,31 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           font-style: italic;
           background: rgba(147, 51, 234, 0.05);
           border: 1px solid rgba(147, 51, 234, 0.1);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          position: relative;
+          overflow: hidden;
+          animation: acknowledgeBorderFlow 2s ease-in-out infinite;
+        }
+
+        /* Glow effect for acknowledge */
+        .tiptap-ai-acknowledge::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          border-radius: 6px;
+          background: linear-gradient(45deg, 
+            rgba(147, 51, 234, 0.3),
+            rgba(168, 85, 247, 0.3),
+            rgba(147, 51, 234, 0.3)
+          );
+          background-size: 400% 400%;
+          z-index: -1;
+          opacity: 0;
+          animation: acknowledgeGlow 2s ease-in-out infinite;
+          filter: blur(4px);
         }
 
         .tiptap-ai-text {
@@ -254,6 +279,40 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           to {
             opacity: 1;
             transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes acknowledgeBorderFlow {
+          0% {
+            background-position: 0% 0%, 0% 0%;
+            transform: scale(1);
+          }
+          25% {
+            background-position: 0% 0%, 100% 0%;
+            transform: scale(1.02);
+          }
+          50% {
+            background-position: 0% 0%, 100% 100%;
+            transform: scale(1);
+          }
+          75% {
+            background-position: 0% 0%, 0% 100%;
+            transform: scale(1.02);
+          }
+          100% {
+            background-position: 0% 0%, 0% 0%;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes acknowledgeGlow {
+          0%, 100% {
+            opacity: 0;
+            background-position: 0% 0%;
+          }
+          50% {
+            opacity: 0.6;
+            background-position: 100% 100%;
           }
         }
       `}</style>

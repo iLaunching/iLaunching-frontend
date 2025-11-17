@@ -23,22 +23,13 @@ const AITurnComponent: React.FC<AITurnComponentProps> = memo(({ node, updateAttr
         className="ai-turn-container" 
         data-turn-id={attrs.turnId}
         style={{
-          border: '2px solid #3b82f6',
-          borderRadius: '8px',
-          padding: '12px',
-          marginBottom: '16px',
-          backgroundColor: '#eff6ff'
+         /* border: '2px solid #3b82f6',*/
+         /* borderRadius: '8px',*/
+         /* padding: '12px',*/
+          marginBottom: '0px',
+         
         }}
       >
-        <div style={{ 
-          fontSize: '10px', 
-          color: '#3b82f6', 
-          fontWeight: 'bold',
-          marginBottom: '8px',
-          fontFamily: 'monospace'
-        }}>
-          AITurn: {attrs.turnId}
-        </div>
         <NodeViewContent className="ai-turn-content" />
       </div>
     </NodeViewWrapper>
