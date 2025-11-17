@@ -6,6 +6,7 @@ import { getRandomSubmitAcknowledgeMessage } from '../constants';
 
 export default function WebSocketTestPage() {
   const [editor, setEditor] = useState<any>(null);
+  const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
 
   // Initialize streaming with WebSocket
   const streaming = useStreaming(editor, {
@@ -46,6 +47,8 @@ export default function WebSocketTestPage() {
     },
     onStreamComplete: (message) => {
       console.log('✅ Stream completed:', message.total_chunks);
+      // Reset padding to half viewport height after streaming completes
+      setNeedsScrollPadding(false);
     },
     onError: (error) => {
       console.error('❌ Error:', error);
@@ -168,6 +171,8 @@ export default function WebSocketTestPage() {
           const hasPreiousContent = nodeCount > 5;
           
           if (!hasPreiousContent) {
+            // No previous content, no padding needed
+            setNeedsScrollPadding(false);
             console.log('📜 Skipping scroll - editor is empty or first query');
             // Start streaming immediately without scrolling
             streaming.addToQueue(queryText, {
@@ -180,21 +185,24 @@ export default function WebSocketTestPage() {
             return;
           }
           
-          let lastQueryPos = -1;
+          // Enable padding BEFORE finding positions for scrolling
+          setNeedsScrollPadding(true);
           
-          // Find the LAST Query node (the one we just created)
-          doc.descendants((node: any, pos: any) => {
-            if (node.type.name === 'query') {
-              lastQueryPos = pos; // Keep updating to get the last one
-            }
-          });
+          // Small delay to let padding apply and DOM update
+          setTimeout(() => {
+            let lastQueryPos = -1;
           
-          if (lastQueryPos >= 0) {
-            const editorElement = editor.view.dom;
-            
-            // Get the Query DOM element
-            const queryElement = editor.view.domAtPos(lastQueryPos).node as HTMLElement;
-            const queryParent = (queryElement?.closest('[data-node-type="query"]') || queryElement) as HTMLElement;
+            // Find the LAST Query node (the one we just created)
+            doc.descendants((node: any, pos: any) => {
+              if (node.type.name === 'query') {
+                lastQueryPos = pos; // Keep updating to get the last one
+              }
+            });
+          
+            if (lastQueryPos >= 0) {
+              // Get the Query DOM element
+              const queryElement = editor.view.domAtPos(lastQueryPos).node as HTMLElement;
+              const queryParent = (queryElement?.closest('[data-node-type="query"]') || queryElement) as HTMLElement;
             
             if (queryParent) {
               const beforeScrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -242,29 +250,43 @@ export default function WebSocketTestPage() {
               
               console.log('📜 Scrolling window to align Query below header border');
               
-              // Wait for scroll to complete, then start streaming
-              setTimeout(() => {
-                streaming.addToQueue(queryText, {
-                  content_type: 'markdown',
-                  speed: 'normal',
-                  responseId: responseId,
-                  turnId: turnId,
-                  timestamp: timestamp
-                });
-              }, 0); // Minimal delay for instant scroll
+              // Listen for scroll end instead of using timer
+              let scrollEndTimer: NodeJS.Timeout;
+              const handleScrollEnd = () => {
+                clearTimeout(scrollEndTimer);
+                scrollEndTimer = setTimeout(() => {
+                  // Scroll has stopped, remove listener and start streaming
+                  window.removeEventListener('scroll', handleScrollEnd);
+                  
+                  console.log('✅ Scroll completed, starting stream');
+                  streaming.addToQueue(queryText, {
+                    content_type: 'markdown',
+                    speed: 'normal',
+                    responseId: responseId,
+                    turnId: turnId,
+                    timestamp: timestamp
+                  });
+                }, 50); // 50ms debounce to detect scroll stop
+              };
               
-              return; // Exit early since we're starting stream in setTimeout
+              // Add scroll listener
+              window.addEventListener('scroll', handleScrollEnd);
+              // Trigger once immediately in case scroll is instant
+              handleScrollEnd();
+              
+                return; // Exit early since we're starting stream in setTimeout
+              }
             }
-          }
           
-          // Fallback: start streaming immediately if scroll fails
-          streaming.addToQueue(queryText, {
-            content_type: 'markdown',
-            speed: 'normal',
-            responseId: responseId,
-            turnId: turnId,
-            timestamp: timestamp
-          });
+            // Fallback: start streaming immediately if scroll fails
+            streaming.addToQueue(queryText, {
+              content_type: 'markdown',
+              speed: 'normal',
+              responseId: responseId,
+              turnId: turnId,
+              timestamp: timestamp
+            });
+          }, 50); // Small delay to let padding apply
         } catch (scrollError) {
           console.warn('⚠️ Error scrolling to AI Indicator:', scrollError);
           // Start streaming anyway on error
@@ -400,7 +422,7 @@ export default function WebSocketTestPage() {
 
       {/* Editor Container - No overflow, browser scrolls */}
       {/* pb-[100vh] adds viewport height padding at bottom so content can scroll all the way up */}
-      <div className="container mx-auto px-4 pb-[100vh]">
+      <div className={`container mx-auto px-4 ${needsScrollPadding ? 'pb-[100vh]' : 'pb-[50vh]'}`}>
         <div className="max-w-4xl mx-auto py-4">
           <StreamingEditor
             onEditorReady={setEditor}
