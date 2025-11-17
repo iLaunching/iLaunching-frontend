@@ -251,7 +251,7 @@ export default function WebSocketTestPage() {
                   turnId: turnId,
                   timestamp: timestamp
                 });
-              }, 150); // Reduced from 400ms for faster response
+              }, 0); // Minimal delay for instant scroll
               
               return; // Exit early since we're starting stream in setTimeout
             }
