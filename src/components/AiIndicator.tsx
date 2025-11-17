@@ -116,7 +116,7 @@ export default function AiIndicator({
 
           .ai-name {
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             color: #1e293b;
             white-space: nowrap;
             user-select: none;
@@ -124,7 +124,7 @@ export default function AiIndicator({
           }
 
           .ai-acknowledge {
-            font-size: 11px;
+            font-size: 13px;
             color: #64748b;
             font-style: italic;
             white-space: nowrap;

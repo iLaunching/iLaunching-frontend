@@ -23,6 +23,21 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
     }
   }, [hasAnimated]);
   
+  // Split acknowledge message into words for animation
+  const renderAcknowledgeWords = (message: string) => {
+    if (!message) return null;
+    const words = message.split(' ');
+    return words.map((word, index) => (
+      <span
+        key={index}
+        className="acknowledge-word"
+        style={{ animationDelay: `${index * 0.03}s` }}
+      >
+        {word}{index < words.length - 1 ? ' ' : ''}
+      </span>
+    ));
+  };
+  
   return (
     <NodeViewWrapper className={`ce-ai ${hasAnimated ? 'no-animate' : ''}`}>
       <div className="tiptap-ai-container">
@@ -41,7 +56,7 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           {/* AI Acknowledge (only show if not empty) */}
           {aiAcknowledge && (
             <div className="tiptap-ai-acknowledge">
-              {aiAcknowledge}
+              {renderAcknowledgeWords(aiAcknowledge)}
             </div>
           )}
         </div>
@@ -182,9 +197,9 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
         }
 
         .tiptap-ai-acknowledge {
-          font-size: 12px;
+          font-size: 14px;
           font-weight: 500;
-          color: rgba(17, 15, 117, 0.7);
+          color: rgba(17, 15, 117, 1);
           padding: 2px 6px;
           border-radius: 4px;
           line-height: 1.2;
@@ -197,10 +212,17 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           transition: opacity 0.2s ease, transform 0.2s ease;
           position: relative;
           overflow: hidden;
-          animation: acknowledgeBorderFlow 2s ease-in-out infinite;
+          white-space: pre-wrap;
+        }
+        
+        /* Individual word animation */
+        .tiptap-ai-acknowledge .acknowledge-word {
+          display: inline;
+          opacity: 0;
+          animation: acknowledgeTypewriter 0.50s ease-out both;
         }
 
-        /* Glow effect for acknowledge */
+        /* Glow effect for acknowledge - starts after word animation */
         .tiptap-ai-acknowledge::before {
           content: '';
           position: absolute;
@@ -217,7 +239,8 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           background-size: 400% 400%;
           z-index: -1;
           opacity: 0;
-          animation: acknowledgeGlow 2s ease-in-out infinite;
+          /* Glow animation starts after word animations complete */
+          animation: acknowledgeGlow 2s ease-in-out infinite 1s;
           filter: blur(4px);
         }
 
@@ -282,26 +305,13 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           }
         }
 
-        @keyframes acknowledgeBorderFlow {
+        /* Smooth typewriter fade-in animation */
+        @keyframes acknowledgeTypewriter {
           0% {
-            background-position: 0% 0%, 0% 0%;
-            transform: scale(1);
-          }
-          25% {
-            background-position: 0% 0%, 100% 0%;
-            transform: scale(1.02);
-          }
-          50% {
-            background-position: 0% 0%, 100% 100%;
-            transform: scale(1);
-          }
-          75% {
-            background-position: 0% 0%, 0% 100%;
-            transform: scale(1.02);
+            opacity: 0;
           }
           100% {
-            background-position: 0% 0%, 0% 0%;
-            transform: scale(1);
+            opacity: 1;
           }
         }
 

@@ -43,7 +43,7 @@
   }
 }
 
-/* Slide in for code blocks */
+/* Slide in for code blocks and acknowledge messages */
 @keyframes streamSlideIn {
   0% {
     opacity: 0;
