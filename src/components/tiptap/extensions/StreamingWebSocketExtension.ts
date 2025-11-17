@@ -424,7 +424,7 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
 
           // Start processing queue if not already processing
           if (!storage.isProcessingQueue) {
-            processQueueWithDelay(editor, storage, this.options.animationDelay || 150);
+            processQueueWithDelay(editor, storage, this.options.animationDelay || 150, this.options);
           }
 
           return true;
@@ -524,7 +524,7 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
 
           // Resume processing queue
           if (!storage.isProcessingQueue && storage.nodeQueue.length > 0) {
-            processQueueWithDelay(editor, storage, this.options.animationDelay || 200);
+            processQueueWithDelay(editor, storage, this.options.animationDelay || 200, this.options);
           }
 
           return true;
@@ -720,7 +720,7 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
  * Process the node queue sequentially with animation timing.
  * This prevents browser crashes by inserting nodes one at a time.
  */
-async function processQueueWithDelay(editor: Editor, storage: any, _animationDelay: number) {
+async function processQueueWithDelay(editor: Editor, storage: any, _animationDelay: number, options: any) {
   if (storage.isProcessingQueue) {
     console.log('[StreamingWS] ⚠️ Already processing queue, skipping duplicate call');
     return; // Already processing
@@ -943,19 +943,43 @@ async function processQueueWithDelay(editor: Editor, storage: any, _animationDel
                         });
                       }
                     } else {
-                      // Editor element scrolling - scroll the editor itself
-                      const editorHeight = editorElement.clientHeight;
-                      const scrollHeight = editorElement.scrollHeight;
-                      const scrollTop = editorElement.scrollTop;
-                      const distanceFromBottom = scrollHeight - (scrollTop + editorHeight);
+                      // Container scrolling - find the scrollable parent container
+                      let scrollContainer = editorElement.parentElement;
                       
-                      // Only scroll if we're within threshold of bottom
-                      if (distanceFromBottom < storage.scrollThreshold) {
-                        editorElement.scrollTo({
-                          top: scrollHeight,
-                          behavior: 'smooth'
+                      // Walk up the DOM to find the scrollable container
+                      while (scrollContainer) {
+                        const overflowY = window.getComputedStyle(scrollContainer).overflowY;
+                        if (overflowY === 'auto' || overflowY === 'scroll') {
+                          break;
+                        }
+                        scrollContainer = scrollContainer.parentElement;
+                      }
+                      
+                      if (scrollContainer) {
+                        const containerHeight = scrollContainer.clientHeight;
+                        const scrollHeight = scrollContainer.scrollHeight;
+                        const scrollTop = scrollContainer.scrollTop;
+                        const distanceFromBottom = scrollHeight - (scrollTop + containerHeight);
+                        
+                        console.log('[StreamingWS] 📏 Scroll check:', {
+                          containerHeight,
+                          scrollHeight,
+                          scrollTop,
+                          distanceFromBottom,
+                          threshold: storage.scrollThreshold
                         });
-                        storage.lastScrollTime = Date.now();
+                        
+                        // Only scroll if we're within threshold of bottom
+                        if (distanceFromBottom < storage.scrollThreshold) {
+                          console.log('[StreamingWS] 📜 Auto-scrolling to bottom');
+                          scrollContainer.scrollTo({
+                            top: scrollHeight,
+                            behavior: 'smooth'
+                          });
+                          storage.lastScrollTime = Date.now();
+                        }
+                      } else {
+                        console.warn('[StreamingWS] ⚠️ No scrollable container found');
                       }
                     }
                   } catch (scrollError) {

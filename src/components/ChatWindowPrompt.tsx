@@ -38,10 +38,10 @@ export default function ChatWindowPrompt({
         width: '100%',
         minHeight: '120px',
         margin: '0',
-        padding: '16px 20px 20px 20px',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+       /* padding: '16px 20px 20px 20px',*/
+        /*backgroundColor: 'rgba(255, 255, 255, 0.08)',*/
         borderRadius: '0 0 16px 16px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+       /* borderTop: '1px solid rgba(255, 255, 255, 0.1)',*/
         display: 'flex',
         alignItems: 'flex-end',
         boxSizing: 'border-box',
@@ -60,6 +60,8 @@ export default function ChatWindowPrompt({
 
       {/* Custom styles matching ChatWindow */}
       <style>{`
+
+      /*
         .chat-window-prompt-container {
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
@@ -75,7 +77,7 @@ export default function ChatWindowPrompt({
         /* Glass morphism enhancement */
         .chat-window-prompt-container {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        }*/
       `}</style>
     </div>
   );
