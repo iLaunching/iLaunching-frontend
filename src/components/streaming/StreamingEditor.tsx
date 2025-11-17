@@ -179,19 +179,18 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       <EditorContent editor={editor} />
       <style>{`
         .streaming-editor-wrapper {
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          background: white;
-          padding: 16px;
-          min-height: 200px;
+          background: transparent;
+        }
+        
+        .streaming-editor-wrapper .tiptap {
+          outline: none;
         }
         
         .streaming-editor-wrapper .ProseMirror {
           outline: none;
-          min-height: 180px;
           color: #000;
           font-size: 16px;
-          /* Performance optimizations - removed 'paint' to allow overflow */
+          /* Performance optimizations */
           contain: layout style;
           will-change: contents;
         }

@@ -26,6 +26,10 @@ export interface StreamingWebSocketOptions {
   animationDelay?: number; // Milliseconds between node insertions
   enableAnimations?: boolean; // Enable/disable animations
   maxConcurrentAnimations?: number; // Max nodes animating at once
+  autoScroll?: boolean; // Enable automatic scrolling
+  scrollTarget?: 'container' | 'browser'; // Scroll container or browser window
+  batchSize?: number; // Number of nodes per batch
+  batchDelay?: number; // Delay between batches (ms)
 }
 
 declare module '@tiptap/core' {
@@ -98,6 +102,10 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
       animationDelay: 0, // Milliseconds between node insertions (faster block-by-block)
       enableAnimations: true, // Enable/disable animations
       maxConcurrentAnimations: 3, // Max nodes animating at once
+      batchSize: 15, // Number of nodes to insert in one batch
+      batchDelay: 300, // Delay between batches (ms)
+      autoScroll: true, // Enable automatic scrolling by default
+      scrollTarget: 'container', // Default to container scrolling
     };
   },
 
@@ -117,10 +125,19 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
       currentTurnId: null as string | null,
       animatingNodes: 0, // Track concurrent animations
       animationsEnabled: true, // Runtime toggle
+      batchModeEnabled: true, // Batch mode enabled by default for better performance
+      streamCompleteReceived: false, // Backend sent stream_complete
+      // Batch processing
+      currentBatch: [] as any[], // Current batch being assembled
+      currentBatchStartPos: null as number | null, // Where current batch starts
+      activeBatchAnimations: [] as any[], // Track active animations to clean up
       // Store callbacks in storage so they can be updated dynamically
       onStreamStart: undefined as ((data: any) => void) | undefined,
       onStreamComplete: undefined as ((data: any) => void) | undefined,
       onError: undefined as ((error: any) => void) | undefined,
+      // Scroll tracking
+      lastScrollTime: 0, // Last time we scrolled
+      scrollThreshold: 200, // Pixels from bottom to trigger scroll
     };
   },
 
@@ -207,6 +224,7 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                   storage.nodeQueue = [];
                   storage.isPaused = false;
                   storage.lastInsertPosition = null;
+                  storage.streamCompleteReceived = false; // Reset for new stream
                   
                   // Find the most recent AITurn (the one without a Response yet)
                   let aiTurnPos = -1;
@@ -283,6 +301,14 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                   console.log('[StreamingWS] 📦 Node received:', message.data.type, `(${message.index + 1}/${storage.totalNodesExpected})`);
                   storage.nodesReceived++;
                   
+                  // Log content preview for debugging (first 80 chars)
+                  if (message.data.content && Array.isArray(message.data.content)) {
+                    const firstText = message.data.content.find((c: any) => c.text)?.text;
+                    if (firstText) {
+                      console.log('[StreamingWS] 📄 Content:', firstText.substring(0, 80) + (firstText.length > 80 ? '...' : ''));
+                    }
+                  }
+                  
                   // Queue the node
                   editor.commands.queueStreamedNode(
                     message.data,
@@ -292,12 +318,21 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                   break;
 
                 case 'stream_complete':
-                  console.log('[StreamingWS] ✅ Stream complete. Received:', storage.nodesReceived, 'Inserted:', storage.nodesInserted);
+                  console.log('[StreamingWS] 📥 Backend stream complete. Received:', storage.nodesReceived, 'Inserted:', storage.nodesInserted, 'Queue:', storage.nodeQueue.length);
                   
-                  if (storage.onStreamComplete) {
-                    storage.onStreamComplete({
-                      total_nodes: message.total_nodes,
-                    });
+                  // Mark that backend finished, but wait for queue to empty
+                  storage.streamCompleteReceived = true;
+                  
+                  // If queue is already empty, call callback immediately
+                  if (storage.nodeQueue.length === 0 && !storage.isProcessingQueue) {
+                    console.log('[StreamingWS] ✅ Queue empty, calling completion callback now');
+                    if (storage.onStreamComplete) {
+                      storage.onStreamComplete({
+                        total_nodes: storage.nodesInserted,
+                      });
+                    }
+                  } else {
+                    console.log('[StreamingWS] ⏳ Waiting for queue to finish. Queue:', storage.nodeQueue.length, 'Processing:', storage.isProcessingQueue);
                   }
                   break;
 
@@ -550,6 +585,19 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
           const delays = { slow: 500, normal: 200, fast: 100 };
           this.options.animationDelay = delays[speed];
           console.log('[StreamingWS] ⚡ Animation speed set to:', speed, `(${delays[speed]}ms)`);
+
+          return true;
+        },
+
+      setBatchMode:
+        (enabled: boolean, batchSize?: number) =>
+        () => {
+          if (batchSize) {
+            this.options.batchSize = batchSize;
+          }
+          const storage = this.storage;
+          storage.batchModeEnabled = enabled;
+          console.log('[StreamingWS] 📦 Batch mode:', enabled ? `enabled (${this.options.batchSize || 15} nodes/batch)` : 'disabled');
 
           return true;
         },
@@ -870,6 +918,51 @@ async function processQueueWithDelay(editor: Editor, storage: any, _animationDel
                 // No animation, resolve immediately
                 resolveInsertion();
               }
+
+              // Smart auto-scroll: only scroll when near bottom (Claude-style)
+              const autoScroll = options.autoScroll;
+              const scrollTarget = options.scrollTarget;
+              
+              if (autoScroll) {
+                setTimeout(() => {
+                  try {
+                    const editorElement = editor.view.dom as HTMLElement;
+                    
+                    if (scrollTarget === 'browser') {
+                      // Browser window scrolling
+                      const windowHeight = window.innerHeight;
+                      const documentHeight = document.documentElement.scrollHeight;
+                      const scrollTop = window.scrollY;
+                      const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
+                      
+                      // Only scroll if we're within threshold of bottom
+                      if (distanceFromBottom < storage.scrollThreshold) {
+                        window.scrollTo({
+                          top: documentHeight,
+                          behavior: 'smooth'
+                        });
+                      }
+                    } else {
+                      // Editor element scrolling - scroll the editor itself
+                      const editorHeight = editorElement.clientHeight;
+                      const scrollHeight = editorElement.scrollHeight;
+                      const scrollTop = editorElement.scrollTop;
+                      const distanceFromBottom = scrollHeight - (scrollTop + editorHeight);
+                      
+                      // Only scroll if we're within threshold of bottom
+                      if (distanceFromBottom < storage.scrollThreshold) {
+                        editorElement.scrollTo({
+                          top: scrollHeight,
+                          behavior: 'smooth'
+                        });
+                        storage.lastScrollTime = Date.now();
+                      }
+                    }
+                  } catch (scrollError) {
+                    console.warn('[StreamingWS] ⚠️ Auto-scroll error:', scrollError);
+                  }
+                }, 50); // Small delay to ensure DOM is updated
+              }
             } else {
               console.error('[StreamingWS] ❌ Failed to insert node:', item.node);
               resolveInsertion();
@@ -887,7 +980,18 @@ async function processQueueWithDelay(editor: Editor, storage: any, _animationDel
         await processNext();
       } else {
         storage.isProcessingQueue = false;
-        console.log('[StreamingWS] ✅ Queue processing complete');
+        console.log('[StreamingWS] ✅ Queue processing complete. Total inserted:', storage.nodesInserted);
+        
+        // If backend already sent stream_complete, call the completion callback now
+        if (storage.streamCompleteReceived) {
+          console.log('[StreamingWS] 🎉 All nodes inserted, calling completion callback');
+          if (storage.onStreamComplete) {
+            storage.onStreamComplete({
+              total_nodes: storage.nodesInserted,
+            });
+          }
+          storage.streamCompleteReceived = false; // Reset for next stream
+        }
       }
     } catch (error) {
       console.error('[StreamingWS] ❌ Error in queue processing:', error);

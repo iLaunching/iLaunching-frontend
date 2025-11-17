@@ -83,36 +83,36 @@
    LISTS
    ============================================ */
 
-/* List items get fade animation */
+/* Lists - NO ANIMATION */
 .response-streaming .response-text-area li {
-  animation: streamFadeInLine 0.5s ease-out both;
+  animation: none !important;
   display: list-item;
 }
 
-/* Content within list items gets wave */
+/* Content within list items - NO ANIMATION */
 .response-streaming .response-text-area li > * {
   display: inline-block;
-  animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: none !important;
 }
 
-/* Task lists */
+/* Task lists - NO ANIMATION */
 .response-streaming .response-text-area [data-type="taskList"],
 .response-streaming .response-text-area [data-type="taskItem"] {
-  animation: streamFadeInLine 0.5s ease-out both;
+  animation: none !important;
 }
 
 /* ============================================
    CODE BLOCKS
    ============================================ */
 
-/* Code blocks get slide-in animation */
+/* Code blocks - NO ANIMATION */
 .response-streaming .response-text-area pre,
 .response-streaming .response-text-area [data-node-type="codeBlock"],
 .response-streaming .response-text-area .code-block-container {
-  animation: streamSlideIn 0.6s ease-out both;
+  animation: none !important;
 }
 
-/* Code content inside should NOT wave (preserve formatting) */
+/* Code content inside - NO ANIMATION */
 .response-streaming .response-text-area pre *,
 .response-streaming .response-text-area pre code,
 .response-streaming .response-text-area .code-block-container * {
@@ -124,26 +124,20 @@
    TABLES
    ============================================ */
 
-/* Table fade in */
+/* Tables - NO ANIMATION */
 .response-streaming .response-text-area table {
-  animation: streamFadeInLine 0.5s ease-out both;
+  animation: none !important;
 }
 
-/* Table rows stagger slightly */
+/* Table rows - NO ANIMATION */
 .response-streaming .response-text-area tr {
-  animation: streamFadeInLine 0.4s ease-out both;
+  animation: none !important;
 }
 
-.response-streaming .response-text-area tr:nth-child(1) { animation-delay: 0s; }
-.response-streaming .response-text-area tr:nth-child(2) { animation-delay: 0.05s; }
-.response-streaming .response-text-area tr:nth-child(3) { animation-delay: 0.1s; }
-.response-streaming .response-text-area tr:nth-child(4) { animation-delay: 0.15s; }
-.response-streaming .response-text-area tr:nth-child(5) { animation-delay: 0.2s; }
-
-/* Table cells don't animate individually */
+/* Table cells - NO ANIMATION */
 .response-streaming .response-text-area td,
 .response-streaming .response-text-area th {
-  animation: none;
+  animation: none !important;
 }
 
 /* ============================================

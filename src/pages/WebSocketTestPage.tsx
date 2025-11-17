@@ -163,27 +163,31 @@ export default function WebSocketTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      <div className="container mx-auto px-4 py-8">
+    <div className="h-screen bg-white flex flex-col overflow-hidden relative">
+      {/* Header */}
+      <div className="flex-shrink-0 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
+          <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">iLaunching AI Chat</h1>
             <p className="text-gray-600">Powered by streaming AI with real-time responses</p>
           </div>
+        </div>
+      </div>
 
-          {/* Main Content - Transparent Editor */}
-          <div className="bg-transparent">
+      {/* Main Content - Scrollable Editor Area (extends behind prompt) */}
+      <div className="flex-1 container mx-auto px-4 overflow-hidden">
+        <div className="max-w-4xl mx-auto h-full">
+          <div className="h-full border border-gray-200 rounded-lg bg-white p-4 pb-32 overflow-y-auto">
             <StreamingEditor
               onEditorReady={setEditor}
-              className="min-h-[400px]"
+              className="h-auto"
             />
           </div>
         </div>
       </div>
       
-      {/* Chat Input - Sticky at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+      {/* Chat Input - Fixed at Bottom (doesn't move with scroll) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg pointer-events-auto z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="max-w-4xl mx-auto">
             <ChatWindowPrompt
