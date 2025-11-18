@@ -14,6 +14,7 @@ interface StreamingChatInterfaceProps {
   className?: string;
   maxWidth?: string;
   topOffset?: number; // Offset from top if there's a fixed header
+  style?: React.CSSProperties; // Inline styles for width control
 }
 
 export function StreamingChatInterface({
@@ -25,7 +26,8 @@ export function StreamingChatInterface({
   placeholder = 'Type your message...',
   className = '',
   maxWidth = '4xl',
-  topOffset = 0
+  topOffset = 0,
+  style
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
@@ -339,7 +341,7 @@ export function StreamingChatInterface({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} style={style}>
       {/* Editor Container with dynamic padding */}
       <div className={`container mx-auto px-4 ${needsScrollPadding ? 'pb-[100vh]' : 'pb-[50vh]'}`}>
         <div className={`max-w-${maxWidth} mx-auto py-4`}>
@@ -350,15 +352,13 @@ export function StreamingChatInterface({
         </div>
       </div>
       
-      {/* Chat Input - Fixed at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className={`max-w-${maxWidth} mx-auto`}>
-            <ChatWindowPrompt
-              onSubmit={handleQuerySubmit}
-              placeholder={placeholder}
-            />
-          </div>
+      {/* Chat Input - Fixed at Bottom of parent container */}
+      <div className="fixed bottom-0 z-50" style={{ left: style?.width ? '18px' : undefined, width: style?.width }}>
+        <div className="px-4 py-4">
+          <ChatWindowPrompt
+            onSubmit={handleQuerySubmit}
+            placeholder={placeholder}
+          />
         </div>
       </div>
     </div>

@@ -3,19 +3,21 @@ import ChatWindow from '@/components/ChatWindow';
 
 interface HeaderProps {
   aiActive?: boolean; // Whether AI is active in sales mode
+  className?: string; // Optional className for visibility control
 }
 
-export default function Header({ aiActive = false }: HeaderProps) {
+export default function Header({ aiActive = false, className = '' }: HeaderProps) {
   const [showChatWindow, setShowChatWindow] = useState(false);
   return (
     <header 
-      className="w-full fixed top-0 left-0 right-0"
+      className={`w-full fixed top-0 left-0 right-0 transition-opacity duration-500 ${className}`}
       style={{
         paddingLeft: '50px',
         paddingRight: '50px',
         paddingTop: '30px',
         paddingBottom: '20px',
         backgroundColor: 'transparent',
+      
         zIndex: 10000,
       }}
     >

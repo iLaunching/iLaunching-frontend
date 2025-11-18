@@ -4,7 +4,7 @@ import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackgrou
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
-import ChatWindow from '@/components/ChatWindow';
+import { StreamingChatInterface } from '@/components/StreamingChatInterface';
 import { UserPlus, LogIn } from 'lucide-react';
 import { 
   getRandomWelcomeMessage, 
@@ -262,40 +262,26 @@ export default function Landing() {
         </div>
       </div>
       
-      {/* Sticky Chat Window - Show in sales stage */}
+      {/* Sticky Chat Interface - Show in sales stage */}
       {(showChatWindow || authState.stage === 'sales') && (
         <div className="chat-window-sticky">
-          <ChatWindow
-            message={chatMessage}
+          <StreamingChatInterface
+            testMode={true}
+            topOffset={0}
             placeholder="Tell me about your business challenge..."
-            useAiIndicator={authState.stage === 'sales'}
-            aiName="iLaunching AI"
-            aiAcknowledge={authState.user?.name ? `Speaking with ${authState.user.name}` : 'Sales Consultation'}
-            onSubmit={(message) => {
-              if (authState.stage === 'sales' && salesSessionId) {
-                // Handle sales conversation through API
-                handleSalesMessage(message);
-              } else {
-                // In non-sales mode, we shouldn't have the chat window open
-                console.log('User consultation input (no sales session):', message);
-              }
-            }}
-            onVoiceClick={() => {
-              // Handle voice input
-              console.log('Voice input requested');
-              // You can add voice recording logic here
-              alert('Voice input feature coming soon!');
-            }}
-            onTypewriterComplete={() => {
-              console.log('Chat message complete');
-            }}
+            className="h-full"
+            maxWidth="full"
+            style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
           />
         </div>
       )}
       
       {/* Content overlay */}
       <div className="relative flex flex-col min-h-screen">
-        <Header aiActive={authState.stage === 'sales'} />
+        <Header 
+          aiActive={authState.stage === 'sales'} 
+          className={authState.stage === 'introduction' || authState.stage === 'sales' ? 'opacity-0' : 'opacity-100'}
+        />
         
         {/* Center the chat interface - Add top padding for sticky header */}
         <div 
@@ -457,20 +443,18 @@ export default function Landing() {
           transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
-        /* Sticky Chat Window Styles */
+        /* Chat Window Styles - Scrollable */
         .chat-window-sticky {
-          position: fixed;
+          position: absolute;
           left: 20px;
           top: 0;
-          bottom: 0;
           z-index: 1000;
           width: 45vw; /* 45% of viewport width */
           min-width: 420px; /* Minimum width for usability */
           max-width: 800px; /* Maximum width for very large screens */
-          height: 100vh;
+          min-height: 100vh;
           padding: 0;
           margin: 0;
-          overflow: hidden;
           animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
