@@ -1,7 +1,17 @@
 export default function ConnectedMindsBackground() {
   return (
     <div className="connected-minds-container">
-      <div className="mesh-overlay"></div>
+      {/* Animated gradient overlay */}
+      <div className="animated-gradient" />
+      
+      {/* Lightening overlay for left side where editor is */}
+      <div
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 30%, rgba(255, 255, 255, 0.32) 45%, rgba(255, 255, 255, 0.12) 55%, transparent 70%)',
+          zIndex: 10,
+        }}
+      />
 
       <style>{`
         .connected-minds-container {

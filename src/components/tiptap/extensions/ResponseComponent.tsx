@@ -39,25 +39,54 @@ const ResponseComponent: React.FC<ResponseComponentProps> = memo(({ node }) => {
         className={`response-container ${attrs.isStreaming ? 'response-streaming' : ''}`}
         style={{
           position: 'relative',
-          borderTop: '1px solid #3b82f660',
           marginTop: '50px',
           paddingTop: '35px',
           transition: 'all 0.3s ease'
         }}
       >
-        {/* iLaunching label positioned absolutely on top border */}
+        {/* Top border with gap for label */}
+        <div style={{
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          height: '1px',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          {/* Border line before label */}
+          <div style={{
+            flex: '0 0 0px',
+            height: '1px',
+            backgroundColor: '#3b82f660'
+          }} />
+          {/* Gap for label */}
+          <div style={{
+            flex: '0 0 85px',
+            height: '1px',
+            backgroundColor: 'transparent'
+          }} />
+          {/* Border line after label */}
+          <div style={{
+            flex: '1',
+            height: '1px',
+            backgroundColor: '#3b82f660'
+          }} />
+        </div>
+        
+        {/* iLaunching label positioned on top */}
         <div style={{
           position: 'absolute',
           top: '-12px',
           left: '0px',
-          backgroundColor: 'white',
           padding: '0 8px',
           fontSize: '12px',
           fontWeight: '600',
           color: '#3b82f660',
           letterSpacing: '0.5px',
           userSelect: 'none',
-          cursor: 'default'
+          cursor: 'default',
+          zIndex: 1
         }}>
           iLaunching
         </div>

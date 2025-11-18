@@ -14,6 +14,7 @@ interface RichTextInputProps {
   maxHeight?: number;
   onVoiceClick?: () => void;
   onPlusClick?: () => void;
+  backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink';
 }
 
 export default function RichTextInput({
@@ -23,11 +24,15 @@ export default function RichTextInput({
   className = "",
   maxHeight = 200,
   onVoiceClick,
-  onPlusClick
+  onPlusClick,
+  backgroundType = 'connected'
 }: RichTextInputProps) {
   const [isEmpty, setIsEmpty] = useState(true);
   const [currentMenu, setCurrentMenu] = useState<'main' | 'import'>('main');
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Check if using default white theme
+  const isDefaultTheme = backgroundType === 'connected' || backgroundType === 'ai';
 
   const editor = useEditor({
     extensions: [
@@ -391,12 +396,12 @@ export default function RichTextInput({
         }
 
         .rich-text-input-wrapper {
-          background: white;
+          background: transparent;
           border-left: 1px solid #9333EA;
           border-right: 1px solid #2563EB;
           border-top: 1px solid #9333EA;
           border-bottom: 1px solid #2563EB;
-          border-radius: 12px;
+          border-radius: 16px;
           overflow: visible;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
@@ -420,7 +425,7 @@ export default function RichTextInput({
           font-family: 'Inter', system-ui, sans-serif;
           font-size: 16px;
           line-height: 1.5;
-          color: #374151;
+          color: ${isDefaultTheme ? '#374151' : 'rgba(255, 255, 255, 0.95)'};
           width: 100%;
           min-height: 60px;
           resize: none;
@@ -429,7 +434,7 @@ export default function RichTextInput({
         /* Placeholder styles for empty editor */
         .rich-text-editor-content .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
-          color: #9ca3af;
+          color: ${isDefaultTheme ? '#9ca3af' : 'rgba(255, 255, 255, 0.5)'};
           pointer-events: none;
           font-style: italic;
           float: left;
@@ -512,7 +517,7 @@ export default function RichTextInput({
 
         .rich-text-submit-area {
           padding: 12px 16px;
-          border-top: 1px solid #f3f4f6;
+          border-top: 1px solid ${isDefaultTheme ? '#f3f4f6' : 'rgba(255, 255, 255, 0.1)'};
           background: transparent;
           display: flex;
           align-items: center;
@@ -548,9 +553,9 @@ export default function RichTextInput({
           width: 40px !important;
           height: 40px !important;
           border-radius: 50% !important;
-          border: 1px solid #e5e7eb !important;
-          background: white !important;
-          color: #6b7280 !important;
+          border: 1px solid ${isDefaultTheme ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)'} !important;
+          background: ${isDefaultTheme ? 'white' : 'rgba(255, 255, 255, 0.1)'} !important;
+          color: ${isDefaultTheme ? '#6b7280' : 'rgba(255, 255, 255, 0.9)'} !important;
           cursor: pointer !important;
           transition: all 0.2s ease !important;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
@@ -586,11 +591,11 @@ export default function RichTextInput({
 
         .rich-text-plus-btn-dropdown:hover:not(:disabled),
         .rich-text-plus-btn-dropdown.active:not(:disabled) {
-          background: #f9fafb !important;
-          color: #374151 !important;
-          border-color: #d1d5db !important;
+          background: ${isDefaultTheme ? '#f9fafb' : 'rgba(255, 255, 255, 0.2)'} !important;
+          color: ${isDefaultTheme ? '#374151' : 'rgba(255, 255, 255, 1)'} !important;
+          border-color: ${isDefaultTheme ? '#d1d5db' : 'rgba(255, 255, 255, 0.3)'} !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, ${isDefaultTheme ? '0.1' : '0.2'}) !important;
         }
 
         .rich-text-plus-btn:disabled {
@@ -606,20 +611,20 @@ export default function RichTextInput({
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          border: 1px solid #e5e7eb;
-          background: white;
-          color: #6b7280;
+          border: 1px solid ${isDefaultTheme ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)'};
+          background: ${isDefaultTheme ? 'white' : 'rgba(255, 255, 255, 0.1)'};
+          color: ${isDefaultTheme ? '#6b7280' : 'rgba(255, 255, 255, 0.9)'};
           cursor: pointer;
           transition: all 0.2s ease;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .rich-text-voice-btn:hover:not(:disabled) {
-          background: #f9fafb;
-          color: #374151;
-          border-color: #d1d5db;
+          background: ${isDefaultTheme ? '#f9fafb' : 'rgba(255, 255, 255, 0.2)'};
+          color: ${isDefaultTheme ? '#374151' : 'rgba(255, 255, 255, 1)'};
+          border-color: ${isDefaultTheme ? '#d1d5db' : 'rgba(255, 255, 255, 0.3)'};
           transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, ${isDefaultTheme ? '0.1' : '0.2'});
         }
 
         .rich-text-voice-btn:disabled {
@@ -801,10 +806,9 @@ export default function RichTextInput({
             14px 0px 0 -2.5px #111827 !important;
         }
 
-        /* Additional Button Section with White Background and Gradient Overlay */
+        /* Additional Button Section with Gradient Overlay */
         .rich-text-additional-section {
-          background: white;
-          background: linear-gradient(90deg, rgba(147, 51, 234, 0.1) 30%, rgba(37, 99, 235, 0.1) 76%);
+          background: transparent;
           border-radius: 0 0 8px 8px;
         }
 

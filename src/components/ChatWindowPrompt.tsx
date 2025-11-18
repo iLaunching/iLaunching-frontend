@@ -13,6 +13,8 @@ interface ChatWindowPromptProps {
   onPlusClick?: () => void;
   /** Custom styling for the container */
   className?: string;
+  /** Background type for custom prompt styling */
+  backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink';
 }
 
 export default function ChatWindowPrompt({
@@ -21,12 +23,48 @@ export default function ChatWindowPrompt({
   onSubmit,
   onVoiceClick,
   onPlusClick,
-  className = ""
+  className = "",
+  backgroundType = 'connected'
 }: ChatWindowPromptProps) {
   
   const handleSubmit = (userMessage: string) => {
     if (onSubmit && !disabled) {
       onSubmit(userMessage);
+    }
+  };
+
+  // Custom styles for each background type
+  const getBackgroundStyle = () => {
+    switch (backgroundType) {
+      case 'deepSea':
+        return {
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.35) 0%, rgba(0, 0, 0, 0.55) 100%)',
+          borderTop: '1px solid rgba(59, 130, 246, 0.3)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 -4px 24px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+        };
+      case 'deepPurple':
+        return {
+          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.35) 0%, rgba(25, 4, 56, 0.55) 100%)',
+          borderTop: '1px solid rgba(139, 92, 246, 0.3)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 -4px 24px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+        };
+      case 'deepPink':
+        return {
+          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.35) 0%, rgba(75, 42, 87, 0.55) 100%)',
+          borderTop: '1px solid rgba(236, 72, 153, 0.3)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 -4px 24px rgba(236, 72, 153, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+        };
+      case 'connected':
+      case 'ai':
+      default:
+        return {
+          background: 'white',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)'
+        };
     }
   };
 
@@ -38,15 +76,14 @@ export default function ChatWindowPrompt({
         width: '100%',
         minHeight: '120px',
         margin: '0',
-       /* padding: '16px 20px 20px 20px',*/
-        /*backgroundColor: 'rgba(255, 255, 255, 0.08)',*/
-        borderRadius: '0 0 16px 16px',
-       /* borderTop: '1px solid rgba(255, 255, 255, 0.1)',*/
+        borderRadius: '16px',
         display: 'flex',
         alignItems: 'flex-end',
         boxSizing: 'border-box',
-        overflow: 'visible',
+        overflow: 'hidden',
         zIndex: 100,
+        transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+        ...getBackgroundStyle()
       }}
     >
       <RichTextInput
@@ -56,6 +93,7 @@ export default function ChatWindowPrompt({
         placeholder={placeholder}
         disabled={disabled}
         maxHeight={600}
+        backgroundType={backgroundType}
       />
 
       {/* Custom styles matching ChatWindow */}

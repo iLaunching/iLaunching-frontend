@@ -15,6 +15,7 @@ interface StreamingChatInterfaceProps {
   maxWidth?: string;
   topOffset?: number; // Offset from top if there's a fixed header
   style?: React.CSSProperties; // Inline styles for width control
+  backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'; // Background type for custom prompt styling
 }
 
 export function StreamingChatInterface({
@@ -27,7 +28,8 @@ export function StreamingChatInterface({
   className = '',
   maxWidth = '4xl',
   topOffset = 0,
-  style
+  style,
+  backgroundType = 'connected'
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
@@ -354,10 +356,11 @@ export function StreamingChatInterface({
       
       {/* Chat Input - Fixed at Bottom of parent container */}
       <div className="fixed bottom-0 z-50" style={{ left: style?.width ? '18px' : undefined, width: style?.width }}>
-        <div className="px-4 py-4">
+        <div className={backgroundType === 'connected' || backgroundType === 'ai' ? 'px-4 py-4' : 'p-4'}>
           <ChatWindowPrompt
             onSubmit={handleQuerySubmit}
             placeholder={placeholder}
+            backgroundType={backgroundType}
           />
         </div>
       </div>

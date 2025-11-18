@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
+import DeepSeaBackground from '@/components/layout/DeepSeaBackground';
+import DeepPurpleSeaBackground from '@/components/layout/DeepPurpleSeaBackground';
+import DeepPinkSeaBackground from '@/components/layout/DeepPinkSeaBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
@@ -34,7 +37,7 @@ export default function Landing() {
   // State to show "Yes Please" button after introduction completes
   const [showYesPleaseButton, setShowYesPleaseButton] = useState(false);
   // State for background transition
-  const [backgroundType, setBackgroundType] = useState<'ai' | 'connected'>('ai');
+  const [backgroundType, setBackgroundType] = useState<'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'>('ai');
   const [isTransitioning, setIsTransitioning] = useState(false);
   // State for chat window
   const [showChatWindow, setShowChatWindow] = useState(false);
@@ -260,6 +263,15 @@ export default function Landing() {
         <div className={`background-layer ${backgroundType === 'connected' ? 'active' : 'inactive'}`}>
           <ConnectedMindsBackground />
         </div>
+        <div className={`background-layer ${backgroundType === 'deepSea' ? 'active' : 'inactive'}`}>
+          <DeepSeaBackground />
+        </div>
+        <div className={`background-layer ${backgroundType === 'deepPurple' ? 'active' : 'inactive'}`}>
+          <DeepPurpleSeaBackground />
+        </div>
+        <div className={`background-layer ${backgroundType === 'deepPink' ? 'active' : 'inactive'}`}>
+          <DeepPinkSeaBackground />
+        </div>
       </div>
       
       {/* Sticky Chat Interface - Show in sales stage */}
@@ -272,6 +284,7 @@ export default function Landing() {
             className="h-full"
             maxWidth="full"
             style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
+            backgroundType={backgroundType}
           />
         </div>
       )}
@@ -369,9 +382,13 @@ export default function Landing() {
                     // Start background transition
                     setIsTransitioning(true);
                     
+                    // Randomly select a background
+                    const backgrounds = ['connected', 'deepSea', 'deepPurple', 'deepPink'] as const;
+                    const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+                    
                     // Change background immediately
                     setTimeout(() => {
-                      setBackgroundType('connected');
+                      setBackgroundType(randomBackground);
                     }, 50);
                     
                     // Complete background transition
