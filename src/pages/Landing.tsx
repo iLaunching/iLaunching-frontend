@@ -285,6 +285,11 @@ export default function Landing() {
             maxWidth="full"
             style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
             backgroundType={backgroundType}
+            showGetStarted={authState.stage === 'sales'}
+            onGetStartedClick={() => {
+              console.log('Get Started clicked in sales stage');
+              // Add your Get Started logic here
+            }}
           />
         </div>
       )}

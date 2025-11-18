@@ -15,6 +15,10 @@ interface ChatWindowPromptProps {
   className?: string;
   /** Background type for custom prompt styling */
   backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink';
+  /** Show Get Started button */
+  showGetStarted?: boolean;
+  /** Callback when Get Started button is clicked */
+  onGetStartedClick?: () => void;
 }
 
 export default function ChatWindowPrompt({
@@ -24,7 +28,9 @@ export default function ChatWindowPrompt({
   onVoiceClick,
   onPlusClick,
   className = "",
-  backgroundType = 'connected'
+  backgroundType = 'connected',
+  showGetStarted = false,
+  onGetStartedClick
 }: ChatWindowPromptProps) {
   
   const handleSubmit = (userMessage: string) => {
@@ -94,6 +100,8 @@ export default function ChatWindowPrompt({
         disabled={disabled}
         maxHeight={600}
         backgroundType={backgroundType}
+        showGetStarted={showGetStarted}
+        onGetStartedClick={onGetStartedClick}
       />
 
       {/* Custom styles matching ChatWindow */}

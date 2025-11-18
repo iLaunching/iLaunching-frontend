@@ -16,6 +16,8 @@ interface StreamingChatInterfaceProps {
   topOffset?: number; // Offset from top if there's a fixed header
   style?: React.CSSProperties; // Inline styles for width control
   backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'; // Background type for custom prompt styling
+  showGetStarted?: boolean; // Show Get Started button in sales stage
+  onGetStartedClick?: () => void; // Callback for Get Started button
 }
 
 export function StreamingChatInterface({
@@ -29,7 +31,9 @@ export function StreamingChatInterface({
   maxWidth = '4xl',
   topOffset = 0,
   style,
-  backgroundType = 'connected'
+  backgroundType = 'connected',
+  showGetStarted = false,
+  onGetStartedClick
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
@@ -361,6 +365,8 @@ export function StreamingChatInterface({
             onSubmit={handleQuerySubmit}
             placeholder={placeholder}
             backgroundType={backgroundType}
+            showGetStarted={showGetStarted}
+            onGetStartedClick={onGetStartedClick}
           />
         </div>
       </div>

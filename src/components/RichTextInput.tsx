@@ -15,6 +15,8 @@ interface RichTextInputProps {
   onVoiceClick?: () => void;
   onPlusClick?: () => void;
   backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink';
+  showGetStarted?: boolean;
+  onGetStartedClick?: () => void;
 }
 
 export default function RichTextInput({
@@ -25,7 +27,9 @@ export default function RichTextInput({
   maxHeight = 200,
   onVoiceClick,
   onPlusClick,
-  backgroundType = 'connected'
+  backgroundType = 'connected',
+  showGetStarted = false,
+  onGetStartedClick
 }: RichTextInputProps) {
   const [isEmpty, setIsEmpty] = useState(true);
   const [currentMenu, setCurrentMenu] = useState<'main' | 'import'>('main');
@@ -353,6 +357,18 @@ export default function RichTextInput({
               tooltip="Insert files for reference"
             />
             
+            {/* Get Started Button - Show in sales stage */}
+            {showGetStarted && onGetStartedClick && (
+              <button
+                type="button"
+                onClick={onGetStartedClick}
+                disabled={disabled}
+                className="rich-text-get-started-btn"
+              >
+                Sign Up
+              </button>
+            )}
+            
             {/* Spacer to push voice and send buttons to the right */}
             <div className="rich-text-spacer" />
             
@@ -599,6 +615,39 @@ export default function RichTextInput({
         }
 
         .rich-text-plus-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .rich-text-get-started-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 40px;
+          padding: 0 20px;
+          margin-left: 8px;
+          border-radius: 20px;
+          border: 1px solid ${isDefaultTheme ? '#e5e7eb' : 'rgba(255, 255, 255, 0.2)'};
+          background: ${isDefaultTheme ? 'white' : 'rgba(255, 255, 255, 0.1)'};
+          color: ${isDefaultTheme ? '#3b82f6' : 'rgba(255, 255, 255, 0.9)'};
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          white-space: nowrap;
+        }
+
+        .rich-text-get-started-btn:hover:not(:disabled) {
+          background: ${isDefaultTheme ? '#3b82f6' : 'rgba(59, 130, 246, 0.8)'};
+          color: white;
+          border-color: ${isDefaultTheme ? '#3b82f6' : 'rgba(59, 130, 246, 0.8)'};
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(59, 130, 246, ${isDefaultTheme ? '0.3' : '0.4'});
+        }
+
+        .rich-text-get-started-btn:disabled {
           opacity: 0.4;
           cursor: not-allowed;
           transform: none;
