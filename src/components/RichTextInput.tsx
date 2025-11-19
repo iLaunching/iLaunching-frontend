@@ -419,7 +419,7 @@ export default function RichTextInput({
           border-bottom: 1px solid #2563EB;
           border-radius: 16px;
           overflow: visible;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 8px rgba(147, 51, 234, 0.15), 0 1px 4px rgba(37, 99, 235, 0.15);
         }
 
         .rich-text-editor-wrapper {

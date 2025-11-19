@@ -16,7 +16,7 @@ export default function ConnectedMindsBackground() {
       <style>{`
         .connected-minds-container {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #a855f7 100%);
+          background: linear-gradient(135deg, #06B6D4 0%, #C026D3 33%, #EC4899 66%, #F59E0B 100%);
           color: #ffffff;
           overflow: hidden;
           font-weight: 400;
@@ -28,9 +28,10 @@ export default function ConnectedMindsBackground() {
           min-height: 400px;
           z-index: -1;
           background-image: 
-            radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.4) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.4) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(124, 58, 237, 0.3) 0%, transparent 50%);
+            radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.6) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(192, 38, 211, 0.6) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.5) 0%, transparent 50%),
+            radial-gradient(circle at 60% 60%, rgba(245, 158, 11, 0.4) 0%, transparent 50%);
         }
 
         .mesh-overlay {

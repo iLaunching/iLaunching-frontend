@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StreamingEditor } from './streaming/StreamingEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
 import ChatWindowPrompt from './ChatWindowPrompt';
+import SignupPopup from './SignupPopup';
 import { getRandomSubmitAcknowledgeMessage } from '../constants';
 
 interface StreamingChatInterfaceProps {
@@ -37,6 +38,7 @@ export function StreamingChatInterface({
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
+  const [showSignupPopup, setShowSignupPopup] = useState(false);
 
   // Initialize streaming with WebSocket
   const streaming = useStreaming(editor, {
@@ -347,9 +349,16 @@ export function StreamingChatInterface({
   };
 
   return (
-    <div className={`relative ${className}`} style={style}>
-      {/* Editor Container with dynamic padding */}
-      <div className={`container mx-auto px-4 ${needsScrollPadding ? 'pb-[100vh]' : 'pb-[50vh]'}`}>
+    <>
+      {/* Signup Popup */}
+      <SignupPopup 
+        isOpen={showSignupPopup} 
+        onClose={() => setShowSignupPopup(false)} 
+      />
+      
+      <div className={`relative ${className}`} style={style}>
+        {/* Editor Container with dynamic padding */}
+        <div className={`container mx-auto px-4 ${needsScrollPadding ? 'pb-[100vh]' : 'pb-[50vh]'}`}>
         <div className={`max-w-${maxWidth} mx-auto py-4`}>
           <StreamingEditor
             onEditorReady={setEditor}
@@ -359,17 +368,23 @@ export function StreamingChatInterface({
       </div>
       
       {/* Chat Input - Fixed at Bottom of parent container */}
-      <div className="fixed bottom-0 z-50" style={{ left: style?.width ? '18px' : undefined, width: style?.width }}>
-        <div className={backgroundType === 'connected' || backgroundType === 'ai' ? 'px-4 py-4' : 'p-4'}>
-          <ChatWindowPrompt
-            onSubmit={handleQuerySubmit}
-            placeholder={placeholder}
-            backgroundType={backgroundType}
-            showGetStarted={showGetStarted}
-            onGetStartedClick={onGetStartedClick}
-          />
+      {!showSignupPopup && (
+        <div className="fixed bottom-0 z-50" style={{ left: style?.width ? '18px' : undefined, width: style?.width }}>
+          <div className={backgroundType === 'connected' || backgroundType === 'ai' ? 'px-4 py-4' : 'p-4'}>
+            <ChatWindowPrompt
+              onSubmit={handleQuerySubmit}
+              placeholder={placeholder}
+              backgroundType={backgroundType}
+              showGetStarted={showGetStarted}
+              onGetStartedClick={() => {
+                setShowSignupPopup(true);
+                onGetStartedClick?.();
+              }}
+            />
+          </div>
         </div>
+      )}
       </div>
-    </div>
+    </>
   );
 }

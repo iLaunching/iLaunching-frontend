@@ -44,24 +44,24 @@ export default function ChatWindowPrompt({
     switch (backgroundType) {
       case 'deepSea':
         return {
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.35) 0%, rgba(0, 0, 0, 0.55) 100%)',
-          borderTop: '1px solid rgba(59, 130, 246, 0.3)',
+          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.4) 0%, rgba(2, 132, 199, 0.6) 100%)',
+          borderTop: '1px solid rgba(6, 182, 212, 0.5)',
           backdropFilter: 'blur(12px)',
-          boxShadow: '0 -4px 24px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          boxShadow: '0 -4px 16px rgba(6, 182, 212, 0.4), 0 -2px 8px rgba(6, 182, 212, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(6, 182, 212, 0.15)'
         };
       case 'deepPurple':
         return {
-          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.35) 0%, rgba(25, 4, 56, 0.55) 100%)',
-          borderTop: '1px solid rgba(139, 92, 246, 0.3)',
+          background: 'linear-gradient(135deg, rgba(192, 38, 211, 0.4) 0%, rgba(147, 51, 234, 0.6) 100%)',
+          borderTop: '1px solid rgba(192, 38, 211, 0.5)',
           backdropFilter: 'blur(12px)',
-          boxShadow: '0 -4px 24px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          boxShadow: '0 -4px 16px rgba(192, 38, 211, 0.4), 0 -2px 8px rgba(192, 38, 211, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(192, 38, 211, 0.15)'
         };
       case 'deepPink':
         return {
-          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.35) 0%, rgba(75, 42, 87, 0.55) 100%)',
-          borderTop: '1px solid rgba(236, 72, 153, 0.3)',
+          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.4) 0%, rgba(219, 39, 119, 0.6) 100%)',
+          borderTop: '1px solid rgba(236, 72, 153, 0.5)',
           backdropFilter: 'blur(12px)',
-          boxShadow: '0 -4px 24px rgba(236, 72, 153, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          boxShadow: '0 -4px 16px rgba(236, 72, 153, 0.4), 0 -2px 8px rgba(236, 72, 153, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(236, 72, 153, 0.15)'
         };
       case 'connected':
       case 'ai':
@@ -69,7 +69,8 @@ export default function ChatWindowPrompt({
         return {
           background: 'white',
           borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 -4px 16px rgba(100, 116, 139, 0.12), 0 -2px 8px rgba(100, 116, 139, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
         };
     }
   };
