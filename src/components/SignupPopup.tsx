@@ -1,15 +1,52 @@
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 
 interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+type AuthView = 'main' | 'email';
+
 const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
+  const [currentView, setCurrentView] = useState<AuthView>('main');
+  const [email, setEmail] = useState('');
+  
+  // Email validation
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  const isEmailValid = email.trim() !== '' && isValidEmail(email);
+
   if (!isOpen) return null;
 
   return (
-    <div 
+    <>
+      <style>{`
+        @keyframes slideInFromLeft {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slideInFromRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+      <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
@@ -32,27 +69,38 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
             maxWidth: '960px',
             width: '100%',
             maxHeight: '90vh',
+            fontFamily: "'Work Sans', sans-serif"
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex-1" style={{ minWidth: '300px', maxWidth: '400px' }}>
-          {/* Header */}
-          <div className="px-8 pt-8 pb-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Log in or sign up in seconds
-            </h2>
-            <p className="text-gray-600">
-              Use your email or another service to continue with Ilaunching (its free)!
-            </p>
-          </div>
+          <div className="flex-1 relative" style={{ minWidth: '380px', maxWidth: '440px', minHeight: '600px' }}>
+          
+          {/* Main View - Login/Signup Options */}
+          {currentView === 'main' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromLeft 0.3s ease-out forwards'
+              }}
+            >
+            <>
+              {/* Header */}
+              <div className="px-8 pt-8 pb-6">
+                <h2 className="text-2xl font-semibold text-black mb-5">
+                  Log in or sign up in seconds
+                </h2>
+                <p className="text-gray-700">
+                  Use your email or another service to continue with Ilaunching (its free)!
+                </p>
+              </div>
 
-          {/* Auth Buttons */}
-          <div className="px-8 pb-8">
-            <div className="space-y-3">
-              {/* Continue with Google */}
+              {/* Auth Buttons */}
+              <div className="px-8 pb-8">
+                <div className="space-y-4">
+              {/* Continue with Email */}
               <button
                 type="button"
-                className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all relative"
+                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">
                   <path
@@ -78,7 +126,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               {/* Continue with Facebook */}
               <button
                 type="button"
-                className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all relative"
+                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -86,10 +134,11 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                 <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Facebook</span>
               </button>
 
-              {/* Continue with Email */}
+              {/* Continue with Email Button */}
               <button
                 type="button"
-                className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all relative"
+                onClick={() => setCurrentView('email')}
+                className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -100,56 +149,121 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               {/* Continue Another Way */}
               <button
                 type="button"
-                className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all relative"
+                className="w-full flex items-center justify-center py-3 px-4  rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                
               >
-                <svg className="w-5 h-5 absolute left-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue Another Way</span>
+                <span className="text-sm font-medium text-gray-700">Continue Another Way</span>
               </button>
             </div>
 
             {/* Terms & Privacy */}
-            <p className="mt-6 text-center text-xs text-gray-500">
+            <p className="mt-6 text-left text-xs text-gray-500">
               By continuing, you agree to our{' '}
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                Terms of Service
+              <a href="/essential-information#terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 font-medium">
+                Terms of Use
               </a>
-              {' '}and{' '}
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+              {' '}read our{' '}
+              <a href="/essential-information#privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 font-medium">
                 Privacy Policy
               </a>
             </p>
+
+            {/* Work Email Button */}
+            <button
+              type="button"
+              className="w-full flex items-start gap-2 py-3 px-0 mt-4 transition-colors duration-50"
+            >
+              <svg 
+                className="w-5 h-5 text-gray-900" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
+                />
+              </svg>
+              <span className="text-sm font-medium text-gray-900 group-hover:text-gray-600 hover:text-gray-600 transition-colors duration-50">
+                Sign up with your work email
+              </span>
+            </button>
           </div>
+          </>
+            </div>
+          )}
+
+          {/* Email View */}
+          {currentView === 'email' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+            >
+            <>
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => setCurrentView('main')} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">Continue with email</h2>
+                </div>
+                <p className="text-gray-700">
+                  We'll check if you have an account, and help create one if you don't.
+                </p>
+              </div>
+
+              {/* Email Input Form */}
+              <div className="px-8 pb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email (personal or work)
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="name@example.com"
+                />
+                <button 
+                  type="button"
+                  disabled={!isEmailValid}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    isEmailValid 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Continue
+                </button>
+              </div>
+            </>
+            </div>
+          )}
           </div>
 
           {/* Image Section */}
           <div 
-            className="hidden md:block flex-1 bg-gradient-to-br from-blue-500 to-purple-600 relative"
+            className="hidden md:block flex-1 relative overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600"
             style={{ minWidth: '400px' }}
           >
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-              {/* Placeholder Image */}
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center text-white">
-                  <svg 
-                    className="w-48 h-48 mx-auto mb-4 opacity-50" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={1.5} 
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" 
-                    />
-                  </svg>
-                  <p className="text-xl font-semibold">Welcome to iLaunching</p>
-                  <p className="text-sm opacity-75 mt-2">Your journey starts here</p>
-                </div>
-              </div>
-            </div>
+            <img 
+              src="/signup_poup1.png"
+              alt="Welcome to iLaunching"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ 
+                imageRendering: 'crisp-edges',
+                willChange: 'transform'
+              }}
+            />
           </div>
         </div>
 
@@ -168,6 +282,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 
