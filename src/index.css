@@ -52,6 +52,22 @@ p[contenteditable]:focus {
   box-shadow: none !important;
 }
 
+/* Remove cursor/caret from all editor content */
+.ProseMirror,
+.ProseMirror *,
+.data-turn-content,
+.data-turn-content *,
+.response-text-area,
+.response-text-area * {
+  caret-color: transparent !important;
+}
+
+/* Remove selection color for better appearance */
+.data-turn-content ::selection,
+.response-text-area ::selection {
+  background: rgba(59, 130, 246, 0.2);
+}
+
 /* User Message Node - Fresh Build */
 .user-message-node {
   margin: 16px 0 !important;
