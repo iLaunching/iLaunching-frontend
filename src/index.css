@@ -38,6 +38,26 @@
   }
 }
 
+/* Disable Tiptap Focus extension outline */
+.ProseMirror .has-focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Make editor content fit properly */
+.prose-container {
+  outline: none !important;
+  border: none !important;
+}
+
+.prose-container:focus,
+.prose-container:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* User Message Node - Fresh Build */
 .user-message-node {
   margin: 16px 0 !important;
