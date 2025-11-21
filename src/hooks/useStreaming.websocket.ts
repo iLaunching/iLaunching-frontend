@@ -6,7 +6,7 @@
  * Hook provides: High-level control (connect, addToQueue, pause/resume/skip)
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import type { StreamConfig } from '../services/StreamingWebSocketService';
 
@@ -25,6 +25,8 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   const [currentStreamId, setCurrentStreamId] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const HEARTBEAT_INTERVAL = 60_000; // 60 seconds keep-alive
   const maxRetries = 3;
   const retryDelay = 2000; // 2 seconds
 
@@ -309,8 +311,58 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   useEffect(() => {
     return () => {
       disconnect();
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
     };
   }, [disconnect]);
+
+  // Heartbeat keep-alive to prevent server idle timeout
+  useEffect(() => {
+    if (!editor || !isConnected) {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const getStorage = () => {
+      const storageDirect = (editor.storage as any)?.streamingWebSocket;
+      if (storageDirect) return storageDirect;
+      const streamingExt = (editor as any).extensionManager?.extensions?.find(
+        (ext: any) => ext.name === 'streamingWebSocket'
+      );
+      return streamingExt?.storage;
+    };
+
+    const sendHeartbeat = () => {
+      const storage = getStorage();
+      const ws = storage?.websocket as WebSocket | undefined;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(JSON.stringify({
+            type: 'heartbeat',
+            timestamp: Date.now(),
+          }));
+        } catch (error) {
+          console.warn('⚠️ Failed to send heartbeat:', error);
+        }
+      }
+    };
+
+    // Send immediate heartbeat and start interval
+    sendHeartbeat();
+    heartbeatIntervalRef.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+
+    return () => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+    };
+  }, [editor, isConnected]);
 
   return {
     isConnected,
