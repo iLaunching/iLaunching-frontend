@@ -42,6 +42,12 @@ export function StreamingChatInterface({
   const [isStreamingActive, setIsStreamingActive] = useState(false);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
+  // Reset welcome flag when component mounts (entering sales stage)
+  useEffect(() => {
+    console.log('🎬 StreamingChatInterface mounted - resetting welcome flag');
+    setHasShownWelcome(false);
+  }, []); // Empty deps - only run on mount
+
   // Function to determine the correct padding class
   const getPaddingClass = () => {
     // During scrolling for multiple queries, use 100vh
@@ -158,10 +164,19 @@ export function StreamingChatInterface({
   }, [streaming]);
 
   /**
-   * Send welcome message when component mounts
+   * Send welcome message when editor initializes and WebSocket is connected
    */
   useEffect(() => {
-    if (editor && streaming && !hasShownWelcome) {
+    console.log('🔍 Welcome effect triggered:', { 
+      hasEditor: !!editor, 
+      hasStreaming: !!streaming, 
+      hasShownWelcome,
+      streamingReady: !!streaming?.addToQueue,
+      isConnected: streaming?.isConnected
+    });
+    
+    // Wait for editor, streaming, connection, and ensure we haven't shown welcome yet
+    if (editor && streaming?.addToQueue && streaming?.isConnected && !hasShownWelcome) {
       // Check if editor is truly empty (no aiTurn nodes)
       const { doc } = editor.state;
       let aiTurnCount = 0;
@@ -172,20 +187,35 @@ export function StreamingChatInterface({
         }
       });
       
+      console.log('📊 Editor state:', { aiTurnCount });
+      
       // Only send welcome if editor is empty
       if (aiTurnCount === 0) {
+        console.log('✅ All conditions met, setting up welcome message timer...');
         setHasShownWelcome(true);
         
-        // Small delay to let WebSocket connect and UI settle
+        // Small delay to ensure WebSocket is fully ready
         const timer = setTimeout(() => {
-          console.log('🎉 Sending welcome message...');
+          console.log('🎉 Sending welcome message now!');
           sendSystemMessage(SYSTEM_MESSAGE_TYPES.SALES_WELCOME);
-        }, 1000);
+        }, 1500);
 
-        return () => clearTimeout(timer);
+        return () => {
+          console.log('🧹 Cleaning up welcome timer');
+          clearTimeout(timer);
+        };
+      } else {
+        console.log('⏭️ Editor not empty, skipping welcome message');
       }
+    } else {
+      console.log('⏸️ Waiting for conditions:', {
+        needsEditor: !editor,
+        needsStreaming: !streaming,
+        needsConnection: !streaming?.isConnected,
+        alreadyShown: hasShownWelcome
+      });
     }
-  }, [editor, streaming, hasShownWelcome, sendSystemMessage]);
+  }, [editor, streaming, streaming?.isConnected, hasShownWelcome, sendSystemMessage]);
 
   const handleQuerySubmit = (content: any) => {
     if (!editor) return;
