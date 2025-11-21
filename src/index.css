@@ -52,11 +52,12 @@ p[contenteditable]:focus {
   box-shadow: none !important;
 }
 
-/* Remove cursor/caret from all editor content */
-.ProseMirror,
-.ProseMirror *,
+/* Remove cursor/caret only from DataTurn + Response areas */
 .data-turn-content,
-.data-turn-content *,
+.data-turn-content * {
+  caret-color: transparent !important;
+}
+
 .response-text-area,
 .response-text-area * {
   caret-color: transparent !important;
