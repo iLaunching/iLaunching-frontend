@@ -126,7 +126,8 @@ export function StreamingChatInterface({
     onStreamComplete: (message) => {
       console.log('✅ Stream completed:', message.total_chunks);
       setIsStreamingActive(false);
-      // Don't set needsScrollPadding to false here - let getPaddingClass handle it
+      // Reset scroll padding so layout returns to post-stream state (45vh)
+      setNeedsScrollPadding(false);
       
       // Call custom callback if provided
       onStreamComplete?.(message);
