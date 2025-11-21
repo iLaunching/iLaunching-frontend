@@ -565,6 +565,14 @@ p[contenteditable]:focus {
   min-height: 40px;
   width: fit-content;
   max-width: 100%;
+  user-select: text;
+  pointer-events: auto;
+}
+
+.response-text-area [contenteditable] {
+  user-select: none !important;
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
 .response-text-area p {
