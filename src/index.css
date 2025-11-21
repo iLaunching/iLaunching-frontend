@@ -362,7 +362,7 @@
 
 /* DataTurn Node Styles (for system messages) */
 .data-turn-node {
-  margin: 24px 0;
+  margin: 8px 0;
   padding: 0;
   display: block;
 }

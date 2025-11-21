@@ -22,9 +22,6 @@ const DataTurnComponent: React.FC<DataTurnComponentProps> = memo(({ node }) => {
         className="data-turn-container" 
         data-turn-id={attrs.turnId}
         data-message-type={attrs.messageType}
-        style={{
-          marginBottom: '16px',
-        }}
       >
         <NodeViewContent className="data-turn-content" />
       </div>

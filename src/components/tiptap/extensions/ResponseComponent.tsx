@@ -110,23 +110,6 @@ const ResponseComponent: React.FC<ResponseComponentProps> = memo(({ node }) => {
             )}
           </button>
         </div>
-        
-        {/* Timestamp and ID metadata at the end of response */}
-        {attrs.turnId && attrs.timestamp && (
-          <div className="response-metadata" style={{ 
-            fontSize: '11px', 
-            color: '#9ca3af', 
-            marginTop: '12px',
-            paddingTop: '8px',
-            borderTop: '1px solid #e5e7eb',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <span>{new Date(attrs.timestamp).toLocaleString()}</span>
-            <span style={{ fontFamily: 'monospace', fontSize: '10px' }}>ID: {attrs.turnId}</span>
-          </div>
-        )}
       </div>
     </NodeViewWrapper>
   );
