@@ -38,6 +38,20 @@
   }
 }
 
+/* Remove all focus outlines from Tiptap editor content */
+.ProseMirror:focus,
+.ProseMirror *:focus,
+.ProseMirror [contenteditable]:focus,
+.ProseMirror p:focus,
+.ProseMirror div:focus,
+[contenteditable="true"]:focus,
+div[contenteditable]:focus,
+p[contenteditable]:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* User Message Node - Fresh Build */
 .user-message-node {
   margin: 16px 0 !important;
@@ -368,7 +382,11 @@
 }
 
 .data-turn-node *:focus,
-.data-turn-node *:focus-visible {
+.data-turn-node *:focus-visible,
+.data-turn-node [contenteditable]:focus,
+.data-turn-node [contenteditable="true"]:focus,
+.data-turn-node p:focus,
+.data-turn-node div[contenteditable]:focus {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -388,7 +406,11 @@
 }
 
 .data-turn-content *:focus,
-.data-turn-content *:focus-visible {
+.data-turn-content *:focus-visible,
+.data-turn-content [contenteditable]:focus,
+.data-turn-content [contenteditable="true"]:focus,
+.data-turn-content p:focus,
+.data-turn-content div[contenteditable]:focus {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -402,7 +424,11 @@
 }
 
 .response-node *:focus,
-.response-node *:focus-visible {
+.response-node *:focus-visible,
+.response-node [contenteditable]:focus,
+.response-node [contenteditable="true"]:focus,
+.response-node p:focus,
+.response-node div[contenteditable]:focus {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
