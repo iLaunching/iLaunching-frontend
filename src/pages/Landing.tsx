@@ -244,6 +244,7 @@ export default function Landing() {
               style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
               backgroundType={backgroundType}
               showGetStarted={authState.stage === 'sales'}
+              userName={authState.name || authState.user?.name || ''}
               onGetStartedClick={() => {
                 console.log('Get Started clicked in sales stage');
                 // Add your Get Started logic here

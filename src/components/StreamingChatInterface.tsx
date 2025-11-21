@@ -20,6 +20,7 @@ interface StreamingChatInterfaceProps {
   backgroundType?: 'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'; // Background type for custom prompt styling
   showGetStarted?: boolean; // Show Get Started button in sales stage
   onGetStartedClick?: () => void; // Callback for Get Started button
+  userName?: string; // User's name for personalization
 }
 
 export function StreamingChatInterface({
@@ -35,7 +36,8 @@ export function StreamingChatInterface({
   style,
   backgroundType = 'connected',
   showGetStarted = false,
-  onGetStartedClick
+  onGetStartedClick,
+  userName = ''
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
@@ -198,19 +200,24 @@ export function StreamingChatInterface({
       
       // Small delay to ensure node is inserted
       setTimeout(() => {
+        // Create message with user name for personalization
+        const messagePayload = userName 
+          ? `${messageType}|USER:${userName}` 
+          : messageType;
+        
         // Send the message type through streaming queue
-        streaming.addToQueue(messageType, {
+        streaming.addToQueue(messagePayload, {
           content_type: 'markdown',
           speed: 'normal',
         });
         
-        console.log('✅ System message queued:', messageType);
+        console.log('✅ System message queued:', messagePayload);
       }, 100);
       
     } catch (error) {
       console.error('❌ Error sending system message:', error);
     }
-  }, [streaming, editor]);
+  }, [streaming, editor, userName]);
 
   /**
    * Send welcome message when editor initializes and WebSocket is connected
