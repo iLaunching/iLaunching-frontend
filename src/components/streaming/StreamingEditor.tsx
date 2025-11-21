@@ -192,6 +192,7 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           outline: none;
           color: #000;
           font-size: 16px;
+          font-family: 'helvetica', sans-serif;
           /* Performance optimizations */
           contain: layout style;
           will-change: contents;
@@ -336,17 +337,27 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
         .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] {
           list-style: none;
           padding-left: 0;
+          margin: 12px 0;
         }
         
         .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li {
           display: flex;
-          align-items: flex-start;
-          gap: 8px;
+          align-items: center;
+          gap: 12px;
+          padding: 6px 0;
         }
         
         .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] {
-          margin-top: 4px;
+          width: 22px;
+          height: 22px;
+          border-radius: 6px;
+          border: 2px solid #7c3aed;
+          accent-color: #7c3aed;
           cursor: pointer;
+          margin: 0;
+          flex-shrink: 0;
+          display: grid;
+          place-items: center;
         }
         
         /* Blockquote */
