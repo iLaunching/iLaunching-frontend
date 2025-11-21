@@ -226,61 +226,85 @@ export const StreamingWebSocketExtension = Extension.create<StreamingWebSocketOp
                   storage.lastInsertPosition = null;
                   storage.streamCompleteReceived = false; // Reset for new stream
                   
-                  // Find the most recent AITurn (the one without a Response yet)
-                  let aiTurnPos = -1;
-                  let aiTurnNode: any = null;
+                  // Find the most recent AITurn or DataTurn (the one without a Response yet, or has incomplete Response)
+                  let turnPos = -1;
+                  let turnNode: any = null;
+                  let turnType = '';
                   
                   editor.state.doc.descendants((node, pos) => {
-                    if (node.type.name === 'aiTurn') {
-                      // Check if this AITurn has a Response node
-                      let hasResponse = false;
+                    if (node.type.name === 'aiTurn' || node.type.name === 'dataTurn') {
+                      // Check if this Turn has a complete Response node
+                      let hasCompleteResponse = false;
                       node.descendants((child) => {
                         if (child.type.name === 'response') {
-                          hasResponse = true;
-                          return false; // Stop searching
+                          // Check if response has content or is marked complete
+                          if (child.attrs.isComplete || child.content.size > 2) { // > 2 means has more than just empty paragraph
+                            hasCompleteResponse = true;
+                            return false; // Stop searching
+                          }
                         }
                       });
                       
-                      if (!hasResponse) {
-                        aiTurnPos = pos;
-                        aiTurnNode = node;
+                      if (!hasCompleteResponse) {
+                        turnPos = pos;
+                        turnNode = node;
+                        turnType = node.type.name;
                         storage.currentTurnId = node.attrs.turnId;
                       }
                     }
                   });
                   
-                  if (aiTurnPos >= 0 && aiTurnNode) {
-                    console.log('[StreamingWS] 📍 Found AITurn at position', aiTurnPos, 'turnId:', storage.currentTurnId);
+                  if (turnPos >= 0 && turnNode) {
+                    console.log('[StreamingWS] 📍 Found', turnType, 'at position', turnPos, 'turnId:', storage.currentTurnId);
                     
-                    // Create Response node inside the AITurn
-                    const responseNode = {
-                      type: 'response',
-                      attrs: {
-                        response_id: storage.currentTurnId || 'response_' + Date.now(),
-                        ai_name: 'iLaunching',
-                        ai_model: 'Assistant',
-                        ai_avatar_url: '',
-                        timestamp: new Date().toISOString()
-                      },
-                      content: [] // Will be filled with streamed nodes
-                    };
+                    // Check if Response already exists but is empty
+                    let hasResponse = false;
+                    let responsePos = -1;
                     
-                    // Insert Response node as the last child of AITurn
-                    // Position is: aiTurnPos + 1 (opening tag) + aiTurnNode.content.size (existing content)
-                    const insertPos = aiTurnPos + 1 + aiTurnNode.content.size;
+                    turnNode.descendants((child: any, pos: number) => {
+                      if (child.type.name === 'response') {
+                        hasResponse = true;
+                        responsePos = turnPos + 1 + pos; // Absolute position
+                        return false;
+                      }
+                    });
                     
-                    const { tr } = editor.state;
-                    const pmResponseNode = editor.schema.nodeFromJSON(responseNode);
-                    tr.insert(insertPos, pmResponseNode);
-                    editor.view.dispatch(tr);
-                    
-                    // Store position inside the Response node (after its opening tag)
-                    storage.currentResponsePos = insertPos + 1;
-                    storage.lastInsertPosition = insertPos + 1;
-                    
-                    console.log('[StreamingWS] ✅ Response node created at position', insertPos);
+                    if (hasResponse && responsePos >= 0) {
+                      // Response exists, stream into it
+                      storage.currentResponsePos = responsePos + 1; // Inside the response node
+                      storage.lastInsertPosition = responsePos + 1;
+                      console.log('[StreamingWS] ✅ Using existing Response node at position', responsePos);
+                    } else {
+                      // Create Response node inside the Turn
+                      const responseNode = {
+                        type: 'response',
+                        attrs: {
+                          response_id: storage.currentTurnId || 'response_' + Date.now(),
+                          ai_name: 'iLaunching',
+                          ai_model: 'Assistant',
+                          ai_avatar_url: '',
+                          timestamp: new Date().toISOString()
+                        },
+                        content: [] // Will be filled with streamed nodes
+                      };
+                      
+                      // Insert Response node as the last child of Turn
+                      // Position is: turnPos + 1 (opening tag) + turnNode.content.size (existing content)
+                      const insertPos = turnPos + 1 + turnNode.content.size;
+                      
+                      const { tr } = editor.state;
+                      const pmResponseNode = editor.schema.nodeFromJSON(responseNode);
+                      tr.insert(insertPos, pmResponseNode);
+                      editor.view.dispatch(tr);
+                      
+                      // Store position inside the Response node (after its opening tag)
+                      storage.currentResponsePos = insertPos + 1;
+                      storage.lastInsertPosition = insertPos + 1;
+                      
+                      console.log('[StreamingWS] ✅ Response node created at position', insertPos);
+                    }
                   } else {
-                    console.warn('[StreamingWS] ⚠️ No AITurn found without Response - will insert at document end');
+                    console.warn('[StreamingWS] ⚠️ No AITurn/DataTurn found without complete Response - will insert at document end');
                     storage.currentResponsePos = null;
                     storage.lastInsertPosition = null;
                   }
