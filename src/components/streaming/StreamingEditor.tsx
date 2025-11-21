@@ -347,16 +347,18 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           padding: 6px 0;
         }
 
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li label {
+        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] > li > label {
           display: flex;
           align-items: center;
           gap: 6px;
           margin: 0;
           padding: 0;
-          flex-shrink: 0;
+          flex: 0 0 auto;
+          width: auto;
+          min-width: fit-content;
         }
 
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li > div {
+        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] > li > div {
           flex: 1;
           display: flex;
           align-items: center;
