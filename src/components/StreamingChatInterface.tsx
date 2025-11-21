@@ -60,16 +60,16 @@ export function StreamingChatInterface({
       // When not streaming and editor has actual conversations, use 45vh
       if (!isStreamingActive) {
         const { doc } = editor.state;
-        let aiTurnCount = 0;
+        let conversationCount = 0;
         
         doc.descendants((node: any) => {
-          if (node.type.name === 'aiTurn') {
-            aiTurnCount++;
+          if (node.type.name === 'aiTurn' || node.type.name === 'dataTurn') {
+            conversationCount++;
           }
         });
         
         // Only add padding if there are actual completed conversations
-        if (aiTurnCount > 0) return 'pb-[45vh]';
+        if (conversationCount > 0) return 'pb-[45vh]';
       }
     } catch (error) {
       console.warn('Error accessing editor state:', error);
@@ -373,19 +373,19 @@ export function StreamingChatInterface({
           const { doc } = editor.state;
           
           // Check if editor has meaningful content (not just AI indicator and the current query)
-          let aiTurnCount = 0;
+          let conversationCount = 0;
           let aiIndicatorCount = 0;
           
           doc.descendants((node: any) => {
-            if (node.type.name === 'aiTurn') {
-              aiTurnCount++;
+            if (node.type.name === 'aiTurn' || node.type.name === 'dataTurn') {
+              conversationCount++;
             } else if (node.type.name === 'aiIndicator') {
               aiIndicatorCount++;
             }
           });
           
-          // If we only have 1 aiTurn (the one we just created) and an aiIndicator, no previous content
-          const hasOnlyCurrentQuery = aiTurnCount <= 1 && aiIndicatorCount <= 1;
+          // If we only have 1 conversation turn (the one we just created) and an aiIndicator, no previous content
+          const hasOnlyCurrentQuery = conversationCount <= 1 && aiIndicatorCount <= 1;
           
           if (hasOnlyCurrentQuery) {
             // No previous content, no padding needed
@@ -431,7 +431,7 @@ export function StreamingChatInterface({
                 console.log('   document height:', beforeScrollHeight);
                 console.log('   window height:', beforeClientHeight);
                 console.log('   query position in doc:', lastQueryPos);
-                console.log('   aiTurn count:', aiTurnCount);
+                console.log('   conversation count:', conversationCount);
                 
                 // Get the query's absolute position on the page
                 const queryRect = queryParent.getBoundingClientRect();
