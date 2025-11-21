@@ -29,6 +29,7 @@ import { StreamingWebSocketExtension } from '../tiptap/extensions/StreamingWebSo
 import { AiIndicator } from '../tiptap/AiIndicator';
 import { Query } from '../tiptap/Query';
 import { AITurn } from '../tiptap/extensions/AITurn';
+import { DataTurn } from '../tiptap/extensions/DataTurn';
 import { Response } from '../tiptap/extensions/Response';
 
 interface StreamingEditorProps {
@@ -58,6 +59,7 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       CodeBlockWithHighlight, // Custom codeBlockHighlight for manual use
       AiIndicator, // AI response indicator with animated icon
       AITurn, // Parent node wrapping Query + Response for conversation turns
+      DataTurn, // Parent node for system messages (welcome, transitions, etc.)
       Query, // User query node with avatar and background colors
       Response, // AI response node with streaming support (animations via CSS)
       

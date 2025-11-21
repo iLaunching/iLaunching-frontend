@@ -139,29 +139,78 @@ export function StreamingChatInterface({
 
   /**
    * Send system message through API
-   * Message will be streamed back like an LLM response
+   * Creates a DataTurn node and streams the message into it
    */
   const sendSystemMessage = useCallback(async (messageType: SystemMessageType) => {
-    if (!streaming?.addToQueue) {
-      console.warn('⚠️ Streaming not ready, cannot send system message');
+    if (!streaming?.addToQueue || !editor) {
+      console.warn('⚠️ Streaming or editor not ready, cannot send system message');
       return;
     }
 
     try {
       console.log('📤 Sending system message:', messageType);
       
-      // Send through streaming queue - it will go to backend API
-      // The message type itself is the content (it's a special flag the backend recognizes)
-      streaming.addToQueue(messageType, {
-        content_type: 'markdown',
-        speed: 'normal',
+      // Find aiIndicator position
+      const { doc } = editor.state;
+      let aiIndicatorPos = -1;
+      
+      doc.descendants((node: any, pos: any) => {
+        if (node.type.name === 'aiIndicator') {
+          aiIndicatorPos = pos;
+          return false; // Stop early
+        }
       });
       
-      console.log('✅ System message queued:', messageType);
+      const insertPos = aiIndicatorPos >= 0 ? aiIndicatorPos : doc.content.size;
+      
+      // Generate unique IDs for this data turn
+      const turnId = 'data_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      
+      // Insert DataTurn node above AI indicator
+      editor.commands.insertContentAt(insertPos, {
+        type: 'dataTurn',
+        attrs: {
+          turnId: turnId,
+          timestamp: new Date().toISOString(),
+          messageType: messageType,
+        },
+        content: [
+          {
+            type: 'response',
+            attrs: {
+              responseId: turnId,
+              isStreaming: true,
+              isComplete: false,
+              turnId: turnId,
+              timestamp: new Date().toISOString(),
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [],
+              },
+            ],
+          },
+        ],
+      });
+      
+      console.log('✅ DataTurn created with turnId:', turnId);
+      
+      // Small delay to ensure node is inserted
+      setTimeout(() => {
+        // Send the message type through streaming queue
+        streaming.addToQueue(messageType, {
+          content_type: 'markdown',
+          speed: 'normal',
+        });
+        
+        console.log('✅ System message queued:', messageType);
+      }, 100);
+      
     } catch (error) {
       console.error('❌ Error sending system message:', error);
     }
-  }, [streaming]);
+  }, [streaming, editor]);
 
   /**
    * Send welcome message when editor initializes and WebSocket is connected
@@ -191,20 +240,20 @@ export function StreamingChatInterface({
       return;
     }
     
-    // Check if editor is truly empty (no aiTurn nodes)
+    // Check if editor is truly empty (no aiTurn or dataTurn nodes)
     const { doc } = editor.state;
-    let aiTurnCount = 0;
+    let conversationCount = 0;
     
     doc.descendants((node: any) => {
-      if (node.type.name === 'aiTurn') {
-        aiTurnCount++;
+      if (node.type.name === 'aiTurn' || node.type.name === 'dataTurn') {
+        conversationCount++;
       }
     });
     
-    console.log('📊 Editor state:', { aiTurnCount });
+    console.log('📊 Editor state:', { conversationCount });
     
     // Only send welcome if editor is empty
-    if (aiTurnCount === 0) {
+    if (conversationCount === 0) {
       console.log('✅ All conditions met, setting up welcome message timer...');
       // Set flag immediately to prevent re-runs
       hasShownWelcomeRef.current = true;
