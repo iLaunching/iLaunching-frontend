@@ -14,7 +14,6 @@ import {
   getRandomLoginMessage,
   getRandomAskNameMessage,
   USER_NOT_REGISTERED_MESSAGES,
-  INTRODUCTION_MESSAGES,
 } from '../constants';
 
 export function useLandingAuth() {
@@ -154,10 +153,10 @@ export function useLandingAuth() {
   };
 
   /**
-   * Handle name submission (new user) - Start sales flow with introduction
+   * Handle name submission (new user) - Store name and go directly to sales
    */
   const handleNameSubmit = (name: string): void => {
-    // Handle continue action after introduction
+    // Handle continue action after name (go to password creation)
     if (name === 'continue-to-password') {
       setAuthState((prev: AuthState) => ({
         ...prev,
@@ -175,21 +174,15 @@ export function useLandingAuth() {
       return;
     }
 
-    // Store name and move to introduction stage
+    // Store name and transition directly to sales stage
     setAuthState((prev: AuthState) => ({
       ...prev,
       name: name.trim(),
-      stage: 'introduction',
-      message: '', // Clear message first
+      stage: 'sales',
+      message: '',
+      isProcessing: false,
+      error: null,
     }));
-    
-    // Add delay before showing personalized introduction
-    setTimeout(() => {
-      setAuthState((prev: AuthState) => ({
-        ...prev,
-        message: getRandomMessage(INTRODUCTION_MESSAGES).replaceAll('{name}', name.trim()),
-      }));
-    }, 500); // 500ms delay before showing introduction
   };
 
   /**

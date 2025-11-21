@@ -16,7 +16,7 @@ import {
   APP_CONFIG 
 } from '@/constants';
 import { useLandingAuth } from '@/hooks/useLandingAuth';
-import { salesApi } from '@/api/sales';
+
 
 export default function Landing() {
   // Use the auth hook for state management
@@ -28,25 +28,17 @@ export default function Landing() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
-    enterSalesMode,
   } = useLandingAuth();
   
   // State to control button visibility after typewriter completes
   const [showButtons, setShowButtons] = useState(false);
   // State to control when to show name input prompt after message completes
   const [showNameInput, setShowNameInput] = useState(false);
-  // State to show "Yes Please" button after introduction completes
-  const [showYesPleaseButton, setShowYesPleaseButton] = useState(false);
   // State for background transition
   const [backgroundType, setBackgroundType] = useState<'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'>('ai');
   const [isTransitioning, setIsTransitioning] = useState(false);
   // State for chat window
   const [showChatWindow, setShowChatWindow] = useState(false);
-  const [chatMessage, setChatMessage] = useState("");
-  
-  // State for sales conversation
-  const [salesSessionId, setSalesSessionId] = useState<string | null>(null);
-  const [isStreamingResponse, setIsStreamingResponse] = useState(false);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -80,7 +72,34 @@ export default function Landing() {
         await handleEmailSubmit(message);
         break;
       case 'name_input':
-        handleNameSubmit(message);
+        // Store the name and transition directly to sales
+        if (message.trim()) {
+          handleNameSubmit(message);
+          
+          // Start background transition immediately
+          setIsTransitioning(true);
+          
+          // Randomly select a background
+          const backgrounds = ['connected', 'deepSea', 'deepPurple', 'deepPink'] as const;
+          const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+          
+          // Change background
+          setTimeout(() => {
+            setBackgroundType(randomBackground);
+          }, 50);
+          
+          // Complete background transition
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 800);
+          
+          // Show chat window after background is settled
+          setTimeout(async () => {
+            setShowChatWindow(true);
+            // Initialize the sales conversation with API
+            await initializeSalesConversation();
+          }, 900);
+        }
         break;
       case 'password_create':
         await handlePasswordCreate(message);
@@ -116,95 +135,17 @@ export default function Landing() {
       : 'text';
   };
 
-  // Initialize sales conversation and start streaming
+  // Initialize sales conversation
   const initializeSalesConversation = async () => {
-    try {
-      // Generate session ID
-      const sessionId = salesApi.generateSessionId();
-      setSalesSessionId(sessionId);
-
-      // Get user information from authState
-      const userName = authState.user?.name || authState.name || 'there';
-
-      // Clear message initially
-      setChatMessage('');
-      setIsStreamingResponse(true);
-
-      // Send initial message to the sales API to get the real AI response
-      const initialUserMessage = `Hi! I just clicked "Let's do this" to learn more about iLaunching. I'm ${userName} and I'm interested in exploring how you can help my business.`;
-
-      // Send to sales API for real AI response
-      salesApi.createMessageStream(
-        {
-          session_id: sessionId,
-          message: initialUserMessage,
-          email: authState.user?.email || authState.email,
-          name: userName
-        },
-        (response) => {
-          // Update chat message as it streams from the API
-          setChatMessage(response.message);
-        },
-        (error) => {
-          console.error('Sales API initialization error:', error);
-          setChatMessage("Connection error. Please refresh and try again.");
-          setIsStreamingResponse(false);
-        },
-        () => {
-          // Streaming complete
-          setIsStreamingResponse(false);
-        }
-      );
-
-    } catch (error) {
-      console.error('Failed to initialize sales conversation:', error);
-      setChatMessage("Unable to connect to sales service. Please try again.");
-      setIsStreamingResponse(false);
-    }
+    // The StreamingChatInterface handles its own initialization
+    console.log('Sales conversation initialized with user:', authState.name || authState.user?.name);
   };
 
-  // Handle sales conversation messages
-  const handleSalesMessage = async (message: string) => {
-    if (!salesSessionId || isStreamingResponse) return;
 
-    try {
-      setIsStreamingResponse(true);
-      setChatMessage('');
-
-      // Send message to sales API with streaming
-      salesApi.createMessageStream(
-        {
-          session_id: salesSessionId,
-          message: message,
-          email: authState.user?.email || authState.email,
-          name: authState.user?.name || authState.name
-        },
-        (response) => {
-          // Update chat message as it streams
-          setChatMessage(response.message);
-        },
-        (error) => {
-          console.error('Sales API error:', error);
-          setChatMessage("I apologize, but I'm having trouble connecting right now. Could you please try again?");
-          setIsStreamingResponse(false);
-        },
-        () => {
-          // Streaming complete
-          setIsStreamingResponse(false);
-        }
-      );
-
-    } catch (error) {
-      console.error('Failed to send sales message:', error);
-      setChatMessage("I'm here to help! Could you tell me more about your business needs?");
-      setIsStreamingResponse(false);
-    }
-  };
   
   // Determine if chat should be visible
   const shouldShowChat = authState.stage !== 'authenticated' && 
-                         authState.stage !== 'new_user' &&
-                         authState.stage !== 'introduction';
+                         authState.stage !== 'new_user';
   
   // Should show chat container during name_input but with opacity control
   const isNameInputStage = authState.stage === 'name_input';
@@ -223,11 +164,6 @@ export default function Landing() {
       // When the "ask name" message completes, fade in the name input
       setTimeout(() => {
         setShowNameInput(true);
-      }, 100);
-    } else if (authState.stage === 'introduction') {
-      // When the introduction message completes, show "Yes Please" button
-      setTimeout(() => {
-        setShowYesPleaseButton(true);
       }, 100);
     }
   }, [authState.stage]);
@@ -388,50 +324,7 @@ export default function Landing() {
 
             )}
             
-            {/* Introduction "Continue" Button - Hide when in sales stage */}
-            {authState.stage === 'introduction' && (
-              <div 
-                className="flex justify-center mt-6"
-                style={{ marginBottom: '200px', minHeight: '60px' }}
-              >
-                <button
-                  onClick={async () => {
-                    // Transition to sales mode - this will clear all content
-                    enterSalesMode();
-                    
-                    // Start background transition
-                    setIsTransitioning(true);
-                    
-                    // Randomly select a background
-                    const backgrounds = ['connected', 'deepSea', 'deepPurple', 'deepPink'] as const;
-                    const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-                    
-                    // Change background immediately
-                    setTimeout(() => {
-                      setBackgroundType(randomBackground);
-                    }, 50);
-                    
-                    // Complete background transition
-                    setTimeout(() => {
-                      setIsTransitioning(false);
-                    }, 800);
-                    
-                    // Show chat window after background is settled
-                    setTimeout(async () => {
-                      setShowChatWindow(true);
-                      // Initialize the sales conversation with API
-                      await initializeSalesConversation();
-                    }, 900);
-                  }}
-                  className={`flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
-                    showYesPleaseButton ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ maxHeight: '45px', minWidth: '200px', justifyContent: 'center' }}
-                >
-                  Let's Do This! 
-                </button>
-              </div>
-            )}
+
 
             {/* Show user info when authenticated */}
             {authState.stage === 'authenticated' && authState.user && (
