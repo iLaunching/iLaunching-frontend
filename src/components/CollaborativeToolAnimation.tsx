@@ -104,13 +104,14 @@ interface CursorProps {
 
 const Cursor = ({ x, y, name, color, opacity, showMessage, message }: CursorProps) => (
   <div
-    className="pointer-events-none fixed z-50"
+    className="pointer-events-none fixed"
     style={{
       left: `${x}px`,
       top: `${y}px`,
       transform: 'translate(-2px, -2px)',
       opacity,
-      transition: 'opacity 0.3s ease'
+      transition: 'opacity 0.3s ease',
+      zIndex: 40,
     }}
   >
     <MousePointer2 

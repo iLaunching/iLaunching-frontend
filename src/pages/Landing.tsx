@@ -9,6 +9,7 @@ import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
 import { StreamingChatInterface } from '@/components/StreamingChatInterface';
 import CollaborativeToolAnimation from '@/components/CollaborativeToolAnimation';
+import SalesControlPanel from '@/components/SalesControlPanel';
 import { UserPlus, LogIn } from 'lucide-react';
 import { 
   getRandomWelcomeMessage, 
@@ -211,15 +212,20 @@ export default function Landing() {
         </div>
       </div>
       
-      {/* Collaborative Cursor Animation - Show only in sales stage */}
+      {/* Collaborative Cursor Animation - Show only in sales stage, hide when popup is open */}
       {authState.stage === 'sales' && (
         <>
-          <CollaborativeToolAnimation className="fixed inset-0 z-10" />
+          <CollaborativeToolAnimation className="fixed inset-0 z-40" />
           <style>{`
             body:not(.popup-open), 
             body:not(.popup-open) *, 
             body:not(.popup-open) *:hover {
               cursor: none !important;
+            }
+            
+            /* Hide collaborative animation when popup is open */
+            body.popup-open .fixed.inset-0.z-40 {
+              display: none !important;
             }
           `}</style>
         </>
@@ -227,22 +233,29 @@ export default function Landing() {
       
       {/* Sticky Chat Interface - Show in sales stage */}
       {(showChatWindow || authState.stage === 'sales') && (
-        <div className="chat-window-sticky">
-          <StreamingChatInterface
-            testMode={true}
-            topOffset={0}
-            placeholder="Tell me about your business challenge..."
-            className="h-full"
-            maxWidth="full"
-            style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
-            backgroundType={backgroundType}
-            showGetStarted={authState.stage === 'sales'}
-            onGetStartedClick={() => {
-              console.log('Get Started clicked in sales stage');
-              // Add your Get Started logic here
-            }}
-          />
-        </div>
+        <>
+          <div className="chat-window-sticky">
+            <StreamingChatInterface
+              testMode={true}
+              topOffset={0}
+              placeholder="Tell me about your business challenge..."
+              className="h-full"
+              maxWidth="full"
+              style={{ width: '45vw', minWidth: '420px', maxWidth: '800px' }}
+              backgroundType={backgroundType}
+              showGetStarted={authState.stage === 'sales'}
+              onGetStartedClick={() => {
+                console.log('Get Started clicked in sales stage');
+                // Add your Get Started logic here
+              }}
+            />
+          </div>
+          
+          {/* Sales Control Panel - Right side, controlled by MCP */}
+          <div className="sales-panel-sticky">
+            <SalesControlPanel />
+          </div>
+        </>
       )}
       
       {/* Content overlay */}
@@ -378,7 +391,7 @@ export default function Landing() {
           position: absolute;
           left: 20px;
           top: 0;
-          z-index: 1000;
+          z-index: 5;
           width: 45vw; /* 45% of viewport width */
           min-width: 420px; /* Minimum width for usability */
           max-width: 800px; /* Maximum width for very large screens */
@@ -391,6 +404,28 @@ export default function Landing() {
         @keyframes slideInLeft {
           from {
             transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+        
+        /* Sales Control Panel - Right side */
+        .sales-panel-sticky {
+          position: absolute;
+          right: 0;
+          top: 0;
+          z-index: 1;
+          width: 55%; /* 55% of viewport width as requested */
+          min-height: 100vh;
+          padding: 0;
+          margin: 0;
+          animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
           }
           to {
             transform: translateX(0);
@@ -433,6 +468,25 @@ export default function Landing() {
             width: auto;
             max-height: 60vh;
             animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          
+          .sales-panel-sticky {
+            position: fixed;
+            right: 10px;
+            left: 10px;
+            top: 10px;
+            width: auto;
+            max-height: 35vh;
+            animation: slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+        }
+        
+        @keyframes slideInDown {
+          from {
+            transform: translateY(-100%);
+          }
+          to {
+            transform: translateY(0);
           }
         }
         
