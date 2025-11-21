@@ -38,26 +38,6 @@
   }
 }
 
-/* Disable Tiptap Focus extension outline */
-.ProseMirror .has-focus {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Make editor content fit properly */
-.prose-container {
-  outline: none !important;
-  border: none !important;
-}
-
-.prose-container:focus,
-.prose-container:focus-visible {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
 /* User Message Node - Fresh Build */
 .user-message-node {
   margin: 16px 0 !important;
@@ -387,6 +367,13 @@
   display: block;
 }
 
+.data-turn-node *:focus,
+.data-turn-node *:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .data-turn-container {
   position: relative;
   background: transparent;
@@ -400,11 +387,25 @@
   gap: 16px;
 }
 
+.data-turn-content *:focus,
+.data-turn-content *:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* Response Node Styles */
 .response-node {
   margin: 0;
   padding: 0;
   display: block;
+}
+
+.response-node *:focus,
+.response-node *:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .response-container {
@@ -419,6 +420,13 @@
   width: fit-content;
   max-width: 100%;
   display: inline-block;
+}
+
+.response-content-wrapper *:focus,
+.response-content-wrapper *:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .response-copy-button {
