@@ -346,6 +346,21 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           gap: 12px;
           padding: 6px 0;
         }
+
+        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin: 0;
+          padding: 0;
+          flex-shrink: 0;
+        }
+
+        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li > div {
+          flex: 1;
+          display: flex;
+          align-items: center;
+        }
         
         .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] {
           width: 22px;
