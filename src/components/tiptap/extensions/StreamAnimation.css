@@ -175,22 +175,8 @@
 }
 
 /* ============================================
-   CURSOR
-   ============================================ */
-
-/* Blinking cursor at the end while streaming */
-.response-streaming .response-text-area::after {
-  content: '▊';
-  color: #10b981;
-  animation: cursorPulse 1s ease-in-out infinite;
-  margin-left: 2px;
-  font-weight: bold;
-  display: inline-block;
-}
-
-/* ============================================
-   PERFORMANCE & ACCESSIBILITY
-   ============================================ */
+  PERFORMANCE & ACCESSIBILITY
+  ============================================ */
 
 /* GPU acceleration hint */
 .response-text-area {
