@@ -175,46 +175,47 @@ export function StreamingChatInterface({
       isConnected: streaming?.isConnected
     });
     
-    // Wait for editor, streaming, connection, and ensure we haven't shown welcome yet
-    if (editor && streaming?.addToQueue && streaming?.isConnected && !hasShownWelcomeRef.current) {
-      // Check if editor is truly empty (no aiTurn nodes)
-      const { doc } = editor.state;
-      let aiTurnCount = 0;
-      
-      doc.descendants((node: any) => {
-        if (node.type.name === 'aiTurn') {
-          aiTurnCount++;
-        }
-      });
-      
-      console.log('📊 Editor state:', { aiTurnCount });
-      
-      // Only send welcome if editor is empty
-      if (aiTurnCount === 0) {
-        console.log('✅ All conditions met, setting up welcome message timer...');
-        // Set flag BEFORE timer to prevent re-runs
-        hasShownWelcomeRef.current = true;
-        
-        // Small delay to ensure WebSocket is fully ready
-        const timer = setTimeout(() => {
-          console.log('🎉 Sending welcome message now!');
-          sendSystemMessage(SYSTEM_MESSAGE_TYPES.SALES_WELCOME);
-        }, 1500);
-
-        return () => {
-          console.log('🧹 Cleaning up welcome timer');
-          clearTimeout(timer);
-        };
-      } else {
-        console.log('⏭️ Editor not empty, skipping welcome message');
-      }
-    } else {
+    // Skip if already shown
+    if (hasShownWelcomeRef.current) {
+      console.log('⏭️ Welcome already shown, skipping');
+      return;
+    }
+    
+    // Wait for editor, streaming, connection
+    if (!editor || !streaming?.addToQueue || !streaming?.isConnected) {
       console.log('⏸️ Waiting for conditions:', {
         needsEditor: !editor,
         needsStreaming: !streaming,
         needsConnection: !streaming?.isConnected,
-        alreadyShown: hasShownWelcomeRef.current
       });
+      return;
+    }
+    
+    // Check if editor is truly empty (no aiTurn nodes)
+    const { doc } = editor.state;
+    let aiTurnCount = 0;
+    
+    doc.descendants((node: any) => {
+      if (node.type.name === 'aiTurn') {
+        aiTurnCount++;
+      }
+    });
+    
+    console.log('📊 Editor state:', { aiTurnCount });
+    
+    // Only send welcome if editor is empty
+    if (aiTurnCount === 0) {
+      console.log('✅ All conditions met, setting up welcome message timer...');
+      // Set flag immediately to prevent re-runs
+      hasShownWelcomeRef.current = true;
+      
+      // Send welcome message after a delay
+      setTimeout(() => {
+        console.log('🎉 Sending welcome message now!');
+        sendSystemMessage(SYSTEM_MESSAGE_TYPES.SALES_WELCOME);
+      }, 1500);
+    } else {
+      console.log('⏭️ Editor not empty, skipping welcome message');
     }
   }, [editor, streaming?.isConnected, sendSystemMessage]);
 
