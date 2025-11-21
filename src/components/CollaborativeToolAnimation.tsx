@@ -2,30 +2,118 @@ import { useState, useEffect } from 'react';
 import { MousePointer2 } from 'lucide-react';
 
 const COLORS = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-  '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+  '#6448ef', // Original: Medium Purple
+  '#38c893', // Original: Medium Spring Green
+  '#da42d3', // Original: Orchid
+  '#f2994b', // Original: Neon Carrot
+  
+  '#008080', // Deep Teal
+  '#DC143C', // Crimson Red
+  '#4169E1', // Royal Blue
+  '#9400D3', // Dark Violet
+  '#50C878', // Emerald Green
+  '#8B4513', // Saddle Brown
+  '#FFC300', // Marigold Yellow
+  '#CC5500', // Burnt Orange
+  '#00BFFF', // Deep Sky Blue
+  '#E0115F', // Ruby Pink
+  '#4B0082', // Indigo
+  '#228B22', // Forest Green
+  '#A800FF', // Electric Purple
+  '#007AA5', // Cerulean Blue
+  '#00A693'  // Persian Green
 ];
 
-const USERS = [
+// Pool of possible users - randomly select 3 each time
+const USER_POOL = [
   { 
-    id: 1, 
     name: 'Sarah', 
-    color: COLORS[0],
-    message: 'Help with my clothing brand idea'
-  },
-  { 
-    id: 2, 
-    name: 'Mike', 
     color: COLORS[1],
-    message: 'Design feedback needed'
+    message: 'I have three unrelated ideas. How do I choose the best one to focus on first?' // Idea Selection
   },
   { 
-    id: 3, 
+    name: 'Mike', 
+    color: COLORS[3],
+    message: 'How can I test the demand for my handmade product idea without spending much money?' // Low-Cost Validation
+  },
+  { 
     name: 'Emma', 
-    color: COLORS[2],
-    message: 'What do you think of this layout?'
+    color: COLORS[4],
+    message: 'I want a side hustle based on my existing skills. What are the high-demand options right now?' // Skill-Based Ideation
+  },
+  { 
+    name: 'Alex', 
+    color: COLORS[5],
+    message: 'What’s the simplest way to calculate if my side hustle idea is actually profitable?' // Feasibility & Profit Check
+  },
+  { 
+    name: 'Jordan', 
+    color: COLORS[6],
+    message: 'I’m completely stuck and need an idea. Can you help me brainstorm based on market gaps?' // Idea Generation
+  },
+  { 
+    name: 'Taylor', 
+    color: COLORS[7],
+    message: 'What should be my first marketing effort when launching a service-based side business?' // Initial Marketing
+  },
+  { 
+    name: 'Chris', 
+    color: COLORS[8],
+    message: 'I need to define my target customer for this idea. How do I create a strong customer profile?' // Target Audience Clarity
+  },
+  { 
+    name: 'Sam', 
+    color: COLORS[9],
+    message: 'What basic legal steps (e.g., permits, registrations) should I take for a local side business?' // Initial Legal Steps
+  },
+  { 
+    name: 'Casey', 
+    color: COLORS[10],
+    message: 'My idea solves a problem for me, but is it a problem for others? How do I confirm?' // Problem/Solution Validation
+  },
+  { 
+    name: 'Ryan', 
+    color: COLORS[11],
+    message: 'I need a clear, easy-to-manage budget plan for my first 6 months of operation.' // Initial Finance/Budgeting
+  },
+  { 
+    name: 'Jamie', 
+    color: COLORS[12],
+    message: 'What’s the fastest way to build a simple landing page to gauge interest in my product idea?' // MVP/Initial Presence
+  },
+  { 
+    name: 'Erin', 
+    color: COLORS[13],
+    message: 'I’m worried about competitors. How do I find my unique angle or competitive advantage?' // Differentiation
+  },
+  { 
+    name: 'Devon', 
+    color: COLORS[14],
+    message: 'I want to turn my hobby into income. How do I price my services fairly?' // Pricing Strategy
+  },
+  { 
+    name: 'Morgan', 
+    color: COLORS[15],
+    message: 'What are the essential tools (free or cheap) I need to run a small side hustle efficiently?' // Tool Recommendations
+  },
+  { 
+    name: 'Jessie', 
+    color: COLORS[16],
+    message: 'How do I balance my full-time job with the demands of starting a new side business?' // Time Management/Structure
   }
 ];
+
+// Function to randomly select 3 users from the pool
+const getRandomUsers = () => {
+  const shuffled = [...USER_POOL].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 3).map((user, index) => ({
+    id: index + 1,
+    ...user
+  }));
+};
+
+// Initialize with random users
+const USERS = getRandomUsers();
 
 // Predefined animation paths with smooth pauses
 const getAnimationPath = (id: number, width: number, height: number) => {
@@ -259,7 +347,7 @@ export default function CollaborativeToolAnimation({ className }: CollaborativeT
         x={ownCursor.x}
         y={ownCursor.y}
         name="You"
-        color={COLORS[7]}
+        color={COLORS[0]}
         opacity={1}
         showMessage={false}
       />

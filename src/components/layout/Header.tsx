@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ChatWindow from '@/components/ChatWindow';
 
 interface HeaderProps {
@@ -8,6 +8,20 @@ interface HeaderProps {
 
 export default function Header({ aiActive = false, className = '' }: HeaderProps) {
   const [showChatWindow, setShowChatWindow] = useState(false);
+  
+  // Preload the signup popup image
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = '/signup_poup1.png';
+    document.head.appendChild(link);
+    
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+  
   return (
     <header 
       className={`w-full fixed top-0 left-0 right-0 transition-opacity duration-500 ${className}`}

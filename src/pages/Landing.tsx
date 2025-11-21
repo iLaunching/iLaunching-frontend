@@ -192,7 +192,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className={`relative ${authState.stage === 'sales' ? 'h-screen' : 'min-h-screen'}`}>
       {/* Background with smooth transition */}
       <div className={`background-transition ${isTransitioning ? 'transitioning' : ''}`}>
         <div className={`background-layer ${backgroundType === 'ai' ? 'active' : 'inactive'}`}>
@@ -259,7 +259,7 @@ export default function Landing() {
       )}
       
       {/* Content overlay */}
-      <div className="relative flex flex-col min-h-screen">
+      <div className={`relative flex flex-col ${authState.stage === 'sales' ? 'hidden' : 'min-h-screen'}`}>
         <Header 
           aiActive={authState.stage === 'sales'} 
           className={authState.stage === 'introduction' || authState.stage === 'sales' ? 'opacity-0' : 'opacity-100'}
@@ -267,9 +267,7 @@ export default function Landing() {
         
         {/* Center the chat interface - Add top padding for sticky header */}
         <div 
-          className={`flex-1 flex items-center justify-center p-8 transition-opacity duration-1000 ${
-            authState.stage === 'sales' ? 'opacity-0' : 'opacity-100'
-          }`} 
+          className="flex-1 flex items-center justify-center p-8"
           style={{ paddingTop: '140px' }}
         >
           <div className="w-full max-w-[800px] flex flex-col" style={{ gap: '10px' }}>
@@ -395,7 +393,7 @@ export default function Landing() {
           width: 45vw; /* 45% of viewport width */
           min-width: 420px; /* Minimum width for usability */
           max-width: 800px; /* Maximum width for very large screens */
-          min-height: 100vh;
+          height: 100vh;
           padding: 0;
           margin: 0;
           animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -417,7 +415,7 @@ export default function Landing() {
           top: 0;
           z-index: 1;
           width: 55%; /* 55% of viewport width as requested */
-          min-height: 100vh;
+          height: 100vh;
           padding: 0;
           margin: 0;
           animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
