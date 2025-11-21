@@ -38,6 +38,38 @@ export function StreamingChatInterface({
 }: StreamingChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
+  const [isStreamingActive, setIsStreamingActive] = useState(false);
+
+  // Function to determine the correct padding class
+  const getPaddingClass = () => {
+    // During scrolling for multiple queries, use 100vh
+    if (needsScrollPadding) return 'pb-[100vh]';
+    
+    // If editor is not initialized yet, no padding
+    if (!editor) return '';
+    
+    try {
+      // When not streaming and editor has actual conversations, use 45vh
+      if (!isStreamingActive) {
+        const { doc } = editor.state;
+        let aiTurnCount = 0;
+        
+        doc.descendants((node: any) => {
+          if (node.type.name === 'aiTurn') {
+            aiTurnCount++;
+          }
+        });
+        
+        // Only add padding if there are actual completed conversations
+        if (aiTurnCount > 0) return 'pb-[45vh]';
+      }
+    } catch (error) {
+      console.warn('Error accessing editor state:', error);
+    }
+    
+    // Default: no padding when editor is empty or only has AI indicator
+    return '';
+  };
   const [showSignupPopup, setShowSignupPopup] = useState(false);
 
   // Initialize streaming with WebSocket
@@ -46,6 +78,7 @@ export function StreamingChatInterface({
     testMode,
     onStreamStart: (message) => {
       console.log('✅ Stream started:', message.metadata);
+      setIsStreamingActive(true);
       
       // Clear acknowledge message when streaming starts
       if (editor) {
@@ -82,8 +115,8 @@ export function StreamingChatInterface({
     },
     onStreamComplete: (message) => {
       console.log('✅ Stream completed:', message.total_chunks);
-      // Reset padding to half viewport height after streaming completes
-      setNeedsScrollPadding(false);
+      setIsStreamingActive(false);
+      // Don't set needsScrollPadding to false here - let getPaddingClass handle it
       
       // Call custom callback if provided
       onStreamComplete?.(message);
@@ -136,7 +169,7 @@ export function StreamingChatInterface({
     const { doc } = editor.state;
     let aiIndicatorPos = -1;
     
-    doc.descendants((node, pos) => {
+    doc.descendants((node: any, pos: any) => {
       if (node.type.name === 'aiIndicator') {
         aiIndicatorPos = pos;
         return false; // Stop early
@@ -200,19 +233,25 @@ export function StreamingChatInterface({
         try {
           const { doc } = editor.state;
           
-          // Check if editor has content (more than just the new query)
-          let nodeCount = 0;
-          doc.descendants(() => {
-            nodeCount++;
+          // Check if editor has meaningful content (not just AI indicator and the current query)
+          let aiTurnCount = 0;
+          let aiIndicatorCount = 0;
+          
+          doc.descendants((node: any) => {
+            if (node.type.name === 'aiTurn') {
+              aiTurnCount++;
+            } else if (node.type.name === 'aiIndicator') {
+              aiIndicatorCount++;
+            }
           });
           
-          // More than ~5 nodes means there's previous content
-          const hasPreviousContent = nodeCount > 5;
+          // If we only have 1 aiTurn (the one we just created) and an aiIndicator, no previous content
+          const hasOnlyCurrentQuery = aiTurnCount <= 1 && aiIndicatorCount <= 1;
           
-          if (!hasPreviousContent) {
+          if (hasOnlyCurrentQuery) {
             // No previous content, no padding needed
             setNeedsScrollPadding(false);
-            console.log('📜 Skipping scroll - editor is empty or first query');
+            console.log('📜 Skipping scroll - editor only has AI node and current query');
             // Start streaming immediately without scrolling
             streaming.addToQueue(queryText, {
               content_type: 'markdown',
@@ -253,7 +292,7 @@ export function StreamingChatInterface({
                 console.log('   document height:', beforeScrollHeight);
                 console.log('   window height:', beforeClientHeight);
                 console.log('   query position in doc:', lastQueryPos);
-                console.log('   node count:', nodeCount);
+                console.log('   aiTurn count:', aiTurnCount);
                 
                 // Get the query's absolute position on the page
                 const queryRect = queryParent.getBoundingClientRect();
@@ -286,7 +325,7 @@ export function StreamingChatInterface({
                 console.log('📜 Scrolling window to align Query');
                 
                 // Listen for scroll end instead of using timer
-                let scrollEndTimer: NodeJS.Timeout;
+                let scrollEndTimer: number;
                 const handleScrollEnd = () => {
                   clearTimeout(scrollEndTimer);
                   scrollEndTimer = setTimeout(() => {
@@ -358,7 +397,7 @@ export function StreamingChatInterface({
       
       <div className={`relative ${className}`} style={style}>
         {/* Editor Container with dynamic padding */}
-        <div className={`container mx-auto px-4 ${needsScrollPadding ? 'pb-[100vh]' : 'pb-[50vh]'}`}>
+        <div className={`container mx-auto px-4 ${getPaddingClass()}`}>
         <div className={`max-w-${maxWidth} mx-auto py-4`}>
           <StreamingEditor
             onEditorReady={setEditor}

@@ -1,5 +1,5 @@
 import { X, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface SignupPopupProps {
   isOpen: boolean;
@@ -23,6 +23,20 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const isEmailValid = email.trim() !== '' && isValidEmail(email);
   const isPasswordValid = password.length >= 8;
   const isConfirmationValid = password === confirmPassword && isPasswordValid;
+
+  // Add/remove body class when popup opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('popup-open');
+    } else {
+      document.body.classList.remove('popup-open');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('popup-open');
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

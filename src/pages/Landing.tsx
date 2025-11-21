@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
 import { StreamingChatInterface } from '@/components/StreamingChatInterface';
+import CollaborativeToolAnimation from '@/components/CollaborativeToolAnimation';
 import { UserPlus, LogIn } from 'lucide-react';
 import { 
   getRandomWelcomeMessage, 
@@ -273,6 +274,20 @@ export default function Landing() {
           <DeepPinkSeaBackground />
         </div>
       </div>
+      
+      {/* Collaborative Cursor Animation - Show only in sales stage */}
+      {authState.stage === 'sales' && (
+        <>
+          <CollaborativeToolAnimation className="fixed inset-0 z-10" />
+          <style>{`
+            body:not(.popup-open), 
+            body:not(.popup-open) *, 
+            body:not(.popup-open) *:hover {
+              cursor: none !important;
+            }
+          `}</style>
+        </>
+      )}
       
       {/* Sticky Chat Interface - Show in sales stage */}
       {(showChatWindow || authState.stage === 'sales') && (
