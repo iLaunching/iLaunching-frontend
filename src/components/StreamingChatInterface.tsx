@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { StreamingEditor } from './streaming/StreamingEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
 import ChatWindowPrompt from './ChatWindowPrompt';
 import SignupPopup from './SignupPopup';
 import { getRandomSubmitAcknowledgeMessage } from '../constants';
+import { SYSTEM_MESSAGE_TYPES, type SystemMessageType } from '../constants/systemMessages';
 
 interface StreamingChatInterfaceProps {
   apiUrl?: string;
@@ -39,6 +40,7 @@ export function StreamingChatInterface({
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
   const [isStreamingActive, setIsStreamingActive] = useState(false);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
   // Function to determine the correct padding class
   const getPaddingClass = () => {
@@ -128,6 +130,62 @@ export function StreamingChatInterface({
       onError?.(error);
     }
   });
+
+  /**
+   * Send system message through API
+   * Message will be streamed back like an LLM response
+   */
+  const sendSystemMessage = useCallback(async (messageType: SystemMessageType) => {
+    if (!streaming?.addToQueue) {
+      console.warn('⚠️ Streaming not ready, cannot send system message');
+      return;
+    }
+
+    try {
+      console.log('📤 Sending system message:', messageType);
+      
+      // Send through streaming queue - it will go to backend API
+      // The message type itself is the content (it's a special flag the backend recognizes)
+      streaming.addToQueue(messageType, {
+        content_type: 'markdown',
+        speed: 'normal',
+      });
+      
+      console.log('✅ System message queued:', messageType);
+    } catch (error) {
+      console.error('❌ Error sending system message:', error);
+    }
+  }, [streaming]);
+
+  /**
+   * Send welcome message when component mounts
+   */
+  useEffect(() => {
+    if (editor && streaming && !hasShownWelcome) {
+      // Check if editor is truly empty (no aiTurn nodes)
+      const { doc } = editor.state;
+      let aiTurnCount = 0;
+      
+      doc.descendants((node: any) => {
+        if (node.type.name === 'aiTurn') {
+          aiTurnCount++;
+        }
+      });
+      
+      // Only send welcome if editor is empty
+      if (aiTurnCount === 0) {
+        setHasShownWelcome(true);
+        
+        // Small delay to let WebSocket connect and UI settle
+        const timer = setTimeout(() => {
+          console.log('🎉 Sending welcome message...');
+          sendSystemMessage(SYSTEM_MESSAGE_TYPES.SALES_WELCOME);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [editor, streaming, hasShownWelcome, sendSystemMessage]);
 
   const handleQuerySubmit = (content: any) => {
     if (!editor) return;
