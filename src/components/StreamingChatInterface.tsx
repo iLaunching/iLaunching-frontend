@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { StreamingEditor } from './streaming/StreamingEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
 import ChatWindowPrompt from './ChatWindowPrompt';
@@ -40,12 +40,12 @@ export function StreamingChatInterface({
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
   const [isStreamingActive, setIsStreamingActive] = useState(false);
-  const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const hasShownWelcomeRef = useRef(false);
 
   // Reset welcome flag when component mounts (entering sales stage)
   useEffect(() => {
     console.log('🎬 StreamingChatInterface mounted - resetting welcome flag');
-    setHasShownWelcome(false);
+    hasShownWelcomeRef.current = false;
   }, []); // Empty deps - only run on mount
 
   // Function to determine the correct padding class
@@ -170,13 +170,13 @@ export function StreamingChatInterface({
     console.log('🔍 Welcome effect triggered:', { 
       hasEditor: !!editor, 
       hasStreaming: !!streaming, 
-      hasShownWelcome,
+      hasShownWelcome: hasShownWelcomeRef.current,
       streamingReady: !!streaming?.addToQueue,
       isConnected: streaming?.isConnected
     });
     
     // Wait for editor, streaming, connection, and ensure we haven't shown welcome yet
-    if (editor && streaming?.addToQueue && streaming?.isConnected && !hasShownWelcome) {
+    if (editor && streaming?.addToQueue && streaming?.isConnected && !hasShownWelcomeRef.current) {
       // Check if editor is truly empty (no aiTurn nodes)
       const { doc } = editor.state;
       let aiTurnCount = 0;
@@ -192,7 +192,8 @@ export function StreamingChatInterface({
       // Only send welcome if editor is empty
       if (aiTurnCount === 0) {
         console.log('✅ All conditions met, setting up welcome message timer...');
-        setHasShownWelcome(true);
+        // Set flag BEFORE timer to prevent re-runs
+        hasShownWelcomeRef.current = true;
         
         // Small delay to ensure WebSocket is fully ready
         const timer = setTimeout(() => {
@@ -212,10 +213,10 @@ export function StreamingChatInterface({
         needsEditor: !editor,
         needsStreaming: !streaming,
         needsConnection: !streaming?.isConnected,
-        alreadyShown: hasShownWelcome
+        alreadyShown: hasShownWelcomeRef.current
       });
     }
-  }, [editor, streaming, streaming?.isConnected, hasShownWelcome, sendSystemMessage]);
+  }, [editor, streaming?.isConnected, sendSystemMessage]);
 
   const handleQuerySubmit = (content: any) => {
     if (!editor) return;
