@@ -84,13 +84,13 @@
    ============================================ */
 
 /* Lists - NO ANIMATION */
-.response-streaming .response-text-area li {
+.response-streaming .response-text-area li:not([data-type="taskItem"]) {
   animation: none !important;
   display: list-item;
 }
 
 /* Content within list items - NO ANIMATION */
-.response-streaming .response-text-area li > * {
+.response-streaming .response-text-area li:not([data-type="taskItem"]) > * {
   display: inline-block;
   animation: none !important;
 }
@@ -99,6 +99,28 @@
 .response-streaming .response-text-area [data-type="taskList"],
 .response-streaming .response-text-area [data-type="taskItem"] {
   animation: none !important;
+}
+
+/* Task list layout should remain flex so checkbox + text stay inline */
+.response-streaming .response-text-area ul[data-type="taskList"] li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.response-streaming .response-text-area .task-item-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  min-width: 26px;
+}
+
+.response-streaming .response-text-area .task-item-inline-content {
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* ============================================

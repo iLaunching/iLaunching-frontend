@@ -18,7 +18,7 @@ import { Typography } from '@tiptap/extension-typography';
 import { CharacterCount } from '@tiptap/extension-character-count';
 import { Focus } from '@tiptap/extension-focus';
 import { TaskList } from '@tiptap/extension-task-list';
-import { TaskItem } from '@tiptap/extension-task-item';
+import { StreamingTaskItem } from '../tiptap/extensions/StreamingTaskItem';
 import { Mathematics } from '@tiptap/extension-mathematics';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { StreamContent } from '../tiptap/extensions/StreamContent';
@@ -105,7 +105,7 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
       
       // Task lists
       TaskList,
-      TaskItem.configure({
+      StreamingTaskItem.configure({
         nested: true,
       }),
       
@@ -338,40 +338,72 @@ export const StreamingEditor: React.FC<StreamingEditorProps> = ({
           list-style: none;
           padding-left: 0;
           margin: 12px 0;
+          
         }
         
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li {
+        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li[data-type="taskItem"] {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
+          justify-content: flex-start;
           gap: 12px;
           padding: 6px 0;
+          width: 100%;
+          list-style: none;
+         
         }
 
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] > li > label {
-          display: flex;
+        .streaming-editor-wrapper .task-item-checkbox-wrapper {
+          display: inline-flex;
           align-items: center;
-          gap: 6px;
+          justify-content: center;
           margin: 0;
           padding: 0;
-          flex: 0 0 auto;
-          width: auto;
-          min-width: fit-content;
+          flex: 0 0 26px;
+          width: 26px;
+          min-width: 26px;
+          
         }
 
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] > li > div {
-          flex: 1;
-          display: flex;
-          align-items: center;
+        .streaming-editor-wrapper .task-item-inline-content {
+          flex: 1 1 auto;
+          min-width: 0;
+          display: inline-flex;
+          flex-direction: column;
+          gap: 2px;
+         
+         
+          margin-left: 15px;
+          padding:0px;
+        }
+
+        .streaming-editor-wrapper .task-item-inline-content > * {
+          margin: 0;
+          
+        }
+
+        .streaming-editor-wrapper .task-item-checkbox-visual {
+          display: none;
+        }
+        .streaming-editor-wrapper li[data-type="taskItem"][data-checked="true"] .task-item-inline-content {
+          color: #6b7280;
+          text-decoration: line-through;
         }
         
-        .streaming-editor-wrapper .ProseMirror ul[data-type="taskList"] li input[type="checkbox"] {
-          width: 22px;
-          height: 22px;
+        .streaming-editor-wrapper li[data-type="taskItem"][data-checked="true"] .task-item-inline-content * {
+          color: inherit;
+          text-decoration: inherit;
+        }
+        
+        .streaming-editor-wrapper .task-item-checkbox-wrapper input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
           border-radius: 6px;
           border: 2px solid #7c3aed;
           accent-color: #7c3aed;
           cursor: pointer;
-          margin: 0;
+          margin-right: 0px;
+          
+
           flex-shrink: 0;
           display: grid;
           place-items: center;
