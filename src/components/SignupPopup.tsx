@@ -35,6 +35,13 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     window.location.href = googleAuthUrl;
   };
 
+  // Handle Facebook OAuth login
+  const handleFacebookLogin = () => {
+    // Redirect to backend OAuth endpoint
+    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    window.location.href = facebookAuthUrl;
+  };
+
   // Add/remove body class when popup opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -151,6 +158,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               {/* Continue with Facebook */}
               <button
                 type="button"
+                onClick={handleFacebookLogin}
                 className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
@@ -393,6 +401,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   {/* Continue with Facebook */}
                   <button
                     type="button"
+                    onClick={handleFacebookLogin}
                     className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
                   >
                     <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
