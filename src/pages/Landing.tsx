@@ -17,6 +17,7 @@ import {
   APP_CONFIG 
 } from '@/constants';
 import { useLandingAuth } from '@/hooks/useLandingAuth';
+import { authApi } from '@/api/auth';
 
 
 export default function Landing() {
@@ -40,6 +41,20 @@ export default function Landing() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   // State for chat window
   const [showChatWindow, setShowChatWindow] = useState(false);
+  
+  // Handle OAuth callback on page load
+  useEffect(() => {
+    const oauthResult = authApi.handleOAuthCallback();
+    
+    if (oauthResult.success) {
+      console.log('OAuth authentication successful:', oauthResult.action);
+      // You can redirect to dashboard or show success message
+      // For now, we'll just log it
+    } else if (oauthResult.error) {
+      console.error('OAuth authentication failed:', oauthResult.error);
+      // You can show an error message to the user
+    }
+  }, []);
   
   // Initialize with welcome message on first load
   useEffect(() => {
