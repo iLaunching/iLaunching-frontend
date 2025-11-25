@@ -42,6 +42,13 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     window.location.href = facebookAuthUrl;
   };
 
+  // Handle Microsoft OAuth login
+  const handleMicrosoftLogin = () => {
+    // Redirect to backend OAuth endpoint
+    const microsoftAuthUrl = `${API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    window.location.href = microsoftAuthUrl;
+  };
+
   // Add/remove body class when popup opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -413,6 +420,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   {/* Continue with Microsoft */}
                   <button
                     type="button"
+                    onClick={handleMicrosoftLogin}
                     className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
                   >
                     <svg className="w-5 h-5 absolute left-4" fill="#00A4EF" viewBox="0 0 24 24">
