@@ -14,6 +14,9 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
+  // Get API URL from environment
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  
   // Email validation
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,6 +26,13 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const isEmailValid = email.trim() !== '' && isValidEmail(email);
   const isPasswordValid = password.length >= 8;
   const isConfirmationValid = password === confirmPassword && isPasswordValid;
+
+  // Handle Google OAuth login
+  const handleGoogleLogin = () => {
+    // Redirect to backend OAuth endpoint
+    const googleAuthUrl = `${API_URL}/api/v1/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    window.location.href = googleAuthUrl;
+  };
 
   // Add/remove body class when popup opens/closes
   useEffect(() => {
@@ -113,6 +123,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               {/* Continue with Email */}
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">
@@ -366,6 +377,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   {/* Continue with Google */}
                   <button
                     type="button"
+                    onClick={handleGoogleLogin}
                     className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
                   >
                     <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">

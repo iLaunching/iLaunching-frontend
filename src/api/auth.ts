@@ -251,6 +251,52 @@ export const authApi = {
     }
     return null;
   },
+
+  /**
+   * Handle OAuth callback - extract tokens from URL and store them
+   * Call this on your callback/redirect page after OAuth flow
+   */
+  handleOAuthCallback(): { success: boolean; action?: string; error?: string } {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Check for errors
+    const error = params.get('auth_error');
+    if (error) {
+      return { success: false, error };
+    }
+    
+    // Check for successful authentication
+    const authSuccess = params.get('auth_success');
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+    const action = params.get('action');
+    
+    if (authSuccess === 'true' && accessToken && refreshToken) {
+      // Store tokens
+      localStorage.setItem('access_token', accessToken);
+      localStorage.setItem('refresh_token', refreshToken);
+      
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      return { success: true, action: action || 'login' };
+    }
+    
+    return { success: false };
+  },
+
+  /**
+   * Check OAuth provider status
+   */
+  async getOAuthStatus(): Promise<{ google_enabled: boolean; facebook_enabled: boolean; microsoft_enabled: boolean }> {
+    try {
+      const response = await apiClient.get('/auth/oauth/status');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get OAuth status:', error);
+      return { google_enabled: false, facebook_enabled: false, microsoft_enabled: false };
+    }
+  },
 };
 
 export default apiClient;
