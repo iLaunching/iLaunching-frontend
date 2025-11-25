@@ -48,11 +48,21 @@ export default function Landing() {
     
     if (oauthResult.success) {
       console.log('OAuth authentication successful:', oauthResult.action);
-      // You can redirect to dashboard or show success message
-      // For now, we'll just log it
+      
+      // Fetch user info to confirm authentication
+      authApi.getMe()
+        .then(response => {
+          console.log('User authenticated via OAuth:', response.user);
+          // Show success - user is now logged in
+          // You can redirect to dashboard or update UI to show logged-in state
+          alert(`Welcome ${response.user.email}! You're now logged in via Google.`);
+        })
+        .catch(error => {
+          console.error('Failed to fetch user info:', error);
+        });
     } else if (oauthResult.error) {
       console.error('OAuth authentication failed:', oauthResult.error);
-      // You can show an error message to the user
+      alert(`Authentication failed: ${oauthResult.error}`);
     }
   }, []);
   
