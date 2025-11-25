@@ -30,7 +30,8 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   // Handle Google OAuth login
   const handleGoogleLogin = () => {
     // Redirect to backend OAuth endpoint
-    const googleAuthUrl = `${API_URL}/api/v1/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    // API_URL already includes /api/v1
+    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
     window.location.href = googleAuthUrl;
   };
 
