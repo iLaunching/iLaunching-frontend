@@ -1,18 +1,23 @@
 import { X, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { authApi } from '../api/auth';
 
 interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type AuthView = 'main' | 'email' | 'password' | 'options';
+type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
 
 const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [currentView, setCurrentView] = useState<AuthView>('main');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -47,6 +52,49 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     // Redirect to backend OAuth endpoint
     const microsoftAuthUrl = `${API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
     window.location.href = microsoftAuthUrl;
+  };
+
+  // Handle sending verification code
+  const handleSendVerificationCode = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await authApi.sendVerificationCode(email);
+      setCodeSent(true);
+      setCurrentView('verify');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to send verification code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle verification code submission
+  const handleVerifyCode = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      // Verify the code
+      await authApi.verifyCode(email, verificationCode);
+      
+      // Code verified, now create the account
+      const response = await authApi.signup(email, password);
+      
+      // Success! Close popup and redirect/refresh
+      onClose();
+      window.location.reload();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Verification failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle resending verification code
+  const handleResendCode = async () => {
+    await handleSendVerificationCode();
   };
 
   // Add/remove body class when popup opens/closes
@@ -345,21 +393,101 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   placeholder="Confirm Password"
                   onKeyDown={e => {
                     if (e.key === 'Enter' && isConfirmationValid) {
-                      // handle login here
+                      handleSendVerificationCode();
                     }
                   }}
                 />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
                 <button
                   type="button"
-                  disabled={!isConfirmationValid}
+                  disabled={!isConfirmationValid || isLoading}
+                  onClick={handleSendVerificationCode}
                   className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
-                    isConfirmationValid
+                    isConfirmationValid && !isLoading
                       ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  // onClick={...} // handle login here
                 >
-                  login
+                  {isLoading ? 'Sending code...' : 'Continue'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Verification Code View */}
+          {currentView === 'verify' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+            >
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => setCurrentView('password')} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">Verify your email</h2>
+                </div>
+                <p className="text-gray-700 break-all">We sent a 6-digit code to {email}</p>
+              </div>
+
+              {/* Verification Code Input */}
+              <div className="px-8 pb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter verification code
+                </label>
+                <input
+                  type="text"
+                  value={verificationCode}
+                  onChange={e => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setVerificationCode(value);
+                  }}
+                  maxLength={6}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-center text-2xl tracking-widest font-mono"
+                  placeholder="000000"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && verificationCode.length === 6) {
+                      handleVerifyCode();
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  Code expires in 10 minutes
+                </p>
+                
+                {error && (
+                  <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+                )}
+                
+                <button
+                  type="button"
+                  disabled={verificationCode.length !== 6 || isLoading}
+                  onClick={handleVerifyCode}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    verificationCode.length === 6 && !isLoading
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isLoading ? 'Verifying...' : 'Verify and Create Account'}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  disabled={isLoading}
+                  className="w-full mt-3 py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Resend code
                 </button>
               </div>
             </div>

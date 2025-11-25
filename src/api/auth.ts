@@ -297,6 +297,32 @@ export const authApi = {
       return { google_enabled: false, facebook_enabled: false, microsoft_enabled: false };
     }
   },
+
+  /**
+   * Send verification code to email
+   */
+  async sendVerificationCode(email: string): Promise<{ success: boolean; message: string; expires_in_minutes: number }> {
+    try {
+      const response = await apiClient.post('/auth/send-verification-code', { email });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to send verification code:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Verify email code
+   */
+  async verifyCode(email: string, code: string): Promise<{ verified: boolean; message: string }> {
+    try {
+      const response = await apiClient.post('/auth/verify-code', { email, code });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to verify code:', error);
+      throw error;
+    }
+  },
 };
 
 export default apiClient;
