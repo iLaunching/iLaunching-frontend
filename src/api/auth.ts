@@ -89,6 +89,15 @@ export interface CheckEmailResponse {
   message: string;
 }
 
+export interface CheckEmailSignupResponse {
+  action: 'login' | 'signup';
+  message: string;
+  logged_in: boolean;
+  access_token?: string;
+  refresh_token?: string;
+  user?: User;
+}
+
 export interface AuthResponse {
   user: User;
   access_token: string;
@@ -114,6 +123,29 @@ export const authApi = {
       return response.data;
     } catch (error) {
       console.error('Email check failed:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Check email during signup flow - logs in if user exists with matching password,
+   * or returns action to proceed with signup if new user
+   */
+  async checkEmailSignup(email: string, password: string): Promise<CheckEmailSignupResponse> {
+    try {
+      const response = await apiClient.post('/auth/check-email-signup', { email, password });
+      const data: CheckEmailSignupResponse = response.data;
+      
+      // If logged in, store tokens
+      if (data.logged_in && data.access_token && data.refresh_token && data.user) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Email signup check failed:', error);
       throw error;
     }
   },

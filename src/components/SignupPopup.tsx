@@ -54,17 +54,27 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     window.location.href = microsoftAuthUrl;
   };
 
-  // Handle sending verification code
-  const handleSendVerificationCode = async () => {
+  // Handle checking email and password - logs in if user exists, or starts signup
+  const handleCheckEmailAndPassword = async () => {
     setIsLoading(true);
     setError('');
     
     try {
-      await authApi.sendVerificationCode(email);
-      setCodeSent(true);
-      setCurrentView('verify');
+      const result = await authApi.checkEmailSignup(email, password);
+      
+      if (result.action === 'login') {
+        // User exists and logged in successfully
+        onClose();
+        window.location.reload();
+      } else if (result.action === 'signup') {
+        // New user - proceed with email verification
+        await authApi.sendVerificationCode(email);
+        setCodeSent(true);
+        setCurrentView('verify');
+      }
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to send verification code');
+      const errorMessage = err.response?.data?.detail || 'Failed to process request';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +104,18 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
 
   // Handle resending verification code
   const handleResendCode = async () => {
-    await handleSendVerificationCode();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await authApi.sendVerificationCode(email);
+      setCodeSent(true);
+      setError('');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to resend code');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Add/remove body class when popup opens/closes
@@ -393,7 +414,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   placeholder="Confirm Password"
                   onKeyDown={e => {
                     if (e.key === 'Enter' && isConfirmationValid) {
-                      handleSendVerificationCode();
+                      handleCheckEmailAndPassword();
                     }
                   }}
                 />
@@ -403,14 +424,14 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                 <button
                   type="button"
                   disabled={!isConfirmationValid || isLoading}
-                  onClick={handleSendVerificationCode}
+                  onClick={handleCheckEmailAndPassword}
                   className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
                     isConfirmationValid && !isLoading
                       ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {isLoading ? 'Sending code...' : 'Continue'}
+                  {isLoading ? 'Checking...' : 'Continue'}
                 </button>
               </div>
             </div>
