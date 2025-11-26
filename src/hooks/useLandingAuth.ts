@@ -153,7 +153,7 @@ export function useLandingAuth() {
   };
 
   /**
-   * Handle name submission (new user) - Store name and go to password creation
+   * Handle name submission (new user) - Store name and go to sales stage
    */
   const handleNameSubmit = (name: string): void => {
     // Handle continue action after name (go to password creation)
@@ -174,12 +174,12 @@ export function useLandingAuth() {
       return;
     }
 
-    // Store name and move to password creation
+    // Store name and move to sales stage (streaming chat with signup button)
     setAuthState((prev: AuthState) => ({
       ...prev,
       name: name.trim(),
-      stage: 'password_create',
-      message: "Perfect! Now let's secure your account. Create a password (at least 8 characters):",
+      stage: 'sales',
+      message: '',
       isProcessing: false,
       error: null,
     }));
