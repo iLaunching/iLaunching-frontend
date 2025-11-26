@@ -26,7 +26,6 @@ export default function RichTextInput({
   className = "",
   maxHeight = 200,
   onVoiceClick,
-  onPlusClick,
   backgroundType = 'connected',
   showGetStarted = false,
   onGetStartedClick
