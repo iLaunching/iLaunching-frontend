@@ -105,7 +105,7 @@ export const AITurn = Node.create<AITurnOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(AITurnComponent);
+    return ReactNodeViewRenderer(AITurnComponent as any);
   },
 
   addCommands() {

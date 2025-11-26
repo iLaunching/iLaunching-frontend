@@ -122,31 +122,4 @@ export function ExampleMenuUsage() {
   );
 }
 
-// CSS for custom styling (add to your global CSS or component)
-const customStyles = `
-  .custom-trigger {
-    background: #3b82f6 !important;
-    color: white !important;
-    border-color: #3b82f6 !important;
-  }
-
-  .custom-trigger:hover {
-    background: #2563eb !important;
-  }
-
-  .custom-gradient-trigger {
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-  }
-
-  .text-red-600 {
-    color: #dc2626 !important;
-  }
-
-  .hover\\:bg-red-50:hover {
-    background-color: #fef2f2 !important;
-  }
-`;
-
 export default ExampleMenuUsage;

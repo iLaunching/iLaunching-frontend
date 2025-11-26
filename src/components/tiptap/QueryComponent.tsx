@@ -1,25 +1,8 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
+import type { ReactNodeViewProps } from '@tiptap/react';
 
-interface QueryComponentProps {
-  node: {
-    attrs: {
-      user_avatar_type: string;
-      user_avatar_image_link: string;
-      user_avatar_svg: string;
-      user_avatar_text: string;
-      user_first_name: string;
-      user_surname: string;
-      user_id: string;
-      text: string;
-      query_id: string;
-    };
-  };
-  updateAttributes: (attributes: any) => void;
-  deleteNode: () => void;
-}
-
-const QueryComponent: React.FC<QueryComponentProps> = memo(({ node }) => {
+const QueryComponent: React.FC<ReactNodeViewProps> = memo(({ node }) => {
   const { attrs } = node;
   const contentWrapperRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLDivElement>(null);

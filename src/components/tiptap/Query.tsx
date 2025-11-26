@@ -76,7 +76,7 @@ export const Query = Node.create<QueryOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(QueryComponent);
+    return ReactNodeViewRenderer(QueryComponent as any);
   },
 
   addCommands() {

@@ -1,20 +1,8 @@
 import React, { memo } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
+import type { ReactNodeViewProps } from '@tiptap/react';
 
-interface AITurnComponentProps {
-  node: {
-    attrs: {
-      turnId: string;
-      timestamp: number;
-      summary: string;
-      cites: any[];
-    };
-  };
-  updateAttributes: (attributes: any) => void;
-  deleteNode: () => void;
-}
-
-const AITurnComponent: React.FC<AITurnComponentProps> = memo(({ node, updateAttributes }) => {
+const AITurnComponent: React.FC<ReactNodeViewProps> = memo(({ node }) => {
   const { attrs } = node;
 
   return (
