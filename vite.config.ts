@@ -15,4 +15,13 @@ export default defineConfig({
     port: 5174,
     strictPort: true,
   },
+  preview: {
+    host: true,
+    port: 5174,
+    strictPort: false,
+    allowedHosts: [
+      'ilaunching-frontend-production.up.railway.app',
+      '.up.railway.app',
+    ],
+  },
 })
