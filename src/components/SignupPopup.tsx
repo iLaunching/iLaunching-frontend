@@ -18,6 +18,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [codeSent, setCodeSent] = useState(false);
+  const [userExists, setUserExists] = useState(false);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -54,27 +55,50 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     window.location.href = microsoftAuthUrl;
   };
 
-  // Handle checking email and password - logs in if user exists, or starts signup
-  const handleCheckEmailAndPassword = async () => {
+  // Handle checking if email exists before moving to password
+  const handleEmailContinue = async () => {
     setIsLoading(true);
     setError('');
     
     try {
-      const result = await authApi.checkEmailSignup(email, password);
-      
-      if (result.action === 'login') {
-        // User exists and logged in successfully
-        onClose();
-        window.location.reload();
-      } else if (result.action === 'signup') {
-        // New user - proceed with email verification
-        await authApi.sendVerificationCode(email);
-        setCodeSent(true);
-        setCurrentView('verify');
-      }
+      const result = await authApi.checkEmail(email);
+      setUserExists(result.exists);
+      setCurrentView('password');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Failed to process request';
-      setError(errorMessage);
+      setError(err.response?.data?.detail || 'Failed to check email');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle login for existing users
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await authApi.login(email, password);
+      onClose();
+      window.location.reload();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Incorrect password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle signup for new users - send verification code
+  const handleSignupContinue = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      // Send verification code
+      await authApi.sendVerificationCode(email);
+      setCodeSent(true);
+      setCurrentView('verify');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to send verification code');
     } finally {
       setIsLoading(false);
     }
@@ -343,24 +367,25 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="name@example.com"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && isEmailValid) {
-                      setCurrentView('password');
+                    if (e.key === 'Enter' && isEmailValid && !isLoading) {
+                      handleEmailContinue();
                     }
                   }}
                 />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
                 <button 
                   type="button"
-                  disabled={!isEmailValid}
+                  disabled={!isEmailValid || isLoading}
                   className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
-                    isEmailValid 
+                    isEmailValid && !isLoading
                       ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  onClick={() => {
-                    if (isEmailValid) setCurrentView('password');
-                  }}
+                  onClick={handleEmailContinue}
                 >
-                  Continue
+                  {isLoading ? 'Checking...' : 'Continue'}
                 </button>
               </div>
             </div>
@@ -378,21 +403,30 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               <div className="px-8 pt-8 pb-6">
                 <div className="flex items-center gap-3 mb-5">
                   <button 
-                    onClick={() => setCurrentView('email')} 
+                    onClick={() => {
+                      setCurrentView('email');
+                      setError('');
+                      setPassword('');
+                      setConfirmPassword('');
+                    }} 
                     className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
                     type="button"
                   >
                     <ArrowLeft className="w-5 h-5 text-gray-700" />
                   </button>
-                  <h2 className="text-2xl font-semibold text-black">Log into your account</h2>
+                  <h2 className="text-2xl font-semibold text-black">
+                    {userExists ? 'Welcome back!' : 'Create your account'}
+                  </h2>
                 </div>
-                <p className="text-gray-700 break-all">with {email}</p>
+                <p className="text-gray-700 break-all">
+                  {userExists ? `Log in with ${email}` : `Set up your account for ${email}`}
+                </p>
               </div>
 
               {/* Password Input Form */}
               <div className="px-8 pb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  set a password for your account
+                  {userExists ? 'Password' : 'Create a password'}
                 </label>
                 <input
                   type="password"
@@ -400,38 +434,54 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
                   onChange={e => setPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="Password"
-                />
-                <hr className="my-4 border-gray-300" style={{ borderWidth: 2 }} />
-                <p className="text-xs text-gray-500 mb-4">Use 8 or more characters with a mix of letters, numbers & symbols.</p>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  confirm yor password
-                </label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Confirm Password"
                   onKeyDown={e => {
-                    if (e.key === 'Enter' && isConfirmationValid) {
-                      handleCheckEmailAndPassword();
+                    if (e.key === 'Enter') {
+                      if (userExists && isPasswordValid) {
+                        handleLogin();
+                      } else if (!userExists && isConfirmationValid) {
+                        handleSignupContinue();
+                      }
                     }
                   }}
                 />
+                
+                {/* Show confirm password section only for new signups */}
+                {!userExists && (
+                  <>
+                    <hr className="my-4 border-gray-300" style={{ borderWidth: 2 }} />
+                    <p className="text-xs text-gray-500 mb-4">Use 8 or more characters with a mix of letters, numbers & symbols.</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      confirm your password
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Confirm Password"
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && isConfirmationValid) {
+                          handleSignupContinue();
+                        }
+                      }}
+                    />
+                  </>
+                )}
+                
                 {error && (
                   <p className="text-red-500 text-sm mt-2">{error}</p>
                 )}
                 <button
                   type="button"
-                  disabled={!isConfirmationValid || isLoading}
-                  onClick={handleCheckEmailAndPassword}
+                  disabled={(userExists ? !isPasswordValid : !isConfirmationValid) || isLoading}
+                  onClick={userExists ? handleLogin : handleSignupContinue}
                   className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
-                    isConfirmationValid && !isLoading
+                    (userExists ? isPasswordValid : isConfirmationValid) && !isLoading
                       ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {isLoading ? 'Checking...' : 'Continue'}
+                  {isLoading ? (userExists ? 'Logging in...' : 'Sending code...') : (userExists ? 'Log in' : 'Continue')}
                 </button>
               </div>
             </div>
