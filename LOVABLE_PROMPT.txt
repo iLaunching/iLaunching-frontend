@@ -1,0 +1,242 @@
+# 📋 LOVABLE.DEV PROMPT - STRUCTURE & BOILERPLATE ONLY
+
+Create the **project structure and boilerplate setup** for "iLaunching" - an AI-powered business intelligence platform. 
+
+**IMPORTANT:** Generate only the folder structure, configuration files, API setup, routing skeleton, and TypeScript types. Create **placeholder components** (simple divs with component names). I will build the actual UI components myself.
+
+**TECH STACK:**
+- React 18 + TypeScript + Vite
+- Tailwind CSS + shadcn/ui components
+- React Router v6, React Query, Zustand
+- React Hook Form + Zod, Axios, Socket.io-client
+- Lucide React icons
+
+**PROJECT STRUCTURE:**
+```
+src/
+├── components/
+│   ├── ui/              # shadcn components (Button, Input, Card, Form, Alert)
+│   ├── layout/          # Header, Footer (PLACEHOLDER ONLY)
+│   └── auth/            # LoginForm, SignupForm (PLACEHOLDER ONLY)
+├── pages/
+│   ├── Landing.tsx      # PLACEHOLDER: <div>Landing Page</div>
+│   ├── Login.tsx        # PLACEHOLDER: <div>Login Page</div>
+│   ├── Signup.tsx       # PLACEHOLDER: <div>Signup Page</div>
+│   └── Dashboard.tsx    # PLACEHOLDER: <div>Dashboard</div>
+├── lib/
+│   └── api.ts           # FULL IMPLEMENTATION: Axios instance + interceptors
+├── hooks/
+│   └── useAuth.ts       # FULL IMPLEMENTATION: Auth hook with React Query
+├── store/
+│   └── authStore.ts     # FULL IMPLEMENTATION: Zustand store
+├── types/
+│   └── index.ts         # FULL IMPLEMENTATION: TypeScript interfaces
+└── App.tsx              # FULL IMPLEMENTATION: Routing + protected routes
+```
+
+**WHAT TO GENERATE:**
+
+**1. FULL IMPLEMENTATION (Complete Working Code):**
+- ✅ `vite.config.ts` - Vite configuration
+- ✅ `tailwind.config.js` - Tailwind with indigo/purple theme
+- ✅ `tsconfig.json` - TypeScript strict config
+- ✅ `package.json` - All dependencies
+- ✅ `.env.example` - Environment variables
+- ✅ `src/lib/api.ts` - Axios instance + JWT interceptors
+- ✅ `src/hooks/useAuth.ts` - Auth mutations (signup, login, logout)
+- ✅ `src/store/authStore.ts` - Zustand store with localStorage persistence
+- ✅ `src/types/index.ts` - TypeScript interfaces
+- ✅ `src/App.tsx` - React Router with protected routes
+- ✅ `src/components/ui/*` - shadcn components (Button, Input, Card, Form, Alert)
+
+**2. PLACEHOLDER COMPONENTS (Minimal Skeleton):**
+- ⚠️ `src/pages/Landing.tsx` - Just `<div>Landing Page</div>`
+- ⚠️ `src/pages/Login.tsx` - Just `<div>Login Page</div>`
+- ⚠️ `src/pages/Signup.tsx` - Just `<div>Signup Page</div>`
+- ⚠️ `src/pages/Dashboard.tsx` - Just `<div>Dashboard</div>`
+- ⚠️ `src/components/layout/Header.tsx` - Just `<header>Header</header>`
+- ⚠️ `src/components/layout/Footer.tsx` - Just `<footer>Footer</footer>`
+- ⚠️ `src/components/auth/LoginForm.tsx` - Just `<div>Login Form</div>`
+- ⚠️ `src/components/auth/SignupForm.tsx` - Just `<div>Signup Form</div>`
+
+**API ENDPOINTS (Backend Integration):**
+Base URL: `process.env.VITE_API_URL` (default: http://localhost:8000)
+
+```typescript
+// Authentication Endpoints
+POST /auth/signup
+  Request: { email: string, password: string, name: string }
+  Response: { user: User, access_token: string, refresh_token: string }
+
+POST /auth/login
+  Request: { email: string, password: string }
+  Response: { user: User, access_token: string, refresh_token: string }
+
+POST /auth/refresh
+  Request: { refresh_token: string }
+  Response: { access_token: string }
+
+POST /auth/logout
+  Request: { refresh_token: string }
+  Response: { message: string }
+```
+
+**AXIOS SETUP (src/lib/api.ts):**
+```typescript
+// Create axios instance with base URL
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000'
+});
+
+// Request interceptor: Add JWT token to headers
+api.interceptors.request.use((config) => {
+  const token = authStore.getState().accessToken;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Response interceptor: Handle 401 with token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Try to refresh token
+      const refreshToken = authStore.getState().refreshToken;
+      const response = await axios.post('/auth/refresh', { refresh_token: refreshToken });
+      authStore.getState().setAccessToken(response.data.access_token);
+      // Retry original request
+      return api(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+**ZUSTAND STORE (src/store/authStore.ts):**
+```typescript
+interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  logout: () => void;
+}
+
+// With persist middleware (localStorage)
+```
+
+**USEAUTH HOOK (src/hooks/useAuth.ts):**
+```typescript
+// React Query mutations for signup, login, logout
+const useAuth = () => {
+  const signupMutation = useMutation({ mutationFn: signup });
+  const loginMutation = useMutation({ mutationFn: login });
+  const logoutMutation = useMutation({ mutationFn: logout });
+  return { signup, login, logout, isLoading };
+};
+```
+
+**TYPESCRIPT TYPES (src/types/index.ts):**
+```typescript
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  subscription_tier: string;
+  created_at: string;
+}
+
+interface AuthResponse {
+  user: User;
+  access_token: string;
+  refresh_token: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface SignupRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+```
+
+**ROUTING (src/App.tsx):**
+```tsx
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+// ProtectedRoute: Redirect to /login if not authenticated
+// PublicRoute: Redirect to /dashboard if authenticated
+```
+
+**TAILWIND THEME:**
+```js
+theme: {
+  extend: {
+    colors: {
+      primary: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }, // indigo
+      secondary: { 500: '#a855f7', 600: '#9333ea' } // purple
+    }
+  }
+}
+```
+
+**REQUIRED PACKAGES (package.json):**
+```json
+{
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-router-dom": "^6.22.0",
+    "@tanstack/react-query": "^5.0.0",
+    "zustand": "^4.5.0",
+    "axios": "^1.6.0",
+    "react-hook-form": "^7.50.0",
+    "zod": "^3.22.0",
+    "@hookform/resolvers": "^3.3.0",
+    "lucide-react": "^0.344.0",
+    "socket.io-client": "^4.7.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0"
+  }
+}
+```
+
+**ENVIRONMENT VARIABLES (.env.example):**
+```
+VITE_API_URL=http://localhost:8000
+```
+
+**OUTPUT REQUIREMENTS:**
+1. Complete folder structure with all files
+2. Working configs (vite, tailwind, tsconfig)
+3. Full implementation of api.ts, authStore.ts, useAuth.ts, types, App.tsx
+4. Placeholder components (just divs with names)
+5. shadcn/ui components installed
+6. All dependencies in package.json
+7. TypeScript strict mode enabled
+8. Ready for me to build actual UI components

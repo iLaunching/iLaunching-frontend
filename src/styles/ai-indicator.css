@@ -1,0 +1,179 @@
+/* Tiptap AI Indicator Animations - Global CSS to ensure they work */
+
+@keyframes tiptapAiColorFlow {
+  0% {
+    background-position: 0% 0% !important;
+    transform: rotate(-45deg) scale(1) !important;
+  }
+  33% {
+    background-position: 100% 100% !important;
+    transform: rotate(-45deg) scale(1.05) !important;
+  }
+  66% {
+    background-position: 0% 100% !important;
+    transform: rotate(-45deg) scale(1) !important;
+  }
+  100% {
+    background-position: 0% 0% !important;
+    transform: rotate(-45deg) scale(1) !important;
+  }
+}
+
+@keyframes tiptapIconBorderFlow {
+  0% {
+    background-position: 0% 0% !important;
+    opacity: 0 !important;
+    transform: scale(1) !important;
+  }
+  33% {
+    background-position: 100% 100% !important;
+    opacity: 0.8 !important;
+    transform: scale(1.02) !important;
+  }
+  66% {
+    background-position: 0% 100% !important;
+    opacity: 0.4 !important;
+    transform: scale(1.01) !important;
+  }
+  100% {
+    background-position: 0% 0% !important;
+    opacity: 0 !important;
+    transform: scale(1) !important;
+  }
+}
+
+@keyframes tiptapAiSlideIn {
+  from {
+    opacity: 0 !important;
+    transform: translateY(12px) scale(0.95) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+  }
+}
+
+/* Tiptap AI Indicator Styles - Exact Match to Editor.js */
+.ce-ai {
+  margin: 1em 0 !important;
+  position: relative !important;
+  animation: tiptapAiSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.tiptap-ai-container {
+  border-radius: 12px !important;
+  position: relative !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.tiptap-ai-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 10px !important;
+  position: relative !important;
+  overflow: visible !important; /* Changed from hidden to visible to show animations */
+}
+
+.tiptap-ai-icon {
+  flex-shrink: 0 !important;
+  width: 35px !important;
+  height: 35px !important;
+  transform: rotate(45deg) !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 50%, rgba(236, 72, 153, 0.08) 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: rgba(59, 130, 246, 0.8) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.15) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+  overflow: visible !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+}
+
+.tiptap-ai-icon::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  left: -2px !important;
+  right: -2px !important;
+  bottom: -2px !important;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #3b82f6) !important;
+  background-size: 400% 400% !important;
+  border-radius: 10px !important;
+  z-index: -1 !important;
+  opacity: 0 !important;
+  animation: tiptapIconBorderFlow 3s ease-in-out infinite !important;
+  filter: blur(0.5px) !important;
+}
+
+.tiptap-ai-icon::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -4px !important;
+  left: -4px !important;
+  right: -4px !important;
+  bottom: -4px !important;
+  background: linear-gradient(45deg, rgba(59, 130, 246, 0.4), rgba(147, 51, 234, 0.4), rgba(236, 72, 153, 0.4), rgba(251, 146, 60, 0.4), rgba(59, 130, 246, 0.4)) !important;
+  background-size: 400% 400% !important;
+  border-radius: 12px !important;
+  z-index: -2 !important;
+  opacity: 0 !important;
+  animation: tiptapIconBorderFlow 3s ease-in-out infinite 0.5s !important;
+  filter: blur(2px) !important;
+}
+
+.tiptap-ai-letter {
+  transform: rotate(-45deg) !important;
+  font-family: 'Fredoka', sans-serif !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  background: linear-gradient(45deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f59e0b 75%, #3b82f6 100%) !important;
+  background-size: 400% 400% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: tiptapAiColorFlow 3s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3)) !important;
+}
+
+.tiptap-ai-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: rgba(59, 130, 246, 0.8) !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  line-height: 1.2 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+.tiptap-ai-acknowledge {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: rgba(17, 15, 117, 0.7) !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  line-height: 1.2 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  text-shadow: 0 0 6px rgba(147, 51, 234, 0.2) !important;
+  font-style: italic !important;
+  background: rgba(147, 51, 234, 0.05) !important;
+  border: 1px solid rgba(147, 51, 234, 0.1) !important;
+}
+
+.tiptap-ai-text {
+  color: #334155 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  padding: 10px !important;
+}

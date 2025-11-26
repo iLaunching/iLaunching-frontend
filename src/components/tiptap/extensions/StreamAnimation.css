@@ -1,0 +1,225 @@
+/* Stream Animation Styles - Handles All Node Types */
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+/* Wave effect for inline content - INCREASED BOUNCE */
+@keyframes streamTextWave {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translateY(-4px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Fade in for block-level elements */
+@keyframes streamFadeInLine {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Cursor pulse */
+@keyframes cursorPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Slide in for code blocks and acknowledge messages */
+@keyframes streamSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   BLOCK-LEVEL ELEMENTS (Direct children)
+   ============================================ */
+
+/* Animations disabled - causing performance issues */
+
+/* Keep block elements as block */
+.response-streaming .response-text-area > p,
+.response-streaming .response-text-area > h1,
+.response-streaming .response-text-area > h2,
+.response-streaming .response-text-area > h3,
+.response-streaming .response-text-area > h4,
+.response-streaming .response-text-area > h5,
+.response-streaming .response-text-area > h6,
+.response-streaming .response-text-area > blockquote {
+  display: block;
+}
+
+/* ============================================
+   INLINE CONTENT (Text within blocks)
+   ============================================ */
+
+/* Animations disabled - causing performance issues */
+
+/* ============================================
+   LISTS
+   ============================================ */
+
+/* Lists - NO ANIMATION */
+.response-streaming .response-text-area li:not([data-type="taskItem"]) {
+  animation: none !important;
+  display: list-item;
+}
+
+/* Content within list items - NO ANIMATION */
+.response-streaming .response-text-area li:not([data-type="taskItem"]) > * {
+  display: inline-block;
+  animation: none !important;
+}
+
+/* Task lists - NO ANIMATION */
+.response-streaming .response-text-area [data-type="taskList"],
+.response-streaming .response-text-area [data-type="taskItem"] {
+  animation: none !important;
+}
+
+/* Task list layout should remain flex so checkbox + text stay inline */
+.response-streaming .response-text-area ul[data-type="taskList"] li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.response-streaming .response-text-area .task-item-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  min-width: 26px;
+}
+
+.response-streaming .response-text-area .task-item-inline-content {
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+
+/* Code blocks - NO ANIMATION */
+.response-streaming .response-text-area pre,
+.response-streaming .response-text-area [data-node-type="codeBlock"],
+.response-streaming .response-text-area .code-block-container {
+  animation: none !important;
+}
+
+/* Code content inside - NO ANIMATION */
+.response-streaming .response-text-area pre *,
+.response-streaming .response-text-area pre code,
+.response-streaming .response-text-area .code-block-container * {
+  animation: none !important;
+  display: inline !important;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+/* Tables - NO ANIMATION */
+.response-streaming .response-text-area table {
+  animation: none !important;
+}
+
+/* Table rows - NO ANIMATION */
+.response-streaming .response-text-area tr {
+  animation: none !important;
+}
+
+/* Table cells - NO ANIMATION */
+.response-streaming .response-text-area td,
+.response-streaming .response-text-area th {
+  animation: none !important;
+}
+
+/* ============================================
+   MEDIA & EMBEDS
+   ============================================ */
+
+/* Images, videos, iframes get slide-in */
+.response-streaming .response-text-area img,
+.response-streaming .response-text-area video,
+.response-streaming .response-text-area iframe {
+  animation: streamSlideIn 0.6s ease-out both;
+  display: block;
+}
+
+/* ============================================
+   SPECIAL NODES (Custom Tiptap Extensions)
+   ============================================ */
+
+/* AI Indicator */
+.response-streaming .response-text-area [data-type="aiIndicator"] {
+  animation: streamFadeInLine 0.4s ease-out both;
+}
+
+/* Mentions */
+.response-streaming .response-text-area [data-type="mention"] {
+  display: inline-block;
+  animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Highlights */
+.response-streaming .response-text-area mark,
+.response-streaming .response-text-area .highlight {
+  display: inline-block;
+  animation: streamTextWave 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ============================================
+  PERFORMANCE & ACCESSIBILITY
+  ============================================ */
+
+/* GPU acceleration hint */
+.response-text-area {
+  will-change: opacity, transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .response-streaming .response-text-area *,
+  .response-streaming .response-text-area::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   OVERRIDE: No animation on completed responses
+   ============================================ */
+
+/* When streaming is done, remove all animations */
+.response-node:not(.response-streaming) .response-text-area * {
+  animation: none !important;
+}

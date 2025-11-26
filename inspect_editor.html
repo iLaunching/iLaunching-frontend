@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug</title>
+  <script>
+    setTimeout(() => {
+      const prosemirror = document.querySelector('.ProseMirror');
+      if (prosemirror) {
+        console.log('ProseMirror element found');
+        console.log('Computed styles:', window.getComputedStyle(prosemirror));
+        console.log('Color:', window.getComputedStyle(prosemirror).color);
+        console.log('Display:', window.getComputedStyle(prosemirror).display);
+        console.log('Visibility:', window.getComputedStyle(prosemirror).visibility);
+        console.log('Opacity:', window.getComputedStyle(prosemirror).opacity);
+        console.log('InnerHTML:', prosemirror.innerHTML.substring(0, 200));
+      }
+    }, 3000);
+  </script>
+</head>
+<body>Open browser console</body>
+</html>
