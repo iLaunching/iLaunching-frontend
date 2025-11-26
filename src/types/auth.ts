@@ -25,9 +25,13 @@ export interface AuthState {
 }
 
 export interface User {
+  id?: string;
   email: string;
-  name: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
   created_at?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface AuthResponse {

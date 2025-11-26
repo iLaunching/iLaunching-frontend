@@ -1,4 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import AIBackground from '@/components/layout/AIBackground';
 import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
 import DeepSeaBackground from '@/components/layout/DeepSeaBackground';
@@ -21,6 +23,8 @@ import { authApi } from '@/api/auth';
 
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
   // Use the auth hook for state management
   const {
     authState,
@@ -45,32 +49,39 @@ export default function Landing() {
   // Handle OAuth callback on page load
   useEffect(() => {
     const oauthResult = authApi.handleOAuthCallback();
-    
+
     if (oauthResult.success) {
-      console.log('OAuth authentication successful:', oauthResult.action);
-      
-      // Fetch user info and check onboarding status
-      authApi.getMe()
-        .then(response => {
-          console.log('User authenticated via OAuth:', response.user);
-          
-          // Check if onboarding is needed
-          if (response.user.onboarding_completed === false) {
-            window.location.href = '/onboarding';
-          } else {
-            // Redirect to dashboard
-            window.location.href = '/dashboard';
+      (async () => {
+        try {
+          const response = await authApi.getMe();
+          const { user } = response;
+
+          // Persist user locally for future checks
+          localStorage.setItem('user', JSON.stringify(user));
+
+          const accessToken = localStorage.getItem('access_token');
+          const refreshToken = localStorage.getItem('refresh_token');
+
+          if (accessToken && refreshToken) {
+            setAuth(user, accessToken, refreshToken);
           }
-        })
-        .catch(error => {
-          console.error('Failed to fetch user info:', error);
-          alert('Authentication successful but failed to fetch user info. Please refresh the page.');
-        });
+
+          const needsOnboarding = oauthResult.action === 'signup' || !user.onboarding_completed;
+
+          if (needsOnboarding) {
+            navigate('/onboarding', { replace: true });
+          }
+
+          console.log('User authenticated via OAuth:', user);
+        } catch (error) {
+          console.error('Failed to fetch user info after OAuth:', error);
+        }
+      })();
     } else if (oauthResult.error) {
       console.error('OAuth authentication failed:', oauthResult.error);
       alert(`Authentication failed: ${oauthResult.error}`);
     }
-  }, []);
+  }, [navigate, setAuth]);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -104,7 +115,34 @@ export default function Landing() {
         await handleEmailSubmit(message);
         break;
       case 'name_input':
-        await handleNameSubmit(message);
+        // Store the name and transition directly to sales
+        if (message.trim()) {
+          handleNameSubmit(message);
+          
+          // Start background transition immediately
+          setIsTransitioning(true);
+          
+          // Randomly select a background
+          const backgrounds = ['connected', 'deepSea', 'deepPurple', 'deepPink'] as const;
+          const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+          
+          // Change background
+          setTimeout(() => {
+            setBackgroundType(randomBackground);
+          }, 50);
+          
+          // Complete background transition
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 800);
+          
+          // Show chat window after background is settled
+          setTimeout(async () => {
+            setShowChatWindow(true);
+            // Initialize the sales conversation with API
+            await initializeSalesConversation();
+          }, 900);
+        }
         break;
       case 'password_create':
         await handlePasswordCreate(message);

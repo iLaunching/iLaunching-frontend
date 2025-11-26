@@ -80,9 +80,9 @@ export interface User {
   role: string;
   subscription_tier: string;
   email_verified: boolean;
-  onboarding_completed?: boolean;
   created_at: string;
   last_login?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface CheckEmailResponse {

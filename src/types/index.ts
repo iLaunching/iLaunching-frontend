@@ -5,11 +5,16 @@
 export interface User {
   id: string;
   email: string;
-  name: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
   role: string;
   subscription_tier: string;
+  email_verified?: boolean;
   created_at: string;
   updated_at?: string;
+  last_login?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface AuthResponse {
