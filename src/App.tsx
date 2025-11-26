@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Onboarding from './pages/Onboarding';
 import FormattingDemo from '@/components/FormattingDemo';
 import StreamingTestPage from './pages/StreamingTestPage';
 import WebSocketTestPage from './pages/WebSocketTestPage';
@@ -56,6 +57,14 @@ function App() {
           />
 
           {/* Protected Routes */}
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute requireOnboarding={false}>
+                <Onboarding />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
