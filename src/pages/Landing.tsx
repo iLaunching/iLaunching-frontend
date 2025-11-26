@@ -1,6 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/authStore';
 import AIBackground from '@/components/layout/AIBackground';
 import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
 import DeepSeaBackground from '@/components/layout/DeepSeaBackground';
@@ -23,8 +21,6 @@ import { authApi } from '@/api/auth';
 
 
 export default function Landing() {
-  const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
   // Use the auth hook for state management
   const {
     authState,
@@ -34,6 +30,7 @@ export default function Landing() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
+    enterSalesMode,
   } = useLandingAuth();
   
   // State to control button visibility after typewriter completes
@@ -49,39 +46,26 @@ export default function Landing() {
   // Handle OAuth callback on page load
   useEffect(() => {
     const oauthResult = authApi.handleOAuthCallback();
-
+    
     if (oauthResult.success) {
-      (async () => {
-        try {
-          const response = await authApi.getMe();
-          const { user } = response;
-
-          // Persist user locally for future checks
-          localStorage.setItem('user', JSON.stringify(user));
-
-          const accessToken = localStorage.getItem('access_token');
-          const refreshToken = localStorage.getItem('refresh_token');
-
-          if (accessToken && refreshToken) {
-            setAuth(user, accessToken, refreshToken);
-          }
-
-          const needsOnboarding = oauthResult.action === 'signup' || !user.onboarding_completed;
-
-          if (needsOnboarding) {
-            navigate('/onboarding', { replace: true });
-          }
-
-          console.log('User authenticated via OAuth:', user);
-        } catch (error) {
-          console.error('Failed to fetch user info after OAuth:', error);
-        }
-      })();
+      console.log('OAuth authentication successful:', oauthResult.action);
+      
+      // Fetch user info to confirm authentication
+      authApi.getMe()
+        .then(response => {
+          console.log('User authenticated via OAuth:', response.user);
+          // Show success - user is now logged in
+          // You can redirect to dashboard or update UI to show logged-in state
+          alert(`Welcome ${response.user.email}! You're now logged in via Google.`);
+        })
+        .catch(error => {
+          console.error('Failed to fetch user info:', error);
+        });
     } else if (oauthResult.error) {
       console.error('OAuth authentication failed:', oauthResult.error);
       alert(`Authentication failed: ${oauthResult.error}`);
     }
-  }, [navigate, setAuth]);
+  }, []);
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -368,34 +352,45 @@ export default function Landing() {
             {/* New User Buttons - Hide when in sales stage */}
             {shouldShowButtonContainer && authState.stage !== 'sales' && (
               <div 
-                className="flex gap-8 justify-center mt-6"
+                className="flex flex-col items-center gap-4 mt-6"
                 style={{ marginBottom: '200px', minHeight: '60px' }}
               >
-               
-                <button
-                  onClick={handleLoginChoice}
-                  className={`flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 hover:scale-105 transition-all duration-500 shadow-md ${
-                    showButtons ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ maxHeight: '45px' }}
-                >
-                  <LogIn className="w-5 h-5" />
-                  Log Me In
-                </button>
+                <div className="flex gap-8 justify-center">
+                  <button
+                    onClick={handleLoginChoice}
+                    className={`flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 hover:scale-105 transition-all duration-500 shadow-md ${
+                      showButtons ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ maxHeight: '45px' }}
+                  >
+                    <LogIn className="w-5 h-5" />
+                    Log Me In
+                  </button>
               
 
 
+                  <button
+                    onClick={handleSignupChoice}
+                    className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
+                      showButtons ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ maxHeight: '45px',minWidth: '300px',maxWidth: '350px', justifyContent: 'center'    }}
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    Yes Please
+                  </button>
+                </div>
+                
+                {/* Skip to Sales Mode Button */}
                 <button
-                  onClick={handleSignupChoice}
-                  className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-500 ${
+                  onClick={enterSalesMode}
+                  className={`text-white/70 hover:text-white text-sm underline transition-all duration-500 ${
                     showButtons ? 'opacity-100' : 'opacity-0'
                   }`}
-                  style={{ maxHeight: '45px',minWidth: '300px',maxWidth: '350px', justifyContent: 'center'    }}
                 >
-                  <UserPlus className="w-5 h-5" />
-                  Yes Please
+                  Continue without signing up
                 </button>
-                </div>
+              </div>
 
 
             )}

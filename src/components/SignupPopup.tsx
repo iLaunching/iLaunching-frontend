@@ -17,6 +17,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
   const [userExists, setUserExists] = useState(false);
   
   // Get API URL from environment
@@ -94,6 +95,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     try {
       // Send verification code
       await authApi.sendVerificationCode(email);
+      setCodeSent(true);
       setCurrentView('verify');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to send verification code');
@@ -112,7 +114,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
       await authApi.verifyCode(email, verificationCode);
       
       // Code verified, now create the account
-      await authApi.signup(email, password);
+      const response = await authApi.signup(email, password);
       
       // Success! Close popup and redirect/refresh
       onClose();
@@ -131,6 +133,7 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
     
     try {
       await authApi.sendVerificationCode(email);
+      setCodeSent(true);
       setError('');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to resend code');

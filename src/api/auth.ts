@@ -82,7 +82,6 @@ export interface User {
   email_verified: boolean;
   created_at: string;
   last_login?: string;
-  onboarding_completed?: boolean;
 }
 
 export interface CheckEmailResponse {

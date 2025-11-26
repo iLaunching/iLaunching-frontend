@@ -68,7 +68,7 @@ export default function RichTextInput({
         class: 'rich-text-input-editor',
         'data-placeholder': placeholder,
       },
-      handlePaste: (_view, event) => {
+      handlePaste: (view, event) => {
         const text = event.clipboardData?.getData('text/plain');
         if (!text) return false;
 
@@ -203,6 +203,12 @@ export default function RichTextInput({
   const handleVoiceClick = () => {
     if (onVoiceClick) {
       onVoiceClick();
+    }
+  };
+
+  const handlePlusClick = () => {
+    if (onPlusClick) {
+      onPlusClick();
     }
   };
 
