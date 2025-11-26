@@ -153,7 +153,7 @@ export function useLandingAuth() {
   };
 
   /**
-   * Handle name submission (new user) - Store name and go directly to sales
+   * Handle name submission (new user) - Store name and go to password creation
    */
   const handleNameSubmit = (name: string): void => {
     // Handle continue action after name (go to password creation)
@@ -174,12 +174,12 @@ export function useLandingAuth() {
       return;
     }
 
-    // Store name and transition directly to sales stage
+    // Store name and move to password creation
     setAuthState((prev: AuthState) => ({
       ...prev,
       name: name.trim(),
-      stage: 'sales',
-      message: '',
+      stage: 'password_create',
+      message: "Perfect! Now let's secure your account. Create a password (at least 8 characters):",
       isProcessing: false,
       error: null,
     }));
@@ -215,6 +215,14 @@ export function useLandingAuth() {
         isProcessing: false,
         error: null,
       }));
+
+      // Check if onboarding is needed and redirect
+      if (result.user.onboarding_completed === false) {
+        window.location.href = '/onboarding';
+      } else {
+        // Redirect to dashboard or main app
+        window.location.href = '/dashboard';
+      }
     } catch (error: any) {
       console.error('Signup error:', error);
       setAuthState((prev: AuthState) => ({
@@ -257,6 +265,14 @@ export function useLandingAuth() {
         isProcessing: false,
         error: null,
       }));
+
+      // Check if onboarding is needed and redirect
+      if (result.user.onboarding_completed === false) {
+        window.location.href = '/onboarding';
+      } else {
+        // Redirect to dashboard or main app
+        window.location.href = '/dashboard';
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       setAuthState((prev: AuthState) => ({

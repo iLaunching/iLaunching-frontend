@@ -49,16 +49,22 @@ export default function Landing() {
     if (oauthResult.success) {
       console.log('OAuth authentication successful:', oauthResult.action);
       
-      // Fetch user info to confirm authentication
+      // Fetch user info and check onboarding status
       authApi.getMe()
         .then(response => {
           console.log('User authenticated via OAuth:', response.user);
-          // Show success - user is now logged in
-          // You can redirect to dashboard or update UI to show logged-in state
-          alert(`Welcome ${response.user.email}! You're now logged in via Google.`);
+          
+          // Check if onboarding is needed
+          if (response.user.onboarding_completed === false) {
+            window.location.href = '/onboarding';
+          } else {
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+          }
         })
         .catch(error => {
           console.error('Failed to fetch user info:', error);
+          alert('Authentication successful but failed to fetch user info. Please refresh the page.');
         });
     } else if (oauthResult.error) {
       console.error('OAuth authentication failed:', oauthResult.error);
@@ -98,34 +104,7 @@ export default function Landing() {
         await handleEmailSubmit(message);
         break;
       case 'name_input':
-        // Store the name and transition directly to sales
-        if (message.trim()) {
-          handleNameSubmit(message);
-          
-          // Start background transition immediately
-          setIsTransitioning(true);
-          
-          // Randomly select a background
-          const backgrounds = ['connected', 'deepSea', 'deepPurple', 'deepPink'] as const;
-          const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-          
-          // Change background
-          setTimeout(() => {
-            setBackgroundType(randomBackground);
-          }, 50);
-          
-          // Complete background transition
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 800);
-          
-          // Show chat window after background is settled
-          setTimeout(async () => {
-            setShowChatWindow(true);
-            // Initialize the sales conversation with API
-            await initializeSalesConversation();
-          }, 900);
-        }
+        await handleNameSubmit(message);
         break;
       case 'password_create':
         await handlePasswordCreate(message);
