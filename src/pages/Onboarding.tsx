@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authApi } from '@/api/auth';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -15,6 +16,14 @@ export default function Onboarding() {
   });
 
   useEffect(() => {
+    // Handle OAuth callback if present
+    const oauthResult = authApi.handleOAuthCallback();
+    
+    if (oauthResult.success) {
+      console.log('OAuth authentication successful on onboarding page:', oauthResult.action);
+      // Tokens are already stored by handleOAuthCallback
+    }
+    
     // Check if user is authenticated
     const token = localStorage.getItem('access_token');
     if (!token) {
