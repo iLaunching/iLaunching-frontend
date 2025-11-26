@@ -678,6 +678,9 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
               src="/signup_poup1.png"
               alt="Welcome to iLaunching"
               className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="sync"
               style={{ 
                 imageRendering: 'crisp-edges',
                 willChange: 'transform'
