@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import ChatWindow from '@/components/ChatWindow';
+import { useEffect } from 'react';
 
 interface HeaderProps {
   aiActive?: boolean; // Whether AI is active in sales mode
@@ -7,8 +6,6 @@ interface HeaderProps {
 }
 
 export default function Header({ aiActive = false, className = '' }: HeaderProps) {
-  const [showChatWindow, setShowChatWindow] = useState(false);
-  
   // Preload the signup popup image
   useEffect(() => {
     const link = document.createElement('link');
@@ -57,83 +54,6 @@ export default function Header({ aiActive = false, className = '' }: HeaderProps
           >
             iLaunching
           </h1>
-        </div>
-        
-        {/* Right side - Test buttons */}
-        <div className="flex items-center gap-3">
-          <a
-            href="/streaming-test"
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-            style={{
-              fontFamily: "'Baloo 2', sans-serif",
-              fontSize: '14px',
-              fontWeight: '500',
-            }}
-          >
-            Streaming Test
-          </a>
-          
-          <button
-            onClick={() => setShowChatWindow(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            style={{
-              fontFamily: "'Baloo 2', sans-serif",
-              fontSize: '14px',
-              fontWeight: '500',
-            }}
-          >
-            Test Chat
-          </button>
-          
-          {showChatWindow && (
-            <button
-              onClick={() => {
-                console.log('Append API Response button clicked!');
-                
-                // Get the current chat window editor instance and append new content
-                const chatElements = document.querySelectorAll('.chat-window-editor-v2, .tiptap-typewriter');
-                console.log('Found chat elements:', chatElements.length);
-                
-                const chatElement = chatElements[chatElements.length - 1]; // Get the last one (chat window)
-                console.log('Selected chat element:', chatElement);
-                
-                // Send complete HTML chunks that can be parsed properly
-                const contentChunks = [
-                  `<p><strong>Great questions!</strong> Based on what you've shared, I think our platform could really help with:</p>`,
-                  `<p><strong>Lead Generation:</strong> Our AI-powered tools can help identify potential customers in your industry</p>`,
-                  `<p><strong>Process Automation:</strong> We can streamline your current workflows to save time and reduce costs</p>`,
-                  `<p><strong>Market Analysis:</strong> Get insights into your competition and market opportunities</p>`,
-                  `<p>Would you like me to show you a <strong>personalized demo</strong> focusing on any of these areas?</p>`
-                ];
-                
-                console.log('Starting streaming simulation with', contentChunks.length, 'chunks');
-                
-                // Send each chunk with a delay to simulate streaming
-                contentChunks.forEach((chunk, index) => {
-                  setTimeout(() => {
-                    console.log(`Sending chunk ${index + 1}:`, chunk);
-                    
-                    const event = new CustomEvent('appendTestContent', {
-                      detail: {
-                        content: chunk
-                      }
-                    });
-                    window.dispatchEvent(event);
-                  }, index * 800); // 800ms between chunks
-                });
-                
-                console.log('All streaming chunks scheduled');
-              }}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              style={{
-                fontFamily: "'Baloo 2', sans-serif",
-                fontSize: '14px',
-                fontWeight: '500',
-              }}
-            >
-              Append API Response
-            </button>
-          )}
         </div>
       </div>
 
@@ -331,38 +251,6 @@ export default function Header({ aiActive = false, className = '' }: HeaderProps
           transform: rotate(45deg) scale(1) !important;
         }
       `}</style>
-      
-      {/* Test Chat Window */}
-      {showChatWindow && (
-        <div 
-          className="fixed left-0 top-0 z-[10001] bg-white shadow-2xl border-r border-gray-200"
-          style={{ width: '45%', height: '100vh' }}
-        >
-          {/* Close button */}
-          <button
-            onClick={() => setShowChatWindow(false)}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full z-[10002]"
-            style={{ fontSize: '16px' }}
-          >
-            ×
-          </button>
-          
-          <ChatWindow
-            message="<h3><strong>To get started:</strong></h3>Could you share a bit more about your business? <strong>Specifically, I'm curious about your industry and any key challenges you're currently facing?</strong>"
-            onSubmit={(message) => {
-              console.log('Chat message submitted:', message);
-              // Handle message submission here
-            }}
-            onTypewriterComplete={() => {
-              console.log('Typewriter animation completed');
-            }}
-            useAiIndicator={true}
-            aiName="AI Assistant"
-            aiAcknowledge="Let me help you with your business needs"
-            className="w-full h-full"
-          />
-        </div>
-      )}
     </header>
   );
 }
