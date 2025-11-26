@@ -50,7 +50,7 @@ const CodeBlockStreamComponent: React.FC<CodeBlockStreamProps> = ({ node }) => {
         if (highlightTimeoutRef.current) {
           clearTimeout(highlightTimeoutRef.current);
         }
-        highlightTimeoutRef.current = setTimeout(highlightCode, 100);
+        highlightTimeoutRef.current = setTimeout(highlightCode, 100) as any;
       }
     });
 

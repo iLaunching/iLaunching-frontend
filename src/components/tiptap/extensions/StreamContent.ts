@@ -82,10 +82,10 @@ export const StreamContent = Extension.create({
           }
           
           console.log('✅ Found AITurn at position:', aiTurnPos, 'turnId:', turnId);
-          console.log('📏 AITurn nodeSize:', aiTurnNode.nodeSize);
+          console.log('📏 AITurn nodeSize:', aiTurnNode?.nodeSize || 0);
           
           // Insert Response at the end of AITurn content (after Query, before closing)
-          const insertPos = aiTurnPos + aiTurnNode.nodeSize - 1;
+          const insertPos = aiTurnPos + (aiTurnNode?.nodeSize || 1) - 1;
           
           console.log('📍 Inserting Response at position:', insertPos);
           
@@ -115,7 +115,7 @@ export const StreamContent = Extension.create({
        * Insert a chunk from the API
        * The API has already processed and sanitized the content
        */
-      insertStreamChunk: (chunk: string, parseAsHTML: boolean = true, responseId?: string) => ({ commands, state }) => {
+      insertStreamChunk: (chunk: string, responseId?: string) => ({ commands, state }) => {
         try {
           const { doc } = state;
           

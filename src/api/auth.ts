@@ -76,12 +76,13 @@ apiClient.interceptors.response.use(
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  name: string;
   role: string;
   subscription_tier: string;
   email_verified: boolean;
   created_at: string;
   last_login?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface CheckEmailResponse {

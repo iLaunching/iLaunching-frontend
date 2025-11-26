@@ -86,7 +86,7 @@ export const DataTurn = Node.create<DataTurnOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(DataTurnComponent);
+    return ReactNodeViewRenderer(DataTurnComponent as any);
   },
 
   addCommands() {

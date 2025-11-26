@@ -65,7 +65,7 @@ export const Response = Node.create<ResponseOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ResponseComponent);
+    return ReactNodeViewRenderer(ResponseComponent as any);
   },
 
   addCommands() {
