@@ -248,6 +248,28 @@ export default function Landing() {
               cursor: none !important;
             }
             
+            /* Show pointer cursor on interactive elements in collaborative animation */
+            body:not(.popup-open) .fixed.inset-0.z-40 button,
+            body:not(.popup-open) .fixed.inset-0.z-40 .bg-white.rounded-xl {
+              cursor: pointer !important;
+            }
+            
+            /* Show pointer cursor on dropdown menus and ALL their children */
+            body:not(.popup-open) .dropdown-menu,
+            body:not(.popup-open) .dropdown-menu *,
+            body:not(.popup-open) .dropdown-option,
+            body:not(.popup-open) .dropdown-option *,
+            body:not(.popup-open) .plus-button-menu .dropdown-menu,
+            body:not(.popup-open) .plus-button-menu .dropdown-menu *,
+            body:not(.popup-open) .plus-button-menu .dropdown-option,
+            body:not(.popup-open) .plus-button-menu .dropdown-option *,
+            body:not(.popup-open) .import-button-menu .dropdown-menu,
+            body:not(.popup-open) .import-button-menu .dropdown-menu *,
+            body:not(.popup-open) .import-button-menu .dropdown-option,
+            body:not(.popup-open) .import-button-menu .dropdown-option * {
+              cursor: pointer !important;
+            }
+            
             /* Hide collaborative animation when popup is open */
             body.popup-open .fixed.inset-0.z-40 {
               display: none !important;

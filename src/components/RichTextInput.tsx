@@ -879,6 +879,7 @@ export default function RichTextInput({
           min-width: 300px !important;
           max-width: 320px !important;
           width: 100% !important;
+          cursor: default !important;
         }
 
         .plus-button-menu .dropdown-option {
@@ -888,10 +889,12 @@ export default function RichTextInput({
           padding: 10px 16px !important;
           font-weight: 400 !important;
           font-size: 15px !important;
+          cursor: pointer !important;
         }
 
         .plus-button-menu .dropdown-option:hover:not(.disabled) {
           background: #d6d6d630 !important;
+          cursor: pointer !important;
           /* transform: translateX(2px) !important; */
           /* transition: all 0.2s ease !important; */
         }
@@ -923,6 +926,7 @@ export default function RichTextInput({
           min-width: 300px !important;
           max-width: 320px !important;
           width: 100% !important;
+          cursor: default !important;
         }
 
         .import-button-menu .dropdown-option {
@@ -932,10 +936,12 @@ export default function RichTextInput({
           padding: 8px 16px !important;
           font-weight: 400 !important;
           font-size: 15px !important;
+          cursor: pointer !important;
         }
 
         .import-button-menu .dropdown-option:hover:not(.disabled) {
           background: #d6d6d630 !important;
+          cursor: pointer !important;
           /* transform: translateX(2px) !important; */
           /* transition: all 0.2s ease !important; */
         }
