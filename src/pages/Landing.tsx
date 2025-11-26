@@ -49,20 +49,13 @@ export default function Landing() {
     if (oauthResult.success) {
       console.log('OAuth authentication successful:', oauthResult.action);
       
-      // Fetch user info to confirm authentication and check onboarding status
+      // Fetch user info to confirm authentication
       authApi.getMe()
         .then(response => {
           console.log('User authenticated via OAuth:', response.user);
-          
-          // Note: If user needs onboarding, they should already be redirected to /onboarding
-          // by the backend. This handles the case where they're already onboarded.
+          // Show success - user is now logged in
           // You can redirect to dashboard or update UI to show logged-in state
-          if (response.user.email) {
-            // User is fully authenticated and onboarded
-            console.log(`Welcome back ${response.user.email}! Redirecting to dashboard...`);
-            // Optionally redirect to dashboard
-            // navigate('/dashboard');
-          }
+          alert(`Welcome ${response.user.email}! You're now logged in via Google.`);
         })
         .catch(error => {
           console.error('Failed to fetch user info:', error);
