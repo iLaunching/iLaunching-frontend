@@ -7,9 +7,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
-import FormattingDemo from '@/components/FormattingDemo';
-import StreamingTestPage from './pages/StreamingTestPage';
-import WebSocketTestPage from './pages/WebSocketTestPage';
 import EssentialInformation from './pages/EssentialInformation';
 
 // ========================
@@ -36,9 +33,6 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/essential-information" element={<EssentialInformation />} />
-          <Route path="/demo" element={<FormattingDemo />} />
-          <Route path="/streaming-test" element={<StreamingTestPage />} />
-          <Route path="/websocket-test" element={<WebSocketTestPage />} />
           <Route
             path="/login"
             element={
