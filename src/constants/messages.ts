@@ -785,7 +785,6 @@ export const SUBMIT_ACKNOWLEDGE_MESSAGE = [
 
 
 
-
 /**
  * Email Prompt Messages
  */

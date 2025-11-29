@@ -289,7 +289,7 @@ export const authApi = {
    * Handle OAuth callback - extract tokens from URL and store them
    * Call this on your callback/redirect page after OAuth flow
    */
-  handleOAuthCallback(): { success: boolean; action?: string; error?: string } {
+  handleOAuthCallback(): { success: boolean; action?: string; provider?: string; error?: string } {
     const params = new URLSearchParams(window.location.search);
     
     // Check for errors
@@ -303,6 +303,7 @@ export const authApi = {
     const accessToken = params.get('access_token');
     const refreshToken = params.get('refresh_token');
     const action = params.get('action');
+    const provider = params.get('provider');
     
     if (authSuccess === 'true' && accessToken && refreshToken) {
       // Store tokens
@@ -312,7 +313,7 @@ export const authApi = {
       // Clean up URL parameters
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      return { success: true, action: action || 'login' };
+      return { success: true, action: action || 'login', provider: provider || 'unknown' };
     }
     
     return { success: false };

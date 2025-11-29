@@ -5,6 +5,7 @@ import { PublicRoute } from '@/components/auth/PublicRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import SignupInterface from './pages/SignupInterface';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
 import EssentialInformation from './pages/EssentialInformation';
@@ -32,6 +33,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
+          <Route path="/signup-interface" element={<SignupInterface />} />
           <Route path="/essential-information" element={<EssentialInformation />} />
           <Route
             path="/login"

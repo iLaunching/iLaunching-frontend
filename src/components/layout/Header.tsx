@@ -3,9 +3,11 @@ import { useEffect } from 'react';
 interface HeaderProps {
   aiActive?: boolean; // Whether AI is active in sales mode
   className?: string; // Optional className for visibility control
+  hideLogo?: boolean; // Hide the animated logo
+  textColor?: string; // Text color for the title
 }
 
-export default function Header({ aiActive = false, className = '' }: HeaderProps) {
+export default function Header({ aiActive = false, className = '', hideLogo = false, textColor = 'text-black' }: HeaderProps) {
   // Preload the signup popup image
   useEffect(() => {
     const link = document.createElement('link');
@@ -36,15 +38,17 @@ export default function Header({ aiActive = false, className = '' }: HeaderProps
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-4">
         {/* AI Tool Logo - 50x50px diamond with animated "i" */}
-        <div className="ai-icon-container">
-          <div className={`ai-icon ${aiActive ? 'ai-active' : ''}`}>
-            <span className={`ai-letter ${aiActive ? 'ai-active' : ''}`}>i</span>
+        {!hideLogo && (
+          <div className="ai-icon-container">
+            <div className={`ai-icon ${aiActive ? 'ai-active' : ''}`}>
+              <span className={`ai-letter ${aiActive ? 'ai-active' : ''}`}>i</span>
+            </div>
           </div>
-        </div>
+        )}
         
           {/* Text */}
           <h1 
-            className="text-black"
+            className={textColor}
             style={{
               fontFamily: "'Baloo 2', sans-serif",
               fontSize: '40px',

@@ -36,21 +36,23 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const handleGoogleLogin = () => {
     // Redirect to backend OAuth endpoint
     // API_URL already includes /api/v1
-    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    console.log('🔵 Google OAuth URL:', googleAuthUrl);
+    console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
     window.location.href = googleAuthUrl;
   };
 
   // Handle Facebook OAuth login
   const handleFacebookLogin = () => {
     // Redirect to backend OAuth endpoint
-    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     window.location.href = facebookAuthUrl;
   };
 
   // Handle Microsoft OAuth login
   const handleMicrosoftLogin = () => {
     // Redirect to backend OAuth endpoint
-    const microsoftAuthUrl = `${API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin)}`;
+    const microsoftAuthUrl = `${API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     window.location.href = microsoftAuthUrl;
   };
 
