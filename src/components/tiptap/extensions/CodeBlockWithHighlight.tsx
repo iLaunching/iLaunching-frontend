@@ -24,7 +24,7 @@ interface CodeBlockComponentProps {
   extension: any;
 }
 
-function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComponentProps) {
+function CodeBlockComponent({ node, updateAttributes }: CodeBlockComponentProps) {
   const [copied, setCopied] = useState(false);
   const codeRef = useRef<HTMLElement>(null);
   const language = node.attrs.language || 'javascript';
@@ -49,7 +49,7 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         if (m.type === 'characterData') return true;
         if (m.type === 'childList') {
           // Check if added nodes are text nodes (not spans from Prism)
-          return Array.from(m.addedNodes).some(node => node.nodeType === Node.TEXT_NODE);
+          return Array.from(m.addedNodes).some(node => node.nodeType === 3); // TEXT_NODE
         }
         return false;
       });
@@ -130,7 +130,7 @@ function CodeBlockComponent({ node, updateAttributes, extension }: CodeBlockComp
         </div>
         <pre className="code-block-content">
           <code ref={codeRef} className={`language-${language}`}>
-            <NodeViewContent as="span" />
+            <NodeViewContent as={("span" as any)} />
           </code>
         </pre>
       </div>
@@ -381,7 +381,7 @@ export const CodeBlockWithHighlight = Node.create({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(CodeBlockComponent);
+    return ReactNodeViewRenderer(CodeBlockComponent as any);
   },
 
   addKeyboardShortcuts() {

@@ -472,7 +472,7 @@ export function StreamingChatInterface({
                 console.log('📜 Scrolling window to align Query');
                 
                 // Listen for scroll end instead of using timer
-                let scrollEndTimer: number;
+                let scrollEndTimer: ReturnType<typeof setTimeout>;
                 const handleScrollEnd = () => {
                   clearTimeout(scrollEndTimer);
                   scrollEndTimer = setTimeout(() => {

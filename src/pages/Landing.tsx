@@ -48,18 +48,37 @@ export default function Landing() {
     const oauthResult = authApi.handleOAuthCallback();
     
     if (oauthResult.success) {
-      console.log('OAuth authentication successful:', oauthResult.action);
+      console.log('OAuth authentication successful:', {
+        action: oauthResult.action,
+        provider: oauthResult.provider
+      });
       
       // Fetch user info to confirm authentication
       authApi.getMe()
         .then(response => {
           console.log('User authenticated via OAuth:', response.user);
-          // Show success - user is now logged in
-          // You can redirect to dashboard or update UI to show logged-in state
-          alert(`Welcome ${response.user.email}! You're now logged in via Google.`);
+          
+          // Trigger workflow based on action type and provider
+          if (oauthResult.action === 'signup') {
+            // New user from OAuth signup
+            console.log(`New user signup via ${oauthResult.provider} - checking onboarding status`);
+            
+            if (response.user.onboarding_completed === false) {
+              // Redirect to onboarding
+              window.location.href = '/onboarding';
+            } else {
+              // Show welcome message for returning user
+              alert(`Welcome ${response.user.email}! Signed up with ${oauthResult.provider}.`);
+            }
+          } else if (oauthResult.action === 'login') {
+            // Existing user login via OAuth
+            console.log(`Existing user login via ${oauthResult.provider}`);
+            alert(`Welcome back ${response.user.email}! Logged in with ${oauthResult.provider}.`);
+          }
         })
         .catch(error => {
           console.error('Failed to fetch user info:', error);
+          alert('Authentication succeeded but failed to load user profile.');
         });
     } else if (oauthResult.error) {
       console.error('OAuth authentication failed:', oauthResult.error);

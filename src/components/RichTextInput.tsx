@@ -26,7 +26,6 @@ export default function RichTextInput({
   className = "",
   maxHeight = 200,
   onVoiceClick,
-  onPlusClick,
   backgroundType = 'connected',
   showGetStarted = false,
   onGetStartedClick
@@ -68,7 +67,7 @@ export default function RichTextInput({
         class: 'rich-text-input-editor',
         'data-placeholder': placeholder,
       },
-      handlePaste: (view, event) => {
+      handlePaste: (_view, event) => {
         const text = event.clipboardData?.getData('text/plain');
         if (!text) return false;
 
@@ -203,12 +202,6 @@ export default function RichTextInput({
   const handleVoiceClick = () => {
     if (onVoiceClick) {
       onVoiceClick();
-    }
-  };
-
-  const handlePlusClick = () => {
-    if (onPlusClick) {
-      onPlusClick();
     }
   };
 

@@ -48,7 +48,7 @@ export const StreamAnimation = Extension.create<StreamAnimationOptions>({
             };
           },
           
-          apply(tr, value, oldState, newState) {
+          apply(tr, value) {
             if (!extensionThis.options.enabled) {
               return { animatedNodes: new Map(), decorations: DecorationSet.empty };
             }
@@ -60,14 +60,12 @@ export const StreamAnimation = Extension.create<StreamAnimationOptions>({
             decorations = decorations.map(tr.mapping, tr.doc);
 
             // Detect new content additions
-            tr.steps.forEach((step, index) => {
+            tr.steps.forEach((_step, index) => {
               const stepMap = tr.mapping.maps[index];
               
-              stepMap.forEach((oldStart, oldEnd, newStart, newEnd) => {
+              stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
                 // Check if this is an insertion (newEnd > newStart)
                 if (newEnd > newStart) {
-                  // Mark the inserted range for animation
-                  const insertedSize = newEnd - newStart;
                   
                   // Find all block nodes in the inserted range
                   tr.doc.nodesBetween(newStart, newEnd, (node, pos) => {
@@ -146,7 +144,7 @@ export const StreamAnimation = Extension.create<StreamAnimationOptions>({
       /**
        * Enable/disable stream animation
        */
-      setStreamAnimation: (enabled: boolean) => ({ commands }) => {
+      setStreamAnimation: (enabled: boolean) => () => {
         this.options.enabled = enabled;
         return true;
       },
@@ -154,11 +152,11 @@ export const StreamAnimation = Extension.create<StreamAnimationOptions>({
       /**
        * Update animation settings
        */
-      updateStreamAnimationSettings: (settings: Partial<StreamAnimationOptions>) => ({ commands }) => {
+      updateStreamAnimationSettings: (settings: Partial<StreamAnimationOptions>) => () => {
         this.options = { ...this.options, ...settings };
         return true;
       },
-    };
+    } as any;
   },
 });
 

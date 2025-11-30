@@ -24,7 +24,7 @@ declare module '@tiptap/core' {
        * Insert a pre-processed chunk from API
        * Chunks arrive already sanitized and ready to insert
        */
-      insertStreamChunk: (chunk: string, parseAsHTML?: boolean, responseId?: string) => ReturnType;
+      insertStreamChunk: (chunk: string, responseId?: string) => ReturnType;
       
       /**
        * Clear the stream buffer
@@ -61,14 +61,14 @@ export const StreamContent = Extension.create({
        * Create Response node inside AITurn with matching turnId
        * Called when stream starts
        */
-      createResponseInTurn: (turnId: string) => ({ editor, commands }) => {
+      createResponseInTurn: (turnId: string) => ({ editor, commands }: any) => {
         try {
           const { doc } = editor.state;
           let aiTurnPos = -1;
-          let aiTurnNode = null;
+          let aiTurnNode: any = null;
           
           // Find the AITurn with matching turnId
-          doc.descendants((node, pos) => {
+          doc.descendants((node: any, pos: number) => {
             if (node.type.name === 'aiTurn' && node.attrs.turnId === turnId) {
               aiTurnPos = pos;
               aiTurnNode = node;
@@ -82,10 +82,10 @@ export const StreamContent = Extension.create({
           }
           
           console.log('✅ Found AITurn at position:', aiTurnPos, 'turnId:', turnId);
-          console.log('📏 AITurn nodeSize:', aiTurnNode.nodeSize);
+          console.log('📏 AITurn nodeSize:', aiTurnNode?.nodeSize || 0);
           
           // Insert Response at the end of AITurn content (after Query, before closing)
-          const insertPos = aiTurnPos + aiTurnNode.nodeSize - 1;
+          const insertPos = aiTurnPos + (aiTurnNode?.nodeSize || 1) - 1;
           
           console.log('📍 Inserting Response at position:', insertPos);
           
@@ -115,7 +115,7 @@ export const StreamContent = Extension.create({
        * Insert a chunk from the API
        * The API has already processed and sanitized the content
        */
-      insertStreamChunk: (chunk: string, parseAsHTML: boolean = true, responseId?: string) => ({ commands, state }) => {
+      insertStreamChunk: (chunk: string, responseId?: string) => ({ commands, state }: any) => {
         try {
           const { doc } = state;
           
@@ -125,7 +125,7 @@ export const StreamContent = Extension.create({
           
           if (responseId) {
             // First priority: Find Response node with matching responseId
-            doc.descendants((node, pos) => {
+            doc.descendants((node: any, pos: number) => {
               if (node.type.name === 'response' && node.attrs.responseId === responseId) {
                 responsePos = pos;
                 responseNodeSize = node.nodeSize;
@@ -136,7 +136,7 @@ export const StreamContent = Extension.create({
           
           // Fallback: Find AI Indicator if Response not found
           if (responsePos < 0) {
-            doc.descendants((node, pos) => {
+            doc.descendants((node: any, pos: number) => {
               if (node.type.name === 'aiIndicator') {
                 responsePos = pos;
                 return false;
@@ -198,7 +198,7 @@ export const StreamContent = Extension.create({
       isStreaming: () => () => {
         return true;
       },
-    };
+    } as any;
   },
 });
 
