@@ -5,6 +5,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ilaunching-frontend</title>
+    
+    <!-- Preconnect to API server for faster authentication calls -->
+    <link rel="preconnect" href="https://auth-server-production-b51c.up.railway.app">
+    <link rel="dns-prefetch" href="https://auth-server-production-b51c.up.railway.app">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +17,17 @@
     
     <!-- Preload critical background image for instant display -->
     <link rel="preload" href="/interface background.png" as="image" fetchpriority="high">
+    
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

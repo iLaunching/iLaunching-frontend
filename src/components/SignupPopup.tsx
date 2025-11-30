@@ -1,5 +1,6 @@
 import { X, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api/auth';
 
 interface SignupPopupProps {
@@ -10,6 +11,7 @@ interface SignupPopupProps {
 type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
 
 const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<AuthView>('main');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -116,11 +118,11 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
       // Code verified, now create the account
       await authApi.signup(email, password);
       
-      // Success! Close popup and redirect to signup-interface
+      // Success! Close popup and use React Router navigation for smoother transition
       onClose();
       
-      // Redirect to signup-interface page with email provider
-      window.location.href = '/signup-interface?action=signup&provider=email';
+      // Use React Router for smooth transition (no full page reload)
+      navigate('/signup-interface?action=signup&provider=email');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Verification failed');
     } finally {

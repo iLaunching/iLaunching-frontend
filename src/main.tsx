@@ -13,7 +13,7 @@ console.log('Root element:', rootElement);
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={null}>
         <App />
       </Suspense>
     </StrictMode>,
