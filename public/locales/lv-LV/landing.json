@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Sveiki! 👋 Laipni lūdzam iLaunching. Sāksim?",
+      "Hei! Gatavs sākt kaut ko brīnišķīgu?",
+      "Laipni lūdzam! Sāksim jūsu ceļojumu.",
+      "Sveiki! Jūs esat īstajā vietā. Sāksim!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Laipni lūdzam atpakaļ! 😊",
+      "Hei, es jūs atceros! Laipni lūdzam atpakaļ!",
+      "Priecājos jūs atkal redzēt!",
+      "Jūs atkal šeit! Laipni lūdzam!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Paldies! Brīdi...",
+      "Lieliski, pārbaudu...",
+      "Sekundi, pārbaidu...",
+      "Saņemts! Ātra pārbaude..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Meklēju <strong>{email}</strong>...",
+      "Pārbauda <strong>{email}</strong>...",
+      "Pārbauda <strong>{email}</strong> sistēmā...",
+      "Brīdi, meklēju <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, tas neizskatās pēc derīga e-pasta. Mēģināt vēlreiz?",
+      "Ups! Nederīgs e-pasta formāts. Pārbaudīt vēlreiz?",
+      "Kaut kas nav kārtībā ar šo e-pastu. Vai jūs varat pārbaudīt?",
+      "E-pasta formāts izskatās dīvains. Pārbaudīt vēlreiz?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Izskatās, ka jūs esat jauns šeit! Tas ir aizraujoši. Vēlaties pievienoties?",
+      "Es jūs vēl neredzu sistēmā. Gatavs sākt?",
+      "Jauna seja! Vēlaties izveidot kontu?",
+      "Jūs vēl neesat reģistrējies. Mainīsim to?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Lieliska izvēle! Kāds ir jūsu vārds?",
+      "Lieliski! Kā man jūs saukt?",
+      "Brīnišķīgi! Pastāstiet man savu vārdu.",
+      "Labi! Kāds ir jūsu vārds?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Laipni lūdzam atpakaļ! Kāds ir jūsu e-pasts?",
+      "Priecājos jūs atkal redzēt! Ievadiet savu e-pastu.",
+      "Pieslēgsimies. Kāds ir jūsu e-pasts?",
+      "Gatavs pieslēgties? Dalieties ar savu e-pastu."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Es jūs redzu! Tagad ievadiet savu paroli.",
+      "Atrasts! Kāda ir jūsu parole?",
+      "Jūs tur esat! Ievadiet paroli, lai turpinātu.",
+      "Sapratu! Tagad jūsu parole, lūdzu."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Lieliski! Tagad nodrošināsim jūsu kontu. Izveidojiet paroli (vismaz 8 rakstzīmes):"
+  },
+  "passwordTooShort": {
+    "message": "Jūsu parolei jābūt vismaz 8 rakstzīmēm. Mēģināt vēlreiz?"
+  },
+  "nameRequired": {
+    "message": "Man ir nepieciešams jūsu vārds, lai turpinātu. Kāds ir jūsu vārds?"
+  },
+  "errors": {
+    "generic": "Ups! Kaut kas nogāja greizi. Lūdzu, mēģiniet vēlreiz.",
+    "emailCheck": "E-pasta pārbaude neizdevās",
+    "loginFailed": "Pieteikšanās neizdevās. Pārbaudiet savus datus.",
+    "signupFailed": "Reģistrācija neizdevās. Lūdzu, mēģiniet vēlreiz."
+  },
+  "placeholders": {
+    "email": "Ierakstiet savu e-pastu šeit...",
+    "name": "Ievadiet savu vārdu...",
+    "password_create": "Izveidojiet paroli (vismaz 8 rakstzīmes)...",
+    "password_input": "Ievadiet savu paroli..."
+  },
+  "buttons": {
+    "yesPlease": "Jā, Lūdzu",
+    "logMeIn": "Pieteikties",
+    "continueWithoutSignup": "Turpināt bez reģistrācijas"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Përshëndetje! 👋 Mirë se vini në iLaunching. Të fillojmë?",
+      "Hej! Gati të filloni diçka të mrekullueshme?",
+      "Mirë se vini! Le të fillojmë udhëtimin tuaj.",
+      "Përshëndetje! Jeni në vendin e duhur. Le të fillojmë!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Mirë se u kthyet! 😊",
+      "Hej, ju mbaj mend! Mirë se u kthyet!",
+      "Gëzohem që ju shoh përsëri!",
+      "Jeni këtu përsëri! Mirë se vini!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Faleminderit! Një moment...",
+      "Perfekt, po kontrolloj...",
+      "Një sekondë, po verifikoj...",
+      "U mor! Kontroll i shpejtë..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Po kërkoj <strong>{email}</strong>...",
+      "Po kontrolloj <strong>{email}</strong>...",
+      "Po kontrolloj <strong>{email}</strong> në sistem...",
+      "Një moment, po kërkoj <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, ky nuk duket si një email i vlefshëm. Provoni përsëri?",
+      "Ups! Format i pavlefshëm emaili. Kontrolloni përsëri?",
+      "Diçka nuk është në rregull me atë email. Mund ta kontrolloni?",
+      "Formati i emailit duket i çuditshëm. Kontrolloni përsëri?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Duket se jeni i ri këtu! Kjo është emocionuese. Dëshironi të bashkoheni?",
+      "Nuk ju shoh ende në sistem. Gati për të filluar?",
+      "Fytyrë e re! Dëshironi të krijoni një llogari?",
+      "Ende nuk jeni regjistruar. Ta ndryshojmë këtë?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Zgjedhje e shkëlqyer! Si quheni?",
+      "Perfekt! Si duhet t'ju thërras?",
+      "Mahnitëse! Më thoni emrin tuaj.",
+      "Mirë! Si quheni?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Mirë se u kthyet! Cili është emaili juaj?",
+      "Gëzohem që ju shoh përsëri! Vendosni emailin tuaj.",
+      "Le t'ju futem brenda. Cili është emaili juaj?",
+      "Gati për t'u futur? Ndani emailin tuaj."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Ju shoh! Tani vendosni fjalëkalimin tuaj.",
+      "U gjetët! Cili është fjalëkalimi juaj?",
+      "Jeni aty! Vendosni fjalëkalimin për të vazhduar.",
+      "Kuptova! Tani fjalëkalimi juaj, ju lutem."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfekt! Tani le ta sigurojmë llogarinë tuaj. Krijoni një fjalëkalim (të paktën 8 karaktere):"
+  },
+  "passwordTooShort": {
+    "message": "Fjalëkalimi juaj duhet të jetë të paktën 8 karaktere. Provoni përsëri?"
+  },
+  "nameRequired": {
+    "message": "Më duhet emri juaj për të vazhduar. Si quheni?"
+  },
+  "errors": {
+    "generic": "Ups! Diçka shkoi keq. Ju lutem provoni përsëri.",
+    "emailCheck": "Kontrolli i emailit dështoi",
+    "loginFailed": "Hyrja dështoi. Kontrolloni kredencialet tuaja.",
+    "signupFailed": "Regjistrimi dështoi. Ju lutem provoni përsëri."
+  },
+  "placeholders": {
+    "email": "Shkruani emailin tuaj këtu...",
+    "name": "Vendosni emrin tuaj...",
+    "password_create": "Krijoni një fjalëkalim (të paktën 8 karaktere)...",
+    "password_input": "Vendosni fjalëkalimin tuaj..."
+  },
+  "buttons": {
+    "yesPlease": "Po, Ju Lutem",
+    "logMeIn": "Identifikohu",
+    "continueWithoutSignup": "Vazhdo pa u regjistruar"
+  }
+}

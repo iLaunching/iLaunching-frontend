@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "אני מוכן - בואו נתחיל!",
+    "continue": "המשך",
+    "back": "חזור",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "ברוך הבא",
+    "loading": "טוען...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

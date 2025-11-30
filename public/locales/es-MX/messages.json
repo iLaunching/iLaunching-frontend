@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Bienvenido! 🎉</h1><hr /><h2>Bienvenido! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Bienvenido! 🎉</h1><hr /><h2>Bienvenido! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Bienvenido! 🎉</h1><hr /><h2>Bienvenido! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Bienvenido! 🎉</h1><hr /><h2>Bienvenido! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ ¡Listo!",
+    "subtitle": "¡Todo está listo! Avísame cuando estés listo para comenzar."
+  },
+  "default": {
+    "title": "Bienvenido! 🎉",
+    "subtitle": "¡Todo está listo! Avísame cuando estés listo para comenzar.",
+    "building": "Cargando...",
+    "joining": ""
+  }
+}

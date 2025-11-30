@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Ahoj! 👋 Vítej v iLaunching. Začneme?",
+      "Ahoj! Jsi připraven začít něco úžasného?",
+      "Vítej! Začněme tvou cestu.",
+      "Ahoj! Jsi na správném místě. Pojďme na to!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Vítej zpět! 😊",
+      "Hej, pamatuju si tě! Vítej zpět!",
+      "Rád tě zase vidím!",
+      "Jsi tu zase! Vítej!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Díky! Moment...",
+      "Perfektní, kontroluji...",
+      "Vteřinu, ověřuji...",
+      "Přijato! Rychlá kontrola..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Hledám <strong>{email}</strong>...",
+      "Kontroluji <strong>{email}</strong>...",
+      "Kontroluji <strong>{email}</strong> v systému...",
+      "Moment, hledám <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, tohle nevypadá jako platný email. Zkusíš to znovu?",
+      "Jejda! Neplatný formát emailu. Zkontroluj to ještě jednou?",
+      "S tím emailem je něco špatně. Můžeš to zkontrolovat?",
+      "Ten formát emailu vypadá divně. Zkontrolovat znovu?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Vypadá to, že jsi tu nový! To je vzrušující. Chceš se připojit?",
+      "V systému tě ještě nevidím. Jsi připraven začít?",
+      "Nová tvář! Chceš vytvořit účet?",
+      "Ještě nejsi zaregistrovaný. Změníme to?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Skvělá volba! Jak se jmenuješ?",
+      "Perfektní! Jak tě mám oslovovat?",
+      "Úžasné! Pověz mi své jméno.",
+      "Dobře! Jak se jmenuješ?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Vítej zpět! Jaký je tvůj email?",
+      "Rád tě zase vidím! Zadej svůj email.",
+      "Přihlásíme tě. Jaký je tvůj email?",
+      "Jsi připraven se přihlásit? Sdílej svůj email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Vidím tě! Teď zadej své heslo.",
+      "Našel jsem tě! Jaké je tvé heslo?",
+      "Tam jsi! Zadej heslo pro pokračování.",
+      "Rozumím! Teď tvoje heslo, prosím."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfektní! Teď zabezpečíme tvůj účet. Vytvoř heslo (alespoň 8 znaků):"
+  },
+  "passwordTooShort": {
+    "message": "Tvoje heslo musí mít alespoň 8 znaků. Zkusit znovu?"
+  },
+  "nameRequired": {
+    "message": "Potřebuji tvoje jméno, abych mohl pokračovat. Jak se jmenuješ?"
+  },
+  "errors": {
+    "generic": "Jejda! Něco se pokazilo. Zkus to prosím znovu.",
+    "emailCheck": "Kontrola emailu selhala",
+    "loginFailed": "Přihlášení selhalo. Zkontroluj přihlašovací údaje.",
+    "signupFailed": "Registrace selhala. Zkus to prosím znovu."
+  },
+  "placeholders": {
+    "email": "Zadejte svůj e-mail zde...",
+    "name": "Zadejte své jméno...",
+    "password_create": "Vytvořte heslo (alespoň 8 znaků)...",
+    "password_input": "Zadejte své heslo..."
+  },
+  "buttons": {
+    "yesPlease": "Ano, Prosím",
+    "logMeIn": "Přihlásit Se",
+    "continueWithoutSignup": "Pokračovat bez registrace"
+  }
+}

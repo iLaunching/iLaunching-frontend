@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Спреман сам - Почнимо!",
+    "continue": "Настави",
+    "back": "Назад",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Добродошли",
+    "loading": "Учитавање...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

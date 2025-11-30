@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hai! 👋 Selamat datang ke iLaunching. Mula?",
+      "Hai! Bersedia untuk memulakan sesuatu yang hebat?",
+      "Selamat datang! Mari mulakan perjalanan anda.",
+      "Hai! Anda berada di tempat yang betul. Mari kita mulakan!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Selamat kembali! 😊",
+      "Hai, saya ingat anda! Selamat kembali!",
+      "Gembira bertemu anda lagi!",
+      "Anda di sini lagi! Selamat datang!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Terima kasih! Sebentar...",
+      "Sempurna, memeriksa...",
+      "Seketika, mengesahkan...",
+      "Diterima! Pemeriksaan pantas..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Mencari <strong>{email}</strong>...",
+      "Memeriksa <strong>{email}</strong>...",
+      "Memeriksa <strong>{email}</strong> dalam sistem...",
+      "Sebentar, mencari <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, ini tidak kelihatan seperti emel yang sah. Cuba lagi?",
+      "Ops! Format emel tidak sah. Periksa semula?",
+      "Ada yang tidak kena dengan emel itu. Boleh semak?",
+      "Format emel itu kelihatan pelik. Periksa semula?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Nampaknya anda baru di sini! Ini menarik. Ingin sertai?",
+      "Saya belum nampak anda dalam sistem. Bersedia untuk mula?",
+      "Muka baru! Ingin buat akaun?",
+      "Anda belum berdaftar lagi. Kita ubah itu?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Pilihan yang bagus! Siapa nama anda?",
+      "Sempurna! Apa yang patut saya panggil anda?",
+      "Hebat! Beritahu nama anda.",
+      "Baik! Siapa nama anda?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Selamat kembali! Apa emel anda?",
+      "Gembira bertemu anda lagi! Masukkan emel anda.",
+      "Mari log masuk. Apa emel anda?",
+      "Bersedia untuk log masuk? Kongsi emel anda."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Saya nampak anda! Sekarang masukkan kata laluan anda.",
+      "Jumpa! Apa kata laluan anda?",
+      "Anda di situ! Masukkan kata laluan untuk teruskan.",
+      "Faham! Sekarang kata laluan anda, sila."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Sempurna! Sekarang mari lindungi akaun anda. Cipta kata laluan (sekurang-kurangnya 8 aksara):"
+  },
+  "passwordTooShort": {
+    "message": "Kata laluan anda mesti sekurang-kurangnya 8 aksara. Cuba lagi?"
+  },
+  "nameRequired": {
+    "message": "Saya perlukan nama anda untuk teruskan. Siapa nama anda?"
+  },
+  "errors": {
+    "generic": "Ops! Ada yang tidak kena. Sila cuba lagi.",
+    "emailCheck": "Pemeriksaan emel gagal",
+    "loginFailed": "Log masuk gagal. Semak kelayakan anda.",
+    "signupFailed": "Pendaftaran gagal. Sila cuba lagi."
+  },
+  "placeholders": {
+    "email": "Taip e-mel anda di sini...",
+    "name": "Masukkan nama anda...",
+    "password_create": "Buat kata laluan (sekurang-kurangnya 8 aksara)...",
+    "password_input": "Masukkan kata laluan anda..."
+  },
+  "buttons": {
+    "yesPlease": "Ya, Sila",
+    "logMeIn": "Log Masuk",
+    "continueWithoutSignup": "Teruskan tanpa mendaftar"
+  }
+}

@@ -7,14 +7,19 @@ import { useState } from 'react';
 import { authApi } from '@/api/auth';
 import type { AuthState } from '@/types/auth';
 import {
-  getRandomWrongEmailMessage,
+  getRandomAcknowledgeMessage,
   getRandomCheckingEmailMessage,
-  getRandomMessage,
-  getRandomPasswordPrompt,
-  getRandomLoginMessage,
+  getRandomWrongFormatMessage,
+  getRandomUserNotRegisteredMessage,
   getRandomAskNameMessage,
-  USER_NOT_REGISTERED_MESSAGES,
-} from '../constants';
+  getRandomLoginMessage,
+  getRandomPasswordPrompt,
+  getPasswordCreateMessage,
+  getPasswordTooShortMessage,
+  getNameRequiredMessage,
+  getErrorMessage,
+} from '@/i18n/landingHelpers';
+import i18n from '@/i18n/config';
 
 export function useLandingAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -102,7 +107,7 @@ export function useLandingAuth() {
         setTimeout(() => {
           setAuthState((prev: AuthState) => ({
             ...prev,
-            message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
+            message: getRandomUserNotRegisteredMessage(),
           }));
         }, 800); // 800ms delay for natural conversational flow
       }
@@ -111,9 +116,9 @@ export function useLandingAuth() {
       setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'email_input',
-        message: `Oops! ${error.response?.data?.detail || 'Something went wrong. Please try again.'}`,
+        message: `${getErrorMessage('generic')} ${error.response?.data?.detail || ''}`,
         isProcessing: false,
-        error: error.message || 'Failed to check email',
+        error: error.message || getErrorMessage('emailCheck'),
       }));
     }
   };
@@ -161,7 +166,7 @@ export function useLandingAuth() {
       setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'password_create',
-        message: "Perfect! Now let's secure your account. Create a password (at least 8 characters):",
+        message: getPasswordCreateMessage(),
       }));
       return;
     }
@@ -169,7 +174,7 @@ export function useLandingAuth() {
     if (!name.trim()) {
       setAuthState((prev: AuthState) => ({
         ...prev,
-        message: "I'll need your name to continue. What should I call you?",
+        message: getNameRequiredMessage(),
       }));
       return;
     }
@@ -192,7 +197,7 @@ export function useLandingAuth() {
     if (password.length < 8) {
       setAuthState((prev: AuthState) => ({
         ...prev,
-        message: "Your password needs to be at least 8 characters long. Try again?",
+        message: getPasswordTooShortMessage(),
       }));
       return;
     }
@@ -220,8 +225,8 @@ export function useLandingAuth() {
       if (result.user.onboarding_completed === false) {
         window.location.href = '/onboarding';
       } else {
-        // Redirect to dashboard or main app
-        window.location.href = '/dashboard';
+        // Redirect to smart hub
+        window.location.href = '/smart-hub';
       }
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -270,8 +275,8 @@ export function useLandingAuth() {
       if (result.user.onboarding_completed === false) {
         window.location.href = '/onboarding';
       } else {
-        // Redirect to dashboard or main app
-        window.location.href = '/dashboard';
+        // Redirect to smart hub
+        window.location.href = '/smart-hub';
       }
     } catch (error: any) {
       console.error('Login error:', error);

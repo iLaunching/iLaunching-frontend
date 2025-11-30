@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Benvingut! 🎉</h1><hr /><h2>Benvingut! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Benvingut! 🎉</h1><hr /><h2>Benvingut! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Benvingut! 🎉</h1><hr /><h2>Benvingut! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Benvingut! 🎉</h1><hr /><h2>Benvingut! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Fet!",
+    "subtitle": "Tot està preparat. Fes-me saber quan estiguis preparat per començar!"
+  },
+  "default": {
+    "title": "Benvingut! 🎉",
+    "subtitle": "Tot està preparat. Fes-me saber quan estiguis preparat per començar!",
+    "building": "Carregant...",
+    "joining": ""
+  }
+}

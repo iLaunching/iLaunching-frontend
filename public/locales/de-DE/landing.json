@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Sie sind bei iLaunching, wo Ideen zu Marken werden, die wirklich zählen. Ich bin i. Ich halte keine Reden. Ich helfe Ihnen voranzukommen. Was ist Ihre E-Mail, um zu sehen, ob wir uns schon kennen?",
+      "Willkommen bei iLaunching. Sie sind früh gekommen. Das ist bereits der richtige Schritt. Ich bin i, und ich bin hier, um den Weg zu ebnen, nicht um ihn zu verkaufen. Teilen Sie Ihre E-Mail und lassen Sie uns sehen, ob Sie bereits im System sind.",
+      "Das ist iLaunching, der Ort, an dem Gründer schneller bauen, als sie für möglich hielten. Ich bin i. Betrachten Sie mich als den stillen Partner, der es einfach erledigt. Was ist Ihre E-Mail? Lassen Sie mich prüfen, ob wir uns kennen.",
+      "Sie haben iLaunching gefunden. Gutes Timing. Ich bin i, entwickelt, um Ihnen zu helfen, den Lärm zu überspringen und etwas Echtes aufzubauen. Teilen Sie Ihre E-Mail, damit ich sehen kann, ob wir schon zusammengearbeitet haben."
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Schon zurück? Ich mag Ihre Energie. Ich bin i und warte hier. Was ist nochmal Ihre E-Mail?",
+      "Sie sind zurück! Gut. Das bedeutet, dass Sie es ernst meinen. Ich bin i. Teilen Sie Ihre E-Mail und lassen Sie uns dort weitermachen, wo wir aufgehört haben.",
+      "Willkommen zurück bei iLaunching. Bereit, dieses Mal einzutauchen? Ich bin i. Was ist Ihre E-Mail, damit wir loslegen können?",
+      "Zweiter Blick? Kluger Schritt. Ich bin i, und ich bin immer noch hier, bereit, Ihnen beim Aufbau zu helfen. Was ist Ihre E-Mail?"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Danke! Einen Moment, während ich das überprüfe.",
+      "Verstanden! Geben Sie mir eine Sekunde, um Sie zu suchen.",
+      "Perfekt! Lassen Sie mich sehen, was wir hier haben.",
+      "Danke! Überprüfe jetzt unser System."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Perfekt! Lass mich prüfen, ob {email} in unserem System ist.",
+      "Verstanden! Suche jetzt nach {email}.",
+      "Ausgezeichnet! Suche nach {email} in unseren Aufzeichnungen.",
+      "Danke! Lass mich sehen, ob {email} bereits bei uns ist."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Das ist keine E-Mail. Versuchen Sie es noch einmal mit etwas, das wie eine aussieht.",
+      "Ich brauche eine echte E-Mail, um fortzufahren. Überprüfen Sie das Format.",
+      "Das funktioniert nicht. Verwenden Sie eine gültige E-Mail-Adresse.",
+      "Nicht ganz. Stellen Sie sicher, dass es ein gültiges E-Mail-Format ist."
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Sieht so aus, als wären Sie neu hier! Das ist aufregend. Möchten Sie mitmachen?",
+      "Ich sehe Sie noch nicht im System. Bereit anzufangen?",
+      "Neues Gesicht! Möchten Sie ein Konto erstellen?",
+      "Sie sind noch nicht registriert. Sollen wir das ändern?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Tolle Wahl! Wie ist Ihr Name?",
+      "Perfekt! Wie soll ich Sie nennen?",
+      "Großartig! Sagen Sie mir Ihren Namen.",
+      "Schön! Wie heißen Sie?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Willkommen zurück! Was ist Ihre E-Mail?",
+      "Schön, Sie wiederzusehen! Geben Sie Ihre E-Mail ein.",
+      "Lassen Sie uns Sie anmelden. Was ist Ihre E-Mail?",
+      "Bereit zum Anmelden? Teilen Sie Ihre E-Mail."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Ich sehe Sie! Jetzt geben Sie Ihr Passwort ein.",
+      "Gefunden! Was ist Ihr Passwort?",
+      "Da sind Sie! Geben Sie Ihr Passwort ein, um fortzufahren.",
+      "Verstanden! Jetzt Ihr Passwort, bitte."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfekt! Jetzt sichern wir Ihr Konto. Erstellen Sie ein Passwort (mindestens 8 Zeichen):"
+  },
+  "passwordTooShort": {
+    "message": "Ihr Passwort muss mindestens 8 Zeichen lang sein. Nochmal versuchen?"
+  },
+  "nameRequired": {
+    "message": "Ich brauche Ihren Namen, um fortzufahren. Wie heißen Sie?"
+  },
+  "errors": {
+    "generic": "Hoppla! Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+    "emailCheck": "E-Mail-Überprüfung fehlgeschlagen",
+    "loginFailed": "Anmeldung fehlgeschlagen. Überprüfen Sie Ihre Anmeldedaten.",
+    "signupFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "placeholders": {
+    "email": "Geben Sie Ihre E-Mail hier ein...",
+    "name": "Geben Sie Ihren Namen ein...",
+    "password_create": "Erstellen Sie ein Passwort (mindestens 8 Zeichen)...",
+    "password_input": "Geben Sie Ihr Passwort ein..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Bitte",
+    "logMeIn": "Anmelden",
+    "continueWithoutSignup": "Ohne Registrierung fortfahren"
+  }
+}

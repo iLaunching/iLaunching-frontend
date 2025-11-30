@@ -1,0 +1,44 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Perfect! Your email is verified. 🎉</h1><hr /><h2>Welcome to the network! 🚀</h2><p>I'm building your personal hub inside our global network...</p><p>✨ <strong>You're joining thousands of creators</strong> who are already launching their dreams.</p>",
+      "<h1>Email confirmed! You're all set. ✨</h1><hr /><h2>Welcome aboard! 🚀</h2><p>Setting up your personal workspace right now...</p><p>💫 <strong>Join thousands of creators</strong> already building their future here.</p>",
+      "<h1>Verified! Let's get you started. 🎯</h1><hr /><h2>Welcome to the community! 🌟</h2><p>Creating your hub in our global network...</p><p>🚀 <strong>You're now part of something special</strong> — thousands of dreamers launching together.</p>",
+      "<h1>Great! Your email checks out. ✅</h1><hr /><h2>Welcome to the network! 🎉</h2><p>Building your personal command center...</p><p>⭐ <strong>Thousands of creators</strong> are already here, and now you are too!</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Thank you, Google! 🙏</h1><p>Your seamless authentication just made getting started so much easier.</p><hr /><h2>Welcome to the network! 🎉</h2><p>I'm building your personal hub inside our global network right now...</p><p>✨ <strong>You're joining thousands of creators</strong> who are already launching their dreams.</p>",
+      "<h1>Thanks for using Google! 🚀</h1><p>Quick and secure — exactly what we love to see.</p><hr /><h2>Welcome aboard! 🌟</h2><p>Setting up your workspace in our global network...</p><p>💫 <strong>Thousands of creators</strong> are already here building their future.</p>",
+      "<h1>Google makes it easy! ✨</h1><p>Appreciate the smooth authentication experience.</p><hr /><h2>Welcome to the community! 🎯</h2><p>Creating your personal hub right now...</p><p>🚀 <strong>You're now part of something special</strong> with thousands of dreamers.</p>",
+      "<h1>Google, you're the best! 🎉</h1><p>Seamless sign-in means we can get you started faster.</p><hr /><h2>Welcome to the network! ⚡</h2><p>Building your command center...</p><p>⭐ <strong>Join thousands of creators</strong> already launching their dreams here.</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Thank you, Facebook! 🙏</h1><p>Your seamless authentication just made getting started so much easier.</p><hr /><h2>Welcome to the network! 🎉</h2><p>I'm building your personal hub inside our global network right now...</p><p>✨ <strong>You're joining thousands of creators</strong> who are already launching their dreams.</p>",
+      "<h1>Thanks for using Facebook! 🚀</h1><p>Quick and secure — exactly what we love to see.</p><hr /><h2>Welcome aboard! 🌟</h2><p>Setting up your workspace in our global network...</p><p>💫 <strong>Thousands of creators</strong> are already here building their future.</p>",
+      "<h1>Facebook makes it easy! ✨</h1><p>Appreciate the smooth authentication experience.</p><hr /><h2>Welcome to the community! 🎯</h2><p>Creating your personal hub right now...</p><p>🚀 <strong>You're now part of something special</strong> with thousands of dreamers.</p>",
+      "<h1>Facebook, you're awesome! 🎉</h1><p>Seamless sign-in means we can get you started faster.</p><hr /><h2>Welcome to the network! ⚡</h2><p>Building your command center...</p><p>⭐ <strong>Join thousands of creators</strong> already launching their dreams here.</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Thank you, Microsoft! 🙏</h1><p>Your seamless authentication just made getting started so much easier.</p><hr /><h2>Welcome to the network! 🎉</h2><p>I'm building your personal hub inside our global network right now...</p><p>✨ <strong>You're joining thousands of creators</strong> who are already launching their dreams.</p>",
+      "<h1>Thanks for using Microsoft! 🚀</h1><p>Quick and secure — exactly what we love to see.</p><hr /><h2>Welcome aboard! 🌟</h2><p>Setting up your workspace in our global network...</p><p>💫 <strong>Thousands of creators</strong> are already here building their future.</p>",
+      "<h1>Microsoft makes it easy! ✨</h1><p>Appreciate the smooth authentication experience.</p><hr /><h2>Welcome to the community! 🎯</h2><p>Creating your personal hub right now...</p><p>🚀 <strong>You're now part of something special</strong> with thousands of dreamers.</p>",
+      "<h1>Microsoft, you're the best! 🎉</h1><p>Seamless sign-in means we can get you started faster.</p><hr /><h2>Welcome to the network! ⚡</h2><p>Building your command center...</p><p>⭐ <strong>Join thousands of creators</strong> already launching their dreams here.</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ All done!",
+    "subtitle": "Everything is ready. Let me know when you're ready to get started!"
+  },
+  "default": {
+    "title": "Welcome to the network! 🎉",
+    "subtitle": "Your account is ready!",
+    "building": "I'm building your personal hub inside our global network right now...",
+    "joining": "✨ <strong>You're joining thousands of creators</strong> who are already launching their dreams."
+  }
+}

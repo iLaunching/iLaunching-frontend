@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Salut! 👋 Bine ai venit la iLaunching. Începem?",
+      "Hei! Gata să începi ceva minunat?",
+      "Bine ai venit! Să începem călătoria ta.",
+      "Salut! Ești în locul potrivit. Să începem!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Bine ai revenit! 😊",
+      "Hei, te-am recunoscut! Bine ai revenit!",
+      "Mă bucur să te văd din nou!",
+      "Ești din nou aici! Bine ai venit!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Mulțumesc! Un moment...",
+      "Perfect, verific...",
+      "O secundă, verific...",
+      "Primit! Verificare rapidă..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Caut <strong>{email}</strong>...",
+      "Verific <strong>{email}</strong>...",
+      "Verific <strong>{email}</strong> în sistem...",
+      "Un moment, caut <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, nu arată ca un email valid. Mai încerci o dată?",
+      "Hopa! Format de email invalid. Verifici din nou?",
+      "Ceva nu e în regulă cu acel email. Poți verifica?",
+      "Formatul emailului arată ciudat. Verifici din nou?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Se pare că ești nou aici! E captivant. Vrei să te alături?",
+      "Nu te văd încă în sistem. Gata să începi?",
+      "Față nouă! Vrei să creezi un cont?",
+      "Nu ești încă înregistrat. Schimbăm asta?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Alegere grozavă! Cum te cheamă?",
+      "Perfect! Cum să te numesc?",
+      "Minunat! Spune-mi numele tău.",
+      "Bine! Cum te cheamă?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Bine ai revenit! Care e emailul tău?",
+      "Mă bucur să te văd din nou! Introdu emailul.",
+      "Să te conectăm. Care e emailul tău?",
+      "Gata să te conectezi? Împărtășește emailul."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Te văd! Acum introdu parola.",
+      "Te-am găsit! Care e parola ta?",
+      "Ești acolo! Introdu parola pentru a continua.",
+      "Înțeles! Acum parola ta, te rog."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfect! Acum să-ți securizăm contul. Creează o parolă (cel puțin 8 caractere):"
+  },
+  "passwordTooShort": {
+    "message": "Parola ta trebuie să aibă cel puțin 8 caractere. Mai încerci?"
+  },
+  "nameRequired": {
+    "message": "Am nevoie de numele tău pentru a continua. Cum te cheamă?"
+  },
+  "errors": {
+    "generic": "Hopa! Ceva a mers prost. Te rog încearcă din nou.",
+    "emailCheck": "Verificarea emailului a eșuat",
+    "loginFailed": "Conectarea a eșuat. Verifică datele de autentificare.",
+    "signupFailed": "Înregistrarea a eșuat. Te rog încearcă din nou."
+  },
+  "placeholders": {
+    "email": "Introduceți adresa dvs. de e-mail aici...",
+    "name": "Introduceți numele dvs...",
+    "password_create": "Creați o parolă (minim 8 caractere)...",
+    "password_input": "Introduceți parola dvs..."
+  },
+  "buttons": {
+    "yesPlease": "Da, Vă Rog",
+    "logMeIn": "Conectare",
+    "continueWithoutSignup": "Continuați fără înregistrare"
+  }
+}

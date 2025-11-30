@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Tervetuloa! 🎉</h1><hr /><h2>Tervetuloa! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Tervetuloa! 🎉</h1><hr /><h2>Tervetuloa! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Tervetuloa! 🎉</h1><hr /><h2>Tervetuloa! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Tervetuloa! 🎉</h1><hr /><h2>Tervetuloa! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Valmis!",
+    "subtitle": "Kaikki on valmista. Kerro minulle, kun olet valmis aloittamaan!"
+  },
+  "default": {
+    "title": "Tervetuloa! 🎉",
+    "subtitle": "Kaikki on valmista. Kerro minulle, kun olet valmis aloittamaan!",
+    "building": "Ladataan...",
+    "joining": ""
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hei! 👋 Tervetuloa iLaunchingiin. Aloitetaanko?",
+      "Hei! Valmiina aloittamaan jotain mahtavaa?",
+      "Tervetuloa! Aloitetaan matkasi.",
+      "Hei! Olet oikeassa paikassa. Aloitetaan!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Tervetuloa takaisin! 😊",
+      "Hei, muistan sinut! Tervetuloa takaisin!",
+      "Kiva nähdä sinut taas!",
+      "Siinäpä olet taas! Tervetuloa!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Kiitos! Hetki...",
+      "Täydellista, tarkistan...",
+      "Sekunti, tarkistan...",
+      "Vastaanotettu! Nopea tarkistus..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Etsin <strong>{email}</strong>...",
+      "Tarkistan <strong>{email}</strong>...",
+      "Tarkistan <strong>{email}</strong> järjestelmästä...",
+      "Hetki, etsin <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, tuo ei näytä kelvolliselta sähköpostilta. Yritä uudelleen?",
+      "Hups! Virheellinen sähköpostimuoto. Tarkista uudelleen?",
+      "Jotain on vialla tuossa sähköpostissa. Voitko tarkistaa?",
+      "Tuo sähköpostimuoto näyttää oudolta. Tarkista uudelleen?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Näytät olevan uusi täällä! Se on jännittävää. Haluatko liittyä?",
+      "En näe sinua vielä järjestelmässä. Valmiina aloittamaan?",
+      "Uusi kasvo! Haluatko luoda tilin?",
+      "Et ole vielä rekisteröitynyt. Muutetaanko se?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Hieno valinta! Mikä sinun nimesi on?",
+      "Täydellinen! Miten kutsun sinua?",
+      "Mahtavaa! Kerro nimesi.",
+      "Hyvä! Mikä sinun nimesi on?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Tervetuloa takaisin! Mikä on sähköpostisi?",
+      "Kiva nähdä sinut taas! Syötä sähköpostisi.",
+      "Kirjataan sinut sisään. Mikä on sähköpostisi?",
+      "Valmiina kirjautumaan? Jaa sähköpostisi."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Näen sinut! Syötä nyt salasanasi.",
+      "Löytyi! Mikä on salasanasi?",
+      "Siinä olet! Syötä salasanasi jatkaaksesi.",
+      "Selvä! Nyt salasanasi, kiitos."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Täydellinen! Nyt suojataan tilisi. Luo salasana (vähintään 8 merkkiä):"
+  },
+  "passwordTooShort": {
+    "message": "Salasanasi on oltava vähintään 8 merkkiä pitkä. Yritä uudelleen?"
+  },
+  "nameRequired": {
+    "message": "Tarvitsen nimesi jatkaakseni. Mikä sinun nimesi on?"
+  },
+  "errors": {
+    "generic": "Hups! Jotain meni pieleen. Yritä uudelleen.",
+    "emailCheck": "Sähköpostin tarkistus epäonnistui",
+    "loginFailed": "Kirjautuminen epäonnistui. Tarkista kirjautumistietosi.",
+    "signupFailed": "Rekisteröityminen epäonnistui. Yritä uudelleen."
+  },
+  "placeholders": {
+    "email": "Kirjoita sähköpostisi tähän...",
+    "name": "Syötä nimesi...",
+    "password_create": "Luo salasana (vähintään 8 merkkiä)...",
+    "password_input": "Syötä salasanasi..."
+  },
+  "buttons": {
+    "yesPlease": "Kyllä Kiitos",
+    "logMeIn": "Kirjaudu Sisään",
+    "continueWithoutSignup": "Jatka ilman rekisteröitymistä"
+  }
+}

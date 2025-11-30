@@ -1,0 +1,33 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Parfait ! Votre email est vérifié. 🎉</h1><hr /><h2>Bienvenue sur le réseau ! 🚀</h2><p>Je construis votre hub personnel dans notre réseau mondial...</p><p>✨ <strong>Vous rejoignez des milliers de créateurs</strong> qui lancent déjà leurs rêves.</p>",
+      "<h1>Email confirmé ! Vous êtes prêt. ✨</h1><hr /><h2>Bienvenue à bord ! 🚀</h2><p>Configuration de votre espace de travail personnel maintenant...</p><p>💫 <strong>Des milliers de créateurs</strong> sont déjà ici en train de construire leur avenir.</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Merci, Google ! 🙏</h1><p>Votre authentification transparente a rendu le démarrage beaucoup plus facile.</p><hr /><h2>Bienvenue sur le réseau ! 🎉</h2><p>Je construis votre hub personnel dans notre réseau mondial maintenant...</p><p>✨ <strong>Vous rejoignez des milliers de créateurs</strong> qui lancent déjà leurs rêves.</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Merci, Facebook ! 🙏</h1><p>Votre authentification transparente a rendu le démarrage beaucoup plus facile.</p><hr /><h2>Bienvenue sur le réseau ! 🎉</h2><p>Je construis votre hub personnel dans notre réseau mondial maintenant...</p><p>✨ <strong>Vous rejoignez des milliers de créateurs</strong> qui lancent déjà leurs rêves.</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Merci, Microsoft ! 🙏</h1><p>Votre authentification transparente a rendu le démarrage beaucoup plus facile.</p><hr /><h2>Bienvenue sur le réseau ! 🎉</h2><p>Je construis votre hub personnel dans notre réseau mondial maintenant...</p><p>✨ <strong>Vous rejoignez des milliers de créateurs</strong> qui lancent déjà leurs rêves.</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Tout est prêt !",
+    "subtitle": "Tout est prêt. Faites-moi savoir quand vous êtes prêt à commencer !"
+  },
+  "default": {
+    "title": "Bienvenue sur le réseau ! 🎉",
+    "subtitle": "Votre compte est prêt !",
+    "building": "Je construis votre hub personnel dans notre réseau mondial maintenant...",
+    "joining": "✨ <strong>Vous rejoignez des milliers de créateurs</strong> qui lancent déjà leurs rêves."
+  }
+}

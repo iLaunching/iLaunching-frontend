@@ -1,0 +1,38 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Perfekt! Ihre E-Mail ist verifiziert. 🎉</h1><hr /><h2>Willkommen an Bord! 🚀</h2><p>Lassen Sie uns etwas Erstaunliches zusammen aufbauen...</p>",
+      "<h1>Fantastisch! Ihre E-Mail ist bestätigt. ✅</h1><hr /><h2>Zeit, durchzustarten! 💪</h2><p>Bereit, Ihre Reise zu beginnen?</p>",
+      "<h1>Großartig! Sie sind verifiziert. 🎊</h1><hr /><h2>Auf geht's! 🌟</h2><p>Ihre Abenteuer beginnen jetzt...</p>",
+      "<h1>Ausgezeichnet! E-Mail bestätigt. ✨</h1><hr /><h2>Willkommen im Team! 🎯</h2><p>Lassen Sie uns etwas Besonderes schaffen...</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Willkommen! Google-Anmeldung erfolgreich. ��</h1><hr /><h2>Schön, Sie zu sehen! 👋</h2><p>Ihre personalisierte Erfahrung wartet...</p>",
+      "<h1>Hallo! Mit Google verbunden. ✅</h1><hr /><h2>Los geht's! 🚀</h2><p>Zeit, etwas Großartiges zu schaffen...</p>",
+      "<h1>Perfekt! Google-Konto verknüpft. 🌟</h1><hr /><h2>Willkommen zurück! 💫</h2><p>Lassen Sie uns dort weitermachen, wo wir aufgehört haben...</p>",
+      "<h1>Fantastisch! Google-Anmeldung abgeschlossen. ✨</h1><hr /><h2>Bereit zum Start! 🎯</h2><p>Ihre Reise beginnt hier...</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Willkommen! Facebook-Anmeldung erfolgreich. 🎉</h1><hr /><h2>Schön, Sie zu haben! 👋</h2><p>Ihre Erfahrung beginnt jetzt...</p>",
+      "<h1>Hallo! Mit Facebook verbunden. ✅</h1><hr /><h2>Perfekt! 🚀</h2><p>Lassen Sie uns etwas Erstaunliches schaffen...</p>",
+      "<h1>Super! Facebook-Konto verknüpft. 🌟</h1><hr /><h2>Willkommen im Club! 💫</h2><p>Zeit, zu beginnen...</p>",
+      "<h1>Ausgezeichnet! Facebook-Anmeldung abgeschlossen. ✨</h1><hr /><h2>Los geht's! 🎯</h2><p>Ihre Reise wartet...</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Willkommen! Microsoft-Anmeldung erfolgreich. 🎉</h1><hr /><h2>Perfekt eingerichtet! 👋</h2><p>Ihre Workspace ist bereit...</p>",
+      "<h1>Hallo! Mit Microsoft verbunden. ✅</h1><hr /><h2>Bereit zum Loslegen! 🚀</h2><p>Lassen Sie uns produktiv sein...</p>",
+      "<h1>Großartig! Microsoft-Konto verknüpft. ��</h1><hr /><h2>Willkommen an Bord! 💫</h2><p>Zeit, durchzustarten...</p>",
+      "<h1>Fantastisch! Microsoft-Anmeldung abgeschlossen. ✨</h1><hr /><h2>Los geht's! 🎯</h2><p>Ihre Tools warten...</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Alles erledigt!",
+    "subtitle": "Alles ist bereit. Sag mir Bescheid, wenn du loslegen möchtest!"
+  }
+}

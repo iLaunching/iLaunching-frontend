@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Chào mừng! 🎉</h1><hr /><h2>Chào mừng! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Chào mừng! 🎉</h1><hr /><h2>Chào mừng! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Chào mừng! 🎉</h1><hr /><h2>Chào mừng! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Chào mừng! 🎉</h1><hr /><h2>Chào mừng! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Hoàn thành!",
+    "subtitle": "Mọi thứ đã sẵn sàng. Hãy cho tôi biết khi bạn sẵn sàng bắt đầu!"
+  },
+  "default": {
+    "title": "Chào mừng! 🎉",
+    "subtitle": "Mọi thứ đã sẵn sàng. Hãy cho tôi biết khi bạn sẵn sàng bắt đầu!",
+    "building": "Đang tải...",
+    "joining": ""
+  }
+}

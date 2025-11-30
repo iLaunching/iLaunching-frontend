@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hei! 👋 Velkommen til iLaunching. Skal vi begynne?",
+      "Hei! Klar til å starte noe fantastisk?",
+      "Velkommen! La oss starte reisen din.",
+      "Hei! Du er på rett sted. La oss begynne!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Velkommen tilbake! 😊",
+      "Hei, jeg husker deg! Velkommen tilbake!",
+      "Hyggelig å se deg igjen!",
+      "Der er du igjen! Velkommen!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Takk! Et øyeblikk...",
+      "Perfekt, sjekker...",
+      "Ett sekund, kontrollerer...",
+      "Mottatt! Rask sjekk..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Leter etter <strong>{email}</strong>...",
+      "Kontrollerer <strong>{email}</strong>...",
+      "Sjekker <strong>{email}</strong> i systemet...",
+      "Et øyeblikk, leter etter <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, det ser ikke ut som en gyldig e-post. Prøv igjen?",
+      "Oops! Ugyldig e-postformat. Sjekk det igjen?",
+      "Noe er galt med den e-posten. Kan du sjekke?",
+      "Det e-postformatet ser rart ut. Sjekk igjen?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Det ser ut som du er ny her! Det er spennende. Vil du bli med?",
+      "Jeg ser deg ikke i systemet ennå. Klar til å starte?",
+      "Nytt ansikt! Vil du opprette en konto?",
+      "Du er ikke registrert ennå. Skal vi endre det?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Flott valg! Hva heter du?",
+      "Perfekt! Hva skal jeg kalle deg?",
+      "Fantastisk! La meg vite navnet ditt.",
+      "Bra! Hva heter du?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Velkommen tilbake! Hva er e-posten din?",
+      "Hyggelig å se deg igjen! Skriv inn e-posten din.",
+      "La oss logge deg inn. Hva er e-posten din?",
+      "Klar til å logge inn? Del e-posten din."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Jeg ser deg! Skriv nå inn passordet ditt.",
+      "Funnet! Hva er passordet ditt?",
+      "Der er du! Skriv inn passordet ditt for å fortsette.",
+      "Forstått! Nå passordet ditt, takk."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfekt! Nå sikrer vi kontoen din. Opprett et passord (minst 8 tegn):"
+  },
+  "passwordTooShort": {
+    "message": "Passordet ditt må være minst 8 tegn langt. Prøv igjen?"
+  },
+  "nameRequired": {
+    "message": "Jeg trenger navnet ditt for å fortsette. Hva heter du?"
+  },
+  "errors": {
+    "generic": "Oops! Noe gikk galt. Prøv igjen.",
+    "emailCheck": "E-postsjekk mislyktes",
+    "loginFailed": "Innlogging mislyktes. Sjekk påloggingsinformasjonen din.",
+    "signupFailed": "Registrering mislyktes. Prøv igjen."
+  },
+  "placeholders": {
+    "email": "Skriv inn e-posten din her...",
+    "name": "Skriv inn navnet ditt...",
+    "password_create": "Opprett et passord (minst 8 tegn)...",
+    "password_input": "Skriv inn passordet ditt..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Takk",
+    "logMeIn": "Logg Inn",
+    "continueWithoutSignup": "Fortsett uten påmelding"
+  }
+}

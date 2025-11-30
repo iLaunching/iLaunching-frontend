@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Salut ! 👋 Bienvenue sur iLaunching. On commence ?",
+      "Hé ! Prêt à commencer quelque chose de génial ?",
+      "Bienvenue ! Commençons votre voyage.",
+      "Salut ! Vous êtes au bon endroit. Allons-y !"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Content de vous revoir ! 😊",
+      "Hé, je me souviens de vous ! Bon retour !",
+      "Ravi de vous revoir !",
+      "Vous revoilà ! Bienvenue !"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Merci ! Un instant...",
+      "Parfait, je vérifie...",
+      "Une seconde, je contrôle...",
+      "Reçu ! Contrôle rapide..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Je cherche <strong>{email}</strong>...",
+      "Je vérifie <strong>{email}</strong>...",
+      "Je contrôle <strong>{email}</strong> dans le système...",
+      "Un instant, je cherche <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, ça ne ressemble pas à un email valide. Réessayer ?",
+      "Oups ! Format d'email invalide. Revérifier ?",
+      "Il y a un problème avec cet email. Pouvez-vous vérifier ?",
+      "Ce format d'email semble bizarre. Revérifier ?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Il semblerait que vous soyez nouveau ici ! C'est chouette. Envie de rejoindre ?",
+      "Je ne vous vois pas encore dans le système. Prêt à démarrer ?",
+      "Nouveau visage ! Envie de créer un compte ?",
+      "Vous n'êtes pas encore enregistré. On change ça ?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Excellent choix ! C'est quoi votre nom ?",
+      "Parfait ! Comment je vous appelle ?",
+      "Super ! Dites-moi votre nom.",
+      "Bien ! C'est quoi votre nom ?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Content de vous revoir ! C'est quoi votre email ?",
+      "Ravi de vous revoir ! Entrez votre email.",
+      "On vous connecte. C'est quoi votre email ?",
+      "Prêt à vous connecter ? Partagez votre email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Je vous vois ! Maintenant entrez votre mot de passe.",
+      "Trouvé ! C'est quoi votre mot de passe ?",
+      "Vous voilà ! Entrez votre mot de passe pour continuer.",
+      "Compris ! Maintenant votre mot de passe, s'il vous plaît."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Parfait ! Maintenant sécurisons votre compte. Créez un mot de passe (au moins 8 caractères) :"
+  },
+  "passwordTooShort": {
+    "message": "Votre mot de passe doit contenir au moins 8 caractères. Réessayer ?"
+  },
+  "nameRequired": {
+    "message": "J'ai besoin de votre nom pour continuer. C'est quoi votre nom ?"
+  },
+  "errors": {
+    "generic": "Oups ! Quelque chose a raté. Veuillez réessayer.",
+    "emailCheck": "La vérification de l'email a échoué",
+    "loginFailed": "La connexion a échoué. Vérifiez vos identifiants.",
+    "signupFailed": "L'inscription a échoué. Veuillez réessayer."
+  },
+  "placeholders": {
+    "email": "Tapez votre e-mail ici...",
+    "name": "Entrez votre nom...",
+    "password_create": "Créez un mot de passe (minimum 8 caractères)...",
+    "password_input": "Entrez votre mot de passe..."
+  },
+  "buttons": {
+    "yesPlease": "Oui, S'il Vous Plaît",
+    "logMeIn": "Me Connecter",
+    "continueWithoutSignup": "Continuer sans s'inscrire"
+  }
+}

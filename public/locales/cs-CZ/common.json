@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Jsem připraven - Začněme!",
+    "continue": "Pokračovat",
+    "back": "Zpět",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Vítejte",
+    "loading": "Načítání...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

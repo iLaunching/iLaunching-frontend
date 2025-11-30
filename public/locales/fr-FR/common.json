@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Langue"
+  },
+  "buttons": {
+    "getStarted": "Je suis prêt - C'est parti!",
+    "continue": "Continuer",
+    "back": "Retour",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "logout": "Déconnexion"
+  },
+  "common": {
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès"
+  }
+}

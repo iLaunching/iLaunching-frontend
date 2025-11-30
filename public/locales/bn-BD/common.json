@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "আমি প্রস্তুত - চলুন শুরু করি!",
+    "continue": "চালিয়ে যান",
+    "back": "পিছনে",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "স্বাগতম",
+    "loading": "লোড হচ্ছে...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

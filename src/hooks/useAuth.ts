@@ -20,7 +20,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setAuth(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      navigate('/dashboard');
+      navigate('/smart-hub');
     },
   });
 
@@ -30,7 +30,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setAuth(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      navigate('/dashboard');
+      navigate('/smart-hub');
     },
   });
 

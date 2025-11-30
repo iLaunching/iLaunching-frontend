@@ -1,0 +1,33 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>¡Perfecto! Tu correo está verificado. 🎉</h1><hr /><h2>¡Bienvenido a la red! 🚀</h2><p>Estoy construyendo tu centro personal dentro de nuestra red global...</p><p>✨ <strong>Te unes a miles de creadores</strong> que ya están lanzando sus sueños.</p>",
+      "<h1>¡Correo confirmado! Todo listo. ✨</h1><hr /><h2>¡Bienvenido a bordo! 🚀</h2><p>Configurando tu espacio de trabajo personal ahora...</p><p>💫 <strong>Miles de creadores</strong> ya están aquí construyendo su futuro.</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>¡Gracias, Google! 🙏</h1><p>Tu autenticación perfecta hizo que comenzar fuera mucho más fácil.</p><hr /><h2>¡Bienvenido a la red! 🎉</h2><p>Estoy construyendo tu centro personal dentro de nuestra red global ahora...</p><p>✨ <strong>Te unes a miles de creadores</strong> que ya están lanzando sus sueños.</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>¡Gracias, Facebook! 🙏</h1><p>Tu autenticación perfecta hizo que comenzar fuera mucho más fácil.</p><hr /><h2>¡Bienvenido a la red! 🎉</h2><p>Estoy construyendo tu centro personal dentro de nuestra red global ahora...</p><p>✨ <strong>Te unes a miles de creadores</strong> que ya están lanzando sus sueños.</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>¡Gracias, Microsoft! 🙏</h1><p>Tu autenticación perfecta hizo que comenzar fuera mucho más fácil.</p><hr /><h2>¡Bienvenido a la red! 🎉</h2><p>Estoy construyendo tu centro personal dentro de nuestra red global ahora...</p><p>✨ <strong>Te unes a miles de creadores</strong> que ya están lanzando sus sueños.</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ ¡Todo listo!",
+    "subtitle": "Todo está preparado. ¡Avísame cuando estés listo para empezar!"
+  },
+  "default": {
+    "title": "¡Bienvenido a la red! 🎉",
+    "subtitle": "¡Tu cuenta está lista!",
+    "building": "Estoy construyendo tu centro personal dentro de nuestra red global ahora...",
+    "joining": "✨ <strong>Te unes a miles de creadores</strong> que ya están lanzando sus sueños."
+  }
+}

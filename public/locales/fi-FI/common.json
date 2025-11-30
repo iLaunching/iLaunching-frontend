@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Olen valmis - Aloitetaan!",
+    "continue": "Jatka",
+    "back": "Takaisin",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Tervetuloa",
+    "loading": "Ladataan...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

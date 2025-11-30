@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authApi } from '../api/auth';
 import { useAuthStore } from '@/store/authStore';
 import { 
@@ -7,13 +8,14 @@ import {
   getRandomGoogleSignupMessage, 
   getRandomFacebookSignupMessage, 
   getRandomMicrosoftSignupMessage 
-} from '@/constants/messages';
+} from '@/i18n/messageHelpers';
 import BackgroundImage from '../components/BackgroundImage';
 import Header from '@/components/layout/Header';
 import GuardedTypewriter from '@/components/GuardedTypewriter';
 
 const SignupInterface = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['messages', 'common']);
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isProcessing, setIsProcessing] = useState(true);
   const [message, setMessage] = useState('');
@@ -59,11 +61,11 @@ const SignupInterface = () => {
         const hrNode = schema.nodes.horizontalRule.create();
         const h2Node = schema.nodes.heading.create(
           { level: 2 },
-          schema.text('✅ All done!')
+          schema.text(t('messages:completion.title'))
         );
         const pNode = schema.nodes.paragraph.create(
           null,
-          schema.text('Everything is ready. Let me know when you\'re ready to get started!')
+          schema.text(t('messages:completion.subtitle'))
         );
         
         // Insert nodes at the end
@@ -171,7 +173,7 @@ const SignupInterface = () => {
             setIsProcessing(false);
             
             setTimeout(() => {
-              navigate('/dashboard');
+              navigate('/smart-hub');
             }, 1500);
           }
         })
@@ -232,7 +234,7 @@ const SignupInterface = () => {
                   className="px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                   style={{ fontFamily: "'Work Sans', sans-serif" }}
                 >
-                  🚀 I'm Ready - Let's Get Started!
+                  🚀 {t('common:buttons.getStarted')}
                 </button>
               </div>
             )}

@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Você está no iLaunching, onde ideias se transformam em marcas que realmente importam. Eu sou i. Não faço discursos. Eu ajudo você a avançar. Qual é seu email para ver se já nos conhecemos?",
+      "Bem-vindo ao iLaunching. Você chegou cedo. Já é a jogada certa. Eu sou i, e estou aqui para abrir o caminho, não para vendê-lo. Compartilhe seu email e vamos ver se você já está no sistema.",
+      "Isto é iLaunching, o lugar onde fundadores constroem mais rápido do que pensavam ser possível. Eu sou i. Pense em mim como o parceiro silencioso que simplesmente faz acontecer. Qual é seu email? Deixe-me verificar se nos conhecemos.",
+      "Você encontrou o iLaunching. Bom timing. Eu sou i, feito para ajudá-lo a pular o ruído e construir algo real. Compartilhe seu email para eu ver se já trabalhamos juntos antes."
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Já voltou? Gosto da sua energia. Eu sou i, e estou aqui esperando. Qual é seu email mesmo?",
+      "Você voltou! Bom. Isso significa que você está levando a sério. Eu sou i. Compartilhe seu email e vamos continuar de onde paramos.",
+      "Bem-vindo de volta ao iLaunching. Pronto para mergulhar desta vez? Eu sou i. Qual é seu email para podermos começar?",
+      "Segunda olhada? Movimento inteligente. Eu sou i, e ainda estou aqui pronto para ajudá-lo a construir. Qual é seu email?"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Obrigado! Um momento enquanto verifico isso.",
+      "Entendi! Me dê um segundo para procurá-lo.",
+      "Perfeito! Deixe-me ver o que temos aqui.",
+      "Obrigado! Verificando nosso sistema agora."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Perfeito! Deixe-me verificar se {email} está em nosso sistema.",
+      "Entendi! Procurando {email} agora.",
+      "Excelente! Procurando {email} em nossos registros.",
+      "Obrigado! Deixe-me ver se {email} já está conosco."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Isso não é um email. Tente novamente com algo que pareça um.",
+      "Preciso de um email real para avançar. Verifique o formato.",
+      "Isso não funciona. Use um endereço de email válido.",
+      "Não exatamente. Certifique-se de que é um formato de email válido."
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Parece que você é novo aqui! Isso é emocionante. Quer participar?",
+      "Ainda não te vejo no sistema. Pronto para começar?",
+      "Cara nova! Gostaria de criar uma conta?",
+      "Você ainda não está registrado. Vamos mudar isso?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Ótima escolha! Qual é o seu nome?",
+      "Perfeito! Como devo te chamar?",
+      "Incrível! Me diga seu nome.",
+      "Legal! Qual é o seu nome?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Bem-vindo de volta! Qual é o seu email?",
+      "Que bom te ver de novo! Digite seu email.",
+      "Vamos fazer o login. Qual é o seu email?",
+      "Pronto para entrar? Compartilhe seu email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Te encontrei! Agora digite sua senha.",
+      "Achei você! Qual é sua senha?",
+      "Aí está você! Digite sua senha para continuar.",
+      "Entendi! Agora sua senha, por favor."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfeito! Agora vamos proteger sua conta. Crie uma senha (pelo menos 8 caracteres):"
+  },
+  "passwordTooShort": {
+    "message": "Sua senha precisa ter pelo menos 8 caracteres. Tentar de novo?"
+  },
+  "nameRequired": {
+    "message": "Vou precisar do seu nome para continuar. Como você se chama?"
+  },
+  "errors": {
+    "generic": "Ops! Algo deu errado. Tente novamente.",
+    "emailCheck": "Falha ao verificar email",
+    "loginFailed": "Login falhou. Verifique suas credenciais.",
+    "signupFailed": "Cadastro falhou. Tente novamente."
+  },
+  "placeholders": {
+    "email": "Digite seu e-mail aqui...",
+    "name": "Digite seu nome...",
+    "password_create": "Crie uma senha (mínimo 8 caracteres)...",
+    "password_input": "Digite sua senha..."
+  },
+  "buttons": {
+    "yesPlease": "Sim, Por Favor",
+    "logMeIn": "Entrar",
+    "continueWithoutSignup": "Continuar sem cadastro"
+  }
+}

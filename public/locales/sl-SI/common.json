@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Pripravljen sem - Začnimo!",
+    "continue": "Nadaljuj",
+    "back": "Nazaj",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Dobrodošli",
+    "loading": "Nalaganje...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Bun venit! 🎉</h1><hr /><h2>Bun venit! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Bun venit! 🎉</h1><hr /><h2>Bun venit! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Bun venit! 🎉</h1><hr /><h2>Bun venit! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Bun venit! 🎉</h1><hr /><h2>Bun venit! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Gata!",
+    "subtitle": "Totul este gata. Anunță-mă când ești gata să începi!"
+  },
+  "default": {
+    "title": "Bun venit! 🎉",
+    "subtitle": "Totul este gata. Anunță-mă când ești gata să începi!",
+    "building": "Se încarcă...",
+    "joining": ""
+  }
+}

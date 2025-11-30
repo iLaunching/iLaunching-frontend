@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "שלום! 👋 ברוכים הבאים ל-iLaunching. מתחילים?",
+      "היי! מוכנים להתחיל משהו מדהים?",
+      "ברוכים הבאים! בואו נתחיל את המסע שלכם.",
+      "שלום! הגעתם למקום הנכון. בואו נתחיל!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "ברוכים השבים! 😊",
+      "היי, אני זוכר אותך! ברוכים השבים!",
+      "שמח לראות אותך שוב!",
+      "אתה כאן שוב! ברוכים הבאים!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "תודה! רגע...",
+      "מושלם, בודק...",
+      "שנייה, מאמת...",
+      "התקבל! בדיקה מהירה..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "מחפש את <strong>{email}</strong>...",
+      "בודק את <strong>{email}</strong>...",
+      "בודק את <strong>{email}</strong> במערכת...",
+      "רגע, מחפש את <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "הממ, זה לא נראה כמו אימייל תקין. לנסות שוב?",
+      "אופס! פורמט אימייל לא תקין. לבדוק שוב?",
+      "משהו לא בסדר עם האימייל הזה. אתה יכול לבדוק?",
+      "פורמט האימייל נראה מוזר. לבדוק שוב?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "נראה שאתה חדש פה! זה מרגש. רוצה להצטרף?",
+      "אני עדיין לא רואה אותך במערכת. מוכן להתחיל?",
+      "פנים חדשות! רוצה ליצור חשבון?",
+      "אתה עדיין לא רשום. נשנה את זה?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "בחירה מעולה! מה השם שלך?",
+      "מושלם! איך לקרוא לך?",
+      "נהדר! ספר לי את השם שלך.",
+      "טוב! מה השם שלך?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "ברוכים השבים! מה האימייל שלך?",
+      "שמח לראות אותך שוב! הכנס את האימייל שלך.",
+      "בוא נכניס אותך. מה האימייל שלך?",
+      "מוכן להתחבר? שתף את האימייל שלך."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "אני רואה אותך! עכשיו הכנס את הסיסמה שלך.",
+      "מצאתי אותך! מה הסיסמה שלך?",
+      "אתה שם! הכנס סיסמה כדי להמשיך.",
+      "הבנתי! עכשיו הסיסמה שלך, בבקשה."
+    ]
+  },
+  "passwordCreate": {
+    "message": "מושלם! עכשיו בוא נאבטח את החשבון שלך. צור סיסמה (לפחות 8 תווים):"
+  },
+  "passwordTooShort": {
+    "message": "הסיסמה שלך צריכה להיות לפחות 8 תווים. לנסות שוב?"
+  },
+  "nameRequired": {
+    "message": "אני צריך את השם שלך כדי להמשיך. מה השם שלך?"
+  },
+  "errors": {
+    "generic": "אופס! משהו השתבש. אנא נסה שוב.",
+    "emailCheck": "בדיקת האימייל נכשלה",
+    "loginFailed": "ההתחברות נכשלה. בדוק את פרטי ההזדהות שלך.",
+    "signupFailed": "ההרשמה נכשלה. אנא נסה שוב."
+  },
+  "placeholders": {
+    "email": "הקלד את המייל שלך כאן...",
+    "name": "הזן את שמך...",
+    "password_create": "צור סיסמה (לפחות 8 תווים)...",
+    "password_input": "הזן את הסיסמה שלך..."
+  },
+  "buttons": {
+    "yesPlease": "כן בבקשה",
+    "logMeIn": "התחבר",
+    "continueWithoutSignup": "המשך בלי להירשם"
+  }
+}

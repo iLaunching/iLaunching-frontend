@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hej! 👋 Välkommen till iLaunching. Ska vi börja?",
+      "Hej! Redo att börja något fantastiskt?",
+      "Välkommen! Låt oss starta din resa.",
+      "Hej! Du är på rätt plats. Låt oss börja!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Välkommen tillbaka! 😊",
+      "Hej, jag minns dig! Välkommen tillbaka!",
+      "Kul att se dig igen!",
+      "Där är du igen! Välkommen!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Tack! Ett ögonblick...",
+      "Perfekt, kollar...",
+      "En sekund, kontrollerar...",
+      "Mottaget! Snabb koll..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Letar efter <strong>{email}</strong>...",
+      "Kontrollerar <strong>{email}</strong>...",
+      "Kollar <strong>{email}</strong> i systemet...",
+      "Ett ögonblick, letar efter <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, det ser inte ut som en giltig e-postadress. Försök igen?",
+      "Hoppsan! Ogiltigt e-postformat. Kontrollera igen?",
+      "Något är fel med den e-postadressen. Kan du kolla?",
+      "Det e-postformatet ser konstigt ut. Kontrollera igen?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Det verkar som att du är ny här! Det är spännande. Vill du gå med?",
+      "Jag ser dig inte i systemet ännu. Redo att börja?",
+      "Nytt ansikte! Vill du skapa ett konto?",
+      "Du är inte registrerad ännu. Ska vi ändra på det?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Bra val! Vad heter du?",
+      "Perfekt! Vad ska jag kalla dig?",
+      "Fantastiskt! Låt mig veta ditt namn.",
+      "Bra! Vad heter du?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Välkommen tillbaka! Vad är din e-post?",
+      "Kul att se dig igen! Ange din e-post.",
+      "Låt oss logga in dig. Vad är din e-post?",
+      "Redo att logga in? Dela din e-post."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Jag ser dig! Ange nu ditt lösenord.",
+      "Hittade dig! Vad är ditt lösenord?",
+      "Där är du! Ange ditt lösenord för att fortsätta.",
+      "Förstått! Nu ditt lösenord, tack."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfekt! Nu säkrar vi ditt konto. Skapa ett lösenord (minst 8 tecken):"
+  },
+  "passwordTooShort": {
+    "message": "Ditt lösenord måste vara minst 8 tecken långt. Försök igen?"
+  },
+  "nameRequired": {
+    "message": "Jag behöver ditt namn för att fortsätta. Vad heter du?"
+  },
+  "errors": {
+    "generic": "Hoppsan! Något gick fel. Försök igen.",
+    "emailCheck": "E-postkontroll misslyckades",
+    "loginFailed": "Inloggning misslyckades. Kontrollera dina uppgifter.",
+    "signupFailed": "Registrering misslyckades. Försök igen."
+  },
+  "placeholders": {
+    "email": "Skriv din e-post här...",
+    "name": "Ange ditt namn...",
+    "password_create": "Skapa ett lösenord (minst 8 tecken)...",
+    "password_input": "Ange ditt lösenord..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Tack",
+    "logMeIn": "Logga In",
+    "continueWithoutSignup": "Fortsätt utan registrering"
+  }
+}

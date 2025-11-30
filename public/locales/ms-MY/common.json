@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Saya bersedia - Mari kita mulakan!",
+    "continue": "Teruskan",
+    "back": "Kembali",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Selamat datang",
+    "loading": "Memuatkan...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

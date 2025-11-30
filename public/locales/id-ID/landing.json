@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Halo! 👋 Selamat datang di iLaunching. Mulai?",
+      "Hei! Siap memulai sesuatu yang luar biasa?",
+      "Selamat datang! Mari mulai perjalanan Anda.",
+      "Halo! Anda berada di tempat yang tepat. Ayo mulai!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Selamat datang kembali! 😊",
+      "Hei, saya ingat Anda! Selamat datang kembali!",
+      "Senang bertemu lagi!",
+      "Anda di sini lagi! Selamat datang!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Terima kasih! Sebentar...",
+      "Sempurna, memeriksa...",
+      "Sedetik, memverifikasi...",
+      "Diterima! Pemeriksaan cepat..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Mencari <strong>{email}</strong>...",
+      "Memeriksa <strong>{email}</strong>...",
+      "Memeriksa <strong>{email}</strong> di sistem...",
+      "Sebentar, mencari <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, ini tidak terlihat seperti email yang valid. Coba lagi?",
+      "Ups! Format email tidak valid. Periksa lagi?",
+      "Ada yang salah dengan email itu. Bisa Anda periksa?",
+      "Format email itu terlihat aneh. Periksa lagi?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Sepertinya Anda baru di sini! Ini menarik. Ingin bergabung?",
+      "Saya belum melihat Anda di sistem. Siap untuk mulai?",
+      "Wajah baru! Ingin membuat akun?",
+      "Anda belum terdaftar. Kita ubah itu?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Pilihan bagus! Siapa nama Anda?",
+      "Sempurna! Apa yang harus saya panggil Anda?",
+      "Luar biasa! Beri tahu nama Anda.",
+      "Bagus! Siapa nama Anda?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Selamat datang kembali! Apa email Anda?",
+      "Senang bertemu lagi! Masukkan email Anda.",
+      "Mari masuk. Apa email Anda?",
+      "Siap untuk masuk? Bagikan email Anda."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Saya melihat Anda! Sekarang masukkan kata sandi Anda.",
+      "Ketemu! Apa kata sandi Anda?",
+      "Anda di sana! Masukkan kata sandi untuk melanjutkan.",
+      "Mengerti! Sekarang kata sandi Anda, silakan."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Sempurna! Sekarang mari amankan akun Anda. Buat kata sandi (minimal 8 karakter):"
+  },
+  "passwordTooShort": {
+    "message": "Kata sandi Anda harus minimal 8 karakter. Coba lagi?"
+  },
+  "nameRequired": {
+    "message": "Saya perlu nama Anda untuk melanjutkan. Siapa nama Anda?"
+  },
+  "errors": {
+    "generic": "Ups! Ada yang salah. Silakan coba lagi.",
+    "emailCheck": "Pemeriksaan email gagal",
+    "loginFailed": "Masuk gagal. Periksa kredensial Anda.",
+    "signupFailed": "Pendaftaran gagal. Silakan coba lagi."
+  },
+  "placeholders": {
+    "email": "Ketik email Anda di sini...",
+    "name": "Masukkan nama Anda...",
+    "password_create": "Buat kata sandi (minimal 8 karakter)...",
+    "password_input": "Masukkan kata sandi Anda..."
+  },
+  "buttons": {
+    "yesPlease": "Ya, Silakan",
+    "logMeIn": "Masuk",
+    "continueWithoutSignup": "Lanjutkan tanpa mendaftar"
+  }
+}

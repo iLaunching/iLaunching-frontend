@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Tere tulemast! 🎉</h1><hr /><h2>Tere tulemast! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Tere tulemast! 🎉</h1><hr /><h2>Tere tulemast! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Tere tulemast! 🎉</h1><hr /><h2>Tere tulemast! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Tere tulemast! 🎉</h1><hr /><h2>Tere tulemast! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Valmis!",
+    "subtitle": "Kõik on valmis. Andke mulle teada, kui olete valmis alustama!"
+  },
+  "default": {
+    "title": "Tere tulemast! 🎉",
+    "subtitle": "Kõik on valmis. Andke mulle teada, kui olete valmis alustama!",
+    "building": "Laadimine...",
+    "joining": ""
+  }
+}

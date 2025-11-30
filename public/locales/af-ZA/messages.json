@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Welkom! 🎉</h1><hr /><h2>Welkom! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Welkom! 🎉</h1><hr /><h2>Welkom! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Welkom! 🎉</h1><hr /><h2>Welkom! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Welkom! 🎉</h1><hr /><h2>Welkom! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Klaar!",
+    "subtitle": "Alles is reg. Laat my weet wanneer jy gereed is om te begin!"
+  },
+  "default": {
+    "title": "Welkom! 🎉",
+    "subtitle": "Alles is reg. Laat my weet wanneer jy gereed is om te begin!",
+    "building": "Laai...",
+    "joining": ""
+  }
+}

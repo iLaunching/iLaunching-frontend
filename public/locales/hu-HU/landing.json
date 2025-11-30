@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Szia! 👋 Üdvözlünk az iLaunching-ban. Kezdjük?",
+      "Hé! Készen állsz valami nagyszerű kezdésére?",
+      "Üdvözlünk! Kezdjük el az utazást.",
+      "Szia! Jó helyen jársz. Kezdjünk!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Üdv újra! 😊",
+      "Hé, emlékszem rád! Üdv újra!",
+      "Örülök, hogy újra látlak!",
+      "Megint itt vagy! Üdvözlünk!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Köszönöm! Egy pillanat...",
+      "Tökéletes, ellenőrzöm...",
+      "Egy másodperc, ellenőrzöm...",
+      "Megvan! Gyors ellenőrzés..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Keresem: <strong>{email}</strong>...",
+      "Ellenőrzöm: <strong>{email}</strong>...",
+      "Rendszerben keresem: <strong>{email}</strong>...",
+      "Egy pillanat, keresem: <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, ez nem tűnik érvényes e-mailnek. Próbáld újra?",
+      "Hoppá! Érvénytelen e-mail formátum. Ellenőrizd újra?",
+      "Valami nem stimmel azzal az e-maillel. Megnéznéd?",
+      "Az e-mail formátum furcsának tűnik. Ellenőrizd újra?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Úgy tűnik, új vagy itt! Ez izgalmas. Csatlakoznál?",
+      "Még nem látlak a rendszerben. Készen állsz az indulásra?",
+      "Új arc! Szeretnél fiókot létrehozni?",
+      "Még nem vagy regisztrálva. Változtassunk ezen?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Nagyszerű választás! Mi a neved?",
+      "Tökéletes! Hogy szólítsalak?",
+      "Fantasztikus! Mondd el a neved.",
+      "Jó! Mi a neved?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Üdv újra! Mi az e-mailed?",
+      "Örülök, hogy újra látlak! Add meg az e-mailed.",
+      "Jelentkeztessünk be. Mi az e-mailed?",
+      "Készen állsz a belépésre? Oszd meg az e-mailed."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Látlak! Most add meg a jelszavad.",
+      "Megtaláltalak! Mi a jelszavad?",
+      "Ott vagy! Add meg a jelszavad a folytatáshoz.",
+      "Értem! Most a jelszavad, kérlek."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Tökéletes! Most biztosítsuk a fiókod. Hozz létre egy jelszót (legalább 8 karakter):"
+  },
+  "passwordTooShort": {
+    "message": "A jelszónak legalább 8 karakternek kell lennie. Próbáld újra?"
+  },
+  "nameRequired": {
+    "message": "Szükségem van a nevedre a folytatáshoz. Mi a neved?"
+  },
+  "errors": {
+    "generic": "Hoppá! Valami hiba történt. Kérlek, próbáld újra.",
+    "emailCheck": "E-mail ellenőrzés sikertelen",
+    "loginFailed": "Bejelentkezés sikertelen. Ellenőrizd az adataid.",
+    "signupFailed": "Regisztráció sikertelen. Kérlek, próbáld újra."
+  },
+  "placeholders": {
+    "email": "Írja be az e-mail címét itt...",
+    "name": "Adja meg a nevét...",
+    "password_create": "Hozzon létre jelszót (legalább 8 karakter)...",
+    "password_input": "Adja meg a jelszavát..."
+  },
+  "buttons": {
+    "yesPlease": "Igen, Kérem",
+    "logMeIn": "Bejelentkezés",
+    "continueWithoutSignup": "Folytatás regisztráció nélkül"
+  }
+}

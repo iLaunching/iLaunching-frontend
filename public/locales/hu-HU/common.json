@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Készen állok - Kezdjük el!",
+    "continue": "Tovább",
+    "back": "Vissza",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Üdvözöljük",
+    "loading": "Betöltés...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

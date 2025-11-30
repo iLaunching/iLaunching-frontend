@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hallo! 👋 Welkom by iLaunching. Kom ons begin?",
+      "Haai! Gereed om iets ongelooflik te begin?",
+      "Welkom! Kom ons begin jou reis.",
+      "Hallo! Jy is op die regte plek. Kom ons begin!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Welkom terug! 😊",
+      "Haai, ek onthou jou! Welkom terug!",
+      "Bly om jou weer te sien!",
+      "Jy is weer hier! Welkom!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Dankie! 'n Oomblik...",
+      "Perfek, gaan kyk...",
+      "'n Sekonde, gaan verifieer...",
+      "Ontvang! Vinnige tjek..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Soek vir <strong>{email}</strong>...",
+      "Gaan kyk na <strong>{email}</strong>...",
+      "Gaan kyk na <strong>{email}</strong> in die stelsel...",
+      "'n Oomblik, soek vir <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, dit lyk nie soos 'n geldige e-pos nie. Probeer weer?",
+      "Oeps! Ongeldige e-pos formaat. Gaan weer kyk?",
+      "Iets is fout met daardie e-pos. Kan jy kyk?",
+      "Daardie e-pos formaat lyk vreemd. Gaan weer kyk?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Dit lyk asof jy nuut hier is! Dit is opwindend. Wil jy aansluit?",
+      "Ek sien jou nog nie in die stelsel nie. Gereed om te begin?",
+      "Nuwe gesig! Wil jy 'n rekening skep?",
+      "Jy is nog nie geregistreer nie. Kom ons verander dit?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Groot keuse! Wat is jou naam?",
+      "Perfek! Hoe moet ek jou noem?",
+      "Wonderlik! Sê my jou naam.",
+      "Goed! Wat is jou naam?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Welkom terug! Wat is jou e-pos?",
+      "Bly om jou weer te sien! Voer jou e-pos in.",
+      "Kom ons teken jou in. Wat is jou e-pos?",
+      "Gereed om in te teken? Deel jou e-pos."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Ek sien jou! Voer nou jou wagwoord in.",
+      "Gekry! Wat is jou wagwoord?",
+      "Daar is jy! Voer jou wagwoord in om voort te gaan.",
+      "Verstaan! Nou jou wagwoord, asseblief."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfek! Kom ons beveilig nou jou rekening. Skep 'n wagwoord (ten minste 8 karakters):"
+  },
+  "passwordTooShort": {
+    "message": "Jou wagwoord moet ten minste 8 karakters wees. Probeer weer?"
+  },
+  "nameRequired": {
+    "message": "Ek het jou naam nodig om voort te gaan. Wat is jou naam?"
+  },
+  "errors": {
+    "generic": "Oeps! Iets het verkeerd geloop. Probeer asseblief weer.",
+    "emailCheck": "E-pos tjek het misluk",
+    "loginFailed": "Inteken het misluk. Gaan jou besonderhede na.",
+    "signupFailed": "Registrasie het misluk. Probeer asseblief weer."
+  },
+  "placeholders": {
+    "email": "Tik jou e-pos hier in...",
+    "name": "Voer jou naam in...",
+    "password_create": "Skep 'n wagwoord (ten minste 8 karakters)...",
+    "password_input": "Voer jou wagwoord in..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Asseblief",
+    "logMeIn": "Meld Aan",
+    "continueWithoutSignup": "Gaan voort sonder registrasie"
+  }
+}

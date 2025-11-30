@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Labas! 👋 Sveiki atvykę į iLaunching. Pradėkime?",
+      "Ei! Pasiruošę pradėti kažką nuostabaus?",
+      "Sveiki atvykę! Pradėkime jūsų kelionę.",
+      "Labas! Esate tinkamoje vietoje. Pradėkime!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Sveiki sugrįžę! 😊",
+      "Ei, prisimenu jus! Sveiki sugrįžę!",
+      "Džiugu vėl jus matyti!",
+      "Vėl čia esate! Sveiki atvykę!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Ačiū! Akimirka...",
+      "Puiku, tikrinu...",
+      "Sekundėlę, patikrinu...",
+      "Gauta! Greitas patikrinimas..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Ieškau <strong>{email}</strong>...",
+      "Tikrinu <strong>{email}</strong>...",
+      "Tikrinu <strong>{email}</strong> sistemoje...",
+      "Akimirka, ieškau <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, tai neatrodo kaip galiojantis el. paštas. Bandyti dar kartą?",
+      "Ups! Netinkamas el. pašto formatas. Patikrinti dar kartą?",
+      "Kažkas negerai su tuo el. paštu. Ar galite patikrinti?",
+      "El. pašto formatas atrodo keistas. Patikrinti dar kartą?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Atrodo, kad čia naujas! Tai jaudinanti. Norite prisijungti?",
+      "Dar nematau jūsų sistemoje. Pasiruošę pradėti?",
+      "Naujas veidas! Norite sukurti paskyrą?",
+      "Dar nesate užsiregistravę. Pakeiskime tai?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Puikus pasirinkimas! Koks jūsų vardas?",
+      "Tobula! Kaip jus vadinti?",
+      "Nuostabu! Pasakykite man savo vardą.",
+      "Gerai! Koks jūsų vardas?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Sveiki sugrįžę! Koks jūsų el. paštas?",
+      "Džiugu vėl jus matyti! Įveskite savo el. paštą.",
+      "Prijunkime jus. Koks jūsų el. paštas?",
+      "Pasiruošę prisijungti? Pasidalykite savo el. paštu."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Matau jus! Dabar įveskite savo slaptažodį.",
+      "Radau! Koks jūsų slaptažodis?",
+      "Ten esate! Įveskite slaptažodį, kad tęstumėte.",
+      "Supratau! Dabar jūsų slaptažodis, prašau."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Tobula! Dabar apsaugokime jūsų paskyrą. Sukurkite slaptažodį (bent 8 simboliai):"
+  },
+  "passwordTooShort": {
+    "message": "Jūsų slaptažodis turi būti bent 8 simbolių. Bandyti dar kartą?"
+  },
+  "nameRequired": {
+    "message": "Man reikia jūsų vardo, kad galėčiau tęsti. Koks jūsų vardas?"
+  },
+  "errors": {
+    "generic": "Ups! Kažkas nutiko ne taip. Prašome bandyti dar kartą.",
+    "emailCheck": "El. pašto patikrinimas nepavyko",
+    "loginFailed": "Prisijungimas nepavyko. Patikrinkite savo duomenis.",
+    "signupFailed": "Registracija nepavyko. Prašome bandyti dar kartą."
+  },
+  "placeholders": {
+    "email": "Įveskite savo el. paštą čia...",
+    "name": "Įveskite savo vardą...",
+    "password_create": "Sukurkite slaptažodį (bent 8 simboliai)...",
+    "password_input": "Įveskite savo slaptažodį..."
+  },
+  "buttons": {
+    "yesPlease": "Taip, Prašau",
+    "logMeIn": "Prisijungti",
+    "continueWithoutSignup": "Tęsti be registracijos"
+  }
+}

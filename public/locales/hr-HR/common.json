@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Spreman sam - Krenimo!",
+    "continue": "Nastavi",
+    "back": "Natrag",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Dobrodošli",
+    "loading": "Učitavanje...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

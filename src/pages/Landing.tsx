@@ -11,16 +11,26 @@ import { StreamingChatInterface } from '@/components/StreamingChatInterface';
 import CollaborativeToolAnimation from '@/components/CollaborativeToolAnimation';
 import SalesControlPanel from '@/components/SalesControlPanel';
 import { UserPlus, LogIn } from 'lucide-react';
+import { APP_CONFIG } from '@/constants';
 import { 
   getRandomWelcomeMessage, 
-  getRandomWelcomeBackMessage, 
-  APP_CONFIG 
-} from '@/constants';
+  getRandomWelcomeBackMessage,
+  getEmailPlaceholder,
+  getNamePlaceholder,
+  getPasswordCreatePlaceholder,
+  getPasswordInputPlaceholder,
+  getYesPleaseButtonText,
+  getLogMeInButtonText,
+  getContinueWithoutSignupText
+} from '@/i18n/landingHelpers';
 import { useLandingAuth } from '@/hooks/useLandingAuth';
 import { authApi } from '@/api/auth';
+import { useTranslation } from 'react-i18next';
 
 
 export default function Landing() {
+  const { i18n: i18nInstance } = useTranslation();
+  
   // Use the auth hook for state management
   const {
     authState,
@@ -95,6 +105,20 @@ export default function Landing() {
     }
   }, []);
   
+  // Force re-render when language changes
+  const [languageKey, setLanguageKey] = useState(0);
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setLanguageKey(prev => prev + 1);
+    };
+    
+    i18nInstance.on('languageChanged', handleLanguageChange);
+    
+    return () => {
+      i18nInstance.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18nInstance]);
+  
   // Reset button visibility when stage changes to new_user or email_checking
   useEffect(() => {
     if (authState.stage === 'new_user' || authState.stage === 'email_checking') {
@@ -162,15 +186,15 @@ export default function Landing() {
   const getPlaceholder = () => {
     switch (authState.stage) {
       case 'email_input':
-        return APP_CONFIG.placeholders.email;
+        return getEmailPlaceholder();
       case 'name_input':
-        return 'Enter your name...';
+        return getNamePlaceholder();
       case 'password_create':
-        return 'Create a password...';
+        return getPasswordCreatePlaceholder();
       case 'password_input':
-        return 'Enter your password...';
+        return getPasswordInputPlaceholder();
       default:
-        return APP_CONFIG.placeholders.email;
+        return getEmailPlaceholder();
     }
   };
   
@@ -342,7 +366,7 @@ export default function Landing() {
             {/* Tiptap Typewriter - Hide when in sales stage */}
             {authState.stage !== 'sales' && (
               <TiptapTypewriter 
-                key={authState.message} // Force remount when message changes
+                key={`${authState.message}-${languageKey}`} // Force remount when message or language changes
                 text={getCurrentMessage()}
                 speed={APP_CONFIG.typewriterSpeed}
                 onComplete={handleTypewriterComplete}
@@ -383,7 +407,7 @@ export default function Landing() {
                     style={{ maxHeight: '45px' }}
                   >
                     <LogIn className="w-5 h-5" />
-                    Log Me In
+                    {getLogMeInButtonText()}
                   </button>
               
 
@@ -396,7 +420,7 @@ export default function Landing() {
                     style={{ maxHeight: '45px',minWidth: '300px',maxWidth: '350px', justifyContent: 'center'    }}
                   >
                     <UserPlus className="w-5 h-5" />
-                    Yes Please
+                    {getYesPleaseButtonText()}
                   </button>
                 </div>
                 
@@ -407,7 +431,7 @@ export default function Landing() {
                     showButtons ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  Continue without signing up
+                  {getContinueWithoutSignupText()}
                 </button>
               </div>
 

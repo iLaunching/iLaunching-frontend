@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Witamy! 🎉</h1><hr /><h2>Witamy! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Witamy! 🎉</h1><hr /><h2>Witamy! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Witamy! 🎉</h1><hr /><h2>Witamy! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Witamy! 🎉</h1><hr /><h2>Witamy! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Gotowe!",
+    "subtitle": "Wszystko jest gotowe. Daj mi znać, gdy będziesz gotowy zacząć!"
+  },
+  "default": {
+    "title": "Witamy! 🎉",
+    "subtitle": "Wszystko jest gotowe. Daj mi znać, gdy będziesz gotowy zacząć!",
+    "building": "Ładowanie...",
+    "joining": ""
+  }
+}
