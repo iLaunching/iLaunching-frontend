@@ -154,11 +154,12 @@ const SignupInterface = () => {
               const fullName = user.first_name && user.last_name 
                 ? `${user.first_name} ${user.last_name}`
                 : user.name || user.email;
+              const firstName = user.first_name || fullName.split(' ')[0];
               const newAccount = {
                 id: user.id,
                 email: user.email,
                 name: fullName,
-                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=4285F4&color=fff`,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=4285F4&color=fff`,
                 lastUsed: Date.now()
               };
               

@@ -52,6 +52,7 @@ export default function Landing() {
   const [showNameInput, setShowNameInput] = useState(false);
   // State to control signup popup visibility
   const [isSignupPopupOpen, setIsSignupPopupOpen] = useState(false);
+  const [signupPopupInitialView, setSignupPopupInitialView] = useState<'main' | 'options'>('main');
   // Ref to track the message that's currently rendered in typewriter
   const typewriterMessageRef = useRef<string>('');
   // Key to control typewriter remounting
@@ -87,11 +88,12 @@ export default function Landing() {
               const fullName = user.first_name && user.last_name 
                 ? `${user.first_name} ${user.last_name}`
                 : user.name || user.email;
+              const firstName = user.first_name || fullName.split(' ')[0];
               const newAccount = {
                 id: user.id,
                 email: user.email,
                 name: fullName,
-                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=4285F4&color=fff`,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=4285F4&color=fff`,
                 lastUsed: Date.now()
               };
               
@@ -503,6 +505,10 @@ export default function Landing() {
               <div className="flex flex-col items-center gap-4 transition-opacity duration-500 opacity-100">
                 <GoogleAccountPicker 
                   onAccountSelect={handleGoogleAccountSelect}
+                  onAddAccount={() => {
+                    setIsSignupPopupOpen(true);
+                    setSignupPopupInitialView('options');
+                  }}
                   className="scale-110"
                 />
               </div>
@@ -720,7 +726,11 @@ export default function Landing() {
       {/* Signup Popup */}
       <SignupPopup 
         isOpen={isSignupPopupOpen}
-        onClose={() => setIsSignupPopupOpen(false)}
+        onClose={() => {
+          setIsSignupPopupOpen(false);
+          setSignupPopupInitialView('main');
+        }}
+        initialView={signupPopupInitialView}
       />
     </div>
   );

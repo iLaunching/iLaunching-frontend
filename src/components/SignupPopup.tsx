@@ -6,13 +6,14 @@ import { authApi } from '../api/auth';
 interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  initialView?: AuthView;
 }
 
 type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
 
-const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
+const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps) => {
   const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState<AuthView>('main');
+  const [currentView, setCurrentView] = useState<AuthView>(initialView);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,6 +21,13 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
+  
+  // Reset to initial view when popup opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentView(initialView);
+    }
+  }, [isOpen, initialView]);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
