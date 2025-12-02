@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "準備完了 - 始めましょう！",
+    "continue": "続ける",
+    "back": "戻る",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "ようこそ",
+    "loading": "読み込み中...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

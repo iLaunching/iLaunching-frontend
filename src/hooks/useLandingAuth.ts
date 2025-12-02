@@ -7,14 +7,19 @@ import { useState } from 'react';
 import { authApi } from '@/api/auth';
 import type { AuthState } from '@/types/auth';
 import {
-  getRandomWrongEmailMessage,
+  getRandomAcknowledgeMessage,
   getRandomCheckingEmailMessage,
-  getRandomMessage,
-  getRandomPasswordPrompt,
-  getRandomLoginMessage,
+  getRandomWrongFormatMessage,
+  getRandomUserNotRegisteredMessage,
   getRandomAskNameMessage,
-  USER_NOT_REGISTERED_MESSAGES,
-} from '../constants';
+  getRandomLoginMessage,
+  getRandomPasswordPrompt,
+  getPasswordCreateMessage,
+  getPasswordTooShortMessage,
+  getNameRequiredMessage,
+  getErrorMessage,
+} from '@/i18n/landingHelpers';
+import i18n from '@/i18n/config';
 
 export function useLandingAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -25,6 +30,7 @@ export function useLandingAuth() {
     user: null,
     isProcessing: false,
     error: null,
+    oauth_provider: null,
   });
 
   /**
@@ -39,6 +45,7 @@ export function useLandingAuth() {
       user: null,
       isProcessing: false,
       error: null,
+      oauth_provider: null,
     });
   };
 
@@ -80,16 +87,19 @@ export function useLandingAuth() {
       
       // Check if email exists
       const result = await authApi.checkEmail(email);
+      
+      // Debug logging - detailed response inspection
+      console.log('📧 Email check result:', {
+        exists: result.exists,
+        oauth_provider: result.oauth_provider,
+        oauth_provider_type: typeof result.oauth_provider,
+        has_oauth: !!result.oauth_provider,
+        message: result.message,
+        full_response: result
+      });
 
-      if (result.exists) {
-        // Existing user - move to password input
-        setAuthState((prev: AuthState) => ({
-          ...prev,
-          stage: 'password_input',
-          message: getRandomPasswordPrompt(),
-          isProcessing: false,
-        }));
-      } else {
+      // CHECKPOINT 1: Does the email exist?
+      if (!result.exists) {
         // New user - clear message and change stage to show button container
         setAuthState((prev: AuthState) => ({
           ...prev,
@@ -102,18 +112,49 @@ export function useLandingAuth() {
         setTimeout(() => {
           setAuthState((prev: AuthState) => ({
             ...prev,
-            message: getRandomMessage(USER_NOT_REGISTERED_MESSAGES),
+            message: getRandomUserNotRegisteredMessage(),
           }));
         }, 800); // 800ms delay for natural conversational flow
+        return;
       }
+
+      // CHECKPOINT 2: Is this an OAuth user (external auth)?
+      // Check for any truthy value in oauth_provider (not null, undefined, or empty string)
+      const hasOAuthProvider = result.oauth_provider && 
+                               typeof result.oauth_provider === 'string' && 
+                               result.oauth_provider.trim() !== '';
+      
+      if (hasOAuthProvider) {
+        console.log('🔒 OAuth user detected, showing account picker. Provider:', result.oauth_provider);
+        // OAuth user - show account picker instead of password input
+        setAuthState((prev: AuthState) => ({
+          ...prev,
+          stage: 'oauth_login',
+          message: result.message,  // Backend message explains OAuth requirement
+          isProcessing: false,
+          error: null,
+          oauth_provider: result.oauth_provider || null,
+        }));
+        return;
+      }
+
+      console.log('✅ Password user, proceeding to password input');
+      // Email exists AND has password (not OAuth) - proceed to password input
+      setAuthState((prev: AuthState) => ({
+        ...prev,
+        stage: 'password_input',
+        message: getRandomPasswordPrompt(),
+        isProcessing: false,
+      }));
+
     } catch (error: any) {
       console.error('Email check error:', error);
       setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'email_input',
-        message: `Oops! ${error.response?.data?.detail || 'Something went wrong. Please try again.'}`,
+        message: `${getErrorMessage('generic')} ${error.response?.data?.detail || ''}`,
         isProcessing: false,
-        error: error.message || 'Failed to check email',
+        error: error.message || getErrorMessage('emailCheck'),
       }));
     }
   };
@@ -161,7 +202,7 @@ export function useLandingAuth() {
       setAuthState((prev: AuthState) => ({
         ...prev,
         stage: 'password_create',
-        message: "Perfect! Now let's secure your account. Create a password (at least 8 characters):",
+        message: getPasswordCreateMessage(),
       }));
       return;
     }
@@ -169,7 +210,7 @@ export function useLandingAuth() {
     if (!name.trim()) {
       setAuthState((prev: AuthState) => ({
         ...prev,
-        message: "I'll need your name to continue. What should I call you?",
+        message: getNameRequiredMessage(),
       }));
       return;
     }
@@ -192,7 +233,7 @@ export function useLandingAuth() {
     if (password.length < 8) {
       setAuthState((prev: AuthState) => ({
         ...prev,
-        message: "Your password needs to be at least 8 characters long. Try again?",
+        message: getPasswordTooShortMessage(),
       }));
       return;
     }
@@ -220,8 +261,8 @@ export function useLandingAuth() {
       if (result.user.onboarding_completed === false) {
         window.location.href = '/onboarding';
       } else {
-        // Redirect to dashboard or main app
-        window.location.href = '/dashboard';
+        // Redirect to smart hub
+        window.location.href = '/smart-hub';
       }
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -270,19 +311,48 @@ export function useLandingAuth() {
       if (result.user.onboarding_completed === false) {
         window.location.href = '/onboarding';
       } else {
-        // Redirect to dashboard or main app
-        window.location.href = '/dashboard';
+        // Redirect to smart hub
+        window.location.href = '/smart-hub';
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      setAuthState((prev: AuthState) => ({
-        ...prev,
-        stage: 'password_input',
-        message: `Hmm, that password doesn't match. Want to try again?`,
-        isProcessing: false,
-        error: error.message,
-      }));
+      
+      // Check if this is an OAuth user trying to login with password
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes('OAuth')) {
+        // OAuth user - show specific message and return to email input
+        setAuthState((prev: AuthState) => ({
+          ...prev,
+          stage: 'email_input',
+          message: error.response.data.detail,
+          isProcessing: false,
+          error: null,
+        }));
+      } else {
+        // Regular password error
+        setAuthState((prev: AuthState) => ({
+          ...prev,
+          stage: 'password_input',
+          message: `Hmm, that password doesn't match. Want to try again?`,
+          isProcessing: false,
+          error: error.message,
+        }));
+      }
     }
+  };
+
+  /**
+   * Skip email verification and go directly to name input (demo mode)
+   * @param customMessage - Optional custom message to display instead of default
+   */
+  const skipToNameInput = (customMessage?: string): void => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      email: 'demo@ilaunching.app',
+      stage: 'name_input',
+      message: customMessage || getRandomAskNameMessage(),
+      isProcessing: false,
+      error: null,
+    }));
   };
 
   /**
@@ -293,6 +363,34 @@ export function useLandingAuth() {
       ...prev,
       stage: 'sales',
       message: '',
+      isProcessing: false,
+      error: null,
+    }));
+  };
+
+  /**
+   * Show Google Account Picker - check localStorage for saved accounts
+   */
+  const showGoogleAccountPicker = () => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'oauth_login',
+      oauth_provider: 'google',
+      message: 'Welcome back! Select your Google account to continue.',
+      isProcessing: false,
+      error: null,
+    }));
+  };
+
+  /**
+   * Show Facebook Account Picker - check localStorage for saved accounts
+   */
+  const showFacebookAccountPicker = () => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'oauth_login',
+      oauth_provider: 'facebook',
+      message: 'Welcome back! Select your Facebook account to continue.',
       isProcessing: false,
       error: null,
     }));
@@ -316,7 +414,10 @@ export function useLandingAuth() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
+    skipToNameInput,
     enterSalesMode,
+    showGoogleAccountPicker,
+    showFacebookAccountPicker,
     logout,
     reset,
   };

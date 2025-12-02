@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Sveiki! 🎉</h1><hr /><h2>Sveiki! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Sveiki! 🎉</h1><hr /><h2>Sveiki! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Sveiki! 🎉</h1><hr /><h2>Sveiki! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Sveiki! 🎉</h1><hr /><h2>Sveiki! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Atlikta!",
+    "subtitle": "Viskas paruošta. Praneškite man, kai būsite pasiruošę pradėti!"
+  },
+  "default": {
+    "title": "Sveiki! 🎉",
+    "subtitle": "Viskas paruošta. Praneškite man, kai būsite pasiruošę pradėti!",
+    "building": "Kraunama...",
+    "joining": ""
+  }
+}

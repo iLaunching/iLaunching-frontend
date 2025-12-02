@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hola! 👋 Benvingut a iLaunching. Comencem?",
+      "Ei! Preparat per començar alguna cosa increïble?",
+      "Benvingut! Comencem el teu viatge.",
+      "Hola! Ets al lloc correcte. Comencem!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Benvingut de nou! 😊",
+      "Ei, et recordo! Benvingut de nou!",
+      "Encantat de veure't de nou!",
+      "Tornes a ser aquí! Benvingut!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Gràcies! Un moment...",
+      "Perfecte, comprovant...",
+      "Un segon, verificant...",
+      "Rebut! Comprovació ràpida..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Cercant <strong>{email}</strong>...",
+      "Comprovant <strong>{email}</strong>...",
+      "Verificant <strong>{email}</strong> al sistema...",
+      "Un moment, cercant <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, això no sembla un correu electrònic vàlid. Tornar-ho a provar?",
+      "Ups! Format de correu electrònic invàlid. Comprovar de nou?",
+      "Alguna cosa no està bé amb aquest correu. Pots comprovar-ho?",
+      "Aquest format de correu sembla estrany. Comprovar de nou?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Sembla que ets nou aquí! Això és emocionant. Vols unir-te?",
+      "Encara no et veig al sistema. Preparat per començar?",
+      "Cara nova! Vols crear un compte?",
+      "Encara no estàs registrat. Ho canviem?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Bona elecció! Quin és el teu nom?",
+      "Perfecte! Com t'he de dir?",
+      "Fantàstic! Digues-me el teu nom.",
+      "Bé! Quin és el teu nom?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Benvingut de nou! Quin és el teu correu?",
+      "Encantat de veure't de nou! Introdueix el teu correu.",
+      "Anem a fer login. Quin és el teu correu?",
+      "Preparat per entrar? Comparteix el teu correu."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Et veig! Ara introdueix la teva contrasenya.",
+      "T'he trobat! Quina és la teva contrasenya?",
+      "Aquí estàs! Introdueix la contrasenya per continuar.",
+      "Entès! Ara la teva contrasenya, si us plau."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfecte! Ara protegim el teu compte. Crea una contrasenya (mínim 8 caràcters):"
+  },
+  "passwordTooShort": {
+    "message": "La teva contrasenya ha de tenir almenys 8 caràcters. Tornar-ho a provar?"
+  },
+  "nameRequired": {
+    "message": "Necessito el teu nom per continuar. Quin és el teu nom?"
+  },
+  "errors": {
+    "generic": "Ups! Alguna cosa ha anat malament. Si us plau, torna-ho a provar.",
+    "emailCheck": "Error en la verificació del correu",
+    "loginFailed": "Login fallit. Comprova les teves credencials.",
+    "signupFailed": "Registre fallit. Si us plau, torna-ho a provar."
+  },
+  "placeholders": {
+    "email": "Escriu el teu correu aquí...",
+    "name": "Introdueix el teu nom...",
+    "password_create": "Crea una contrasenya (mínim 8 caràcters)...",
+    "password_input": "Introdueix la teva contrasenya..."
+  },
+  "buttons": {
+    "yesPlease": "Sí, Si Us Plau",
+    "logMeIn": "Iniciar Sessió",
+    "continueWithoutSignup": "Continuar sense registrar-se"
+  }
+}

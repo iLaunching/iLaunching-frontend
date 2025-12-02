@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Cześć! 👋 Witaj w iLaunching. Zaczynamy?",
+      "Hej! Gotowy, aby rozpocząć coś niesamowitego?",
+      "Witaj! Rozpocznijmy Twoją przygodę.",
+      "Cześć! Jesteś we właściwym miejscu. Zaczynajmy!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Witaj ponownie! 😊",
+      "Hej, pamiętam Cię! Witaj z powrotem!",
+      "Miło Cię znowu widzieć!",
+      "Znowu tu jesteś! Witaj!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Dziękuję! Chwileczkę...",
+      "Świetnie, sprawdzam...",
+      "Moment, sprawdzam...",
+      "Otrzymano! Szybkie sprawdzenie..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Szukam <strong>{email}</strong>...",
+      "Sprawdzam <strong>{email}</strong>...",
+      "Sprawdzam <strong>{email}</strong> w systemie...",
+      "Chwila, szukam <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, to nie wygląda na prawidłowy email. Spróbuj ponownie?",
+      "Ups! Nieprawidłowy format emaila. Sprawdź jeszcze raz?",
+      "Coś jest nie tak z tym emailem. Możesz sprawdzić?",
+      "Ten format emaila wygląda dziwnie. Sprawdzić ponownie?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Wygląda na to, że jesteś tu nowy! To ekscytujące. Chcesz dołączyć?",
+      "Nie widzę Cię jeszcze w systemie. Gotowy na start?",
+      "Nowa twarz! Chcesz utworzyć konto?",
+      "Nie jesteś jeszcze zarejestrowany. Zmienimy to?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Świetny wybór! Jak masz na imię?",
+      "Idealnie! Jak mam do Ciebie mówić?",
+      "Super! Powiedz mi jak się nazywasz.",
+      "Dobrze! Jak masz na imię?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Witaj ponownie! Jaki jest Twój email?",
+      "Miło Cię znowu widzieć! Wpisz swój email.",
+      "Zalogujmy Cię. Jaki jest Twój email?",
+      "Gotowy do logowania? Podaj swój email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Widzę Cię! Teraz wpisz hasło.",
+      "Znaleziono! Jakie jest Twoje hasło?",
+      "Jesteś! Wpisz hasło, aby kontynuować.",
+      "Rozumiem! Teraz Twoje hasło, proszę."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Idealnie! Teraz zabezpieczmy Twoje konto. Utwórz hasło (co najmniej 8 znaków):"
+  },
+  "passwordTooShort": {
+    "message": "Twoje hasło musi mieć co najmniej 8 znaków. Spróbować ponownie?"
+  },
+  "nameRequired": {
+    "message": "Potrzebuję Twojego imienia, aby kontynuować. Jak się nazywasz?"
+  },
+  "errors": {
+    "generic": "Ups! Coś poszło nie tak. Spróbuj ponownie.",
+    "emailCheck": "Nie udało się sprawdzić emaila",
+    "loginFailed": "Logowanie nie powiodło się. Sprawdź dane logowania.",
+    "signupFailed": "Rejestracja nie powiodła się. Spróbuj ponownie."
+  },
+  "placeholders": {
+    "email": "Wpisz tutaj swój email...",
+    "name": "Wprowadź swoje imię...",
+    "password_create": "Utwórz hasło (minimum 8 znaków)...",
+    "password_input": "Wprowadź swoje hasło..."
+  },
+  "buttons": {
+    "yesPlease": "Tak, Proszę",
+    "logMeIn": "Zaloguj Się",
+    "continueWithoutSignup": "Kontynuuj bez rejestracji"
+  }
+}

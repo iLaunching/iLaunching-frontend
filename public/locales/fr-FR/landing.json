@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Vous êtes chez iLaunching, où les idées deviennent des marques qui comptent vraiment. Je suis i. Je ne fais pas de présentations. Je vous aide à avancer. Quel est votre email pour voir si nous nous connaissons déjà?",
+      "Bienvenue chez iLaunching. Vous êtes arrivé tôt. C'est déjà le bon geste. Je suis i, et je suis là pour dégager le chemin, pas pour vous le vendre. Partagez votre email et voyons si vous êtes déjà dans le système.",
+      "C'est iLaunching, l'endroit où les fondateurs construisent plus vite qu'ils ne le pensaient possible. Je suis i. Considérez-moi comme le partenaire silencieux qui fait simplement le travail. Quel est votre email? Laissez-moi vérifier si nous nous connaissons.",
+      "Vous avez trouvé iLaunching. Bon timing. Je suis i, conçu pour vous aider à ignorer le bruit et construire quelque chose de réel. Partagez votre email pour que je puisse voir si nous avons déjà travaillé ensemble."
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Déjà de retour? J'aime votre énergie. Je suis i, et je suis là qui attend. Quel est votre email encore?",
+      "Vous êtes de retour! Bien. Cela signifie que vous êtes sérieux. Je suis i. Partagez votre email et reprenons où nous nous sommes arrêtés.",
+      "Bon retour chez iLaunching. Prêt à plonger cette fois? Je suis i. Quel est votre email pour que nous puissions commencer?",
+      "Deuxième regard? Bon geste. Je suis i, et je suis toujours là prêt à vous aider à construire. Quel est votre email?"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Merci! Un instant pendant que je vérifie ça.",
+      "Compris! Donnez-moi une seconde pour vous chercher.",
+      "Parfait! Laissez-moi voir ce que nous avons ici.",
+      "Merci! Vérification de notre système maintenant."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Parfait! Laissez-moi vérifier si {email} est dans notre système.",
+      "Compris! Recherche de {email} maintenant.",
+      "Excellent! Recherche de {email} dans nos dossiers.",
+      "Merci! Laissez-moi voir si {email} est déjà avec nous."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Ce n'est pas un email. Réessayez avec quelque chose qui ressemble à un.",
+      "J'ai besoin d'un vrai email pour avancer. Vérifiez le format.",
+      "Ça ne marche pas. Utilisez une adresse email valide.",
+      "Pas tout à fait. Assurez-vous que c'est un format d'email valide."
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "On dirait que vous êtes nouveau ici ! C'est excitant. Voulez-vous rejoindre ?",
+      "Je ne vous vois pas encore dans le système. Prêt à commencer ?",
+      "Nouveau visage ! Voulez-vous créer un compte ?",
+      "Vous n'êtes pas encore enregistré. On change ça ?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Excellent choix ! Quel est votre nom ?",
+      "Parfait ! Comment dois-je vous appeler ?",
+      "Génial ! Faites-moi savoir votre nom.",
+      "Super ! Quel est votre nom ?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Bon retour ! Quel est votre email ?",
+      "Content de vous revoir ! Entrez votre email.",
+      "Connectons-vous. Quel est votre email ?",
+      "Prêt à vous connecter ? Partagez votre email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Je vous vois ! Maintenant entrez votre mot de passe.",
+      "Trouvé ! Quel est votre mot de passe ?",
+      "Vous voilà ! Entrez votre mot de passe pour continuer.",
+      "Compris ! Maintenant votre mot de passe, s'il vous plaît."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Parfait ! Maintenant sécurisons votre compte. Créez un mot de passe (au moins 8 caractères) :"
+  },
+  "passwordTooShort": {
+    "message": "Votre mot de passe doit contenir au moins 8 caractères. Réessayer ?"
+  },
+  "nameRequired": {
+    "message": "J'aurai besoin de votre nom pour continuer. Comment vous appelez-vous ?"
+  },
+  "errors": {
+    "generic": "Oups ! Quelque chose s'est mal passé. Veuillez réessayer.",
+    "emailCheck": "Échec de la vérification de l'email",
+    "loginFailed": "Échec de la connexion. Vérifiez vos identifiants.",
+    "signupFailed": "Échec de l'inscription. Veuillez réessayer."
+  },
+  "placeholders": {
+    "email": "Tapez votre email ici...",
+    "name": "Entrez votre nom...",
+    "password_create": "Créez un mot de passe (minimum 8 caractères)...",
+    "password_input": "Entrez votre mot de passe..."
+  },
+  "buttons": {
+    "yesPlease": "Oui, S'il Vous Plaît",
+    "logMeIn": "Me Connecter",
+    "continueWithoutSignup": "Continuer sans s'inscrire"
+  }
+}

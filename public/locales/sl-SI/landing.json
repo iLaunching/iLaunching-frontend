@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Zdravo! 👋 Dobrodošli v iLaunching. Začnemo?",
+      "Hej! Pripravljeni začeti nekaj neverjetnega?",
+      "Dobrodošli! Začnimo vašo pot.",
+      "Zdravo! Na pravem mestu ste. Začnimo!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Dobrodošli nazaj! 😊",
+      "Hej, spomnim se vas! Dobrodošli nazaj!",
+      "Vesel sem, da vas spet vidim!",
+      "Spet ste tu! Dobrodošli!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Hvala! Trenutek...",
+      "Odlično, preverjam...",
+      "Sekunda, preverjam...",
+      "Prejeto! Hitra preverba..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Iščem <strong>{email}</strong>...",
+      "Preverjam <strong>{email}</strong>...",
+      "Preverjam <strong>{email}</strong> v sistemu...",
+      "Trenutek, iščem <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, to ne izgleda kot veljaven e-poštni naslov. Poskusite znova?",
+      "Ups! Neveljaven format e-pošte. Preverite znova?",
+      "Nekaj ni v redu s tem e-poštnim naslovom. Lahko preverite?",
+      "Format e-pošte izgleda čudno. Preveriti znova?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Zdi se, da ste tukaj novi! To je vznemirljivo. Želite se pridružiti?",
+      "Še vas ne vidim v sistemu. Pripravljeni začeti?",
+      "Nov obraz! Želite ustvariti račun?",
+      "Še niste registrirani. Spremenimo to?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Odlična izbira! Kako vam je ime?",
+      "Popolno! Kako naj vas kličem?",
+      "Čudovito! Povejte mi svoje ime.",
+      "Dobro! Kako vam je ime?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Dobrodošli nazaj! Kaj je vaš e-poštni naslov?",
+      "Vesel sem, da vas spet vidim! Vnesite svoj e-poštni naslov.",
+      "Prijavimo vas. Kaj je vaš e-poštni naslov?",
+      "Pripravljeni za prijavo? Delite svoj e-poštni naslov."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Vidim vas! Zdaj vnesite svoje geslo.",
+      "Našel sem vas! Kakšno je vaše geslo?",
+      "Tu ste! Vnesite geslo za nadaljevanje.",
+      "Razumem! Zdaj vaše geslo, prosim."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Popolno! Zdaj zavarujmo vaš račun. Ustvarite geslo (najmanj 8 znakov):"
+  },
+  "passwordTooShort": {
+    "message": "Vaše geslo mora imeti najmanj 8 znakov. Poskusite znova?"
+  },
+  "nameRequired": {
+    "message": "Potrebujem vaše ime za nadaljevanje. Kako vam je ime?"
+  },
+  "errors": {
+    "generic": "Ups! Nekaj je šlo narobe. Prosim poskusite znova.",
+    "emailCheck": "Preverjanje e-pošte ni uspelo",
+    "loginFailed": "Prijava ni uspela. Preverite svoje podatke.",
+    "signupFailed": "Registracija ni uspela. Prosim poskusite znova."
+  },
+  "placeholders": {
+    "email": "Vnesite svoj e-poštni naslov tukaj...",
+    "name": "Vnesite svoje ime...",
+    "password_create": "Ustvarite geslo (najmanj 8 znakov)...",
+    "password_input": "Vnesite svoje geslo..."
+  },
+  "buttons": {
+    "yesPlease": "Ja, Prosim",
+    "logMeIn": "Prijavi Se",
+    "continueWithoutSignup": "Nadaljuj brez registracije"
+  }
+}

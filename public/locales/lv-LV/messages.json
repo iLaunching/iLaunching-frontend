@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Laipni lūdzam! 🎉</h1><hr /><h2>Laipni lūdzam! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Laipni lūdzam! 🎉</h1><hr /><h2>Laipni lūdzam! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Laipni lūdzam! 🎉</h1><hr /><h2>Laipni lūdzam! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Laipni lūdzam! 🎉</h1><hr /><h2>Laipni lūdzam! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Gatavs!",
+    "subtitle": "Viss ir gatavs. Paziņojiet man, kad būsiet gatavs sākt!"
+  },
+  "default": {
+    "title": "Laipni lūdzam! 🎉",
+    "subtitle": "Viss ir gatavs. Paziņojiet man, kad būsiet gatavs sākt!",
+    "building": "Ielādē...",
+    "joining": ""
+  }
+}

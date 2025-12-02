@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Jam gati - Le të fillojmë!",
+    "continue": "Vazhdo",
+    "back": "Prapa",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Mirë se vini",
+    "loading": "Duke ngarkuar...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

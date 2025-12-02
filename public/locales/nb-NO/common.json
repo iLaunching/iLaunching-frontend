@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Jeg er klar - La oss begynne!",
+    "continue": "Fortsett",
+    "back": "Tilbake",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Velkommen",
+    "loading": "Laster...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

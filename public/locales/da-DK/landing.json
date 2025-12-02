@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hej! 👋 Velkommen til iLaunching. Skal vi starte?",
+      "Hej! Klar til at begynde noget fantastisk?",
+      "Velkommen! Lad os starte din rejse.",
+      "Hej! Du er det rette sted. Lad os komme i gang!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Velkommen tilbage! 😊",
+      "Hej, jeg husker dig! Velkommen tilbage!",
+      "Dejligt at se dig igen!",
+      "Der er du igen! Velkommen!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Tak! Et øjeblik...",
+      "Perfekt, tjekker...",
+      "Et sekund, kontrollerer...",
+      "Modtaget! Hurtig check..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Leder efter <strong>{email}</strong>...",
+      "Kontrollerer <strong>{email}</strong>...",
+      "Tjekker <strong>{email}</strong> i systemet...",
+      "Et øjeblik, leder efter <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, det ligner ikke en gyldig e-mail. Prøv igen?",
+      "Ups! Ugyldigt e-mailformat. Tjek det igen?",
+      "Noget er galt med den e-mail. Kan du tjekke?",
+      "Det e-mailformat ser mærkeligt ud. Tjek igen?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Det ser ud til, at du er ny her! Det er spændende. Vil du være med?",
+      "Jeg ser dig ikke i systemet endnu. Klar til at starte?",
+      "Nyt ansigt! Vil du oprette en konto?",
+      "Du er ikke registreret endnu. Skal vi ændre det?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Godt valg! Hvad hedder du?",
+      "Perfekt! Hvad skal jeg kalde dig?",
+      "Fantastisk! Lad mig vide dit navn.",
+      "Godt! Hvad hedder du?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Velkommen tilbage! Hvad er din e-mail?",
+      "Dejligt at se dig igen! Indtast din e-mail.",
+      "Lad os logge dig ind. Hvad er din e-mail?",
+      "Klar til at logge ind? Del din e-mail."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Jeg ser dig! Indtast nu din adgangskode.",
+      "Fundet! Hvad er din adgangskode?",
+      "Der er du! Indtast din adgangskode for at fortsætte.",
+      "Forstået! Nu din adgangskode, tak."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfekt! Nu sikrer vi din konto. Opret en adgangskode (mindst 8 tegn):"
+  },
+  "passwordTooShort": {
+    "message": "Din adgangskode skal være mindst 8 tegn lang. Prøv igen?"
+  },
+  "nameRequired": {
+    "message": "Jeg har brug for dit navn for at fortsætte. Hvad hedder du?"
+  },
+  "errors": {
+    "generic": "Ups! Noget gik galt. Prøv igen.",
+    "emailCheck": "E-mailtjek mislykkedes",
+    "loginFailed": "Login mislykkedes. Tjek dine oplysninger.",
+    "signupFailed": "Tilmelding mislykkedes. Prøv igen."
+  },
+  "placeholders": {
+    "email": "Indtast din email her...",
+    "name": "Indtast dit navn...",
+    "password_create": "Opret en adgangskode (mindst 8 tegn)...",
+    "password_input": "Indtast din adgangskode..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Tak",
+    "logMeIn": "Log Ind",
+    "continueWithoutSignup": "Fortsæt uden tilmelding"
+  }
+}

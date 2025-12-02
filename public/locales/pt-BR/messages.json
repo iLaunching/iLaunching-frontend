@@ -1,0 +1,38 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Perfeito! Seu e-mail está verificado. 🎉</h1><hr /><h2>Bem-vindo a bordo! 🚀</h2><p>Vamos construir algo incrível juntos...</p>",
+      "<h1>Fantástico! E-mail confirmado. ✅</h1><hr /><h2>Hora de começar! 💪</h2><p>Pronto para iniciar sua jornada?</p>",
+      "<h1>Ótimo! Você está verificado. 🎊</h1><hr /><h2>Vamos lá! 🌟</h2><p>Sua aventura começa agora...</p>",
+      "<h1>Excelente! E-mail confirmado. ✨</h1><hr /><h2>Bem-vindo ao time! 🎯</h2><p>Vamos criar algo especial...</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Bem-vindo! Login com Google bem-sucedido. 🎉</h1><hr /><h2>Que bom te ver! 👋</h2><p>Sua experiência personalizada espera...</p>",
+      "<h1>Olá! Conectado com Google. ✅</h1><hr /><h2>Vamos lá! 🚀</h2><p>Hora de criar algo incrível...</p>",
+      "<h1>Perfeito! Conta Google conectada. 🌟</h1><hr /><h2>Bem-vindo de volta! 💫</h2><p>Vamos continuar de onde paramos...</p>",
+      "<h1>Fantástico! Login com Google concluído. ✨</h1><hr /><h2>Prontos para começar! 🎯</h2><p>Sua jornada começa aqui...</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Bem-vindo! Login com Facebook bem-sucedido. 🎉</h1><hr /><h2>Feliz em ter você! 👋</h2><p>Sua experiência começa agora...</p>",
+      "<h1>Olá! Conectado com Facebook. ✅</h1><hr /><h2>Perfeito! 🚀</h2><p>Vamos criar algo incrível...</p>",
+      "<h1>Ótimo! Conta Facebook conectada. 🌟</h1><hr /><h2>Bem-vindo ao clube! 💫</h2><p>Hora de começar...</p>",
+      "<h1>Excelente! Login com Facebook concluído. ✨</h1><hr /><h2>Vamos lá! 🎯</h2><p>Sua jornada espera...</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Bem-vindo! Login com Microsoft bem-sucedido. 🎉</h1><hr /><h2>Tudo configurado! 👋</h2><p>Seu workspace está pronto...</p>",
+      "<h1>Olá! Conectado com Microsoft. ✅</h1><hr /><h2>Prontos para começar! 🚀</h2><p>Vamos ser produtivos...</p>",
+      "<h1>Ótimo! Conta Microsoft conectada. 🌟</h1><hr /><h2>Bem-vindo a bordo! 💫</h2><p>Hora de começar...</p>",
+      "<h1>Fantástico! Login com Microsoft concluído. ✨</h1><hr /><h2>Vamos lá! 🎯</h2><p>Suas ferramentas esperam...</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Tudo pronto!",
+    "subtitle": "Tudo está pronto. Me avise quando estiver pronto para começar!"
+  }
+}

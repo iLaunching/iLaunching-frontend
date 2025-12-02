@@ -88,6 +88,7 @@ export interface User {
 export interface CheckEmailResponse {
   exists: boolean;
   message: string;
+  oauth_provider?: string | null;  // e.g., 'google', 'microsoft' if user signed up via OAuth
 }
 
 export interface CheckEmailSignupResponse {

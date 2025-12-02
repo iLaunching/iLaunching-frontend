@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Hoi! 👋 Welkom bij iLaunching. Zullen we beginnen?",
+      "Hey! Klaar om iets geweldigs te beginnen?",
+      "Welkom! Laten we je reis starten.",
+      "Hallo! Je bent op de juiste plek. Laten we gaan!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Welkom terug! 😊",
+      "Hey, ik herinner je! Welkom terug!",
+      "Leuk je weer te zien!",
+      "Daar ben je weer! Welkom!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Bedankt! Even kijken...",
+      "Perfect, even checken...",
+      "Een moment, ik controleer...",
+      "Ontvangen! Snelle check..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Even <strong>{email}</strong> opzoeken...",
+      "<strong>{email}</strong> controleren...",
+      "<strong>{email}</strong> in het systeem nakijken...",
+      "Moment, <strong>{email}</strong> zoeken..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, dit lijkt geen geldig e-mailadres. Opnieuw proberen?",
+      "Oeps! Ongeldig e-mailformaat. Nogmaals controleren?",
+      "Er klopt iets niet met dat e-mailadres. Kun je het checken?",
+      "Dat e-mailformaat ziet er vreemd uit. Controleren?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Het lijkt erop dat je nieuw bent hier! Dat is spannend. Wil je meedoen?",
+      "Ik zie je nog niet in het systeem. Klaar om te beginnen?",
+      "Nieuw gezicht! Wil je een account aanmaken?",
+      "Je bent nog niet geregistreerd. Zullen we dat veranderen?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Geweldige keuze! Wat is je naam?",
+      "Perfect! Hoe moet ik je noemen?",
+      "Geweldig! Laat me je naam weten.",
+      "Mooi! Wat is je naam?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Welkom terug! Wat is je e-mail?",
+      "Fijn je weer te zien! Voer je e-mail in.",
+      "Laten we inloggen. Wat is je e-mail?",
+      "Klaar om in te loggen? Deel je e-mail."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Ik zie je! Voer nu je wachtwoord in.",
+      "Gevonden! Wat is je wachtwoord?",
+      "Daar ben je! Voer je wachtwoord in om door te gaan.",
+      "Begrepen! Nu je wachtwoord, alsjeblieft."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfect! Laten we je account beveiligen. Maak een wachtwoord aan (minimaal 8 tekens):"
+  },
+  "passwordTooShort": {
+    "message": "Je wachtwoord moet minimaal 8 tekens lang zijn. Opnieuw proberen?"
+  },
+  "nameRequired": {
+    "message": "Ik heb je naam nodig om door te gaan. Hoe heet je?"
+  },
+  "errors": {
+    "generic": "Oeps! Er ging iets mis. Probeer het opnieuw.",
+    "emailCheck": "E-mailcontrole mislukt",
+    "loginFailed": "Inloggen mislukt. Controleer je gegevens.",
+    "signupFailed": "Registratie mislukt. Probeer het opnieuw."
+  },
+  "placeholders": {
+    "email": "Typ hier je e-mailadres...",
+    "name": "Voer je naam in...",
+    "password_create": "Maak een wachtwoord (minimaal 8 tekens)...",
+    "password_input": "Voer je wachtwoord in..."
+  },
+  "buttons": {
+    "yesPlease": "Ja Graag",
+    "logMeIn": "Inloggen",
+    "continueWithoutSignup": "Doorgaan zonder aanmelden"
+  }
+}

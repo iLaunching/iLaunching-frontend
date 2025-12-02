@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 interface HeaderProps {
   aiActive?: boolean; // Whether AI is active in sales mode
@@ -59,6 +60,9 @@ export default function Header({ aiActive = false, className = '', hideLogo = fa
             iLaunching
           </h1>
         </div>
+
+        {/* Language Switcher */}
+        <LanguageSwitcher textColor={textColor} />
       </div>
 
       <style>{`

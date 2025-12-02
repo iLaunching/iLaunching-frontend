@@ -1,16 +1,19 @@
 import { X, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api/auth';
 
 interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  initialView?: AuthView;
 }
 
 type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
 
-const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
-  const [currentView, setCurrentView] = useState<AuthView>('main');
+const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps) => {
+  const navigate = useNavigate();
+  const [currentView, setCurrentView] = useState<AuthView>(initialView);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +21,13 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
+  
+  // Reset to initial view when popup opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentView(initialView);
+    }
+  }, [isOpen, initialView]);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -116,9 +126,11 @@ const SignupPopup = ({ isOpen, onClose }: SignupPopupProps) => {
       // Code verified, now create the account
       await authApi.signup(email, password);
       
-      // Success! Close popup and redirect/refresh
+      // Success! Close popup and use React Router navigation for smoother transition
       onClose();
-      window.location.reload();
+      
+      // Use React Router for smooth transition (no full page reload)
+      navigate('/signup-interface?action=signup&provider=email');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Verification failed');
     } finally {

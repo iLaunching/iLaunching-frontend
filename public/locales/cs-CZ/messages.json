@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Vítejte! 🎉</h1><hr /><h2>Vítejte! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Vítejte! 🎉</h1><hr /><h2>Vítejte! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Vítejte! 🎉</h1><hr /><h2>Vítejte! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Vítejte! 🎉</h1><hr /><h2>Vítejte! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Hotovo!",
+    "subtitle": "Vše je připraveno. Dejte mi vědět, až budete připraveni začít!"
+  },
+  "default": {
+    "title": "Vítejte! 🎉",
+    "subtitle": "Vše je připraveno. Dejte mi vědět, až budete připraveni začít!",
+    "building": "Načítání...",
+    "joining": ""
+  }
+}

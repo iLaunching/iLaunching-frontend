@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Välkommen! 🎉</h1><hr /><h2>Välkommen! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Välkommen! 🎉</h1><hr /><h2>Välkommen! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Välkommen! 🎉</h1><hr /><h2>Välkommen! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Välkommen! 🎉</h1><hr /><h2>Välkommen! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Klart!",
+    "subtitle": "Allt är klart. Säg till när du är redo att börja!"
+  },
+  "default": {
+    "title": "Välkommen! 🎉",
+    "subtitle": "Allt är klart. Säg till när du är redo att börja!",
+    "building": "Laddar...",
+    "joining": ""
+  }
+}

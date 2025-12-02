@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Üdvözöljük! 🎉</h1><hr /><h2>Üdvözöljük! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Üdvözöljük! 🎉</h1><hr /><h2>Üdvözöljük! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Üdvözöljük! 🎉</h1><hr /><h2>Üdvözöljük! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Üdvözöljük! 🎉</h1><hr /><h2>Üdvözöljük! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Kész!",
+    "subtitle": "Minden készen áll. Tudassa velem, ha készen áll a kezdésre!"
+  },
+  "default": {
+    "title": "Üdvözöljük! 🎉",
+    "subtitle": "Minden készen áll. Tudassa velem, ha készen áll a kezdésre!",
+    "building": "Betöltés...",
+    "joining": ""
+  }
+}

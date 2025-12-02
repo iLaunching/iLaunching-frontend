@@ -1,0 +1,29 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Mükemmel! E-postanız doğrulandı. 🎉</h1><hr /><h2>Hoş geldiniz! 🚀</h2><p>Birlikte harika bir şeyler yapalım...</p>",
+      "<h1>Harika! E-posta onaylandı. ✅</h1><hr /><h2>Başlama zamanı! 💪</h2><p>Yolculuğunuza başlamaya hazır mısınız?</p>",
+      "<h1>Süper! Doğrulandı. 🎊</h1><hr /><h2>Hadi başlayalım! 🌟</h2><p>Maceranız şimdi başlıyor...</p>",
+      "<h1>Mükemmel! E-posta onaylandı. ✨</h1><hr /><h2>Ekibe hoş geldiniz! 🎯</h2><p>Özel bir şeyler yapalım...</p>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Hoş geldiniz! Google girişi başarılı. 🎉</h1><hr /><h2>Sizi görmek güzel! 👋</h2><p>Kişiselleştirilmiş deneyiminiz sizi bekliyor...</p>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Hoş geldiniz! Facebook girişi başarılı. 🎉</h1><hr /><h2>Sizi aramızda görmekten mutluyuz! 👋</h2><p>Deneyiminiz şimdi başlıyor...</p>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Hoş geldiniz! Microsoft girişi başarılı. 🎉</h1><hr /><h2>Her şey hazır! 👋</h2><p>Çalışma alanınız hazır...</p>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Tamam!",
+    "subtitle": "Her şey hazır. Başlamaya hazır olduğunuzda bana bildirin!"
+  }
+}

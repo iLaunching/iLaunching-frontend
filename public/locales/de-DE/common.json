@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Language"
+  },
+  "buttons": {
+    "getStarted": "Ich bin bereit - Los geht's!",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Willkommen",
+    "loading": "Lädt...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Xin chào! 👋 Chào mừng đến với iLaunching. Bắt đầu nhé?",
+      "Này! Sẵn sàng bắt đầu điều gì đó tuyệt vời chưa?",
+      "Chào mừng! Hãy bắt đầu hành trình của bạn.",
+      "Xin chào! Bạn đã đến đúng nơi rồi. Bắt đầu thôi!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Chào mừng trở lại! 😊",
+      "Này, tôi nhớ bạn! Chào mừng trở lại!",
+      "Rất vui được gặp lại bạn!",
+      "Bạn lại đây rồi! Chào mừng!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Cảm ơn! Chờ một chút...",
+      "Hoàn hảo, đang kiểm tra...",
+      "Một giây, đang xác minh...",
+      "Đã nhận! Kiểm tra nhanh..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Đang tìm kiếm <strong>{email}</strong>...",
+      "Đang kiểm tra <strong>{email}</strong>...",
+      "Đang kiểm tra <strong>{email}</strong> trong hệ thống...",
+      "Chờ một chút, đang tìm kiếm <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, đây không giống email hợp lệ. Thử lại nhé?",
+      "Ối! Định dạng email không hợp lệ. Kiểm tra lại nhé?",
+      "Có vấn đề với email đó. Bạn có thể kiểm tra không?",
+      "Định dạng email đó trông lạ. Kiểm tra lại nhé?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Có vẻ như bạn mới ở đây! Thật thú vị. Muốn tham gia không?",
+      "Tôi chưa thấy bạn trong hệ thống. Sẵn sàng bắt đầu chưa?",
+      "Gương mặt mới! Muốn tạo tài khoản không?",
+      "Bạn chưa đăng ký. Chúng ta thay đổi điều đó nhé?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Lựa chọn tuyệt vời! Tên bạn là gì?",
+      "Hoàn hảo! Tôi nên gọi bạn là gì?",
+      "Tuyệt vời! Cho tôi biết tên bạn.",
+      "Tốt! Tên bạn là gì?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Chào mừng trở lại! Email của bạn là gì?",
+      "Rất vui được gặp lại bạn! Nhập email của bạn.",
+      "Hãy đăng nhập. Email của bạn là gì?",
+      "Sẵn sàng đăng nhập? Chia sẻ email của bạn."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Tôi thấy bạn rồi! Bây giờ nhập mật khẩu của bạn.",
+      "Tìm thấy rồi! Mật khẩu của bạn là gì?",
+      "Bạn đây rồi! Nhập mật khẩu để tiếp tục.",
+      "Hiểu rồi! Bây giờ mật khẩu của bạn, làm ơn."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Hoàn hảo! Bây giờ hãy bảo mật tài khoản của bạn. Tạo mật khẩu (ít nhất 8 ký tự):"
+  },
+  "passwordTooShort": {
+    "message": "Mật khẩu của bạn cần ít nhất 8 ký tự. Thử lại nhé?"
+  },
+  "nameRequired": {
+    "message": "Tôi cần tên của bạn để tiếp tục. Tên bạn là gì?"
+  },
+  "errors": {
+    "generic": "Ối! Có lỗi xảy ra. Vui lòng thử lại.",
+    "emailCheck": "Kiểm tra email thất bại",
+    "loginFailed": "Đăng nhập thất bại. Kiểm tra thông tin đăng nhập của bạn.",
+    "signupFailed": "Đăng ký thất bại. Vui lòng thử lại."
+  },
+  "placeholders": {
+    "email": "Nhập email của bạn ở đây...",
+    "name": "Nhập tên của bạn...",
+    "password_create": "Tạo mật khẩu (tối thiểu 8 ký tự)...",
+    "password_input": "Nhập mật khẩu của bạn..."
+  },
+  "buttons": {
+    "yesPlease": "Vâng, Làm Ơn",
+    "logMeIn": "Đăng Nhập",
+    "continueWithoutSignup": "Tiếp tục mà không đăng ký"
+  }
+}

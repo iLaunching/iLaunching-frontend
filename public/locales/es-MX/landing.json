@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "¡Hola! 👋 Bienvenido a iLaunching. ¿Empezamos?",
+      "¡Órale! ¿Listo para empezar algo increíble?",
+      "¡Bienvenido! Comencemos tu viaje.",
+      "¡Hola! Estás en el lugar correcto. ¡Empecemos!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "¡Bienvenido de regreso! 😊",
+      "¡Órale, te recuerdo! ¡Bienvenido de regreso!",
+      "¡Qué gusto verte otra vez!",
+      "¡Aquí estás de nuevo! ¡Bienvenido!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "¡Gracias! Un momento...",
+      "Perfecto, checando...",
+      "Un segundo, verificando...",
+      "¡Recibido! Chequeo rápido..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Buscando <strong>{email}</strong>...",
+      "Checando <strong>{email}</strong>...",
+      "Verificando <strong>{email}</strong> en el sistema...",
+      "Un momento, buscando <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Mmm, eso no parece un email válido. ¿Intentas de nuevo?",
+      "¡Órale! Formato de email inválido. ¿Lo revisas otra vez?",
+      "Algo no está bien con ese email. ¿Puedes checar?",
+      "Ese formato de email se ve raro. ¿Lo revisas de nuevo?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "¡Parece que eres nuevo aquí! Está padre. ¿Quieres unirte?",
+      "Todavía no te veo en el sistema. ¿Listo para empezar?",
+      "¡Cara nueva! ¿Quieres crear una cuenta?",
+      "Todavía no estás registrado. ¿Lo cambiamos?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "¡Qué buena elección! ¿Cómo te llamas?",
+      "¡Perfecto! ¿Cómo te digo?",
+      "¡Genial! Dime tu nombre.",
+      "¡Bien! ¿Cómo te llamas?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "¡Bienvenido de regreso! ¿Cuál es tu email?",
+      "¡Qué gusto verte otra vez! Ingresa tu email.",
+      "Vamos a loguearte. ¿Cuál es tu email?",
+      "¿Listo para entrar? Comparte tu email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "¡Te veo! Ahora ingresa tu contraseña.",
+      "¡Te encontré! ¿Cuál es tu contraseña?",
+      "¡Ahí estás! Ingresa tu contraseña para continuar.",
+      "¡Entendido! Ahora tu contraseña, por favor."
+    ]
+  },
+  "passwordCreate": {
+    "message": "¡Perfecto! Ahora aseguremos tu cuenta. Crea una contraseña (mínimo 8 caracteres):"
+  },
+  "passwordTooShort": {
+    "message": "Tu contraseña debe tener al menos 8 caracteres. ¿Intentas de nuevo?"
+  },
+  "nameRequired": {
+    "message": "Necesito tu nombre para continuar. ¿Cómo te llamas?"
+  },
+  "errors": {
+    "generic": "¡Órale! Algo salió mal. Intenta de nuevo.",
+    "emailCheck": "Falló la verificación del email",
+    "loginFailed": "Falló el inicio de sesión. Checa tus credenciales.",
+    "signupFailed": "Falló el registro. Intenta de nuevo."
+  },
+  "placeholders": {
+    "email": "Escribe tu correo aquí...",
+    "name": "Ingresa tu nombre...",
+    "password_create": "Crea una contraseña (mínimo 8 caracteres)...",
+    "password_input": "Ingresa tu contraseña..."
+  },
+  "buttons": {
+    "yesPlease": "Sí, Por Favor",
+    "logMeIn": "Iniciar Sesión",
+    "continueWithoutSignup": "Continuar sin registrarse"
+  }
+}

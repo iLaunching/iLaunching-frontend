@@ -1,0 +1,20 @@
+{
+  "header": {
+    "language": "Idioma"
+  },
+  "buttons": {
+    "getStarted": "Estoy listo - ¡Empecemos!",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "logout": "Cerrar sesión"
+  },
+  "common": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  }
+}

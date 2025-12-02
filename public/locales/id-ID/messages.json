@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Selamat datang! 🎉</h1><hr /><h2>Selamat datang! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Selamat datang! 🎉</h1><hr /><h2>Selamat datang! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Selamat datang! 🎉</h1><hr /><h2>Selamat datang! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Selamat datang! 🎉</h1><hr /><h2>Selamat datang! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Selesai!",
+    "subtitle": "Semuanya siap. Beri tahu saya ketika Anda siap untuk memulai!"
+  },
+  "default": {
+    "title": "Selamat datang! 🎉",
+    "subtitle": "Semuanya siap. Beri tahu saya ketika Anda siap untuk memulai!",
+    "building": "Memuat...",
+    "joining": ""
+  }
+}

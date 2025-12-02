@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "Tere! 👋 Tere tulemast iLaunching'i. Alustame?",
+      "Hei! Valmis alustama midagi suurepärast?",
+      "Tere tulemast! Alustame teie teekonda.",
+      "Tere! Olete õiges kohas. Alustame!"
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Tere tulemast tagasi! 😊",
+      "Hei, mäletan sind! Tere tulemast tagasi!",
+      "Tore sind jälle näha!",
+      "Oled jälle siin! Tere tulemast!"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Tänan! Hetk...",
+      "Suurepärane, kontrollin...",
+      "Sekund, kontrollin...",
+      "Vastu võetud! Kiire kontroll..."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Otsin <strong>{email}</strong>...",
+      "Kontrollin <strong>{email}</strong>...",
+      "Kontrollin <strong>{email}</strong> süsteemis...",
+      "Hetk, otsin <strong>{email}</strong>..."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "Hmm, see ei näe välja nagu kehtiv e-post. Proovime uuesti?",
+      "Oih! Kehtetu e-posti vorming. Kontrolli uuesti?",
+      "Selle e-postiga on midagi valesti. Kas saate kontrollida?",
+      "E-posti vorming näeb kummaline välja. Kontrolli uuesti?"
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Tundub, et olete siin uus! See on põnev. Soovite liituda?",
+      "Ma ei näe teid veel süsteemis. Valmis alustama?",
+      "Uus nägu! Soovite luua konto?",
+      "Te pole veel registreeritud. Muudame selle?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Suurepärane valik! Mis teie nimi on?",
+      "Täiuslik! Kuidas ma peaksin teid kutsuma?",
+      "Fantastiline! Öelge mulle oma nimi.",
+      "Hea! Mis teie nimi on?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Tere tulemast tagasi! Mis on teie e-post?",
+      "Tore sind jälle näha! Sisesta oma e-post.",
+      "Logime teid sisse. Mis on teie e-post?",
+      "Valmis sisse logima? Jagage oma e-posti."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "Näen teid! Nüüd sisestage oma parool.",
+      "Leidsin! Mis on teie parool?",
+      "Seal te olete! Sisestage parool jätkamiseks.",
+      "Sain aru! Nüüd teie parool, palun."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Täiuslik! Nüüd turvame teie konto. Looge parool (vähemalt 8 tähemärki):"
+  },
+  "passwordTooShort": {
+    "message": "Teie parool peab olema vähemalt 8 tähemärki pikk. Proovime uuesti?"
+  },
+  "nameRequired": {
+    "message": "Mul on vaja teie nime, et jätkata. Mis teie nimi on?"
+  },
+  "errors": {
+    "generic": "Oih! Midagi läks valesti. Palun proovige uuesti.",
+    "emailCheck": "E-posti kontroll ebaõnnestus",
+    "loginFailed": "Sisselogimine ebaõnnestus. Kontrollige oma andmeid.",
+    "signupFailed": "Registreerimine ebaõnnestus. Palun proovige uuesti."
+  },
+  "placeholders": {
+    "email": "Sisesta oma e-post siia...",
+    "name": "Sisesta oma nimi...",
+    "password_create": "Loo parool (vähemalt 8 tähemärki)...",
+    "password_input": "Sisesta oma parool..."
+  },
+  "buttons": {
+    "yesPlease": "Jah, Palun",
+    "logMeIn": "Logi Sisse",
+    "continueWithoutSignup": "Jätka ilma registreerimata"
+  }
+}

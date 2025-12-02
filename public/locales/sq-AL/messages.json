@@ -1,0 +1,32 @@
+{
+  "emailSignup": {
+    "variations": [
+      "<h1>Mirë se vini! 🎉</h1><hr /><h2>Mirë se vini! 🚀</h2>"
+    ]
+  },
+  "googleSignup": {
+    "variations": [
+      "<h1>Mirë se vini! 🎉</h1><hr /><h2>Mirë se vini! 🚀</h2>"
+    ]
+  },
+  "facebookSignup": {
+    "variations": [
+      "<h1>Mirë se vini! 🎉</h1><hr /><h2>Mirë se vini! 🚀</h2>"
+    ]
+  },
+  "microsoftSignup": {
+    "variations": [
+      "<h1>Mirë se vini! 🎉</h1><hr /><h2>Mirë se vini! 🚀</h2>"
+    ]
+  },
+  "completion": {
+    "title": "✅ Përfunduar!",
+    "subtitle": "Çdo gjë është gati. Më njoftoni kur të jeni gati për të filluar!"
+  },
+  "default": {
+    "title": "Mirë se vini! 🎉",
+    "subtitle": "Çdo gjë është gati. Më njoftoni kur të jeni gati për të filluar!",
+    "building": "Duke ngarkuar...",
+    "joining": ""
+  }
+}

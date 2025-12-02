@@ -1,0 +1,100 @@
+{
+  "welcome": {
+    "variations": [
+      "You're at iLaunching, where ideas turn into brands that actually matter. I'm i. I don't do pitches. I help you move. What's your email so I can see if we've met before?",
+      "Welcome to iLaunching. You showed up early. That's already the right move. I'm i, and I'm here to clear the path, not sell you on it. Drop your email and let's see if you're already in the system.",
+      "This is iLaunching, the place where founders build faster than they thought possible. I'm i. Think of me as the quiet partner who just gets it done. What's your email? Let me check if we know each other.",
+      "You found iLaunching. Good timing. I'm i, built to help you skip the noise and build something real. Share your email so I can see if we've worked together before."
+    ]
+  },
+  "welcomeBack": {
+    "variations": [
+      "Back already? I like your energy. I'm i, and I'm right here waiting. What's your email again?",
+      "You're back! Good. That means you're serious. I'm i. Drop your email and let's pick up where we left off.",
+      "Welcome back to iLaunching. Ready to dive in this time? I'm i. What's your email so we can get moving?",
+      "Second look? Smart move. I'm i, and I'm still here ready to help you build. What's your email?"
+    ]
+  },
+  "acknowledge": {
+    "variations": [
+      "Thank you! Just a moment while I check that.",
+      "Got it! Give me a second to look you up.",
+      "Perfect! Let me see what we have here.",
+      "Thanks! Checking our system now."
+    ]
+  },
+  "checking": {
+    "variations": [
+      "Perfect! Let me check if {email} is in our system.",
+      "Got it! Looking up {email} now.",
+      "Excellent! Searching for {email} in our records.",
+      "Thanks! Let me see if {email} is already with us."
+    ]
+  },
+  "wrongFormat": {
+    "variations": [
+      "That's not an email. Try again with something that looks like one.",
+      "I need a real email to move forward. Check the format.",
+      "That doesn't work. Use a proper email address.",
+      "Not quite. Make sure it's a valid email format."
+    ]
+  },
+  "userNotRegistered": {
+    "variations": [
+      "Looks like you're new here! That's exciting. Want to join?",
+      "I don't see you in the system yet. Ready to get started?",
+      "New face! Would you like to create an account?",
+      "You're not registered yet. Shall we change that?"
+    ]
+  },
+  "askName": {
+    "variations": [
+      "Great choice! What's your name?",
+      "Perfect! What should I call you?",
+      "Awesome! Let me know your name.",
+      "Nice! What's your name?"
+    ]
+  },
+  "loginPrompt": {
+    "variations": [
+      "Welcome back! What's your email?",
+      "Good to see you again! Enter your email.",
+      "Let's get you logged in. What's your email?",
+      "Ready to log in? Share your email."
+    ]
+  },
+  "passwordPrompt": {
+    "variations": [
+      "I see you! Now enter your password.",
+      "Found you! What's your password?",
+      "There you are! Enter your password to continue.",
+      "Got it! Now your password, please."
+    ]
+  },
+  "passwordCreate": {
+    "message": "Perfect! Now let's secure your account. Create a password (at least 8 characters):"
+  },
+  "passwordTooShort": {
+    "message": "Your password needs to be at least 8 characters long. Try again?"
+  },
+  "nameRequired": {
+    "message": "I'll need your name to continue. What should I call you?"
+  },
+  "errors": {
+    "generic": "Oops! Something went wrong. Please try again.",
+    "emailCheck": "Failed to check email",
+    "loginFailed": "Login failed. Check your credentials.",
+    "signupFailed": "Signup failed. Please try again."
+  },
+  "placeholders": {
+    "email": "Type your email here...",
+    "name": "Enter your name...",
+    "password_create": "Create a password (at least 8 characters)...",
+    "password_input": "Enter your password..."
+  },
+  "buttons": {
+    "yesPlease": "Yes Please",
+    "logMeIn": "Log Me In",
+    "continueWithoutSignup": "Continue without signing up"
+  }
+}
