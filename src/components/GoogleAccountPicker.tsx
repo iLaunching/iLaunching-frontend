@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import VariousMenus from './VariousMenus';
 
 interface GoogleAccount {
   id: string;
@@ -26,6 +27,7 @@ export default function GoogleAccountPicker({
 }: GoogleAccountPickerProps) {
   const [savedAccounts, setSavedAccounts] = useState<GoogleAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVariousMenusOpen, setIsVariousMenusOpen] = useState(false);
 
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -93,9 +95,8 @@ export default function GoogleAccountPicker({
   };
 
   const handleRemoveAccounts = () => {
-    console.log('🗑️ Removing all saved accounts');
-    localStorage.removeItem('google_accounts');
-    setSavedAccounts([]);
+    console.log('🗑️ Opening remove accounts menu');
+    setIsVariousMenusOpen(true);
   };
 
   if (isLoading) {
@@ -243,6 +244,26 @@ export default function GoogleAccountPicker({
           </div>
         )}
       </div>
+      
+      {/* VariousMenus Popup */}
+      <VariousMenus
+        isOpen={isVariousMenusOpen}
+        onClose={() => {
+          setIsVariousMenusOpen(false);
+          // Refresh accounts after closing
+          const stored = localStorage.getItem('google_accounts');
+          if (stored) {
+            const accounts = JSON.parse(stored);
+            const sortedAccounts = accounts.sort((a: any, b: any) => 
+              (b.lastUsed || 0) - (a.lastUsed || 0)
+            );
+            setSavedAccounts(sortedAccounts);
+          } else {
+            setSavedAccounts([]);
+          }
+        }}
+        provider="google"
+      />
     </div>
   );
 }

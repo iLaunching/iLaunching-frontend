@@ -19,10 +19,30 @@ const SignupInterface = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isProcessing, setIsProcessing] = useState(true);
   const [message, setMessage] = useState('');
-  const [provider, setProvider] = useState('');
   const [showButton, setShowButton] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [hasCompleted, setHasCompleted] = useState(false);
+
+  const getAvatarColor = (email: string): string => {
+    const colors = [
+      'EA4335', // Google Red
+      '4285F4', // Google Blue
+      'FBBC04', // Google Yellow
+      '34A853', // Google Green
+      'FF6D00', // Deep Orange
+      '9C27B0', // Purple
+      '00ACC1', // Cyan
+      '7CB342', // Light Green
+    ];
+    
+    // Simple hash function to get consistent color for same email
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+      hash = email.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
 
   // Congratulation messages for different providers
   const getCongratsMessage = (providerName: string) => {
@@ -114,8 +134,7 @@ const SignupInterface = () => {
             console.log('✅ Auth store updated with user and tokens');
           }
           
-          // Set provider and message for email signup
-          setProvider('email');
+          // Set message for email signup
           setMessage(getCongratsMessage('email'));
           setIsProcessing(false);
           
@@ -155,11 +174,13 @@ const SignupInterface = () => {
                 ? `${user.first_name} ${user.last_name}`
                 : user.name || user.email;
               const firstName = user.first_name || fullName.split(' ')[0];
+              const avatarColor = getAvatarColor(user.email);
               const newAccount = {
                 id: user.id,
                 email: user.email,
                 name: fullName,
-                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=4285F4&color=fff`,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=${avatarColor}&color=fff&length=1`,
+                avatarColor: avatarColor,
                 lastUsed: Date.now()
               };
               
@@ -189,11 +210,13 @@ const SignupInterface = () => {
                 ? `${user.first_name} ${user.last_name}`
                 : user.name || user.email;
               const firstName = user.first_name || fullName.split(' ')[0];
+              const avatarColor = getAvatarColor(user.email);
               const newAccount = {
                 id: user.id,
                 email: user.email,
                 name: fullName,
-                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=1877F2&color=fff`,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=${avatarColor}&color=fff&length=1`,
+                avatarColor: avatarColor,
                 lastUsed: Date.now()
               };
               
@@ -227,8 +250,7 @@ const SignupInterface = () => {
             // New user from OAuth signup
             console.log(`New user signup via ${oauthResult.provider} - showing signup interface`);
             
-            // Set provider and message ONCE - this prevents re-initialization
-            setProvider(oauthResult.provider || 'default');
+            // Set message ONCE - this prevents re-initialization
             setMessage(getCongratsMessage(oauthResult.provider || 'default'));
             setIsProcessing(false);
             

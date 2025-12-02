@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { authApi } from '@/api/auth';
 import type { AuthState } from '@/types/auth';
 import {
-  getRandomAcknowledgeMessage,
   getRandomCheckingEmailMessage,
   getRandomWrongFormatMessage,
   getRandomUserNotRegisteredMessage,
@@ -19,7 +18,6 @@ import {
   getNameRequiredMessage,
   getErrorMessage,
 } from '@/i18n/landingHelpers';
-import i18n from '@/i18n/config';
 
 export function useLandingAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -65,7 +63,7 @@ export function useLandingAuth() {
     if (!isValidEmail(email)) {
       setAuthState((prev: AuthState) => ({ 
         ...prev, 
-        message: getRandomWrongEmailMessage(),
+          message: getRandomWrongFormatMessage(),
         error: null,
       }));
       return;
@@ -341,14 +339,15 @@ export function useLandingAuth() {
   };
 
   /**
-   * Skip directly to name input (for demo mode)
+   * Skip email verification and go directly to name input (demo mode)
+   * @param customMessage - Optional custom message to display instead of default
    */
-  const skipToNameInput = (): void => {
+  const skipToNameInput = (customMessage?: string): void => {
     setAuthState((prev: AuthState) => ({
       ...prev,
       email: 'demo@ilaunching.app',
       stage: 'name_input',
-      message: getRandomAskNameMessage(),
+      message: customMessage || getRandomAskNameMessage(),
       isProcessing: false,
       error: null,
     }));
@@ -362,6 +361,34 @@ export function useLandingAuth() {
       ...prev,
       stage: 'sales',
       message: '',
+      isProcessing: false,
+      error: null,
+    }));
+  };
+
+  /**
+   * Show Google Account Picker - check localStorage for saved accounts
+   */
+  const showGoogleAccountPicker = () => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'oauth_login',
+      oauth_provider: 'google',
+      message: 'Welcome back! Select your Google account to continue.',
+      isProcessing: false,
+      error: null,
+    }));
+  };
+
+  /**
+   * Show Facebook Account Picker - check localStorage for saved accounts
+   */
+  const showFacebookAccountPicker = () => {
+    setAuthState((prev: AuthState) => ({
+      ...prev,
+      stage: 'oauth_login',
+      oauth_provider: 'facebook',
+      message: 'Welcome back! Select your Facebook account to continue.',
       isProcessing: false,
       error: null,
     }));
@@ -387,6 +414,8 @@ export function useLandingAuth() {
     handlePasswordLogin,
     skipToNameInput,
     enterSalesMode,
+    showGoogleAccountPicker,
+    showFacebookAccountPicker,
     logout,
     reset,
   };

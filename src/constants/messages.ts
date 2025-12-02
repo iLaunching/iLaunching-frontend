@@ -927,6 +927,192 @@ export const SUBMIT_ACKNOWLEDGE_MESSAGE = [
 
 
 
+
+/**
+ * will this make money? prompt Messages
+ */
+export const willThisMakeMoney_MESSAGE = [
+  "That's the million dollar question, right? Let's figure it out together. What's your name?",
+  "I love that you're asking this before diving in. I'm here to help - what should I call you?",
+  "Okay, let's be honest about whether this can actually make you money. First though, what's your name?",
+  "Smart. No point chasing something that won't pay off. What's your name?",
+  "Alright, let's see if this idea's got legs. What should I call you?",
+  "Love the skepticism - that's what keeps bad ideas from becoming bad businesses. What's your name?",
+  "Fair question. Let's dig in and find out. What's your name?",
+  "Let's not waste your time if this won't work. I'm here to help. What should I call you?",
+  "Good - you're thinking like an entrepreneur already. What's your name?",
+  "I get it, you want to know if this is worth your time. Let's find out. What's your name?",
+  "That's exactly what we should figure out before you go any further. What should I call you?",
+  "Honestly? Let's find out together. First, what's your name?",
+  "The real question, right? Let's break it down. What's your name?",
+  "I respect that - you're not here to waste time. What should I call you?",
+  "Let's get real about the money side of this. What's your name?",
+  "That's what matters most. Let's see if the numbers work. What's your name?",
+  "Great minds ask this first. Let's talk it through. What should I call you?",
+  "You're asking the right questions. Let's figure this out. What's your name?",
+  "Money talks, right? Let's see what your idea's really worth. What's your name?",
+  "I'll be straight with you about the potential here. What should I call you?",
+  "Let's make sure this isn't just a hobby that costs you money. What's your name?",
+  "That's the only question that really matters. Let's dive in. What should I call you?",
+  "You'd be surprised how many people skip this step. Smart move. What's your name?",
+  "Let's find out if you're sitting on something valuable. What's your name?",
+  "Before you invest months into this, let's validate it. What should I call you?",
+  "I'll help you see if there's a real business here. What's your name?",
+  "Let's be realistic about what this could earn you. First, what's your name?",
+  "That's the grown-up question. I like it. What should I call you?",
+  "Let's talk dollars and cents, not just dreams. What's your name?",
+  "You're thinking with your head, not just your heart. Good. What's your name?",
+  "Let's see if this passes the money test. What should I call you?",
+  "I'm not here to blow smoke - let's see if this is real. What's your name?",
+  "That's what separates ideas from businesses. Let's check. What's your name?",
+  "Let's make sure you're not building a money pit. What should I call you?",
+  "The market will tell us. Let's look together. What's your name?",
+  "I'd rather tell you now than have you find out the hard way. What's your name?",
+  "Let's test this before you quit your day job. What should I call you?",
+  "You're doing your homework. I respect that. What's your name?",
+  "Let's see if people will actually pay for this. What's your name?",
+  "That's the filter every idea needs to pass through. What should I call you?",
+  "Some ideas make money, some don't. Let's find out which this is. What's your name?",
+  "Let's separate the winners from the wishful thinking. What's your name?",
+  "I'll give you an honest answer, not what you want to hear. What should I call you?",
+  "Let's see if there's actual demand for this. What's your name?",
+  "Before you spend a dime, let's validate the economics. What's your name?",
+  "That's the question that keeps founders up at night. Let's answer it. What should I call you?",
+  "Let's make sure this isn't just burning money. What's your name?",
+  "You need truth, not cheerleading. I got you. What's your name?",
+  "Let's run the numbers and see what's possible. What should I call you?",
+  "That's what I'm here for - real talk about real money. What's your name?"
+] as const;
+
+
+
+
+
+
+/**
+ * launch my idea? prompt Messages
+ */
+export const launchMyIdea_MESSAGE = [
+  "Okay, I like your energy. Let's do this. What's your name?",
+  "Alright, no more messing around. Let's get you launched. What should I call you?",
+  "Hell yeah. Let's turn this into something real. What's your name?",
+  "Finally! Someone who's actually ready to move. What's your name?",
+  "Love it. Let's stop thinking and start building. What should I call you?",
+  "Now we're talking. Let's make this happen. What's your name?",
+  "Okay, you're serious. I'm here for it. What's your name?",
+  "This is the good part. Let's go. What should I call you?",
+  "Alright, let's get you out there. What's your name?",
+  "I respect that you're ready to commit. Let's build this. What's your name?",
+  "Perfect. No more waiting around. What should I call you?",
+  "Let's go - done is better than perfect anyway. What's your name?",
+  "You know what? I like the confidence. Let's launch. What's your name?",
+  "Okay, let's make you some money. What should I call you?",
+  "Time to ship this thing. What's your name?",
+  "Alright, real talk - let's get you from idea to income. What's your name?",
+  "I'm ready if you are. Let's do this properly. What should I call you?",
+  "Let's not overthink it. Time to launch. What's your name?",
+  "You're done planning, right? Good. Let's build. What's your name?",
+  "Okay, here's the deal - we're gonna make this real. What should I call you?",
+  "Love the commitment. Let's turn this into a business. What's your name?",
+  "Alright, let's get your first customer. What's your name?",
+  "This is where it gets fun. Let's launch this. What should I call you?",
+  "You ready? Because I'm about to walk you through everything. What's your name?",
+  "Forget perfect - let's just get it out there. What's your name?",
+  "Okay, so you're actually doing this. Respect. What should I call you?",
+  "Let's go. What's stopping us? What's your name?",
+  "Time to make some moves. What's your name?",
+  "Alright, I'll help you launch faster than you think. What should I call you?",
+  "Let's build something people can actually pay you for. What's your name?",
+  "You've waited long enough. Let's launch. What's your name?",
+  "I like where your head's at. Let's get started. What should I call you?",
+  "Okay, day one starts now. What's your name?",
+  "Let's take this from your head to the real world. What's your name?",
+  "Alright, no more excuses. We're doing this. What should I call you?",
+  "Let's make today the day you actually launch. What's your name?",
+  "Perfect timing. Let's get you moving. What's your name?",
+  "You know what separates successful founders? They ship. Let's go. What should I call you?",
+  "Okay, I'm gonna help you cut through all the noise. What's your name?",
+  "Let's launch lean and learn as we go. What's your name?",
+  "Alright, from zero to launched. Let's do it. What should I call you?",
+  "Time to stop researching and start earning. What's your name?",
+  "Let's build the simplest version and get it out there. What's your name?",
+  "You're closer than you think. Let's finish this. What should I call you?",
+  "Alright, let's make you a business owner. For real. What's your name?",
+  "I'll walk you through it step by step. Let's start. What's your name?",
+  "Time to put your money where your mouth is. Let's launch. What should I call you?",
+  "Let's go - your future customers are waiting. What's your name?",
+  "Okay, no more 'what ifs' - let's just do it. What's your name?",
+  "Let's give this a real shot. What should I call you?"
+] as const;
+
+
+
+
+
+
+/**
+ * see what you can do for me  Messages
+ */
+export const seeWhatYouCanDoForMe_MESSAGE= [
+  "Fair enough. Let me show you what I've got. What's your name?",
+  "Alright, I like a skeptic. Let's see if I can impress you. What should I call you?",
+  "Challenge accepted. First though, what's your name?",
+  "Okay, let me prove it. What's your name?",
+  "I get it - you want to see the goods first. What should I call you?",
+  "Smart. Don't trust anything until you see it work. What's your name?",
+  "Alright, let me show you why people use this. What's your name?",
+  "I respect that. Let me earn your time. What should I call you?",
+  "Okay, no fluff - just results. First, what's your name?",
+  "Let's see if I can convince you. What's your name?",
+  "Fair question. Let me walk you through it. What should I call you?",
+  "Alright, I'll show you exactly what's possible. What's your name?",
+  "You want proof, not promises. I got you. What's your name?",
+  "Let me show you what makes this different. What should I call you?",
+  "Okay, let's do a quick demo just for you. What's your name?",
+  "I like that you're not just taking my word for it. What's your name?",
+  "Alright, let me show you something cool. What should I call you?",
+  "Let's cut to the chase. I'll show you what I can do. What's your name?",
+  "Fair enough - actions speak louder than words. What's your name?",
+  "Let me give you the full picture. What should I call you?",
+  "Okay, prepare to be either impressed or disappointed. What's your name?",
+  "I'll let the results speak for themselves. What's your name?",
+  "Alright, let's see if this is a good fit for you. What should I call you?",
+  "Let me show you what's under the hood. What's your name?",
+  "You came to kick the tires? I respect that. What's your name?",
+  "Okay, let me walk you through what I actually do. What should I call you?",
+  "Let's see if I can solve your problem. What's your name?",
+  "Alright, time for the full tour. What's your name?",
+  "I get it - show don't tell, right? What should I call you?",
+  "Let me show you why this works. What's your name?",
+  "Okay, let's make this personal to you. What's your name?",
+  "Fair. Let me show you what's possible for your situation. What should I call you?",
+  "Alright, no sales pitch - just what I can actually do. What's your name?",
+  "Let me prove I'm worth your time. What's your name?",
+  "Okay, I'll show you rather than tell you. What should I call you?",
+  "Let's get specific about what I can help you with. What's your name?",
+  "Alright, let me customize this for you. What's your name?",
+  "I like the energy. Let me show you the real deal. What should I call you?",
+  "Okay, let's see if I can help you specifically. What's your name?",
+  "Fair enough. Let me give you the personalized version. What's your name?",
+  "Let me show you what others are getting out of this. What should I call you?",
+  "Alright, let's see what you're working with. What's your name?",
+  "Okay, I'll tailor this to your exact situation. What's your name?",
+  "Let me show you the possibilities for someone like you. What should I call you?",
+  "Alright, no generic BS - let's make this about you. What's your name?",
+  "Let me show you what's actually relevant to you. What's your name?",
+  "Okay, skepticism is healthy. Let me earn it. What should I call you?",
+  "Fair. Let's see if this clicks for you. What's your name?",
+  "Alright, I'll give you the real version, not the sales version. What's your name?",
+  "Let me show you exactly how this helps. What should I call you?"
+] as const;
+
+
+
+
+
+
+
+
 /**
  * Email Prompt Messages
  */
@@ -981,3 +1167,6 @@ export const getRandomPasswordPrompt = () => getRandomMessage(PASSWORD_PROMPTS);
 export const getRandomTourMessage = () => getRandomMessage(TOUR_MESSAGES);
 export const getRandomLoginMessage = () => getRandomMessage(LOGIN_MESSAGES);
 export const getRandomAskNameMessage = () => getRandomMessage(ASK_NAME_MESSAGES);
+export const getRandomWillThisMakeMoneyMessage = () => getRandomMessage(willThisMakeMoney_MESSAGE);
+export const getRandomLaunchMyIdeaMessage = () => getRandomMessage(launchMyIdea_MESSAGE);
+export const getRandomSeeWhatYouCanDoForMeMessage = () => getRandomMessage(seeWhatYouCanDoForMe_MESSAGE);

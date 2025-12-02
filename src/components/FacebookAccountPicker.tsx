@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import VariousMenus from './VariousMenus';
 
 interface FacebookAccount {
   id: string;
@@ -26,6 +27,7 @@ export default function FacebookAccountPicker({
 }: FacebookAccountPickerProps) {
   const [savedAccounts, setSavedAccounts] = useState<FacebookAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVariousMenusOpen, setIsVariousMenusOpen] = useState(false);
 
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -87,9 +89,8 @@ export default function FacebookAccountPicker({
   };
 
   const handleRemoveAccounts = () => {
-    console.log('🗑️ Removing all saved Facebook accounts');
-    localStorage.removeItem('facebook_accounts');
-    setSavedAccounts([]);
+    console.log('🗑️ Opening remove accounts menu');
+    setIsVariousMenusOpen(true);
   };
 
   if (isLoading) {
@@ -222,6 +223,26 @@ export default function FacebookAccountPicker({
           </div>
         )}
       </div>
+      
+      {/* VariousMenus Popup */}
+      <VariousMenus
+        isOpen={isVariousMenusOpen}
+        onClose={() => {
+          setIsVariousMenusOpen(false);
+          // Refresh accounts after closing
+          const stored = localStorage.getItem('facebook_accounts');
+          if (stored) {
+            const accounts = JSON.parse(stored);
+            const sortedAccounts = accounts.sort((a: any, b: any) => 
+              (b.lastUsed || 0) - (a.lastUsed || 0)
+            );
+            setSavedAccounts(sortedAccounts);
+          } else {
+            setSavedAccounts([]);
+          }
+        }}
+        provider="facebook"
+      />
     </div>
   );
 }

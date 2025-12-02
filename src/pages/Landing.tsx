@@ -15,6 +15,7 @@ import GoogleAccountPicker from '@/components/GoogleAccountPicker';
 import FacebookAccountPicker from '@/components/FacebookAccountPicker';
 import { UserPlus, LogIn } from 'lucide-react';
 import { APP_CONFIG } from '@/constants';
+import { getRandomWillThisMakeMoneyMessage, getRandomLaunchMyIdeaMessage, getRandomSeeWhatYouCanDoForMeMessage } from '@/constants/messages';
 import { 
   getRandomWelcomeMessage, 
   getRandomWelcomeBackMessage,
@@ -45,6 +46,8 @@ export default function Landing() {
     handlePasswordLogin,
     skipToNameInput,
     enterSalesMode,
+    showGoogleAccountPicker,
+    showFacebookAccountPicker,
   } = useLandingAuth();
   
   // State to control button visibility after typewriter completes
@@ -90,11 +93,13 @@ export default function Landing() {
                 ? `${user.first_name} ${user.last_name}`
                 : user.name || user.email;
               const firstName = user.first_name || fullName.split(' ')[0];
+              const avatarColor = getAvatarColor(user.email);
               const newAccount = {
                 id: user.id,
                 email: user.email,
                 name: fullName,
-                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=4285F4&color=fff`,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=${avatarColor}&color=fff&length=1`,
+                avatarColor: avatarColor,
                 lastUsed: Date.now()
               };
               
@@ -199,6 +204,28 @@ export default function Landing() {
       alert(`Authentication failed: ${oauthResult.error}`);
     }
   }, []);
+  
+  // Generate consistent avatar color from email (like Google does)
+  const getAvatarColor = (email: string): string => {
+    const colors = [
+      'EA4335', // Google Red
+      '4285F4', // Google Blue
+      'FBBC04', // Google Yellow
+      '34A853', // Google Green
+      'FF6D00', // Deep Orange
+      '9C27B0', // Purple
+      '00ACC1', // Cyan
+      '7CB342', // Light Green
+    ];
+    
+    // Simple hash function to get consistent color for same email
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+      hash = email.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
   
   // Initialize with welcome message on first load
   useEffect(() => {
@@ -394,8 +421,83 @@ export default function Landing() {
   
   // Handle sales demo click - skip to name input stage
   const handleSalesDemoClick = useCallback(() => {
-    skipToNameInput();
+    // Get random message from seeWhatYouCanDoForMe array
+    const randomMessage = getRandomSeeWhatYouCanDoForMeMessage();
+    // Skip to name input with the custom message
+    skipToNameInput(randomMessage);
   }, [skipToNameInput]);
+
+  const handleMakeMoneyClick = useCallback(() => {
+    // Get random message from willThisMakeMoney array
+    const randomMessage = getRandomWillThisMakeMoneyMessage();
+    // Skip to name input with the custom message
+    skipToNameInput(randomMessage);
+  }, [skipToNameInput]);
+
+  const handleLaunchIdeaClick = useCallback(() => {
+    // Get random message from launchMyIdea array
+    const randomMessage = getRandomLaunchMyIdeaMessage();
+    // Skip to name input with the custom message
+    skipToNameInput(randomMessage);
+  }, [skipToNameInput]);
+
+  // Handle Google button click - check for saved accounts
+  const handleGoogleClick = useCallback(() => {
+    try {
+      const stored = localStorage.getItem('google_accounts');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      
+      if (stored) {
+        const accounts = JSON.parse(stored);
+        if (accounts && accounts.length > 0) {
+          // Has saved accounts - trigger GoogleAccountPicker flow
+          console.log('📱 Found', accounts.length, 'saved Google accounts, showing picker');
+          showGoogleAccountPicker();
+          return;
+        }
+      }
+      
+      // No saved accounts - go directly to Google OAuth
+      console.log('🔵 No saved accounts, redirecting to Google OAuth');
+      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      window.location.href = googleAuthUrl;
+    } catch (err) {
+      console.error('Error checking Google accounts:', err);
+      // On error, go to OAuth as fallback
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      window.location.href = googleAuthUrl;
+    }
+  }, [showGoogleAccountPicker]);
+
+  // Handle Facebook button click - check for saved accounts
+  const handleFacebookClick = useCallback(() => {
+    try {
+      const stored = localStorage.getItem('facebook_accounts');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      
+      if (stored) {
+        const accounts = JSON.parse(stored);
+        if (accounts && accounts.length > 0) {
+          // Has saved accounts - trigger FacebookAccountPicker flow
+          console.log('📱 Found', accounts.length, 'saved Facebook accounts, showing picker');
+          showFacebookAccountPicker();
+          return;
+        }
+      }
+      
+      // No saved accounts - go directly to Facebook OAuth
+      console.log('🔵 No saved accounts, redirecting to Facebook OAuth');
+      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      window.location.href = facebookAuthUrl;
+    } catch (err) {
+      console.error('Error checking Facebook accounts:', err);
+      // On error, go to OAuth as fallback
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      window.location.href = facebookAuthUrl;
+    }
+  }, [showFacebookAccountPicker]);
   
   // Get current display message
   const getCurrentMessage = () => {
@@ -551,6 +653,14 @@ export default function Landing() {
                   onSignupClick={handleSignupClick}
                   showSalesDemoButton={authState.stage === 'email_input'}
                   onSalesDemoClick={handleSalesDemoClick}
+                  showLaunchIdeaButton={authState.stage === 'email_input'}
+                  onLaunchIdeaClick={handleLaunchIdeaClick}
+                  showMakeMoneyButton={authState.stage === 'email_input'}
+                  onMakeMoneyClick={handleMakeMoneyClick}
+                  showGoogleButton={authState.stage === 'email_input'}
+                  onGoogleClick={handleGoogleClick}
+                  showFacebookButton={authState.stage === 'email_input'}
+                  onFacebookClick={handleFacebookClick}
                 />
               </div>
             )}

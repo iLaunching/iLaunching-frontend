@@ -30,6 +30,7 @@ export interface User {
   email: string;
   name: string;
   created_at?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface AuthResponse {

@@ -10,6 +10,7 @@ export interface User {
   subscription_tier: string;
   created_at: string;
   updated_at?: string;
+  onboarding_completed?: boolean;
 }
 
 export interface AuthResponse {
