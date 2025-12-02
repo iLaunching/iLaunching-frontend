@@ -30,6 +30,7 @@ export function useLandingAuth() {
     user: null,
     isProcessing: false,
     error: null,
+    oauth_provider: null,
   });
 
   /**
@@ -44,6 +45,7 @@ export function useLandingAuth() {
       user: null,
       isProcessing: false,
       error: null,
+      oauth_provider: null,
     });
   };
 
@@ -124,13 +126,14 @@ export function useLandingAuth() {
       
       if (hasOAuthProvider) {
         console.log('🔒 OAuth user detected, showing account picker. Provider:', result.oauth_provider);
-        // OAuth user - show Google account picker instead of password input
+        // OAuth user - show account picker instead of password input
         setAuthState((prev: AuthState) => ({
           ...prev,
           stage: 'oauth_login',
           message: result.message,  // Backend message explains OAuth requirement
           isProcessing: false,
           error: null,
+          oauth_provider: result.oauth_provider || null,
         }));
         return;
       }

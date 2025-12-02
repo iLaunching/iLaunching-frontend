@@ -23,6 +23,7 @@ export interface AuthState {
   user: User | null;
   isProcessing: boolean;
   error: string | null;
+  oauth_provider?: string | null; // 'google', 'facebook', 'microsoft', etc.
 }
 
 export interface User {

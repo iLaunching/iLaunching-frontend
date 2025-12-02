@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-interface GoogleAccount {
+interface FacebookAccount {
   id: string;
   email: string;
   name: string;
@@ -8,23 +8,23 @@ interface GoogleAccount {
   lastUsed?: number; // Timestamp of last use
 }
 
-interface GoogleAccountPickerProps {
-  onAccountSelect: (account: GoogleAccount) => void;
+interface FacebookAccountPickerProps {
+  onAccountSelect: (account: FacebookAccount) => void;
   onAddAccount?: () => void;
   className?: string;
 }
 
 /**
- * GoogleAccountPicker Component
- * Shows previously used Google accounts with custom styling (like Canva)
+ * FacebookAccountPicker Component
+ * Shows previously used Facebook accounts with custom styling (like Canva)
  * Stores account info in localStorage after first OAuth
  */
-export default function GoogleAccountPicker({ 
+export default function FacebookAccountPicker({ 
   onAccountSelect,
   onAddAccount,
   className = '' 
-}: GoogleAccountPickerProps) {
-  const [savedAccounts, setSavedAccounts] = useState<GoogleAccount[]>([]);
+}: FacebookAccountPickerProps) {
+  const [savedAccounts, setSavedAccounts] = useState<FacebookAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Get API URL from environment
@@ -33,7 +33,7 @@ export default function GoogleAccountPicker({
   // Load previously used accounts from localStorage
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('google_accounts');
+      const stored = localStorage.getItem('facebook_accounts');
       if (stored) {
         const accounts = JSON.parse(stored);
         // Sort by lastUsed timestamp (most recent first)
@@ -41,15 +41,15 @@ export default function GoogleAccountPicker({
           (b.lastUsed || 0) - (a.lastUsed || 0)
         );
         setSavedAccounts(sortedAccounts);
-        console.log('✅ Loaded saved accounts:', sortedAccounts.length, 'sorted by lastUsed');
+        console.log('✅ Loaded saved Facebook accounts:', sortedAccounts.length, 'sorted by lastUsed');
       }
     } catch (err) {
-      console.error('Error loading saved accounts:', err);
+      console.error('Error loading saved Facebook accounts:', err);
     }
     setIsLoading(false);
   }, []);
 
-  const getDisplayName = (account: GoogleAccount) => {
+  const getDisplayName = (account: FacebookAccount) => {
     // If name exists and is different from email, extract first and last name
     if (account.name && account.name !== account.email) {
       const nameParts = account.name.trim().split(/\s+/);
@@ -63,38 +63,32 @@ export default function GoogleAccountPicker({
     return account.email.split('@')[0];
   };
 
-  const handleAccountClick = (account: GoogleAccount) => {
-    console.log('🔐 Selected account:', account.email);
+  const handleAccountClick = (account: FacebookAccount) => {
+    console.log('🔐 Selected Facebook account:', account.email);
     onAccountSelect(account);
   };
 
   const handleAddAccount = () => {
-    console.log('➕ Adding new Google account');
+    console.log('➕ Adding new Facebook account');
     if (onAddAccount) {
       // Use callback if provided (e.g., to open SignupPopup)
       onAddAccount();
     } else {
-      // Fallback: Direct redirect to Google OAuth
-      // API_URL already includes /api/v1
-      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
-      console.log('🔵 Google OAuth URL:', googleAuthUrl);
-      console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
-      window.location.href = googleAuthUrl;
+      // Fallback: Direct redirect to Facebook OAuth
+      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      window.location.href = facebookAuthUrl;
     }
   };
 
-  const handleGoogleAuth = () => {
+  const handleFacebookAuth = () => {
     // Redirect to backend OAuth endpoint
-    // API_URL already includes /api/v1
-    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
-    console.log('🔵 Google OAuth URL:', googleAuthUrl);
-    console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
-    window.location.href = googleAuthUrl;
+    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    window.location.href = facebookAuthUrl;
   };
 
   const handleRemoveAccounts = () => {
-    console.log('🗑️ Removing all saved accounts');
-    localStorage.removeItem('google_accounts');
+    console.log('🗑️ Removing all saved Facebook accounts');
+    localStorage.removeItem('facebook_accounts');
     setSavedAccounts([]);
   };
 
@@ -109,7 +103,7 @@ export default function GoogleAccountPicker({
 
   return (
     <div 
-      className={`google-account-picker ${className}`}
+      className={`facebook-account-picker ${className}`}
       style={{
         animation: 'fadeInSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
       }}
@@ -133,7 +127,7 @@ export default function GoogleAccountPicker({
             <div
               key={account.id}
               className={`flex-shrink-0 flex flex-col items-center gap-3 p-5 bg-white rounded-xl transition-all duration-200 relative group shadow-md hover:shadow-lg`}
-              style={{ fontFamily: 'Work Sans', width:"300px", height:'270px', padding:'30px'}}
+              style={{ fontFamily: 'Work Sans', minWidth:'30%', maxWidth:'38%',width:"100%", height:'270px', padding:'30px'}}
             >
               <img
                 src={account.picture}
@@ -156,9 +150,9 @@ export default function GoogleAccountPicker({
               <button
                 onClick={() => handleAccountClick(account)}
                 className="w-full py-2 px-4 rounded-lg text-white text-sm font-medium transition-colors duration-200"
-                style={{ backgroundColor: '#8B3DFF', fontFamily: 'Work Sans' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7029CC'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8B3DFF'}
+                style={{ backgroundColor: '#1877F2', fontFamily: 'Work Sans' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#166FE5'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1877F2'}
               >
                 Select
               </button>
@@ -166,32 +160,17 @@ export default function GoogleAccountPicker({
           ))}
         </div>
         
-        {/* Continue with Google Button - Only show when no accounts */}
+        {/* Continue with Facebook Button - Only show when no accounts */}
         {savedAccounts.length === 0 && (
           <div className="flex justify-center mb-6">
             <button
-              onClick={handleGoogleAuth}
+              onClick={handleFacebookAuth}
               className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative bg-white max-w-[350px]"
             >
-              <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
+              <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
-              <span className="text-sm font-medium text-gray-700 w-full text-center" style={{ fontFamily: 'Work Sans' }}>Continue with Google</span>
+              <span className="text-sm font-medium text-gray-700 w-full text-center" style={{ fontFamily: 'Work Sans' }}>Continue with Facebook</span>
             </button>
           </div>
         )}
@@ -221,9 +200,9 @@ export default function GoogleAccountPicker({
             <button
               onClick={handleRemoveAccounts}
               className="flex items-center gap-2 transition-colors duration-200 group"
-              style={{ color: '#8B3DFF' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#7029CC'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#8B3DFF'}
+              style={{ color: '#1877F2' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#166FE5'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#1877F2'}
             >
               <svg
                 className="w-4 h-4"

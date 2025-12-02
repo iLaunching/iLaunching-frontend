@@ -176,7 +176,41 @@ const SignupInterface = () => {
               localStorage.setItem('google_accounts', JSON.stringify(existingAccounts));
               console.log('✅ Saved Google account to localStorage from SignupInterface:', newAccount.email);
             } catch (err) {
-              console.error('❌ Failed to save account from SignupInterface:', err);
+              console.error('❌ Failed to save Google account from SignupInterface:', err);
+            }
+          }
+          
+          // Save Facebook account to localStorage for account picker
+          if (oauthResult.provider === 'facebook' && response.user) {
+            try {
+              const existingAccounts = JSON.parse(localStorage.getItem('facebook_accounts') || '[]');
+              const user = response.user as any;
+              const fullName = user.first_name && user.last_name 
+                ? `${user.first_name} ${user.last_name}`
+                : user.name || user.email;
+              const firstName = user.first_name || fullName.split(' ')[0];
+              const newAccount = {
+                id: user.id,
+                email: user.email,
+                name: fullName,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=1877F2&color=fff`,
+                lastUsed: Date.now()
+              };
+              
+              const accountExists = existingAccounts.some((acc: any) => acc.email === newAccount.email);
+              if (!accountExists) {
+                existingAccounts.push(newAccount);
+              } else {
+                // Update lastUsed timestamp for existing account
+                const accountIndex = existingAccounts.findIndex((acc: any) => acc.email === newAccount.email);
+                if (accountIndex !== -1) {
+                  existingAccounts[accountIndex].lastUsed = Date.now();
+                }
+              }
+              localStorage.setItem('facebook_accounts', JSON.stringify(existingAccounts));
+              console.log('✅ Saved Facebook account to localStorage from SignupInterface:', newAccount.email);
+            } catch (err) {
+              console.error('❌ Failed to save Facebook account from SignupInterface:', err);
             }
           }
           

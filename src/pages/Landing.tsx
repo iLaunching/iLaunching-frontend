@@ -12,6 +12,7 @@ import { StreamingChatInterface } from '@/components/StreamingChatInterface';
 import CollaborativeToolAnimation from '@/components/CollaborativeToolAnimation';
 import SalesControlPanel from '@/components/SalesControlPanel';
 import GoogleAccountPicker from '@/components/GoogleAccountPicker';
+import FacebookAccountPicker from '@/components/FacebookAccountPicker';
 import { UserPlus, LogIn } from 'lucide-react';
 import { APP_CONFIG } from '@/constants';
 import { 
@@ -117,9 +118,54 @@ export default function Landing() {
               localStorage.setItem('google_accounts', JSON.stringify(existingAccounts));
               console.log('🔍 Verify saved:', localStorage.getItem('google_accounts'));
             } catch (err) {
-              console.error('❌ Failed to save account:', err);
+              console.error('❌ Failed to save Google account:', err);
             }
-          } else {
+          }
+          
+          // Save Facebook account to localStorage for account picker
+          if (oauthResult.provider === 'facebook' && response.user) {
+            try {
+              const existingAccounts = JSON.parse(localStorage.getItem('facebook_accounts') || '[]');
+              console.log('📦 Existing Facebook accounts:', existingAccounts);
+              
+              const user = response.user as any;
+              const fullName = user.first_name && user.last_name 
+                ? `${user.first_name} ${user.last_name}`
+                : user.name || user.email;
+              const firstName = user.first_name || fullName.split(' ')[0];
+              const newAccount = {
+                id: user.id,
+                email: user.email,
+                name: fullName,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}&background=1877F2&color=fff`,
+                lastUsed: Date.now()
+              };
+              
+              console.log('🆕 New Facebook account to save:', newAccount);
+              
+              // Check if account already exists
+              const accountExists = existingAccounts.some((acc: any) => acc.email === newAccount.email);
+              console.log('🔍 Facebook account already exists?', accountExists);
+              
+              if (!accountExists) {
+                existingAccounts.push(newAccount);
+                console.log('✅ Added new Facebook account to localStorage');
+              } else {
+                // Update lastUsed timestamp for existing account
+                const accountIndex = existingAccounts.findIndex((acc: any) => acc.email === newAccount.email);
+                if (accountIndex !== -1) {
+                  existingAccounts[accountIndex].lastUsed = Date.now();
+                  console.log('✅ Updated lastUsed timestamp for existing Facebook account');
+                }
+              }
+              localStorage.setItem('facebook_accounts', JSON.stringify(existingAccounts));
+              console.log('🔍 Verify saved Facebook accounts:', localStorage.getItem('facebook_accounts'));
+            } catch (err) {
+              console.error('❌ Failed to save Facebook account:', err);
+            }
+          }
+          
+          if (oauthResult.provider && !['google', 'facebook'].includes(oauthResult.provider)) {
             console.log('⚠️ Not saving account - provider:', oauthResult.provider, 'user:', !!response.user);
           }
           
@@ -228,9 +274,18 @@ export default function Landing() {
   const handleGoogleAccountSelect = useCallback((account: { id: string; email: string; name: string; picture: string }) => {
     console.log('🔐 Google account selected:', account);
     // Redirect to Google OAuth login with email hint
-    const backendUrl = import.meta.env.VITE_API_URL || 'https://auth-server-production-b51c.up.railway.app/api/v1';
-    const loginUrl = `${backendUrl}/auth/google/login?login_hint=${encodeURIComponent(account.email)}`;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const loginUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}&login_hint=${encodeURIComponent(account.email)}`;
     console.log('Redirecting to Google OAuth:', loginUrl);
+    window.location.href = loginUrl;
+  }, []);
+  
+  const handleFacebookAccountSelect = useCallback((account: { id: string; email: string; name: string; picture: string }) => {
+    console.log('🔐 Facebook account selected:', account);
+    // Redirect to Facebook OAuth login with redirect_url
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const loginUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    console.log('Redirecting to Facebook OAuth:', loginUrl);
     window.location.href = loginUrl;
   }, []);
   
@@ -500,17 +555,29 @@ export default function Landing() {
               </div>
             )}
             
-            {/* Google Account Picker for OAuth users */}
+            {/* OAuth Account Picker - Google or Facebook based on provider */}
             {authState.stage === 'oauth_login' && (
               <div className="flex flex-col items-center gap-4 transition-opacity duration-500 opacity-100">
-                <GoogleAccountPicker 
-                  onAccountSelect={handleGoogleAccountSelect}
-                  onAddAccount={() => {
-                    setIsSignupPopupOpen(true);
-                    setSignupPopupInitialView('options');
-                  }}
-                  className="scale-110"
-                />
+                {authState.oauth_provider === 'google' && (
+                  <GoogleAccountPicker 
+                    onAccountSelect={handleGoogleAccountSelect}
+                    onAddAccount={() => {
+                      setIsSignupPopupOpen(true);
+                      setSignupPopupInitialView('options');
+                    }}
+                    className="scale-110"
+                  />
+                )}
+                {authState.oauth_provider === 'facebook' && (
+                  <FacebookAccountPicker 
+                    onAccountSelect={handleFacebookAccountSelect}
+                    onAddAccount={() => {
+                      setIsSignupPopupOpen(true);
+                      setSignupPopupInitialView('options');
+                    }}
+                    className="scale-110"
+                  />
+                )}
               </div>
             )}
             
