@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { authApi } from '@/api/auth';
 import type { AuthState } from '@/types/auth';
 import {
-  getRandomAcknowledgeMessage,
   getRandomCheckingEmailMessage,
   getRandomWrongFormatMessage,
   getRandomUserNotRegisteredMessage,
@@ -19,7 +18,6 @@ import {
   getNameRequiredMessage,
   getErrorMessage,
 } from '@/i18n/landingHelpers';
-import i18n from '@/i18n/config';
 
 export function useLandingAuth() {
   const [authState, setAuthState] = useState<AuthState>({
