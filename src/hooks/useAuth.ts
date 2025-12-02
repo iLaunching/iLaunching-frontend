@@ -20,7 +20,13 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setAuth(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      navigate('/smart-hub');
+      
+      // Check if onboarding is needed
+      if (data.user.onboarding_completed === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/smart-hub');
+      }
     },
   });
 
@@ -30,7 +36,13 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setAuth(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      navigate('/smart-hub');
+      
+      // Check if onboarding is needed
+      if (data.user.onboarding_completed === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/smart-hub');
+      }
     },
   });
 

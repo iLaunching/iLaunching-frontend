@@ -6,6 +6,7 @@ export type AuthStage =
   | 'email_input'           // Initial state - asking for email
   | 'email_checking'        // Validating and checking email
   | 'new_user'              // New user - showing signup/login options
+  | 'oauth_login'           // OAuth user - show account picker
   | 'password_input'        // Existing user - asking for password
   | 'name_input'            // New user - asking for name
   | 'introduction'          // New user - showing personalized introduction

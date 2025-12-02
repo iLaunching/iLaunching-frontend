@@ -146,6 +146,39 @@ const SignupInterface = () => {
           console.log('🔍 Onboarding status:', response.user.onboarding_completed);
           console.log('🔍 Type:', typeof response.user.onboarding_completed);
           
+          // Save Google account to localStorage for account picker
+          if (oauthResult.provider === 'google' && response.user) {
+            try {
+              const existingAccounts = JSON.parse(localStorage.getItem('google_accounts') || '[]');
+              const user = response.user as any;
+              const fullName = user.first_name && user.last_name 
+                ? `${user.first_name} ${user.last_name}`
+                : user.name || user.email;
+              const newAccount = {
+                id: user.id,
+                email: user.email,
+                name: fullName,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=4285F4&color=fff`,
+                lastUsed: Date.now()
+              };
+              
+              const accountExists = existingAccounts.some((acc: any) => acc.email === newAccount.email);
+              if (!accountExists) {
+                existingAccounts.push(newAccount);
+              } else {
+                // Update lastUsed timestamp for existing account
+                const accountIndex = existingAccounts.findIndex((acc: any) => acc.email === newAccount.email);
+                if (accountIndex !== -1) {
+                  existingAccounts[accountIndex].lastUsed = Date.now();
+                }
+              }
+              localStorage.setItem('google_accounts', JSON.stringify(existingAccounts));
+              console.log('✅ Saved Google account to localStorage from SignupInterface:', newAccount.email);
+            } catch (err) {
+              console.error('❌ Failed to save account from SignupInterface:', err);
+            }
+          }
+          
           // Update auth store with user data and tokens from localStorage
           const accessToken = localStorage.getItem('access_token');
           const refreshToken = localStorage.getItem('refresh_token');
@@ -157,25 +190,27 @@ const SignupInterface = () => {
           // Trigger workflow based on action type and provider
           if (oauthResult.action === 'signup') {
             // New user from OAuth signup
-            console.log(`New user signup via ${oauthResult.provider} - checking onboarding status`);
+            console.log(`New user signup via ${oauthResult.provider} - showing signup interface`);
             
             // Set provider and message ONCE - this prevents re-initialization
             setProvider(oauthResult.provider || 'default');
             setMessage(getCongratsMessage(oauthResult.provider || 'default'));
             setIsProcessing(false);
             
-            // Stay on signup-interface page, don't navigate away
+            // Stay on signup-interface page for new signups
             console.log('🔵 Staying on signup-interface for new signup');
-            // User can manually proceed to onboarding from here
           } else if (oauthResult.action === 'login') {
-            // Existing user login via OAuth
-            console.log(`Existing user login via ${oauthResult.provider}`);
-            setMessage(`Welcome back ${response.user.email}!`);
-            setIsProcessing(false);
+            // Existing user login via OAuth - redirect immediately, don't show interface
+            console.log(`Existing user login via ${oauthResult.provider} - redirecting immediately`);
             
-            setTimeout(() => {
+            // Check if onboarding is needed and redirect immediately
+            if (response.user.onboarding_completed === false) {
+              console.log('🔵 Redirecting to onboarding');
+              navigate('/onboarding');
+            } else {
+              console.log('🔵 Redirecting to smart-hub');
               navigate('/smart-hub');
-            }, 1500);
+            }
           }
         } catch (error) {
           console.error('Failed to fetch user info:', error);

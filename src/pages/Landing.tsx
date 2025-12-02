@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import AIBackground from '@/components/layout/AIBackground';
 import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
 import DeepSeaBackground from '@/components/layout/DeepSeaBackground';
@@ -7,9 +7,11 @@ import DeepPinkSeaBackground from '@/components/layout/DeepPinkSeaBackground';
 import Header from '@/components/layout/Header';
 import ChatPrompt from '@/components/ChatPrompt';
 import TiptapTypewriter from '@/components/TiptapTypewriter';
+import SignupPopup from '@/components/SignupPopup';
 import { StreamingChatInterface } from '@/components/StreamingChatInterface';
 import CollaborativeToolAnimation from '@/components/CollaborativeToolAnimation';
 import SalesControlPanel from '@/components/SalesControlPanel';
+import GoogleAccountPicker from '@/components/GoogleAccountPicker';
 import { UserPlus, LogIn } from 'lucide-react';
 import { APP_CONFIG } from '@/constants';
 import { 
@@ -40,6 +42,7 @@ export default function Landing() {
     handleNameSubmit,
     handlePasswordCreate,
     handlePasswordLogin,
+    skipToNameInput,
     enterSalesMode,
   } = useLandingAuth();
   
@@ -47,6 +50,12 @@ export default function Landing() {
   const [showButtons, setShowButtons] = useState(false);
   // State to control when to show name input prompt after message completes
   const [showNameInput, setShowNameInput] = useState(false);
+  // State to control signup popup visibility
+  const [isSignupPopupOpen, setIsSignupPopupOpen] = useState(false);
+  // Ref to track the message that's currently rendered in typewriter
+  const typewriterMessageRef = useRef<string>('');
+  // Key to control typewriter remounting
+  const [typewriterKey, setTypewriterKey] = useState(0);
   // State for background transition
   const [backgroundType, setBackgroundType] = useState<'ai' | 'connected' | 'deepSea' | 'deepPurple' | 'deepPink'>('ai');
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -68,23 +77,70 @@ export default function Landing() {
         .then(response => {
           console.log('User authenticated via OAuth:', response.user);
           
-          // Trigger workflow based on action type and provider
-          if (oauthResult.action === 'signup') {
-            // New user from OAuth signup
-            console.log(`New user signup via ${oauthResult.provider} - checking onboarding status`);
-            
-            if (response.user.onboarding_completed === false) {
-              // Redirect to onboarding
-              window.location.href = '/onboarding';
-            } else {
-              // Show welcome message for returning user
-              alert(`Welcome ${response.user.email}! Signed up with ${oauthResult.provider}.`);
+          // Save Google account to localStorage for account picker FIRST before any redirects
+          if (oauthResult.provider === 'google' && response.user) {
+            try {
+              const existingAccounts = JSON.parse(localStorage.getItem('google_accounts') || '[]');
+              console.log('📦 Existing accounts:', existingAccounts);
+              
+              const user = response.user as any;
+              const fullName = user.first_name && user.last_name 
+                ? `${user.first_name} ${user.last_name}`
+                : user.name || user.email;
+              const newAccount = {
+                id: user.id,
+                email: user.email,
+                name: fullName,
+                picture: user.avatar_url || user.avatar_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=4285F4&color=fff`,
+                lastUsed: Date.now()
+              };
+              
+              console.log('🆕 New account to save:', newAccount);
+              
+              // Check if account already exists
+              const accountExists = existingAccounts.some((acc: any) => acc.email === newAccount.email);
+              console.log('🔍 Account already exists?', accountExists);
+              
+              if (!accountExists) {
+                existingAccounts.push(newAccount);
+                console.log('✅ Added new Google account to localStorage');
+              } else {
+                // Update lastUsed timestamp for existing account
+                const accountIndex = existingAccounts.findIndex((acc: any) => acc.email === newAccount.email);
+                if (accountIndex !== -1) {
+                  existingAccounts[accountIndex].lastUsed = Date.now();
+                  console.log('✅ Updated lastUsed timestamp for existing account');
+                }
+              }
+              localStorage.setItem('google_accounts', JSON.stringify(existingAccounts));
+              console.log('🔍 Verify saved:', localStorage.getItem('google_accounts'));
+            } catch (err) {
+              console.error('❌ Failed to save account:', err);
             }
-          } else if (oauthResult.action === 'login') {
-            // Existing user login via OAuth
-            console.log(`Existing user login via ${oauthResult.provider}`);
-            alert(`Welcome back ${response.user.email}! Logged in with ${oauthResult.provider}.`);
+          } else {
+            console.log('⚠️ Not saving account - provider:', oauthResult.provider, 'user:', !!response.user);
           }
+          
+          // Add a small delay to ensure localStorage is written before redirect
+          setTimeout(() => {
+            // Trigger workflow based on action type and provider
+            if (oauthResult.action === 'signup') {
+              // New user from OAuth signup
+              console.log(`New user signup via ${oauthResult.provider} - checking onboarding status`);
+              
+              if (response.user.onboarding_completed === false) {
+                // Redirect to onboarding
+                window.location.href = '/onboarding';
+              } else {
+                // Show welcome message for returning user
+                alert(`Welcome ${response.user.email}! Signed up with ${oauthResult.provider}.`);
+              }
+            } else if (oauthResult.action === 'login') {
+              // Existing user login via OAuth
+              console.log(`Existing user login via ${oauthResult.provider}`);
+              alert(`Welcome back ${response.user.email}! Logged in with ${oauthResult.provider}.`);
+            }
+          }, 100);
         })
         .catch(error => {
           console.error('Failed to fetch user info:', error);
@@ -118,6 +174,33 @@ export default function Landing() {
       i18nInstance.off('languageChanged', handleLanguageChange);
     };
   }, [i18nInstance]);
+
+  // Update typewriter key only when message actually changes
+  useEffect(() => {
+    // Debounce to prevent rapid updates
+    const timer = setTimeout(() => {
+      // Get the message based on current state
+      let currentMessage = '';
+      
+      if (authState.message) {
+        currentMessage = authState.message;
+      } else if (authState.error) {
+        currentMessage = authState.error;
+      } else if (authState.stage === 'email_input') {
+        const hasVisited = sessionStorage.getItem('hasVisitedLanding');
+        currentMessage = hasVisited ? getRandomWelcomeBackMessage() : getRandomWelcomeMessage();
+      }
+      
+      // Only update if message actually changed
+      if (currentMessage && currentMessage !== typewriterMessageRef.current) {
+        typewriterMessageRef.current = currentMessage;
+        setTypewriterKey(prev => prev + 1);
+      }
+    }, 50); // 50ms debounce
+    
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authState.message, authState.error, authState.stage, languageKey]);
   
   // Reset button visibility when stage changes to new_user or email_checking
   useEffect(() => {
@@ -133,8 +216,24 @@ export default function Landing() {
     }
   }, [authState.stage]);
   
+  // Initialize sales conversation - memoized to prevent re-renders
+  const initializeSalesConversation = useCallback(async () => {
+    // The StreamingChatInterface handles its own initialization
+    console.log('Sales conversation initialized with user:', authState.name || authState.user?.name);
+  }, [authState.name, authState.user?.name]);
+  
+  // Handle Google account selection for OAuth users
+  const handleGoogleAccountSelect = useCallback((account: { id: string; email: string; name: string; picture: string }) => {
+    console.log('🔐 Google account selected:', account);
+    // Redirect to Google OAuth login with email hint
+    const backendUrl = import.meta.env.VITE_API_URL || 'https://auth-server-production-b51c.up.railway.app/api/v1';
+    const loginUrl = `${backendUrl}/auth/google/login?login_hint=${encodeURIComponent(account.email)}`;
+    console.log('Redirecting to Google OAuth:', loginUrl);
+    window.location.href = loginUrl;
+  }, []);
+  
   // Handle user input based on current stage
-  const handleMessage = async (message: string) => {
+  const handleMessage = useCallback(async (message: string) => {
     if (authState.isProcessing) return;
     
     switch (authState.stage) {
@@ -180,7 +279,7 @@ export default function Landing() {
       default:
         break;
     }
-  };
+  }, [authState.isProcessing, authState.stage, handleEmailSubmit, handleNameSubmit, handlePasswordCreate, handlePasswordLogin, initializeSalesConversation]);
   
   // Get placeholder based on current stage
   const getPlaceholder = () => {
@@ -206,13 +305,6 @@ export default function Landing() {
   };
 
   // Initialize sales conversation
-  const initializeSalesConversation = async () => {
-    // The StreamingChatInterface handles its own initialization
-    console.log('Sales conversation initialized with user:', authState.name || authState.user?.name);
-  };
-
-
-  
   // Determine if chat should be visible
   const shouldShowChat = authState.stage !== 'authenticated' && 
                          authState.stage !== 'new_user';
@@ -237,6 +329,16 @@ export default function Landing() {
       }, 100);
     }
   }, [authState.stage]);
+  
+  // Handle signup popup open - memoized to prevent re-renders
+  const handleSignupClick = useCallback(() => {
+    setIsSignupPopupOpen(true);
+  }, []);
+  
+  // Handle sales demo click - skip to name input stage
+  const handleSalesDemoClick = useCallback(() => {
+    skipToNameInput();
+  }, [skipToNameInput]);
   
   // Get current display message
   const getCurrentMessage = () => {
@@ -366,7 +468,7 @@ export default function Landing() {
             {/* Tiptap Typewriter - Hide when in sales stage */}
             {authState.stage !== 'sales' && (
               <TiptapTypewriter 
-                key={`${authState.message}-${languageKey}`} // Force remount when message or language changes
+                key={typewriterKey} // Only remount when message actually changes
                 text={getCurrentMessage()}
                 speed={APP_CONFIG.typewriterSpeed}
                 onComplete={handleTypewriterComplete}
@@ -379,8 +481,8 @@ export default function Landing() {
               />
             )}
             
-            {/* Chat Prompt - Hide when in sales stage */}
-            {shouldShowChat && authState.stage !== 'sales' && (
+            {/* Chat Prompt - Hide when in sales stage or OAuth login */}
+            {shouldShowChat && authState.stage !== 'sales' && authState.stage !== 'oauth_login' && (
               <div className={`transition-opacity duration-500 ${
                 isNameInputStage && !showNameInput ? 'opacity-0' : 'opacity-100'
               }`}>
@@ -388,6 +490,20 @@ export default function Landing() {
                   onSubmit={handleMessage}
                   placeholder={getPlaceholder()}
                   type={getInputType()}
+                  showSignupButton={authState.stage === 'email_input'}
+                  onSignupClick={handleSignupClick}
+                  showSalesDemoButton={authState.stage === 'email_input'}
+                  onSalesDemoClick={handleSalesDemoClick}
+                />
+              </div>
+            )}
+            
+            {/* Google Account Picker for OAuth users */}
+            {authState.stage === 'oauth_login' && (
+              <div className="flex flex-col items-center gap-4 transition-opacity duration-500 opacity-100">
+                <GoogleAccountPicker 
+                  onAccountSelect={handleGoogleAccountSelect}
+                  className="scale-110"
                 />
               </div>
             )}
@@ -600,6 +716,12 @@ export default function Landing() {
           }
         }
       `}</style>
+      
+      {/* Signup Popup */}
+      <SignupPopup 
+        isOpen={isSignupPopupOpen}
+        onClose={() => setIsSignupPopupOpen(false)}
+      />
     </div>
   );
 }
