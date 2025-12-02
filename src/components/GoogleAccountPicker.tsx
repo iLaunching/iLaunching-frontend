@@ -95,7 +95,7 @@ export default function GoogleAccountPicker({
     return (
       <div className="flex flex-col items-center justify-center py-8 gap-2">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white/50"></div>
-        <p className="text-white/60 text-sm">Loading accounts...</p>
+        <p className="text-white/60 text-sm" style={{ fontFamily: 'Work Sans' }}>Loading accounts...</p>
       </div>
     );
   }
@@ -126,30 +126,30 @@ export default function GoogleAccountPicker({
             <div
               key={account.id}
               className={`flex-shrink-0 flex flex-col items-center gap-3 p-5 bg-white rounded-xl transition-all duration-200 relative group shadow-md hover:shadow-lg`}
-              style={{ fontFamily: 'Work Sans', minWidth:'250px', width:'fit-content', height:'230px'}}
+              style={{ fontFamily: 'Work Sans', width:"300px", height:'270px', padding:'30px'}}
             >
               <img
                 src={account.picture}
                 alt={account.name}
-                className={`w-16 h-16 rounded-full border-2 ${
+                className={`w-20 h-20 rounded-full border-2 ${
                   index === 0 
                     ? 'border-blue-400/50 group-hover:border-blue-400/70' 
                     : 'border-gray-200 group-hover:border-gray-300'
                 }`}
               />
               <div className="w-full text-center flex-1">
-                <p className="font-bold text-black text-sm truncate">{getDisplayName(account)}</p>
+                <p className="font-medium text-black text-3xl truncate mt-2" style={{ fontFamily: 'Work Sans' }}>{getDisplayName(account)}</p>
                 {index === 0 && (
                   <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full text-black whitespace-nowrap" style={{ backgroundColor: '#C3EAC4', fontFamily: 'Work Sans' }}>
                     Last used
                   </span>
                 )}
-                <p className="text-xs text-gray-600 truncate mt-1">{account.email}</p>
+                <p className="text-2sm text-gray-600 truncate mt-1" style={{ fontFamily: 'Work Sans' }}>{account.email}</p>
               </div>
               <button
                 onClick={() => handleAccountClick(account)}
                 className="w-full py-2 px-4 rounded-lg text-white text-sm font-medium transition-colors duration-200"
-                style={{ backgroundColor: '#8B3DFF' }}
+                style={{ backgroundColor: '#8B3DFF', fontFamily: 'Work Sans' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7029CC'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8B3DFF'}
               >
@@ -184,7 +184,7 @@ export default function GoogleAccountPicker({
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Google</span>
+              <span className="text-sm font-medium text-gray-700 w-full text-center" style={{ fontFamily: 'Work Sans' }}>Continue with Google</span>
             </button>
           </div>
         )}
@@ -204,7 +204,7 @@ export default function GoogleAccountPicker({
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <span className="text-sm font-medium text-gray-700">Continue with another account</span>
+            <span className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Work Sans' }}>Continue with another account</span>
           </button>
         </div>
         
@@ -231,7 +231,7 @@ export default function GoogleAccountPicker({
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span className="text-sm underline">Remove accounts</span>
+              <span className="text-sm underline" style={{ fontFamily: 'Work Sans' }}>Remove accounts</span>
             </button>
           </div>
         )}
