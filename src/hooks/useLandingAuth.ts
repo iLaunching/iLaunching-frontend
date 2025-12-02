@@ -65,7 +65,7 @@ export function useLandingAuth() {
     if (!isValidEmail(email)) {
       setAuthState((prev: AuthState) => ({ 
         ...prev, 
-        message: getRandomWrongEmailMessage(),
+          message: getRandomWrongFormatMessage(),
         error: null,
       }));
       return;

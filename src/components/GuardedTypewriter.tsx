@@ -41,7 +41,6 @@ export default function GuardedTypewriter({
   const [isTyping, setIsTyping] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const aiIndicatorNodeRef = useRef<any>(null);
-  const hasTypedRef = useRef(false);
   const textRef = useRef('');
 
   const editor = useEditor({

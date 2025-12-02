@@ -32,7 +32,6 @@ export default function ChatPrompt({
   containerStyle,
   inputClassName = "",
   buttonClassName = "",
-  overlayColor,
   showSignupButton = false,
   onSignupClick,
   showSalesDemoButton = false,

@@ -19,7 +19,6 @@ const SignupInterface = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isProcessing, setIsProcessing] = useState(true);
   const [message, setMessage] = useState('');
-  const [provider, setProvider] = useState('');
   const [showButton, setShowButton] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [hasCompleted, setHasCompleted] = useState(false);
@@ -135,8 +134,7 @@ const SignupInterface = () => {
             console.log('✅ Auth store updated with user and tokens');
           }
           
-          // Set provider and message for email signup
-          setProvider('email');
+          // Set message for email signup
           setMessage(getCongratsMessage('email'));
           setIsProcessing(false);
           
@@ -252,8 +250,7 @@ const SignupInterface = () => {
             // New user from OAuth signup
             console.log(`New user signup via ${oauthResult.provider} - showing signup interface`);
             
-            // Set provider and message ONCE - this prevents re-initialization
-            setProvider(oauthResult.provider || 'default');
+            // Set message ONCE - this prevents re-initialization
             setMessage(getCongratsMessage(oauthResult.provider || 'default'));
             setIsProcessing(false);
             
