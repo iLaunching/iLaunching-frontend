@@ -136,6 +136,7 @@ export default function OnboardingAiHeader({
           user-select: none;
           pointer-events: none;
           text-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+          font-family: 'Work Sans', sans-serif;
         }
 
         .onboarding-ai-acknowledge {
@@ -155,6 +156,7 @@ export default function OnboardingAiHeader({
           position: relative;
           overflow: hidden;
           white-space: pre-wrap;
+          font-family: 'Work Sans', sans-serif;
         }
         
         /* Individual word animation */

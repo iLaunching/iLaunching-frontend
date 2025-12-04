@@ -84,7 +84,7 @@ export default function SimpleTypewriter({
       />
       <style>{`
         .simple-typewriter {
-          text-align: center;
+          text-align: left;
         }
         
         .simple-typewriter .wave-word {

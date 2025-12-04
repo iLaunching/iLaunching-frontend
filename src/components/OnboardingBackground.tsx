@@ -5,13 +5,15 @@ interface OnboardingBackgroundProps {
   opacity?: number;
   overlay?: boolean;
   overlayColor?: string;
+  shouldFadeWhite?: boolean;
 }
 
 const OnboardingBackground = ({ 
   imageUrl = '/ilaunching_dash.png',
   opacity = 1,
   overlay = true,
-  overlayColor = 'bg-black/60'
+  overlayColor = 'bg-black/60',
+  shouldFadeWhite = false
 }: OnboardingBackgroundProps) => {
   
   useEffect(() => {
@@ -56,6 +58,14 @@ const OnboardingBackground = ({
           }}
         />
       )}
+      
+      {/* White fade overlay for thankyou stage */}
+      <div 
+        className="absolute inset-0 bg-white transition-opacity duration-1000 ease-out"
+        style={{
+          opacity: shouldFadeWhite ? 0.6 : 0,
+        }}
+      />
     </div>
   );
 };

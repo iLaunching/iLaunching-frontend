@@ -1160,10 +1160,49 @@ export const ONBOARDING_HUB_NAME_QUESTION =[
  */
 
 export const ONBOARDING_HUB_COLOR_QUESTION =[
-  "Great choice! Now, let's pick a color for your Smart Hub. This color will help you easily identify your hub and make it feel more personal. What color would you like to choose?"
+  "Great choice! Now, let's pick a color for your Smart Hub avatar. This color will help you easily identify your hub and make it feel more personal. What color would you like to choose?"
 
 ] as const;
 
+
+
+
+/**
+ * onboarding smart matrix name 
+ */
+
+export const ONBOARDING_SMART_MATRIX_NAME_QUESTION =[
+  "Awesome! Now, let's name your Smart Matrix. This is where you'll organize your ideas and tasks to keep everything on track. What would you like to call your Smart Matrix?"
+
+] as const;
+
+
+/**
+ * onbording marketting question
+ */ 
+
+export const ONBOARDING_MARKETTING_QUESTION =[
+
+  "Mind if I ask something real quick? Where’d you come across iLaunching? Go ahead and choose from the options."
+
+ ] as const;  
+
+
+export const ONBOARDING_THANKYOU_MESSAGE = [
+  "Thank you! We're all set. Let's get started on bringing your ideas to life!",
+  
+  "Awesome! Everything's ready. Time to turn those ideas into reality!",
+  
+  "Perfect! You're all set up. Let's make something amazing happen!",
+  
+  "Thanks for that! We're good to go. Let's start building something great!",
+  
+  "Excellent! All done here. Ready to launch your next big thing?",
+  
+  "Thank you! Setup complete. Let's get to work on your vision!",
+  
+  "Great! You're ready to roll. Let's make your ideas come alive!"
+] as const;
 
 
 
