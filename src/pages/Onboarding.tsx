@@ -195,11 +195,11 @@ export default function Onboarding() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Step 3: Complete
-      setAcknowledgeStepMessage('All set! Taking you to your dashboard...');
+      setAcknowledgeStepMessage('All set! Taking you to your Smart Hub...');
       
-      // Navigate to dashboard after short delay
+      // Navigate to Smart Hub dashboard after short delay
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/smart-hub');
       }, 2000);
       
     } catch (error) {
