@@ -1140,6 +1140,34 @@ export const TOUR_MESSAGES = [
   "Welcome to the family! Let me give you a quick tour of **iLaunching**.",
 ] as const;
 
+
+
+
+
+
+/**
+ * onbording_hub_name_QUESTION
+ */
+
+export const ONBOARDING_HUB_NAME_QUESTION =[
+  "Let’s get your Smart Hub set up. It’s your personal space, where you’ll plan, organize, and bring everything together in one place. What would you like to name it?"
+
+] as const;
+
+
+/**
+ * onbording smart hub color
+ */
+
+export const ONBOARDING_HUB_COLOR_QUESTION =[
+  "Great choice! Now, let's pick a color for your Smart Hub. This color will help you easily identify your hub and make it feel more personal. What color would you like to choose?"
+
+] as const;
+
+
+
+
+
 /**
  * Helper function to get a random message from an array
  */

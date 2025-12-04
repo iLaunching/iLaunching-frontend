@@ -1,227 +1,164 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import OnboardingBackground from '../components/OnboardingBackground';
+import Header from '@/components/layout/Header';
+import OnboardingPrompt from '@/components/OnboardingPrompt';
+import SimpleTypewriter from '@/components/SimpleTypewriter';
+import OnboardingAiHeader from '@/components/OnboardingAiHeader';
+import { ONBOARDING_HUB_NAME_QUESTION, ONBOARDING_HUB_COLOR_QUESTION } from '@/constants/messages';
+import { APP_CONFIG } from '@/constants';
+import { authApi } from '../api/auth';
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Onboarding form data
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    bio: '',
-    preferences: {},
-  });
+  const [currentStage, setCurrentStage] = useState<'hub_name' | 'hub_color' | 'complete'>('hub_name');
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [hubName, setHubName] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [firstName, setFirstName] = useState('there');
+  const hasCompletedRef = useRef(false);
 
   useEffect(() => {
-    // Check if user is authenticated
+    // Check if user is authenticated and fetch their data
     const token = localStorage.getItem('access_token');
     if (!token) {
       navigate('/');
+    } else {
+      // Fetch user profile
+      authApi.getMe()
+        .then(response => {
+          const user = response.user as any;
+          const fullName = user.first_name && user.last_name 
+            ? `${user.first_name} ${user.last_name}`
+            : user.name || user.email;
+          const userFirstName = user.first_name || fullName.split(' ')[0];
+          setFirstName(userFirstName);
+          setIsInitialized(true);
+        })
+        .catch(error => {
+          console.error('Failed to fetch user:', error);
+          navigate('/');
+        });
     }
   }, [navigate]);
 
-  const handleNext = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleComplete();
+  // Reset typewriter completion state when stage changes
+  useEffect(() => {
+    if (isInitialized) {
+      setShowPrompt(false);
+      hasCompletedRef.current = false;
     }
-  };
+  }, [currentStage, isInitialized]);
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+  const handleTypewriterComplete = useCallback(() => {
+    // Only trigger once per stage with strong guard
+    if (!hasCompletedRef.current && isInitialized) {
+      console.log('Typewriter completed - setting state');
+      hasCompletedRef.current = true;
+      // Show the prompt after typewriter completes
+      setTimeout(() => {
+        setShowPrompt(true);
+      }, 300);
     }
-  };
+  }, [isInitialized]);
 
-  const handleComplete = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Call API to update user profile and set onboarding_completed = true
-      // const response = await fetch('/api/v1/profile/complete-onboarding', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-      //   },
-      //   body: JSON.stringify(formData)
-      // });
-
-      // For now, redirect to dashboard
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Failed to complete onboarding:', error);
-    } finally {
-      setIsLoading(false);
+  // Memoize the message to prevent unnecessary recalculations
+  const currentMessage = useMemo(() => {
+    switch (currentStage) {
+      case 'hub_name':
+        return ONBOARDING_HUB_NAME_QUESTION[0];
+      case 'hub_color':
+        return ONBOARDING_HUB_COLOR_QUESTION[0];
+      case 'complete':
+        return 'Great! Your Smart Hub is ready.';
+      default:
+        return '';
     }
-  };
+  }, [currentStage]);
+
+  // Select acknowledge message with first name
+  const acknowledgeMessage = useMemo(() => {
+    return `Welcome ${firstName}!`;
+  }, [firstName]);
+
+  console.log('Onboarding render - isInitialized:', isInitialized, 'currentMessage:', currentMessage, 'stage:', currentStage);
+
+  const handleSubmit = useCallback((message: string) => {
+    if (currentStage === 'hub_name') {
+      setHubName(message);
+      setShowPrompt(false);
+      console.log('Hub name:', message);
+      // Move to color selection stage
+      setCurrentStage('hub_color');
+    }
+  }, [currentStage]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Progress Bar */}
-        <div className="bg-gray-100 h-2">
+    <div className="min-h-screen relative">
+      {/* Onboarding Background */}
+      <OnboardingBackground />
+      
+      {/* Header with white text and logo only - fixed at top */}
+      <Header aiActive={false} hideLogo={true} textColor="text-white" hideLanguageSwitcher={true} />
+      
+      {isInitialized && (
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div 
-            className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
-          />
-        </div>
-
-        <div className="p-8 md:p-12">
-          {/* Step Indicator */}
-          <div className="flex justify-center mb-8">
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((step) => (
-                <div key={step} className="flex items-center">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                      step === currentStep
-                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white scale-110'
-                        : step < currentStep
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {step < currentStep ? '✓' : step}
-                  </div>
-                  {step < 3 && (
-                    <div className={`w-16 h-1 mx-2 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'}`} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Step 1: Welcome & Name */}
-          {currentStep === 1 && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Welcome to <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">iLaunching</span>!
-                </h1>
-                <p className="text-gray-600 text-lg">Let's get you set up in just a few steps</p>
-              </div>
-
-              <div className="space-y-4 mt-8">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                    placeholder="Enter your first name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                    placeholder="Enter your last name"
-                  />
-                </div>
+            className="w-[60%] h-[70vh] max-w-5xl rounded-2xl overflow-hidden relative z-10 flex flex-col"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.68) 50%, rgba(255, 255, 255, 0.78) 100%)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+            }}
+          >
+            {/* AI Header with icon and acknowledge message */}
+            <OnboardingAiHeader 
+              aiName="iLaunching"
+              acknowledgeMessage={acknowledgeMessage}
+            />
+            
+            {/* Content area with typewriter */}
+            <div className="flex-1 flex items-start justify-center px-8 pt-24">
+              <div className="w-full max-w-[700px]">
+                <SimpleTypewriter 
+                  key={currentStage}
+                  text={currentMessage}
+                  speed={APP_CONFIG.typewriterSpeed}
+                  onComplete={handleTypewriterComplete}
+                  className="text-gray-900"
+                  style={{ 
+                    fontFamily: APP_CONFIG.fonts.primary,
+                    fontSize: '26px',
+                    color: APP_CONFIG.colors.text,
+                  }}
+                />
               </div>
             </div>
-          )}
-
-          {/* Step 2: About You */}
-          {currentStep === 2 && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Tell us about yourself</h2>
-                <p className="text-gray-600">This helps us personalize your experience</p>
+            
+            {/* ChatPrompt at bottom with 20px margin - only show for hub_name stage */}
+            {showPrompt && currentStage === 'hub_name' && (
+              <div className="absolute bottom-5 left-0 right-0 px-6 animate-fade-in">
+                <OnboardingPrompt 
+                  onSubmit={handleSubmit}
+                  placeholder="Type your Smart Hub name here..."
+                  containerStyle={{
+                    background: 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'none',
+                    WebkitBackdropFilter: 'none',
+                    boxShadow: '0 2px 8px rgba(147, 51, 234, 0.08), 0 1px 4px rgba(37, 99, 235, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                  }}
+                />
               </div>
-
-              <div className="space-y-4 mt-8">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bio (Optional)
-                  </label>
-                  <textarea
-                    value={formData.bio}
-                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
-                    placeholder="Tell us a bit about yourself..."
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: All Set */}
-          {currentStep === 3 && (
-            <div className="space-y-6 animate-fadeIn text-center">
-              <div className="flex justify-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">You're all set!</h2>
-                <p className="text-gray-600 text-lg">Ready to start your journey with iLaunching</p>
-              </div>
-
-              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 mt-6">
-                <h3 className="font-semibold text-gray-900 mb-4">What's next?</h3>
-                <ul className="space-y-2 text-left text-gray-700">
-                  <li className="flex items-start">
-                    <span className="text-indigo-600 mr-2">✓</span>
-                    <span>Explore your personalized dashboard</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-indigo-600 mr-2">✓</span>
-                    <span>Connect with our AI assistant</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-indigo-600 mr-2">✓</span>
-                    <span>Start building your projects</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
-            <button
-              onClick={handleBack}
-              disabled={currentStep === 1}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                currentStep === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Back
-            </button>
-
-            <button
-              onClick={handleNext}
-              disabled={isLoading}
-              className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Processing...' : currentStep === 3 ? 'Get Started' : 'Continue'}
-            </button>
+            )}
           </div>
         </div>
-      </div>
-
+      )}
+      
       <style>{`
-        @keyframes fadeIn {
+        @keyframes fade-in {
           from {
             opacity: 0;
             transform: translateY(10px);
@@ -231,9 +168,9 @@ export default function Onboarding() {
             transform: translateY(0);
           }
         }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.4s ease-out;
+        
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
         }
       `}</style>
     </div>

@@ -6,19 +6,35 @@ interface HeaderProps {
   className?: string; // Optional className for visibility control
   hideLogo?: boolean; // Hide the animated logo
   textColor?: string; // Text color for the title
+  hideLanguageSwitcher?: boolean; // Hide the language switcher
 }
 
-export default function Header({ aiActive = false, className = '', hideLogo = false, textColor = 'text-black' }: HeaderProps) {
-  // Preload the signup popup image
+export default function Header({ aiActive = false, className = '', hideLogo = false, textColor = 'text-black', hideLanguageSwitcher = false }: HeaderProps) {
+  // Preload critical images for instant loading
   useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = '/signup_poup1.png';
-    document.head.appendChild(link);
+    const images = [
+      '/signup_poup1.png',
+      '/ilaunching_dash.png' // Onboarding background
+    ];
+    
+    const links: HTMLLinkElement[] = [];
+    
+    images.forEach(imageUrl => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = imageUrl;
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+      links.push(link);
+    });
     
     return () => {
-      document.head.removeChild(link);
+      links.forEach(link => {
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      });
     };
   }, []);
   
@@ -62,7 +78,7 @@ export default function Header({ aiActive = false, className = '', hideLogo = fa
         </div>
 
         {/* Language Switcher */}
-        <LanguageSwitcher textColor={textColor} />
+        {!hideLanguageSwitcher && <LanguageSwitcher textColor={textColor} />}
       </div>
 
       <style>{`
