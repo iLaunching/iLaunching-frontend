@@ -164,7 +164,9 @@ export default function Onboarding() {
       });
       
       if (!hubResponse.ok) {
-        throw new Error('Failed to create Smart Hub');
+        const errorData = await hubResponse.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('Hub creation failed:', hubResponse.status, errorData);
+        throw new Error(errorData.detail || 'Failed to create Smart Hub');
       }
       
       const hubData = await hubResponse.json();
@@ -185,7 +187,9 @@ export default function Onboarding() {
       });
       
       if (!matrixResponse.ok) {
-        throw new Error('Failed to create Smart Matrix');
+        const errorData = await matrixResponse.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('Matrix creation failed:', matrixResponse.status, errorData);
+        throw new Error(errorData.detail || 'Failed to create Smart Matrix');
       }
       
       const matrixData = await matrixResponse.json();
@@ -204,7 +208,8 @@ export default function Onboarding() {
       
     } catch (error) {
       console.error('Onboarding creation failed:', error);
-      setAcknowledgeStepMessage('Oops! Something went wrong. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setAcknowledgeStepMessage(`Error: ${errorMessage}`);
     }
   }, [hubName, selectedColorId, matrixName, selectedMarketingId, navigate]);
 
