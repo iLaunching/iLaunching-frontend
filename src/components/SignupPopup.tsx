@@ -16,7 +16,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<AuthView>(initialView);
   const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState(userName);
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,16 +25,20 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
   
-  // Reset to initial view when popup opens and set firstName from userName
+  // Update firstName whenever userName prop changes
+  useEffect(() => {
+    if (userName) {
+      console.log('👤 Setting firstName from userName:', userName);
+      setFirstName(userName);
+    }
+  }, [userName]);
+  
+  // Reset to initial view when popup opens
   useEffect(() => {
     if (isOpen) {
       setCurrentView(initialView);
-      if (userName) {
-        console.log('👤 Setting firstName from userName:', userName);
-        setFirstName(userName);
-      }
     }
-  }, [isOpen, initialView, userName]);
+  }, [isOpen, initialView]);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
