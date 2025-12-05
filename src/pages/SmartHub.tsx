@@ -20,8 +20,8 @@ interface SmartMatrixData {
 export default function SmartHub() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [hubData, setHubData] = useState<SmartHubData | null>(null);
-  const [matrixData, setMatrixData] = useState<SmartMatrixData | null>(null);
+  const [, setHubData] = useState<SmartHubData | null>(null);
+  const [, setMatrixData] = useState<SmartMatrixData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

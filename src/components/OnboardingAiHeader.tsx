@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface OnboardingAiHeaderProps {
   aiName?: string;
   acknowledgeMessage?: string;
