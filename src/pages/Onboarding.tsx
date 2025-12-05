@@ -153,6 +153,15 @@ export default function Onboarding() {
       const token = localStorage.getItem('access_token');
       const API_URL = 'https://ilaunching-servers-production.up.railway.app';
       
+      // Validate required data
+      if (!hubName || !selectedColorId || !matrixName || !selectedMarketingId) {
+        console.error('Missing required data:', { hubName, selectedColorId, matrixName, selectedMarketingId });
+        setAcknowledgeStepMessage('Error: Missing required information');
+        return;
+      }
+      
+      console.log('Starting onboarding with:', { hubName, selectedColorId, matrixName, selectedMarketingId });
+      
       // Step 1: Create Smart Hub
       setAcknowledgeStepMessage('Creating your Smart Hub...');
       const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}`, {
