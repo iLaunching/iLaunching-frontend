@@ -16,8 +16,8 @@ export default function Onboarding() {
   const [currentStage, setCurrentStage] = useState<'hub_name' | 'hub_color' | 'smart_matrix_name' | 'marketing' | 'thankyou' | 'complete'>('hub_name');
   const [showPrompt, setShowPrompt] = useState(false);
   const [hubName, setHubName] = useState('');
-  const [selectedColorId, setSelectedColorId] = useState<number | undefined>(undefined);
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedColorId, setSelectedColorId] = useState<number>(1); // Default to color ID 1
+  const [selectedColor, setSelectedColor] = useState<string>('#FF6B6B'); // Default color
   const [matrixName, setMatrixName] = useState('');
   const [selectedMarketingId, setSelectedMarketingId] = useState<number | undefined>(undefined);
   const [selectedMarketingName, setSelectedMarketingName] = useState<string>('');
@@ -149,67 +149,60 @@ export default function Onboarding() {
   }, []);
 
   const createSmartHubAndMatrix = useCallback(async () => {
-    console.log('🚀 createSmartHubAndMatrix called with state:', { 
-      hubName, 
-      selectedColorId, 
-      matrixName, 
-      selectedMarketingId,
-      currentStage 
-    });
-    
     try {
       const token = localStorage.getItem('access_token');
       const API_URL = 'https://ilaunching-servers-production.up.railway.app';
       
-      // Validate required fields
-      if (!hubName || !selectedColorId || !matrixName) {
-        console.error('Missing required fields:', { 
-          hubName: hubName || 'MISSING', 
-          selectedColorId: selectedColorId || 'MISSING', 
-          matrixName: matrixName || 'MISSING',
-          selectedMarketingId: selectedMarketingId || 'optional'
-        });
-        setAcknowledgeStepMessage('Error: Missing required information. Please complete all steps.');
+      // Validate required data
+      if (!hubName || !selectedColorId || !matrixName || !selectedMarketingId) {
+        console.error('Missing required data:', { hubName, selectedColorId, matrixName, selectedMarketingId });
+        setAcknowledgeStepMessage('Error: Missing required information');
         return;
       }
       
-      console.log('All fields validated:', { hubName, selectedColorId, matrixName, selectedMarketingId });
+      console.log('Starting onboarding with:', { hubName, selectedColorId, matrixName, selectedMarketingId });
       
-      // Single call to complete onboarding - creates navigation, hub, and matrix
-      setAcknowledgeStepMessage('Creating your Smart Hub and Matrix...');
-      
-      const response = await fetch(`${API_URL}/api/v1/onboarding/complete`, {
+      // Step 1: Create Smart Hub
+      setAcknowledgeStepMessage('Creating your Smart Hub...');
+      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          hub_name: hubName,
-          hub_color_id: selectedColorId,
-          matrix_name: matrixName,
-          marketing_option_id: selectedMarketingId
-        })
+        }
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        console.error('Onboarding failed:', response.status, errorData);
-        
-        // Log the request that was sent for debugging
-        console.error('Request sent:', {
-          hub_name: hubName,
-          hub_color_id: selectedColorId,
-          matrix_name: matrixName,
-          marketing_option_id: selectedMarketingId
-        });
-        
-        throw new Error(errorData.detail || JSON.stringify(errorData) || 'Failed to complete onboarding');
+      if (!hubResponse.ok) {
+        const errorData = await hubResponse.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('Hub creation failed:', hubResponse.status, errorData);
+        throw new Error(errorData.detail || 'Failed to create Smart Hub');
       }
       
-      const data = await response.json();
-      setHubId(data.hub_id);
-      console.log('Onboarding completed:', data);
+      const hubData = await hubResponse.json();
+      setHubId(hubData.hub_id);
+      console.log('Smart Hub created:', hubData);
+      
+      // Small delay for user to see the message
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Step 2: Create Smart Matrix
+      setAcknowledgeStepMessage('Setting up your Smart Matrix...');
+      const matrixResponse = await fetch(`${API_URL}/api/v1/onboarding/create-matrix?hub_id=${hubData.hub_id}&matrix_name=${encodeURIComponent(matrixName)}&marketing_option_id=${selectedMarketingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!matrixResponse.ok) {
+        const errorData = await matrixResponse.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('Matrix creation failed:', matrixResponse.status, errorData);
+        throw new Error(errorData.detail || 'Failed to create Smart Matrix');
+      }
+      
+      const matrixData = await matrixResponse.json();
+      console.log('Smart Matrix created:', matrixData);
       
       // Small delay for user to see the message
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -234,17 +227,7 @@ export default function Onboarding() {
       
     } catch (error) {
       console.error('Onboarding creation failed:', error);
-      let errorMessage = 'Unknown error occurred';
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        errorMessage = error;
-      } else if (error && typeof error === 'object') {
-        // Try to extract meaningful error message from object
-        errorMessage = (error as any).detail || (error as any).message || JSON.stringify(error);
-      }
-      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setAcknowledgeStepMessage(`Error: ${errorMessage}`);
     }
   }, [hubName, selectedColorId, matrixName, selectedMarketingId, navigate]);

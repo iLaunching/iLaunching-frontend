@@ -7,14 +7,17 @@ interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
   initialView?: AuthView;
+  userName?: string;
 }
 
-type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
+type AuthView = 'main' | 'email' | 'name' | 'password' | 'verify' | 'options';
 
-const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps) => {
+const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: SignupPopupProps) => {
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<AuthView>(initialView);
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState(userName);
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -22,12 +25,16 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
   
-  // Reset to initial view when popup opens
+  // Reset to initial view when popup opens and set firstName from userName
   useEffect(() => {
     if (isOpen) {
       setCurrentView(initialView);
+      if (userName) {
+        console.log('👤 Setting firstName from userName:', userName);
+        setFirstName(userName);
+      }
     }
-  }, [isOpen, initialView]);
+  }, [isOpen, initialView, userName]);
   
   // Get API URL from environment
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -66,7 +73,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     window.location.href = microsoftAuthUrl;
   };
 
-  // Handle checking if email exists before moving to password
+  // Handle checking if email exists before moving to name or password
   const handleEmailContinue = async () => {
     setIsLoading(true);
     setError('');
@@ -74,7 +81,11 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     try {
       const result = await authApi.checkEmail(email);
       setUserExists(result.exists);
-      setCurrentView('password');
+      console.log('📧 Email check result:', { exists: result.exists, email });
+      // If user exists, go to password. If new user, go to name collection
+      const nextView = result.exists ? 'password' : 'name';
+      console.log('➡️ Moving to view:', nextView);
+      setCurrentView(nextView);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to check email');
     } finally {
@@ -96,6 +107,24 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle name collection for new users
+  const handleNameContinue = () => {
+    setError('');
+    
+    if (!firstName.trim()) {
+      setError('Please enter your first name');
+      return;
+    }
+    
+    if (!lastName.trim()) {
+      setError('Please enter your last name');
+      return;
+    }
+    
+    // Names validated, move to password stage
+    setCurrentView('password');
   };
 
   // Handle signup for new users - send verification code
@@ -123,8 +152,8 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
       // Verify the code
       await authApi.verifyCode(email, verificationCode);
       
-      // Code verified, now create the account
-      await authApi.signup(email, password);
+      // Code verified, now create the account with first and last name
+      await authApi.signup(email, password, firstName, lastName);
       
       // Success! Close popup and use React Router navigation for smoother transition
       onClose();
@@ -402,6 +431,87 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
             </div>
           )}
 
+          {/* Name View - Collect first and last name for new users */}
+          {currentView === 'name' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+              onAnimationStart={() => console.log('✅ Name view rendered. firstName:', firstName, 'lastName:', lastName)}
+            >
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => {
+                      setCurrentView('email');
+                      setError('');
+                    }} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">What's your name?</h2>
+                </div>
+                <p className="text-gray-700">
+                  This helps us personalize your experience.
+                </p>
+              </div>
+
+              {/* Name Input Form */}
+              <div className="px-8 pb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all mb-4"
+                  placeholder="John"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && firstName.trim() && lastName.trim()) {
+                      handleNameContinue();
+                    }
+                  }}
+                />
+
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Doe"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && firstName.trim() && lastName.trim()) {
+                      handleNameContinue();
+                    }
+                  }}
+                />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
+                <button 
+                  type="button"
+                  disabled={!firstName.trim() || !lastName.trim()}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    firstName.trim() && lastName.trim()
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  onClick={handleNameContinue}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Password View */}
           {currentView === 'password' && (
             <div
@@ -415,7 +525,8 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
                 <div className="flex items-center gap-3 mb-5">
                   <button 
                     onClick={() => {
-                      setCurrentView('email');
+                      // Go back to name for new users, email for existing users
+                      setCurrentView(userExists ? 'email' : 'name');
                       setError('');
                       setPassword('');
                       setConfirmPassword('');

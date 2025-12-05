@@ -77,15 +77,6 @@ export default function SmartHubAvatarColorPicker({
     fetchColors();
   }, [selectedColorId]);
 
-  // Auto-select first color if none selected
-  useEffect(() => {
-    if (colors.length > 0 && !selectedColorId) {
-      const firstColor = colors[0];
-      setSelectedColor(firstColor.metadata.color);
-      onColorSelect(firstColor.option_value_id, firstColor.metadata.color);
-    }
-  }, [colors, selectedColorId, onColorSelect]);
-
   // Fallback mock data matching the SQL schema
   const getMockColors = (): ColorOption[] => [
     { option_value_id: 1, value_name: 'highlight_green', display_name: 'Highlight Green', sort_order: 1, metadata: { color: '#80b918' } },

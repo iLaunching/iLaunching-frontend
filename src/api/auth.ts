@@ -155,12 +155,13 @@ export const authApi = {
   /**
    * Sign up a new user
    */
-  async signup(email: string, password: string, name?: string): Promise<AuthResponse> {
+  async signup(email: string, password: string, firstName?: string, lastName?: string): Promise<AuthResponse> {
     try {
       const response = await apiClient.post('/auth/signup', {
         email,
         password,
-        name,
+        first_name: firstName,
+        last_name: lastName,
       });
       
       const data: AuthResponse = response.data;
