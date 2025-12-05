@@ -201,6 +201,16 @@ export default function Onboarding() {
       // Step 3: Complete
       setAcknowledgeStepMessage('All set! Taking you to your Smart Hub...');
       
+      // Refresh user data to update onboarding_completed status in localStorage
+      try {
+        const userResponse = await authApi.getMe();
+        // Update localStorage with fresh user data
+        localStorage.setItem('user', JSON.stringify(userResponse.user));
+        console.log('✅ User data refreshed after onboarding completion');
+      } catch (error) {
+        console.error('Failed to refresh user data:', error);
+      }
+      
       // Navigate to Smart Hub dashboard after short delay
       setTimeout(() => {
         navigate('/smart-hub');

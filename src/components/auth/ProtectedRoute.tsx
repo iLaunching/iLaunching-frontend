@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import { useEffect, useState } from 'react';
+import { authApi } from '@/api/auth';
 
 // ========================
 // PROTECTED ROUTE
@@ -16,26 +18,62 @@ export const ProtectedRoute = ({ children, requireOnboarding = true }: Protected
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const location = useLocation();
+  const [isChecking, setIsChecking] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!requireOnboarding || location.pathname === '/onboarding') {
+        setIsChecking(false);
+        return;
+      }
+
+      try {
+        // Fetch fresh user data from database
+        const response = await authApi.getMe();
+        const onboardingCompleted = response.user.onboarding_completed;
+        
+        // Update localStorage with fresh data
+        localStorage.setItem('user', JSON.stringify(response.user));
+        
+        // Check if user needs onboarding
+        if (onboardingCompleted === false) {
+          setNeedsOnboarding(true);
+        } else {
+          setNeedsOnboarding(false);
+        }
+      } catch (error) {
+        console.error('Failed to check onboarding status:', error);
+        // If check fails, don't block access
+        setNeedsOnboarding(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      checkOnboardingStatus();
+    } else {
+      setIsChecking(false);
+    }
+  }, [isAuthenticated, requireOnboarding, location.pathname]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user needs onboarding (only if we require it and not already on onboarding page)
-  if (requireOnboarding && user && location.pathname !== '/onboarding') {
-    // Get user from localStorage to check onboarding status
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        // Redirect to onboarding if not completed
-        if (userData.onboarding_completed === false) {
-          return <Navigate to="/onboarding" replace />;
-        }
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-      }
-    }
+  // Show loading while checking onboarding status
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  // Redirect to onboarding if needed
+  if (needsOnboarding) {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return <>{children}</>;
