@@ -203,7 +203,17 @@ export default function Onboarding() {
       
     } catch (error) {
       console.error('Onboarding creation failed:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      let errorMessage = 'Unknown error occurred';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        // Try to extract meaningful error message from object
+        errorMessage = (error as any).detail || (error as any).message || JSON.stringify(error);
+      }
+      
       setAcknowledgeStepMessage(`Error: ${errorMessage}`);
     }
   }, [hubName, selectedColorId, matrixName, selectedMarketingId, navigate]);
