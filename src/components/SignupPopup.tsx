@@ -158,6 +158,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
       await authApi.verifyCode(email, verificationCode);
       
       // Code verified, now create the account with first and last name and account type
+      console.log('🔵 Creating account with:', { email, firstName, lastName, accountType });
       await authApi.signup(email, password, firstName, lastName, accountType);
       
       // Success! Close popup and use React Router navigation for smoother transition
