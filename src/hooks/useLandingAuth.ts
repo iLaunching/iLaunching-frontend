@@ -249,7 +249,7 @@ export function useLandingAuth() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const result = await authApi.signup(authState.email, password, firstName, lastName);
+      const result = await authApi.signup(authState.email, password, firstName, lastName, 'personal');
       
       setAuthState((prev: AuthState) => ({
         ...prev,

@@ -155,13 +155,14 @@ export const authApi = {
   /**
    * Sign up a new user
    */
-  async signup(email: string, password: string, firstName?: string, lastName?: string): Promise<AuthResponse> {
+  async signup(email: string, password: string, firstName?: string, lastName?: string, accountType?: 'personal' | 'business'): Promise<AuthResponse> {
     try {
       const response = await apiClient.post('/auth/signup', {
         email,
         password,
         first_name: firstName,
         last_name: lastName,
+        account_type: accountType || 'personal',
       });
       
       const data: AuthResponse = response.data;

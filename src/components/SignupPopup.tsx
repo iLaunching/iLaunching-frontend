@@ -10,7 +10,7 @@ interface SignupPopupProps {
   userName?: string;
 }
 
-type AuthView = 'main' | 'email' | 'name' | 'password' | 'verify' | 'options';
+type AuthView = 'main' | 'email' | 'work-email' | 'name' | 'password' | 'verify' | 'options';
 
 const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: SignupPopupProps) => {
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
+  const [accountType, setAccountType] = useState<'personal' | 'business'>('personal');
   
   // Update firstName whenever userName prop changes
   useEffect(() => {
@@ -156,8 +157,8 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
       // Verify the code
       await authApi.verifyCode(email, verificationCode);
       
-      // Code verified, now create the account with first and last name
-      await authApi.signup(email, password, firstName, lastName);
+      // Code verified, now create the account with first and last name and account type
+      await authApi.signup(email, password, firstName, lastName, accountType);
       
       // Success! Close popup and use React Router navigation for smoother transition
       onClose();
@@ -314,13 +315,31 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
               {/* Continue with Email Button */}
               <button
                 type="button"
-                onClick={() => setCurrentView('email')}
+                onClick={() => {
+                  setAccountType('personal');
+                  setCurrentView('email');
+                }}
                 className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
               >
                 <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
                 <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Email</span>
+              </button>
+
+              {/* Continue with Work Email Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setAccountType('business');
+                  setCurrentView('work-email');
+                }}
+                className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
+              >
+                <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+                </svg>
+                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Work Email</span>
               </button>
 
               {/* Continue Another Way */}
@@ -410,6 +429,67 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="name@example.com"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && isEmailValid && !isLoading) {
+                      handleEmailContinue();
+                    }
+                  }}
+                />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
+                <button 
+                  type="button"
+                  disabled={!isEmailValid || isLoading}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    isEmailValid && !isLoading
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  onClick={handleEmailContinue}
+                >
+                  {isLoading ? 'Checking...' : 'Continue'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Work Email View */}
+          {currentView === 'work-email' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+            >
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => setCurrentView('main')} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">Continue with your work email</h2>
+                </div>
+                <p className="text-gray-700">
+                  Using your work email makes it easier to design together with your team.
+                </p>
+              </div>
+
+              {/* Work Email Input Form */}
+              <div className="px-8 pb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Work email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="name@company.com"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && isEmailValid && !isLoading) {
                       handleEmailContinue();
