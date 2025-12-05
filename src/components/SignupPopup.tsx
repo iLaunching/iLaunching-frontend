@@ -7,20 +7,32 @@ interface SignupPopupProps {
   isOpen: boolean;
   onClose: () => void;
   initialView?: AuthView;
+  userName?: string;
 }
 
-type AuthView = 'main' | 'email' | 'password' | 'verify' | 'options';
+type AuthView = 'main' | 'email' | 'work-email' | 'name' | 'password' | 'verify' | 'options';
 
-const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps) => {
+const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: SignupPopupProps) => {
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<AuthView>(initialView);
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userExists, setUserExists] = useState(false);
+  const [accountType, setAccountType] = useState<'personal' | 'business'>('personal');
+  
+  // Update firstName whenever userName prop changes
+  useEffect(() => {
+    if (userName) {
+      console.log('👤 Setting firstName from userName:', userName);
+      setFirstName(userName);
+    }
+  }, [userName]);
   
   // Reset to initial view when popup opens
   useEffect(() => {
@@ -66,7 +78,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     window.location.href = microsoftAuthUrl;
   };
 
-  // Handle checking if email exists before moving to password
+  // Handle checking if email exists before moving to name or password
   const handleEmailContinue = async () => {
     setIsLoading(true);
     setError('');
@@ -74,7 +86,11 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     try {
       const result = await authApi.checkEmail(email);
       setUserExists(result.exists);
-      setCurrentView('password');
+      console.log('📧 Email check result:', { exists: result.exists, email });
+      // If user exists, go to password. If new user, go to name collection
+      const nextView = result.exists ? 'password' : 'name';
+      console.log('➡️ Moving to view:', nextView);
+      setCurrentView(nextView);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to check email');
     } finally {
@@ -96,6 +112,24 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle name collection for new users
+  const handleNameContinue = () => {
+    setError('');
+    
+    if (!firstName.trim()) {
+      setError('Please enter your first name');
+      return;
+    }
+    
+    if (!lastName.trim()) {
+      setError('Please enter your last name');
+      return;
+    }
+    
+    // Names validated, move to password stage
+    setCurrentView('password');
   };
 
   // Handle signup for new users - send verification code
@@ -123,8 +157,9 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
       // Verify the code
       await authApi.verifyCode(email, verificationCode);
       
-      // Code verified, now create the account
-      await authApi.signup(email, password);
+      // Code verified, now create the account with first and last name and account type
+      console.log('🔵 Creating account with:', { email, firstName, lastName, accountType });
+      await authApi.signup(email, password, firstName, lastName, accountType);
       
       // Success! Close popup and use React Router navigation for smoother transition
       onClose();
@@ -239,12 +274,12 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
               {/* Auth Buttons */}
               <div className="px-8 pb-8">
                 <div className="space-y-4">
-              {/* Continue with Email */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-              >
+                  {/* Continue with Google */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                  >
                 <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
@@ -263,43 +298,60 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Google</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Google</span>
+                </button>
 
-              {/* Continue with Facebook */}
-              <button
-                type="button"
-                onClick={handleFacebookLogin}
-                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-              >
+                {/* Continue with Facebook */}
+                <button
+                  type="button"
+                  onClick={handleFacebookLogin}
+                  className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                >
                 <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Facebook</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Facebook</span>
+                </button>
 
-              {/* Continue with Email Button */}
-              <button
-                type="button"
-                onClick={() => setCurrentView('email')}
-                className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
-              >
+                {/* Continue with Email Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('personal');
+                    setCurrentView('email');
+                  }}
+                  className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
+                >
                 <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Email</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Email</span>
+                </button>
 
-              {/* Continue Another Way */}
-              <button
-                type="button"
-                onClick={() => setCurrentView('options')}
-                className="w-full flex items-center justify-center py-3 px-4  rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-                
-              >
-                <span className="text-sm font-medium text-gray-700">Continue Another Way</span>
-              </button>
-            </div>
+                {/* Continue with Work Email Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('business');
+                    setCurrentView('work-email');
+                  }}
+                  className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
+                >
+                <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+                </svg>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Work Email</span>
+                </button>
+
+                {/* Continue Another Way */}
+                <button
+                  type="button"
+                  onClick={() => setCurrentView('options')}
+                  className="w-full flex items-center justify-center py-3 px-4 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                >
+                  <span className="text-sm font-medium text-gray-700">Continue Another Way</span>
+                </button>
+              </div>
 
             {/* Terms & Privacy */}
             <p className="mt-6 text-left text-xs text-gray-500">
@@ -312,30 +364,6 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
                 Privacy Policy
               </a>
             </p>
-
-            {/* Work Email Button */}
-            <button
-              type="button"
-              className="w-full flex items-start gap-2 py-3 px-0 mt-4 transition-colors duration-50"
-              onClick={() => setCurrentView('email')}
-            >
-              <svg 
-                className="w-5 h-5 text-gray-900" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-                />
-              </svg>
-              <span className="text-sm font-medium text-gray-900 group-hover:text-gray-600 hover:text-gray-600 transition-colors duration-50">
-                Sign up with your work email
-              </span>
-            </button>
           </div>
           </>
             </div>
@@ -402,6 +430,148 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
             </div>
           )}
 
+          {/* Work Email View */}
+          {currentView === 'work-email' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+            >
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => setCurrentView('main')} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">Continue with your work email</h2>
+                </div>
+                <p className="text-gray-700">
+                  Using your work email makes it easier to design together with your team.
+                </p>
+              </div>
+
+              {/* Work Email Input Form */}
+              <div className="px-8 pb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Work email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="name@company.com"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && isEmailValid && !isLoading) {
+                      handleEmailContinue();
+                    }
+                  }}
+                />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
+                <button 
+                  type="button"
+                  disabled={!isEmailValid || isLoading}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    isEmailValid && !isLoading
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  onClick={handleEmailContinue}
+                >
+                  {isLoading ? 'Checking...' : 'Continue'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Name View - Collect first and last name for new users */}
+          {currentView === 'name' && (
+            <div
+              className="absolute inset-0 animate-slideIn"
+              style={{
+                animation: 'slideInFromRight 0.3s ease-out forwards'
+              }}
+              onAnimationStart={() => console.log('✅ Name view rendered. firstName:', firstName, 'lastName:', lastName)}
+            >
+              {/* Header with Back Button */}
+              <div className="px-8 pt-8 pb-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <button 
+                    onClick={() => {
+                      setCurrentView('email');
+                      setError('');
+                    }} 
+                    className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-50"
+                    type="button"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <h2 className="text-2xl font-semibold text-black">What's your name?</h2>
+                </div>
+                <p className="text-gray-700">
+                  This helps us personalize your experience.
+                </p>
+              </div>
+
+              {/* Name Input Form */}
+              <div className="px-8 pb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all mb-4"
+                  placeholder="John"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && firstName.trim() && lastName.trim()) {
+                      handleNameContinue();
+                    }
+                  }}
+                />
+
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Doe"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && firstName.trim() && lastName.trim()) {
+                      handleNameContinue();
+                    }
+                  }}
+                />
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
+                <button 
+                  type="button"
+                  disabled={!firstName.trim() || !lastName.trim()}
+                  className={`w-full mt-4 py-3 px-6 font-medium rounded-xl transition-colors duration-50 ${
+                    firstName.trim() && lastName.trim()
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  onClick={handleNameContinue}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Password View */}
           {currentView === 'password' && (
             <div
@@ -415,7 +585,8 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main' }: SignupPopupProps
                 <div className="flex items-center gap-3 mb-5">
                   <button 
                     onClick={() => {
-                      setCurrentView('email');
+                      // Go back to name for new users, email for existing users
+                      setCurrentView(userExists ? 'email' : 'name');
                       setError('');
                       setPassword('');
                       setConfirmPassword('');

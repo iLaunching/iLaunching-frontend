@@ -908,6 +908,7 @@ export default function Landing() {
           setSignupPopupInitialView('main');
         }}
         initialView={signupPopupInitialView}
+        userName={authState.name || ''}
       />
     </div>
   );
