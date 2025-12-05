@@ -20,12 +20,12 @@ export default function Onboarding() {
   const [selectedColor, setSelectedColor] = useState<string>('#FF6B6B'); // Default color
   const [matrixName, setMatrixName] = useState('');
   const [selectedMarketingId, setSelectedMarketingId] = useState<number | undefined>(undefined);
-  const [selectedMarketingName, setSelectedMarketingName] = useState<string>('');
+  const [, setSelectedMarketingName] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
   const [firstName, setFirstName] = useState('there');
   const [showMovingAi, setShowMovingAi] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
-  const [hubId, setHubId] = useState<string>('');
+  const [, setHubId] = useState<string>('');
   const [acknowledgeStepMessage, setAcknowledgeStepMessage] = useState<string>('Almost there...');
   const hasCompletedRef = useRef(false);
 
