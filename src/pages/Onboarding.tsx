@@ -153,6 +153,13 @@ export default function Onboarding() {
       const token = localStorage.getItem('access_token');
       const API_URL = 'https://ilaunching-servers-production.up.railway.app';
       
+      // Validate required fields
+      if (!hubName || !selectedColorId || !matrixName) {
+        console.error('Missing required fields:', { hubName, selectedColorId, matrixName });
+        setAcknowledgeStepMessage('Error: Missing required information. Please try again.');
+        return;
+      }
+      
       // Single call to complete onboarding - creates navigation, hub, and matrix
       setAcknowledgeStepMessage('Creating your Smart Hub and Matrix...');
       
@@ -173,7 +180,16 @@ export default function Onboarding() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
         console.error('Onboarding failed:', response.status, errorData);
-        throw new Error(errorData.detail || 'Failed to complete onboarding');
+        
+        // Log the request that was sent for debugging
+        console.error('Request sent:', {
+          hub_name: hubName,
+          hub_color_id: selectedColorId,
+          matrix_name: matrixName,
+          marketing_option_id: selectedMarketingId
+        });
+        
+        throw new Error(errorData.detail || JSON.stringify(errorData) || 'Failed to complete onboarding');
       }
       
       const data = await response.json();
