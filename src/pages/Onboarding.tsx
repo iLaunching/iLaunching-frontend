@@ -149,16 +149,31 @@ export default function Onboarding() {
   }, []);
 
   const createSmartHubAndMatrix = useCallback(async () => {
+    console.log('🚀 createSmartHubAndMatrix called with state:', { 
+      hubName, 
+      selectedColorId, 
+      matrixName, 
+      selectedMarketingId,
+      currentStage 
+    });
+    
     try {
       const token = localStorage.getItem('access_token');
       const API_URL = 'https://ilaunching-servers-production.up.railway.app';
       
       // Validate required fields
       if (!hubName || !selectedColorId || !matrixName) {
-        console.error('Missing required fields:', { hubName, selectedColorId, matrixName });
-        setAcknowledgeStepMessage('Error: Missing required information. Please try again.');
+        console.error('Missing required fields:', { 
+          hubName: hubName || 'MISSING', 
+          selectedColorId: selectedColorId || 'MISSING', 
+          matrixName: matrixName || 'MISSING',
+          selectedMarketingId: selectedMarketingId || 'optional'
+        });
+        setAcknowledgeStepMessage('Error: Missing required information. Please complete all steps.');
         return;
       }
+      
+      console.log('All fields validated:', { hubName, selectedColorId, matrixName, selectedMarketingId });
       
       // Single call to complete onboarding - creates navigation, hub, and matrix
       setAcknowledgeStepMessage('Creating your Smart Hub and Matrix...');
