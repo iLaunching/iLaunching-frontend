@@ -2,21 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 
-interface SmartHubData {
-  id: string;
-  name: string;
-  hub_color: string;
-  is_default: boolean;
-  created_at: string;
-}
-
-interface SmartMatrixData {
-  id: string;
-  name: string;
-  smart_hub_id: string;
-  created_at: string;
-}
-
 export default function SmartHub() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
