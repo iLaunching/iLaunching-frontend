@@ -274,12 +274,12 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
               {/* Auth Buttons */}
               <div className="px-8 pb-8">
                 <div className="space-y-4">
-              {/* Continue with Email */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-              >
+                  {/* Continue with Google */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                  >
                 <svg className="w-5 h-5 absolute left-4" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
@@ -298,61 +298,60 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Google</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Google</span>
+                </button>
 
-              {/* Continue with Facebook */}
-              <button
-                type="button"
-                onClick={handleFacebookLogin}
-                className=" w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-              >
+                {/* Continue with Facebook */}
+                <button
+                  type="button"
+                  onClick={handleFacebookLogin}
+                  className="w-full flex items-center py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                >
                 <svg className="w-5 h-5 absolute left-4" fill="#1877F2" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Facebook</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Facebook</span>
+                </button>
 
-              {/* Continue with Email Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setAccountType('personal');
-                  setCurrentView('email');
-                }}
-                className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
-              >
+                {/* Continue with Email Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('personal');
+                    setCurrentView('email');
+                  }}
+                  className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
+                >
                 <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Email</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Email</span>
+                </button>
 
-              {/* Continue with Work Email Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setAccountType('business');
-                  setCurrentView('work-email');
-                }}
-                className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
-              >
+                {/* Continue with Work Email Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('business');
+                    setCurrentView('work-email');
+                  }}
+                  className="w-full flex items-center py-3 px-4 border border-grey-300 rounded-xl hover:bg-gray-100 transition-colors duration-100 relative"
+                >
                 <svg className="w-5 h-5 absolute left-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
                 </svg>
-                <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Work Email</span>
-              </button>
+                  <span className="text-sm font-medium text-gray-700 w-full text-center">Continue with Work Email</span>
+                </button>
 
-              {/* Continue Another Way */}
-              <button
-                type="button"
-                onClick={() => setCurrentView('options')}
-                className="w-full flex items-center justify-center py-3 px-4  rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
-                
-              >
-                <span className="text-sm font-medium text-gray-700">Continue Another Way</span>
-              </button>
-            </div>
+                {/* Continue Another Way */}
+                <button
+                  type="button"
+                  onClick={() => setCurrentView('options')}
+                  className="w-full flex items-center justify-center py-3 px-4 rounded-xl hover:bg-gray-100 transition-colors duration-50 relative"
+                >
+                  <span className="text-sm font-medium text-gray-700">Continue Another Way</span>
+                </button>
+              </div>
 
             {/* Terms & Privacy */}
             <p className="mt-6 text-left text-xs text-gray-500">
