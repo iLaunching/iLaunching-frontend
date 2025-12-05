@@ -16,8 +16,8 @@ export default function Onboarding() {
   const [currentStage, setCurrentStage] = useState<'hub_name' | 'hub_color' | 'smart_matrix_name' | 'marketing' | 'thankyou' | 'complete'>('hub_name');
   const [showPrompt, setShowPrompt] = useState(false);
   const [hubName, setHubName] = useState('');
-  const [selectedColorId, setSelectedColorId] = useState<number | undefined>(undefined);
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedColorId, setSelectedColorId] = useState<number>(1); // Default to color ID 1
+  const [selectedColor, setSelectedColor] = useState<string>('#FF6B6B'); // Default color
   const [matrixName, setMatrixName] = useState('');
   const [selectedMarketingId, setSelectedMarketingId] = useState<number | undefined>(undefined);
   const [selectedMarketingName, setSelectedMarketingName] = useState<string>('');
