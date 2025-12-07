@@ -123,7 +123,7 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '15px',
+              padding: '10px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
@@ -133,12 +133,12 @@ export default function UserMenuButton({
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '35px',
+                    height: '35px',
                     borderRadius: '360px',
                     backgroundColor: avatarColor,
                     fontFamily: 'Work Sans, sans-serif',
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontWeight: 600,
                     color: '#ffffff'
                   }}
@@ -147,15 +147,32 @@ export default function UserMenuButton({
                 </div>
               }
               section2Content={
-                <div style={{ paddingLeft: '12px' }}>
+                <div style={{ paddingLeft: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
                   <div
                     style={{
                       fontFamily: 'Work Sans, sans-serif',
                       fontSize: '14px',
-                      fontWeight: 400
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      margin: 0,
+                      padding: 0
                     }}
                   >
                     {firstName} {surname}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'Work Sans, sans-serif',
+                      fontSize: '12px',
+                      fontWeight: 300,
+                      color: textColor,
+                      opacity: 0.7,
+                      margin: 0,
+                      padding: 0,
+                      lineHeight: 1
+                    }}
+                  >
+                    placeholder
                   </div>
                 </div>
               }
