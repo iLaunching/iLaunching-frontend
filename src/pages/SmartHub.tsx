@@ -27,6 +27,8 @@ interface SmartHubData {
     user_button_hover: string;
     user_button_icon: string;
     title_menu_color_light: string;
+    border_line_color_light: string;
+    global_button_hover: string;
   } | null;
   profile: {
     id: string;
@@ -45,6 +47,12 @@ interface SmartHubData {
       id: number;
       value_name: string;
       display_name: string;
+    } | null;
+    avatar_color: {
+      id: number;
+      value_name: string;
+      display_name: string;
+      color: string;
     } | null;
   };
 }
@@ -150,7 +158,9 @@ export default function SmartHub() {
     user_button_color: '#ffffff59',
     user_button_hover: '#ffffff66',
     user_button_icon: '#000000',
-    title_menu_color_light: '#d6d6d6'
+    title_menu_color_light: '#d6d6d6',
+    border_line_color_light: '#d6d6d680',
+    global_button_hover: '#d6d6d64d'
   };
   
   return (
@@ -173,6 +183,9 @@ export default function SmartHub() {
         surname={hubData.profile.surname}
         menuColor={theme.menu}
         titleColor={theme.title_menu_color_light}
+        borderLineColor={theme.border_line_color_light}
+        globalButtonHover={theme.global_button_hover}
+        avatarColor={hubData.profile.avatar_color?.color || '#4361EE'}
       />
     </div>
   );

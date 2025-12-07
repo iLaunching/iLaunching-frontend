@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import UserProfileButton from './UserProfileButton';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -8,8 +9,10 @@ interface UserMenuButtonProps {
   buttonHoverColor: string;
   iconColor: string;
   menuColor: string;
-  borderColor: string;
   titleColor: string;
+  borderLineColor: string;
+  globalButtonHover: string;
+  avatarColor: string;
 }
 
 export default function UserMenuButton({
@@ -19,8 +22,10 @@ export default function UserMenuButton({
   buttonHoverColor,
   iconColor,
   menuColor,
-  borderColor,
-  titleColor
+  titleColor,
+  borderLineColor,
+  globalButtonHover,
+  avatarColor
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -75,11 +80,11 @@ export default function UserMenuButton({
             width: '28px',
             height: '28px',
             borderRadius: '360px',
-            backgroundColor: '#ffffff',
+            backgroundColor: avatarColor,
             fontFamily: 'Work Sans, sans-serif',
             fontSize: '12px',
             fontWeight: 600,
-            color: '#000000'
+            color: '#ffffff'
           }}
         >
           {getInitials()}
@@ -112,23 +117,58 @@ export default function UserMenuButton({
         >
           {/* Section 1: User Details */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
-              borderBottom: `1px solid ${borderColor}`
+              padding: '10px',
+              borderBottom: `1px solid ${borderLineColor}`
             }}
           >
-            {/* User details content will go here */}
+            <UserProfileButton
+              globalButtonHover={globalButtonHover}
+              section1Content={
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '360px',
+                    backgroundColor: avatarColor,
+                    fontFamily: 'Work Sans, sans-serif',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: '#ffffff'
+                  }}
+                >
+                  {getInitials()}
+                </div>
+              }
+              section2Content={
+                <div style={{ paddingLeft: '12px' }}>
+                  <div
+                    style={{
+                      fontFamily: 'Work Sans, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }}
+                  >
+                    {firstName} {surname}
+                  </div>
+                </div>
+              }
+              section3Content={null}
+            />
           </div>
 
           {/* Section 2: Config */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
               padding: '16px',
-              borderBottom: `1px solid ${borderColor}`
+              borderBottom: `1px solid ${borderLineColor}`
             }}
           >
             {/* Config content will go here */}
@@ -136,11 +176,12 @@ export default function UserMenuButton({
 
           {/* Section 3: Personal Tools */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
               padding: '16px',
-              borderBottom: `1px solid ${borderColor}`
+              borderBottom: `1px solid ${borderLineColor}`
             }}
           >
             <h3
@@ -159,6 +200,7 @@ export default function UserMenuButton({
 
           {/* Section 4: Account */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',

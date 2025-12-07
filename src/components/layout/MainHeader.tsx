@@ -12,6 +12,9 @@ interface MainHeaderProps {
   surname?: string;
   menuColor?: string;
   titleColor?: string;
+  borderLineColor?: string;
+  globalButtonHover?: string;
+  avatarColor?: string;
 }
 
 export default function MainHeader({ 
@@ -25,7 +28,10 @@ export default function MainHeader({
   firstName = '',
   surname = '',
   menuColor = '#f3f4f6',
-  titleColor = '#d6d6d6'
+  titleColor = '#d6d6d6',
+  borderLineColor = '#d6d6d680',
+  globalButtonHover = '#d6d6d64d',
+  avatarColor = '#4169E1'
 }: MainHeaderProps) {
   return (
     <header 
@@ -37,8 +43,8 @@ export default function MainHeader({
       }}
     >
       <div 
-        className="min-h-[50px] w-full flex items-center justify-between px-6"
-        style={{ backgroundColor: headerOverlayColor }}
+        className="min-h-[50px] w-full flex items-center justify-between"
+        style={{ backgroundColor: headerOverlayColor, paddingLeft: '8px', paddingRight: '8px' }}
       >
         <span style={{ 
           fontFamily: 'Baloo 2, sans-serif',
@@ -56,8 +62,10 @@ export default function MainHeader({
           buttonHoverColor={userButtonHover}
           iconColor={iconColor}
           menuColor={menuColor}
-          borderColor={borderColor}
           titleColor={titleColor}
+          borderLineColor={borderLineColor}
+          globalButtonHover={globalButtonHover}
+          avatarColor={avatarColor}
         />
       </div>
       <div 
