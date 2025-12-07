@@ -25,6 +25,9 @@ interface SmartHubData {
     border: string;
     user_button_color: string;
     user_button_hover: string;
+    user_button_icon: string;
+    title_menu_color_light: string;
+    border_line_color_light: string;
   } | null;
   profile: {
     id: string;
@@ -138,15 +141,18 @@ export default function SmartHub() {
     );
   }
 
-  const theme = hubData.theme || {
+  const theme = hubData?.theme || {
     header_overlay: '#00000080',
-    header_background: '#7F77F1', // Default to ipurple
+    header_background: '#7F77F1',
     background: '#ffffff',
     text: '#000000',
     menu: '#f3f4f6',
     border: '#e5e7eb',
     user_button_color: '#ffffff59',
-    user_button_hover: '#ffffff66'
+    user_button_hover: '#ffffff66',
+    user_button_icon: '#000000',
+    title_menu_color_light: '#d6d6d6',
+    border_line_color_light: '#d6d6d680'
   };
   
   return (
@@ -164,9 +170,12 @@ export default function SmartHub() {
         headerOverlayColor={theme.header_overlay}
         userButtonColor={theme.user_button_color}
         userButtonHover={theme.user_button_hover}
-        iconColor={theme.header_background}
+        iconColor={theme.user_button_icon}
         firstName={hubData.profile.first_name}
         surname={hubData.profile.surname}
+        menuColor={theme.menu}
+        titleColor={theme.title_menu_color_light}
+        borderLineColor={theme.border_line_color_light}
       />
     </div>
   );

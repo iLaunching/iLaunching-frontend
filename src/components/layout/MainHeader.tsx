@@ -10,6 +10,9 @@ interface MainHeaderProps {
   iconColor?: string;
   firstName?: string;
   surname?: string;
+  menuColor?: string;
+  titleColor?: string;
+  borderLineColor?: string;
 }
 
 export default function MainHeader({ 
@@ -21,7 +24,10 @@ export default function MainHeader({
   userButtonHover = '#ffffff66',
   iconColor = '#7F77F1',
   firstName = '',
-  surname = ''
+  surname = '',
+  menuColor = '#f3f4f6',
+  titleColor = '#d6d6d6',
+  borderLineColor = '#d6d6d680'
 }: MainHeaderProps) {
   return (
     <header 
@@ -51,6 +57,9 @@ export default function MainHeader({
           buttonColor={userButtonColor}
           buttonHoverColor={userButtonHover}
           iconColor={iconColor}
+          menuColor={menuColor}
+          titleColor={titleColor}
+          borderLineColor={borderLineColor}
         />
       </div>
       <div 
