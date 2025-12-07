@@ -1,43 +1,113 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import Header from '@/components/layout/Header';
+import MainHeader from '@/components/layout/MainHeader';
+import { authSync } from '@/lib/auth-sync';
+import api from '@/lib/api';
+
+interface SmartHubData {
+  smart_hub: {
+    id: string;
+    name: string;
+    description?: string;
+    owner_id: string;
+    your_role: string;
+    team_members: any[];
+    created_at: string;
+    modified_at: string;
+  } | null;
+  theme: {
+    header_overlay: string;
+    header_background: string;  // From itheme solid_color
+    background: string;
+    text: string;
+    menu: string;
+    border: string;
+    user_button_color: string;
+    user_button_hover: string;
+    user_button_icon: string;
+    title_menu_color_light: string;
+  } | null;
+  profile: {
+    id: string;
+    user_id: string;
+    first_name: string;
+    surname: string;
+    timezone: string;
+    language: string;
+    onboarding_completed: boolean;
+    appearance: {
+      id: number;
+      value_name: string;
+      display_name: string;
+    } | null;
+    itheme: {
+      id: number;
+      value_name: string;
+      display_name: string;
+    } | null;
+  };
+}
 
 export default function SmartHub() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const queryClient = useQueryClient();
+  
+  // Listen for auth events from other tabs
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          navigate('/');
-          return;
-        }
-
-        // TODO: Add API endpoint to fetch user's Smart Hub and Matrix
-        // For now, show welcome message
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to load Smart Hub:', err);
-        setError('Failed to load your Smart Hub');
-        setLoading(false);
+    const unsubscribe = authSync.subscribe((event) => {
+      console.log('SmartHub received auth event:', event.type);
+      
+      if (event.type === 'LOGOUT') {
+        // User logged out in another tab - redirect this tab too
+        console.log('🚪 Logging out due to action in another tab');
+        queryClient.clear(); // Clear all cached data
+        navigate('/login?redirect=/smart-hub&reason=logged_out');
+      } else if (event.type === 'LOGIN' || event.type === 'TOKEN_REFRESH') {
+        // User logged in or token refreshed in another tab - refetch data
+        console.log('🔄 Refreshing data due to auth change in another tab');
+        queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
       }
+    });
+    
+    // Return cleanup function
+    return () => {
+      unsubscribe();
     };
+  }, [navigate, queryClient]);
+  
+  // Fetch current smart hub data from API server
+  const { data: hubData, isLoading, error } = useQuery<SmartHubData>({
+    queryKey: ['current-smart-hub'],
+    queryFn: async () => {
+      // Call API server endpoint - includes JWT token automatically
+      const response = await api.get('/users/me/current-smart-hub');
+      console.log('📊 Smart Hub data loaded:', response.data);
+      return response.data;
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
+  // Handle authentication errors
+  useEffect(() => {
+    if (error && (error as any).response?.status === 401) {
+      // Token expired or invalid - clear and redirect
+      console.error('🔒 Authentication failed, redirecting to login');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      authSync.broadcast({ type: 'LOGOUT' });
+      navigate('/login?redirect=/smart-hub&reason=session_expired');
+    }
+  }, [error, navigate]);
 
-    fetchUserData();
-  }, [navigate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-        <Header aiActive={true} />
-        <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading your Smart Hub...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Smart Hub...</p>
         </div>
       </div>
     );
@@ -45,117 +115,67 @@ export default function SmartHub() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-        <Header aiActive={true} />
-        <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-          <div className="text-center">
-            <p className="text-red-600">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-            >
-              Retry
-            </button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Failed to load Smart Hub</p>
+          <button 
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] })}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <Header aiActive={true} />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Welcome to Your Smart Hub! 🚀
-          </h1>
-          <p className="text-lg text-gray-600">
-            Your intelligent workspace is ready. Let's get started!
-          </p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">📊</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Smart Matrix</h3>
-            <p className="text-gray-600 mb-4">
-              Your intelligent data center and brain for all operations
-            </p>
-            <button className="text-purple-600 font-medium hover:text-purple-700">
-              Open Matrix →
-            </button>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">🤖</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">AI Assistant</h3>
-            <p className="text-gray-600 mb-4">
-              Get help from your intelligent business advisor
-            </p>
-            <button className="text-purple-600 font-medium hover:text-purple-700">
-              Start Chat →
-            </button>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">⚙️</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Hub Settings</h3>
-            <p className="text-gray-600 mb-4">
-              Customize your workspace and preferences
-            </p>
-            <button className="text-purple-600 font-medium hover:text-purple-700">
-              Configure →
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Getting Started</h2>
-          <div className="space-y-4">
-            <div className="flex items-start space-x-4 p-4 bg-purple-50 rounded-lg">
-              <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
-                1
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Explore Your Smart Matrix</h4>
-                <p className="text-gray-600">Learn how to organize and manage your business data</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 bg-pink-50 rounded-lg">
-              <div className="w-8 h-8 bg-pink-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
-                2
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Connect Your Tools</h4>
-                <p className="text-gray-600">Integrate your favorite business tools and platforms</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
-                3
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Invite Your Team</h4>
-                <p className="text-gray-600">Collaborate with your team members in your Smart Hub</p>
-              </div>
-            </div>
-          </div>
+  if (!hubData?.smart_hub) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No active Smart Hub</p>
+          <p className="text-sm text-gray-500">Please create or select a Smart Hub to continue</p>
         </div>
       </div>
+    );
+  }
+
+  const theme = hubData?.theme || {
+    header_overlay: '#00000080',
+    header_background: '#7F77F1',
+    background: '#ffffff',
+    text: '#000000',
+    menu: '#f3f4f6',
+    border: '#e5e7eb',
+    user_button_color: '#ffffff59',
+    user_button_hover: '#ffffff66',
+    user_button_icon: '#000000',
+    title_menu_color_light: '#d6d6d6'
+  };
+  
+  return (
+    <div 
+      className="min-h-screen"
+      style={{ 
+        backgroundColor: theme.background,
+        color: theme.text
+      }}
+    >
+      <MainHeader 
+        borderColor={theme.border} 
+        backgroundColor={theme.background}
+        headerBackgroundColor={theme.header_background}
+        headerOverlayColor={theme.header_overlay}
+        userButtonColor={theme.user_button_color}
+        userButtonHover={theme.user_button_hover}
+        iconColor={theme.user_button_icon}
+        firstName={hubData.profile.first_name}
+        surname={hubData.profile.surname}
+        menuColor={theme.menu}
+        titleColor={theme.title_menu_color_light}
+      />
     </div>
   );
 }
+
 
