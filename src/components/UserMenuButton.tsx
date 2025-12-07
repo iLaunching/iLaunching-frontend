@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import UserProfileButton from './UserProfileButton';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -10,6 +11,9 @@ interface UserMenuButtonProps {
   menuColor: string;
   titleColor: string;
   borderLineColor: string;
+  globalButtonHover: string;
+  avatarColor: string;
+  textColor: string;
 }
 
 export default function UserMenuButton({
@@ -20,7 +24,10 @@ export default function UserMenuButton({
   iconColor,
   menuColor,
   titleColor,
-  borderLineColor
+  borderLineColor,
+  globalButtonHover,
+  avatarColor,
+  textColor
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -75,11 +82,11 @@ export default function UserMenuButton({
             width: '28px',
             height: '28px',
             borderRadius: '360px',
-            backgroundColor: '#ffffff',
+            backgroundColor: avatarColor,
             fontFamily: 'Work Sans, sans-serif',
             fontSize: '12px',
             fontWeight: 600,
-            color: '#000000'
+            color: '#ffffff'
           }}
         >
           {getInitials()}
@@ -112,18 +119,79 @@ export default function UserMenuButton({
         >
           {/* Section 1: User Details */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
+              padding: '15px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
-            {/* User details content will go here */}
+            <UserProfileButton
+              globalButtonHover={globalButtonHover}
+              section1Content={
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '360px',
+                    backgroundColor: avatarColor,
+                    fontFamily: 'Work Sans, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#ffffff'
+                  }}
+                >
+                  {getInitials()}
+                </div>
+              }
+              section2Content={
+                <div style={{ paddingLeft: '12px' }}>
+                  <div
+                    style={{
+                      fontFamily: 'Work Sans, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 400
+                    }}
+                  >
+                    {firstName} {surname}
+                  </div>
+                </div>
+              }
+              section3Content={
+                <div
+                  className="transition-colors duration-200"
+                  style={{
+                    fontFamily: 'Work Sans, sans-serif',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    color: textColor,
+                    backgroundColor: globalButtonHover,
+                    paddingLeft:'8px',
+                    paddingRight:'8px',
+                    paddingTop: '2px',
+                    paddingBottom: '2px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    marginRight:'5px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = globalButtonHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = globalButtonHover;
+                  }}
+                >
+                  Profile
+                </div>
+              }
+            />
           </div>
 
           {/* Section 2: Config */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
@@ -136,6 +204,7 @@ export default function UserMenuButton({
 
           {/* Section 3: Personal Tools */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
@@ -159,6 +228,7 @@ export default function UserMenuButton({
 
           {/* Section 4: Account */}
           <div
+            className="flex flex-col"
             style={{
               minHeight: '100px',
               height: 'fit-content',
