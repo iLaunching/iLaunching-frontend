@@ -30,7 +30,7 @@ export default function GoogleAccountPicker({
   const [isVariousMenusOpen, setIsVariousMenusOpen] = useState(false);
 
   // Get API URL from environment
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
 
   // Load previously used accounts from localStorage
   useEffect(() => {
@@ -77,8 +77,8 @@ export default function GoogleAccountPicker({
       onAddAccount();
     } else {
       // Fallback: Direct redirect to Google OAuth
-      // API_URL already includes /api/v1
-      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      // AUTH_API_URL already includes /api/v1
+      const googleAuthUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       console.log('🔵 Google OAuth URL:', googleAuthUrl);
       console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
       window.location.href = googleAuthUrl;
@@ -87,8 +87,8 @@ export default function GoogleAccountPicker({
 
   const handleGoogleAuth = () => {
     // Redirect to backend OAuth endpoint
-    // API_URL already includes /api/v1
-    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    // AUTH_API_URL already includes /api/v1
+    const googleAuthUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     console.log('🔵 Google OAuth URL:', googleAuthUrl);
     console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
     window.location.href = googleAuthUrl;

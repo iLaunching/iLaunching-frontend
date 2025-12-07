@@ -301,8 +301,8 @@ export default function Landing() {
   const handleGoogleAccountSelect = useCallback((account: { id: string; email: string; name: string; picture: string }) => {
     console.log('🔐 Google account selected:', account);
     // Redirect to Google OAuth login with email hint
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const loginUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}&login_hint=${encodeURIComponent(account.email)}`;
+    const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+    const loginUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}&login_hint=${encodeURIComponent(account.email)}`;
     console.log('Redirecting to Google OAuth:', loginUrl);
     window.location.href = loginUrl;
   }, []);
@@ -310,8 +310,8 @@ export default function Landing() {
   const handleFacebookAccountSelect = useCallback((account: { id: string; email: string; name: string; picture: string }) => {
     console.log('🔐 Facebook account selected:', account);
     // Redirect to Facebook OAuth login with redirect_url
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const loginUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+    const loginUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     console.log('Redirecting to Facebook OAuth:', loginUrl);
     window.location.href = loginUrl;
   }, []);
@@ -445,7 +445,7 @@ export default function Landing() {
   const handleGoogleClick = useCallback(() => {
     try {
       const stored = localStorage.getItem('google_accounts');
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
       
       if (stored) {
         const accounts = JSON.parse(stored);
@@ -459,13 +459,13 @@ export default function Landing() {
       
       // No saved accounts - go directly to Google OAuth
       console.log('🔵 No saved accounts, redirecting to Google OAuth');
-      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      const googleAuthUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       window.location.href = googleAuthUrl;
     } catch (err) {
       console.error('Error checking Google accounts:', err);
       // On error, go to OAuth as fallback
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+      const googleAuthUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       window.location.href = googleAuthUrl;
     }
   }, [showGoogleAccountPicker]);
@@ -474,7 +474,7 @@ export default function Landing() {
   const handleFacebookClick = useCallback(() => {
     try {
       const stored = localStorage.getItem('facebook_accounts');
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
       
       if (stored) {
         const accounts = JSON.parse(stored);
@@ -488,13 +488,13 @@ export default function Landing() {
       
       // No saved accounts - go directly to Facebook OAuth
       console.log('🔵 No saved accounts, redirecting to Facebook OAuth');
-      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      const facebookAuthUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       window.location.href = facebookAuthUrl;
     } catch (err) {
       console.error('Error checking Facebook accounts:', err);
       // On error, go to OAuth as fallback
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
+      const facebookAuthUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       window.location.href = facebookAuthUrl;
     }
   }, [showFacebookAccountPicker]);

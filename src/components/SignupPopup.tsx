@@ -42,7 +42,7 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   }, [isOpen, initialView]);
   
   // Get API URL from environment
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
   
   // Email validation
   const isValidEmail = (email: string) => {
@@ -57,8 +57,8 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   // Handle Google OAuth login
   const handleGoogleLogin = () => {
     // Redirect to backend OAuth endpoint
-    // API_URL already includes /api/v1
-    const googleAuthUrl = `${API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    // AUTH_API_URL already includes /api/v1
+    const googleAuthUrl = `${AUTH_API_URL}/auth/google/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     console.log('🔵 Google OAuth URL:', googleAuthUrl);
     console.log('🔵 Redirect will be:', window.location.origin + '/signup-interface');
     window.location.href = googleAuthUrl;
@@ -67,14 +67,14 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
   // Handle Facebook OAuth login
   const handleFacebookLogin = () => {
     // Redirect to backend OAuth endpoint
-    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    const facebookAuthUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     window.location.href = facebookAuthUrl;
   };
 
   // Handle Microsoft OAuth login
   const handleMicrosoftLogin = () => {
     // Redirect to backend OAuth endpoint
-    const microsoftAuthUrl = `${API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    const microsoftAuthUrl = `${AUTH_API_URL}/auth/microsoft/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     window.location.href = microsoftAuthUrl;
   };
 

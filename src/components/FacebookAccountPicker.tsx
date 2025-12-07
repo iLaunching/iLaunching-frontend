@@ -30,7 +30,7 @@ export default function FacebookAccountPicker({
   const [isVariousMenusOpen, setIsVariousMenusOpen] = useState(false);
 
   // Get API URL from environment
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000';
 
   // Load previously used accounts from localStorage
   useEffect(() => {
@@ -77,14 +77,14 @@ export default function FacebookAccountPicker({
       onAddAccount();
     } else {
       // Fallback: Direct redirect to Facebook OAuth
-      const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+      const facebookAuthUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
       window.location.href = facebookAuthUrl;
     }
   };
 
   const handleFacebookAuth = () => {
     // Redirect to backend OAuth endpoint
-    const facebookAuthUrl = `${API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
+    const facebookAuthUrl = `${AUTH_API_URL}/auth/facebook/login?redirect_url=${encodeURIComponent(window.location.origin + '/signup-interface')}`;
     window.location.href = facebookAuthUrl;
   };
 
