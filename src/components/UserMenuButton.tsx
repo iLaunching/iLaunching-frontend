@@ -2,6 +2,9 @@ import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import UserProfileButton from './UserProfileButton';
 import UserAvatarMenu from './UserAvatarMenu';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -17,6 +20,10 @@ interface UserMenuButtonProps {
   textColor: string;
   avatarColorId: number;
   onAvatarColorChange: (colorId: number) => void;
+  profileIconId?: number;
+  profileIconName?: string;
+  profileIconPrefix?: 'fas' | 'far' | 'fab';
+  onProfileIconChange: (iconId: number) => void;
 }
 
 export default function UserMenuButton({
@@ -32,7 +39,11 @@ export default function UserMenuButton({
   avatarColor,
   textColor,
   avatarColorId,
-  onAvatarColorChange
+  onAvatarColorChange,
+  profileIconId,
+  profileIconName,
+  profileIconPrefix,
+  onProfileIconChange
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
@@ -44,6 +55,30 @@ export default function UserMenuButton({
     const firstInitial = firstName?.charAt(0)?.toUpperCase() || '';
     const lastInitial = surname?.charAt(0)?.toUpperCase() || '';
     return `${firstInitial}${lastInitial}`;
+  };
+
+  const getIconDefinition = (): IconDefinition | null => {
+    if (!profileIconName || !profileIconPrefix) return null;
+    
+    // For now, only support solid icons since we only have that package installed
+    if (profileIconPrefix !== 'fas') {
+      console.warn(`Only solid icons are currently supported. Prefix: ${profileIconPrefix}`);
+      return null;
+    }
+    
+    try {
+      // Convert kebab-case to camelCase and add 'fa' prefix
+      const camelCase = profileIconName
+        .split('-')
+        .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+        .join('');
+      const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
+
+      return solidIcons[iconKey as keyof typeof solidIcons] as IconDefinition;
+    } catch (error) {
+      console.warn(`Icon not found: ${profileIconName}`);
+    }
+    return null;
   };
 
   // Close menu when clicking outside
@@ -101,7 +136,11 @@ export default function UserMenuButton({
             color: '#ffffff'
           }}
         >
-          {getInitials()}
+          {getIconDefinition() ? (
+            <FontAwesomeIcon icon={getIconDefinition()!} size="sm" />
+          ) : (
+            getInitials()
+          )}
         </div>
 
         {/* Arrow Icon */}
@@ -161,7 +200,11 @@ export default function UserMenuButton({
                     cursor: 'pointer'
                   }}
                 >
-                  {getInitials()}
+                  {getIconDefinition() ? (
+                    <FontAwesomeIcon icon={getIconDefinition()!} />
+                  ) : (
+                    getInitials()
+                  )}
                 </div>
               }
               section2Content={
@@ -292,6 +335,10 @@ export default function UserMenuButton({
           titleColor={titleColor}
           currentColorId={avatarColorId}
           onColorChange={onAvatarColorChange}
+          globalButtonHover={globalButtonHover}
+          textColor={textColor}
+          currentIconId={profileIconId}
+          onIconChange={onProfileIconChange}
         />
       </div>
     )}

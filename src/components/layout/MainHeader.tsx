@@ -18,6 +18,10 @@ interface MainHeaderProps {
   textColor?: string;
   avatarColorId?: number;
   onAvatarColorChange?: (colorId: number) => void;
+  profileIconId?: number;
+  profileIconName?: string;
+  profileIconPrefix?: 'fas' | 'far' | 'fab';
+  onProfileIconChange?: (iconId: number) => void;
 }
 
 export default function MainHeader({ 
@@ -37,7 +41,11 @@ export default function MainHeader({
   avatarColor = '#4169E1',
   textColor = '#000000',
   avatarColorId = 1,
-  onAvatarColorChange = () => {}
+  onAvatarColorChange = () => {},
+  profileIconId,
+  profileIconName,
+  profileIconPrefix,
+  onProfileIconChange = () => {}
 }: MainHeaderProps) {
   return (
     <header 
@@ -75,6 +83,10 @@ export default function MainHeader({
           textColor={textColor}
           avatarColorId={avatarColorId}
           onAvatarColorChange={onAvatarColorChange}
+          profileIconId={profileIconId}
+          profileIconName={profileIconName}
+          profileIconPrefix={profileIconPrefix}
+          onProfileIconChange={onProfileIconChange}
         />
       </div>
       <div 

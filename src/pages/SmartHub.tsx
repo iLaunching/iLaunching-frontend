@@ -54,6 +54,13 @@ interface SmartHubData {
       display_name: string;
       color: string;
     } | null;
+    profile_icon: {
+      id: number;
+      value_name: string;
+      display_name: string;
+      icon_name: string;
+      icon_prefix: string;
+    } | null;
   };
 }
 
@@ -119,6 +126,30 @@ export default function SmartHub() {
   const handleAvatarColorChange = (colorId: number) => {
     console.log('Changing avatar color to:', colorId);
     updateAvatarColorMutation.mutate(colorId);
+  };
+
+  // Mutation to update profile icon
+  const updateProfileIconMutation = useMutation({
+    mutationFn: async (iconId: number) => {
+      console.log('Calling API to update profile icon:', iconId);
+      const response = await api.patch(`/profile/icon?profile_icon_id=${iconId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Profile icon updated successfully:', data);
+      // Refetch the smart hub data to get updated icon
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleProfileIconChange = (iconId: number) => {
+    console.log('Changing profile icon to:', iconId);
+    updateProfileIconMutation.mutate(iconId);
   };
   
   // Handle authentication errors
@@ -213,6 +244,10 @@ export default function SmartHub() {
         textColor={theme.text}
         avatarColorId={hubData.profile.avatar_color?.id || 1}
         onAvatarColorChange={handleAvatarColorChange}
+        profileIconId={hubData.profile.profile_icon?.id}
+        profileIconName={hubData.profile.profile_icon?.icon_name}
+        profileIconPrefix={hubData.profile.profile_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
+        onProfileIconChange={handleProfileIconChange}
       />
     </div>
   );
