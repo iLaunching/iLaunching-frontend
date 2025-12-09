@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
@@ -96,6 +96,30 @@ export default function SmartHub() {
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Mutation to update avatar color
+  const updateAvatarColorMutation = useMutation({
+    mutationFn: async (colorId: number) => {
+      console.log('Calling API to update avatar color:', colorId);
+      const response = await api.patch(`/profile/avatar-color?avatar_color_id=${colorId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Avatar color updated successfully:', data);
+      // Refetch the smart hub data to get updated color
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update avatar color:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleAvatarColorChange = (colorId: number) => {
+    console.log('Changing avatar color to:', colorId);
+    updateAvatarColorMutation.mutate(colorId);
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -187,6 +211,8 @@ export default function SmartHub() {
         globalButtonHover={theme.global_button_hover}
         avatarColor={hubData.profile.avatar_color?.color || '#4361EE'}
         textColor={theme.text}
+        avatarColorId={hubData.profile.avatar_color?.id || 1}
+        onAvatarColorChange={handleAvatarColorChange}
       />
     </div>
   );
