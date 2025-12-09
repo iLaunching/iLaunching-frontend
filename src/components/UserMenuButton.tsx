@@ -23,6 +23,7 @@ interface UserMenuButtonProps {
   profileIconId?: number;
   profileIconName?: string;
   profileIconPrefix?: 'fas' | 'far' | 'fab';
+  avatarDisplayMode?: number;
   onProfileIconChange: (iconId: number) => void;
   onClearIcon: () => void;
 }
@@ -44,6 +45,7 @@ export default function UserMenuButton({
   profileIconId,
   profileIconName,
   profileIconPrefix,
+  avatarDisplayMode = 24,
   onProfileIconChange,
   onClearIcon
 }: UserMenuButtonProps) {
@@ -138,7 +140,7 @@ export default function UserMenuButton({
             color: '#ffffff'
           }}
         >
-          {getIconDefinition() ? (
+          {avatarDisplayMode === 26 && getIconDefinition() ? (
             <FontAwesomeIcon icon={getIconDefinition()!} size="sm" />
           ) : (
             getInitials()
@@ -202,7 +204,7 @@ export default function UserMenuButton({
                     cursor: 'pointer'
                   }}
                 >
-                  {getIconDefinition() ? (
+                  {avatarDisplayMode === 26 && getIconDefinition() ? (
                     <FontAwesomeIcon icon={getIconDefinition()!} />
                   ) : (
                     getInitials()

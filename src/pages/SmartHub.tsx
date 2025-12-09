@@ -54,6 +54,7 @@ interface SmartHubData {
       display_name: string;
       color: string;
     } | null;
+    avatar_display_option_value_id: number | null;
     profile_icon: {
       id: number;
       value_name: string;
@@ -271,6 +272,7 @@ export default function SmartHub() {
         profileIconId={hubData.profile.profile_icon?.id}
         profileIconName={hubData.profile.profile_icon?.icon_name}
         profileIconPrefix={hubData.profile.profile_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
+        avatarDisplayMode={hubData.profile.avatar_display_option_value_id || 24}
         onProfileIconChange={handleProfileIconChange}
         onClearIcon={handleClearIcon}
       />

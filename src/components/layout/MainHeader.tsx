@@ -21,6 +21,7 @@ interface MainHeaderProps {
   profileIconId?: number;
   profileIconName?: string;
   profileIconPrefix?: 'fas' | 'far' | 'fab';
+  avatarDisplayMode?: number;
   onProfileIconChange?: (iconId: number) => void;
   onClearIcon?: () => void;
 }
@@ -46,6 +47,7 @@ export default function MainHeader({
   profileIconId,
   profileIconName,
   profileIconPrefix,
+  avatarDisplayMode = 24,
   onProfileIconChange = () => {},
   onClearIcon = () => {}
 }: MainHeaderProps) {
@@ -88,6 +90,7 @@ export default function MainHeader({
           profileIconId={profileIconId}
           profileIconName={profileIconName}
           profileIconPrefix={profileIconPrefix}
+          avatarDisplayMode={avatarDisplayMode}
           onProfileIconChange={onProfileIconChange}
           onClearIcon={onClearIcon}
         />
