@@ -29,6 +29,8 @@ interface SmartHubData {
     title_menu_color_light: string;
     border_line_color_light: string;
     global_button_hover: string;
+    tone_button_bk_color?: string;
+    tone_button_text_color?: string;
   } | null;
   profile: {
     id: string;
@@ -54,6 +56,7 @@ interface SmartHubData {
       display_name: string;
       color: string;
     } | null;
+    avatar_display_option_value_id: number | null;
     profile_icon: {
       id: number;
       value_name: string;
@@ -151,6 +154,30 @@ export default function SmartHub() {
     console.log('Changing profile icon to:', iconId);
     updateProfileIconMutation.mutate(iconId);
   };
+
+  // Mutation to clear profile icon
+  const clearProfileIconMutation = useMutation({
+    mutationFn: async () => {
+      console.log('Calling API to clear profile icon');
+      const response = await api.delete(`/profile/icon`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Profile icon cleared successfully:', data);
+      // Refetch the smart hub data
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleClearIcon = () => {
+    console.log('Clearing profile icon');
+    clearProfileIconMutation.mutate();
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -218,6 +245,8 @@ export default function SmartHub() {
     global_button_hover: '#d6d6d64d'
   };
   
+  console.log('SmartHub - avatar display mode:', hubData?.profile?.avatar_display_option_value_id, 'icon:', hubData?.profile?.profile_icon);
+  
   return (
     <div 
       className="min-h-screen"
@@ -247,7 +276,11 @@ export default function SmartHub() {
         profileIconId={hubData.profile.profile_icon?.id}
         profileIconName={hubData.profile.profile_icon?.icon_name}
         profileIconPrefix={hubData.profile.profile_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
+        avatarDisplayMode={hubData.profile.avatar_display_option_value_id || 24}
         onProfileIconChange={handleProfileIconChange}
+        onClearIcon={handleClearIcon}
+        toneButtonBkColor={theme.tone_button_bk_color}
+        toneButtonTextColor={theme.tone_button_text_color}
       />
     </div>
   );

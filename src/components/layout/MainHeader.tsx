@@ -21,7 +21,11 @@ interface MainHeaderProps {
   profileIconId?: number;
   profileIconName?: string;
   profileIconPrefix?: 'fas' | 'far' | 'fab';
+  avatarDisplayMode?: number;
   onProfileIconChange?: (iconId: number) => void;
+  onClearIcon?: () => void;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
 export default function MainHeader({ 
@@ -45,7 +49,9 @@ export default function MainHeader({
   profileIconId,
   profileIconName,
   profileIconPrefix,
-  onProfileIconChange = () => {}
+  avatarDisplayMode = 24,
+  onProfileIconChange = () => {},
+  onClearIcon = () => {}
 }: MainHeaderProps) {
   return (
     <header 
@@ -86,7 +92,11 @@ export default function MainHeader({
           profileIconId={profileIconId}
           profileIconName={profileIconName}
           profileIconPrefix={profileIconPrefix}
+          avatarDisplayMode={avatarDisplayMode}
           onProfileIconChange={onProfileIconChange}
+          onClearIcon={onClearIcon}
+          toneButtonBkColor={toneButtonBkColor}
+          toneButtonTextColor={toneButtonTextColor}
         />
       </div>
       <div 

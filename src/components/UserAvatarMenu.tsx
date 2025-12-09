@@ -22,9 +22,13 @@ interface UserAvatarMenuProps {
   textColor: string;
   currentIconId?: number;
   onIconChange: (iconId: number) => void;
+  onClearIcon: () => void;
+  borderLineColor: string;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -54,7 +58,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
     <div
       style={{
         position: 'absolute',
-        width: '180px',
+        width: '185px',
         height: 'fit-content',
         minHeight: '200px',
         backgroundColor: menuColor,
@@ -79,7 +83,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
             fontSize: '14px',
-            marginBottom: '10px',
+            marginBottom: '',
             marginLeft:'5px',
             fontWeight: 600
           }}
@@ -138,7 +142,6 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
             fontSize: '14px',
-            marginBottom: '10px',
             marginLeft: '5px',
             fontWeight: 600
           }}
@@ -151,11 +154,25 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             currentIconId={currentIconId}
             onIconSelect={onIconChange}
             onMoreClick={() => setIsIconPickerOpen(true)}
+            onClearIcon={onClearIcon}
             textColor={textColor}
             globalButtonHover={globalButtonHover}
+            toneButtonBkColor={toneButtonBkColor}
+            toneButtonTextColor={toneButtonTextColor}
           />
         </div>
       </div>
+
+      {/* Separator Line */}
+      <div
+        style={{
+          width: '100%',
+          height: '1px',
+          backgroundColor: borderLineColor,
+          marginTop: '10px',
+          marginBottom: '10px'
+        }}
+      />
 
       {/* Section 3 */}
       <div
