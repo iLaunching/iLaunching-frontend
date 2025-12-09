@@ -15,6 +15,9 @@ interface MainHeaderProps {
   borderLineColor?: string;
   globalButtonHover?: string;
   avatarColor?: string;
+  textColor?: string;
+  avatarColorId?: number;
+  onAvatarColorChange?: (colorId: number) => void;
 }
 
 export default function MainHeader({ 
@@ -31,7 +34,10 @@ export default function MainHeader({
   titleColor = '#d6d6d6',
   borderLineColor = '#d6d6d680',
   globalButtonHover = '#d6d6d64d',
-  avatarColor = '#4169E1'
+  avatarColor = '#4169E1',
+  textColor = '#000000',
+  avatarColorId = 1,
+  onAvatarColorChange = () => {}
 }: MainHeaderProps) {
   return (
     <header 
@@ -66,6 +72,9 @@ export default function MainHeader({
           borderLineColor={borderLineColor}
           globalButtonHover={globalButtonHover}
           avatarColor={avatarColor}
+          textColor={textColor}
+          avatarColorId={avatarColorId}
+          onAvatarColorChange={onAvatarColorChange}
         />
       </div>
       <div 

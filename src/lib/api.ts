@@ -8,6 +8,7 @@ import type {
   LogoutRequest,
   LogoutResponse
 } from '@/types';
+import { authSync } from './auth-sync';
 
 // ========================
 // AXIOS INSTANCE
@@ -15,6 +16,15 @@ import type {
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000,
+});
+
+// Auth API client (for authentication endpoints)
+const authApiClient = axios.create({
+  baseURL: import.meta.env.VITE_AUTH_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -125,8 +135,8 @@ api.interceptors.response.use(
       }
 
       // Call refresh endpoint
-      const response = await axios.post<RefreshTokenResponse>(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/refresh`,
+      const response = await authApiClient.post<RefreshTokenResponse>(
+        '/auth/refresh',
         { refresh_token: refreshToken }
       );
 
@@ -147,6 +157,9 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       }
 
+      // Broadcast token refresh to all tabs
+      authSync.broadcast({ type: 'TOKEN_REFRESH', token: newAccessToken });
+
       processQueue(null, newAccessToken);
       isRefreshing = false;
 
@@ -158,6 +171,10 @@ api.interceptors.response.use(
 
       // Clear auth state and redirect to login
       localStorage.removeItem('auth-storage');
+      
+      // Broadcast logout to all tabs
+      authSync.broadcast({ type: 'LOGOUT' });
+      
       window.location.href = '/login';
 
       return Promise.reject(refreshError);
@@ -171,22 +188,22 @@ api.interceptors.response.use(
 
 export const authApi = {
   signup: async (data: SignupRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/signup', data);
+    const response = await authApiClient.post<AuthResponse>('/auth/signup', data);
     return response.data;
   },
 
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', data);
+    const response = await authApiClient.post<AuthResponse>('/auth/login', data);
     return response.data;
   },
 
   refresh: async (data: RefreshTokenRequest): Promise<RefreshTokenResponse> => {
-    const response = await api.post<RefreshTokenResponse>('/auth/refresh', data);
+    const response = await authApiClient.post<RefreshTokenResponse>('/auth/refresh', data);
     return response.data;
   },
 
   logout: async (data: LogoutRequest): Promise<LogoutResponse> => {
-    const response = await api.post<LogoutResponse>('/auth/logout', data);
+    const response = await authApiClient.post<LogoutResponse>('/auth/logout', data);
     return response.data;
   },
 };

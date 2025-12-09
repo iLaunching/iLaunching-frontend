@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import UserProfileButton from './UserProfileButton';
+import UserAvatarMenu from './UserAvatarMenu';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -13,6 +14,9 @@ interface UserMenuButtonProps {
   borderLineColor: string;
   globalButtonHover: string;
   avatarColor: string;
+  textColor: string;
+  avatarColorId: number;
+  onAvatarColorChange: (colorId: number) => void;
 }
 
 export default function UserMenuButton({
@@ -25,11 +29,16 @@ export default function UserMenuButton({
   titleColor,
   borderLineColor,
   globalButtonHover,
-  avatarColor
+  avatarColor,
+  textColor,
+  avatarColorId,
+  onAvatarColorChange
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const avatarMenuRef = useRef<HTMLDivElement>(null);
 
   const getInitials = () => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase() || '';
@@ -43,10 +52,13 @@ export default function UserMenuButton({
       if (
         menuRef.current &&
         buttonRef.current &&
+        avatarMenuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node)
+        !buttonRef.current.contains(event.target as Node) &&
+        !avatarMenuRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        setIsAvatarMenuOpen(false);
       }
     };
 
@@ -55,6 +67,7 @@ export default function UserMenuButton({
   }, []);
 
   return (
+    <>
     <div style={{ position: 'relative' }}>
       <button
         ref={buttonRef}
@@ -75,7 +88,8 @@ export default function UserMenuButton({
       >
         {/* User Avatar */}
         <div
-          className="flex items-center justify-center"
+          className="flex items-center justify-center tooltip-trigger"
+          data-tooltip={`${firstName} ${surname}`}
           style={{
             width: '28px',
             height: '28px',
@@ -111,8 +125,8 @@ export default function UserMenuButton({
             backgroundColor: menuColor,
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            zIndex: 1000,
-            overflow: 'hidden'
+            zIndex: 9999,
+            overflow: 'visible'
           }}
         >
           {/* Section 1: User Details */}
@@ -129,35 +143,84 @@ export default function UserMenuButton({
               globalButtonHover={globalButtonHover}
               section1Content={
                 <div
-                  className="flex items-center justify-center"
+                  className="flex items-center justify-center tooltip-trigger tooltip-top"
+                  data-tooltip={`${firstName} ${surname}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAvatarMenuOpen(!isAvatarMenuOpen);
+                  }}
                   style={{
-                    width: '28px',
-                    height: '28px',
+                    width: '35px',
+                    height: '35px',
                     borderRadius: '360px',
                     backgroundColor: avatarColor,
                     fontFamily: 'Work Sans, sans-serif',
-                    fontSize: '12px',
+                    fontSize: '14px',
                     fontWeight: 600,
-                    color: '#ffffff'
+                    color: '#ffffff',
+                    cursor: 'pointer'
                   }}
                 >
                   {getInitials()}
                 </div>
               }
               section2Content={
-                <div style={{ paddingLeft: '12px' }}>
+                <div style={{ paddingLeft: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
                   <div
                     style={{
                       fontFamily: 'Work Sans, sans-serif',
                       fontSize: '14px',
-                      fontWeight: 600
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      margin: 0,
+                      padding: 0
                     }}
                   >
                     {firstName} {surname}
                   </div>
+                  <div
+                    style={{
+                      fontFamily: 'Work Sans, sans-serif',
+                      fontSize: '12px',
+                      fontWeight: 300,
+                      color: textColor,
+                      opacity: 0.7,
+                      margin: 0,
+                      padding: 0,
+                      lineHeight: 1
+                    }}
+                  >
+                    placeholder
+                  </div>
                 </div>
               }
-              section3Content={null}
+              section3Content={
+                <div
+                  className="transition-colors duration-200"
+                  style={{
+                    fontFamily: 'Work Sans, sans-serif',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    color: textColor,
+                    backgroundColor: globalButtonHover,
+                    paddingLeft:'8px',
+                    paddingRight:'8px',
+                    paddingTop: '2px',
+                    paddingBottom: '2px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    marginRight:'5px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = globalButtonHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = globalButtonHover;
+                  }}
+                >
+                  Profile
+                </div>
+              }
             />
           </div>
 
@@ -212,5 +275,26 @@ export default function UserMenuButton({
         </div>
       )}
     </div>
+
+    {/* User Avatar Menu - positioned globally outside all containers */}
+    {isOpen && isAvatarMenuOpen && (
+      <div
+        ref={avatarMenuRef}
+        style={{
+          position: 'fixed',
+          top: '130px',
+          right: '450px',
+          zIndex: 10001
+        }}
+      >
+        <UserAvatarMenu 
+          menuColor={menuColor} 
+          titleColor={titleColor}
+          currentColorId={avatarColorId}
+          onColorChange={onAvatarColorChange}
+        />
+      </div>
+    )}
+    </>
   );
 }

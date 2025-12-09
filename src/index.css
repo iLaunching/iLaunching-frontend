@@ -661,4 +661,81 @@ p[contenteditable]:focus {
   }
 }
 
+/* Global Tooltip Styles */
+.tooltip-trigger {
+  position: relative;
+}
+
+.tooltip-trigger::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 18px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  color: #f9fafb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-trigger::after {
+  content: '';
+  position: absolute;
+  right: calc(100% + 13px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    14px 0px 0 -2.5px #111827;
+  z-index: 99997;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tooltip-trigger:hover::before,
+.tooltip-trigger:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tooltip top variant for dropdown avatar */
+.tooltip-top::before {
+  right: auto;
+  top: auto;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-top::after {
+  right: auto;
+  top: auto;
+  bottom: calc(100% + 13px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0px 14px 0 -2.5px #111827;
+}
+
+
 

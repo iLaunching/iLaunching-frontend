@@ -4,9 +4,11 @@
  */
 
 import axios, { type AxiosInstance, type AxiosError } from 'axios';
+import { authSync } from '@/lib/auth-sync';
 
 // Get API base URL from environment or use default
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+// Use AUTH_API_URL for authentication endpoints
+const API_BASE_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8000/api/v1';
 
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
@@ -200,6 +202,9 @@ export const authApi = {
       localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
+      // Broadcast login to all tabs
+      authSync.broadcast({ type: 'LOGIN', token: data.access_token });
+      
       return data;
     } catch (error) {
       console.error('Login failed:', error);
@@ -224,6 +229,9 @@ export const authApi = {
       const { access_token } = response.data;
       localStorage.setItem('access_token', access_token);
       
+      // Broadcast token refresh to all tabs
+      authSync.broadcast({ type: 'TOKEN_REFRESH', token: access_token });
+      
       return { access_token };
     } catch (error) {
       console.error('Token refresh failed:', error);
@@ -231,6 +239,10 @@ export const authApi = {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
+      
+      // Broadcast logout to all tabs on refresh failure
+      authSync.broadcast({ type: 'LOGOUT' });
+      
       throw error;
     }
   },
@@ -253,6 +265,9 @@ export const authApi = {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
+      
+      // Broadcast logout to all tabs
+      authSync.broadcast({ type: 'LOGOUT' });
     }
   },
 
