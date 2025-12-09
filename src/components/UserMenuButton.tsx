@@ -24,6 +24,7 @@ interface UserMenuButtonProps {
   profileIconName?: string;
   profileIconPrefix?: 'fas' | 'far' | 'fab';
   onProfileIconChange: (iconId: number) => void;
+  onClearIcon: () => void;
 }
 
 export default function UserMenuButton({
@@ -43,7 +44,8 @@ export default function UserMenuButton({
   profileIconId,
   profileIconName,
   profileIconPrefix,
-  onProfileIconChange
+  onProfileIconChange,
+  onClearIcon
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
@@ -339,6 +341,7 @@ export default function UserMenuButton({
           textColor={textColor}
           currentIconId={profileIconId}
           onIconChange={onProfileIconChange}
+          onClearIcon={onClearIcon}
           borderLineColor={borderLineColor}
         />
       </div>

@@ -151,6 +151,30 @@ export default function SmartHub() {
     console.log('Changing profile icon to:', iconId);
     updateProfileIconMutation.mutate(iconId);
   };
+
+  // Mutation to clear profile icon
+  const clearProfileIconMutation = useMutation({
+    mutationFn: async () => {
+      console.log('Calling API to clear profile icon');
+      const response = await api.delete(`/profile/icon`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Profile icon cleared successfully:', data);
+      // Refetch the smart hub data
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleClearIcon = () => {
+    console.log('Clearing profile icon');
+    clearProfileIconMutation.mutate();
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -248,6 +272,7 @@ export default function SmartHub() {
         profileIconName={hubData.profile.profile_icon?.icon_name}
         profileIconPrefix={hubData.profile.profile_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
         onProfileIconChange={handleProfileIconChange}
+        onClearIcon={handleClearIcon}
       />
     </div>
   );

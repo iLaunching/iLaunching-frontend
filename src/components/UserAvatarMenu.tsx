@@ -22,10 +22,11 @@ interface UserAvatarMenuProps {
   textColor: string;
   currentIconId?: number;
   onIconChange: (iconId: number) => void;
+  onClearIcon: () => void;
   borderLineColor: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, borderLineColor }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -80,7 +81,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
             fontSize: '14px',
-            marginBottom: '10px',
+            marginBottom: '',
             marginLeft:'5px',
             fontWeight: 600
           }}
@@ -139,7 +140,6 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
             fontSize: '14px',
-            marginBottom: '10px',
             marginLeft: '5px',
             fontWeight: 600
           }}
@@ -152,6 +152,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             currentIconId={currentIconId}
             onIconSelect={onIconChange}
             onMoreClick={() => setIsIconPickerOpen(true)}
+            onClearIcon={onClearIcon}
             textColor={textColor}
             globalButtonHover={globalButtonHover}
           />
