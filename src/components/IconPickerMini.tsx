@@ -123,12 +123,14 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
       {/* More Button */}
       <button
         onClick={onMoreClick}
-        className="w-full py-2 rounded-md transition-colors text-sm font-medium"
+        className="w-full  rounded-md transition-colors text-sm font-medium"
         style={{
           backgroundColor: 'transparent',
           color: textColor,
           fontFamily: 'Work Sans, sans-serif',
           border: `1px solid ${textColor}40`,
+          height: '35px',
+          marginBottom: '5px',  
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = globalButtonHover;

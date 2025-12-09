@@ -22,9 +22,10 @@ interface UserAvatarMenuProps {
   textColor: string;
   currentIconId?: number;
   onIconChange: (iconId: number) => void;
+  borderLineColor: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, borderLineColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -54,7 +55,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
     <div
       style={{
         position: 'absolute',
-        width: '180px',
+        width: '185px',
         height: 'fit-content',
         minHeight: '200px',
         backgroundColor: menuColor,
@@ -156,6 +157,17 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
           />
         </div>
       </div>
+
+      {/* Separator Line */}
+      <div
+        style={{
+          width: '100%',
+          height: '1px',
+          backgroundColor: borderLineColor,
+          marginTop: '10px',
+          marginBottom: '10px'
+        }}
+      />
 
       {/* Section 3 */}
       <div

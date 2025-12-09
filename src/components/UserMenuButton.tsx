@@ -339,6 +339,7 @@ export default function UserMenuButton({
           textColor={textColor}
           currentIconId={profileIconId}
           onIconChange={onProfileIconChange}
+          borderLineColor={borderLineColor}
         />
       </div>
     )}
