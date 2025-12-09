@@ -120,7 +120,8 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
                   width: '28px',
                   height: '28px',
                   backgroundColor: 'transparent',
-                  border: '2px solid transparent',
+                  border: 'none',
+                  outline: 'none',
                   color: textColor,
                 }}
                 title="Clear Icon"
@@ -146,7 +147,8 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
                 width: '28px',
                 height: '28px',
                 backgroundColor: isSelected ? (toneButtonBkColor || globalButtonHover) : 'transparent',
-                border: '2px solid transparent',
+                border: 'none',
+                outline: 'none',
                 color: isSelected ? (toneButtonTextColor || textColor) : textColor,
               }}
               title={item.name}

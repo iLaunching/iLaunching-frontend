@@ -51,7 +51,9 @@ export default function MainHeader({
   profileIconPrefix,
   avatarDisplayMode = 24,
   onProfileIconChange = () => {},
-  onClearIcon = () => {}
+  onClearIcon = () => {},
+  toneButtonBkColor,
+  toneButtonTextColor,
 }: MainHeaderProps) {
   return (
     <header 
