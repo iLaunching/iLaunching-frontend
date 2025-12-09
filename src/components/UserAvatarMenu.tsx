@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Upload } from 'lucide-react';
 import api from '@/lib/api';
+import IconPickerMini from './IconPickerMini';
+import IconPicker from './IconPicker';
 
 interface ColorOption {
   option_value_id: number;
@@ -15,11 +18,16 @@ interface UserAvatarMenuProps {
   titleColor: string;
   currentColorId: number;
   onColorChange: (colorId: number) => void;
+  globalButtonHover: string;
+  textColor: string;
+  currentIconId?: number;
+  onIconChange: (iconId: number) => void;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
   useEffect(() => {
     console.log('UserAvatarMenu mounted');
@@ -121,19 +129,31 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
       <div
         style={{
           height: 'fit-content',
-          minHeight: '100px'
+          minHeight: '100px',
+          marginTop: '10px'
         }}
       >
         <div
           style={{
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
-            fontSize: '12px',
+            fontSize: '14px',
             marginBottom: '10px',
+            marginLeft: '5px',
             fontWeight: 600
           }}
         >
           Avatar Icon
+        </div>
+        
+        <div style={{ padding: '5px' }}>
+          <IconPickerMini
+            currentIconId={currentIconId}
+            onIconSelect={onIconChange}
+            onMoreClick={() => setIsIconPickerOpen(true)}
+            textColor={textColor}
+            globalButtonHover={globalButtonHover}
+          />
         </div>
       </div>
 
@@ -141,11 +161,52 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
       <div
         style={{
           height: 'fit-content',
-          minHeight: '100px'
+          justifyContent: 'center',
+          alignItems: 'center',
+          display: 'flex'
+          
         }}
       >
-        {/* Section 3 content */}
+        <button
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = globalButtonHover;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+          style={{
+            height: '35px',
+            fontFamily: 'Work Sans, sans-serif',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            borderRadius: '4px',
+            transition: 'background-color 0.2s ease',
+            padding: '0 10px',
+            color: textColor,
+            width: '100%'
+          }}
+        >
+          <Upload size={18} style={{ color: textColor }} />
+          <span style={{ fontSize: '14px' }}>Upload avatar</span>
+        </button>
       </div>
+      
+      {/* Icon Picker Modal */}
+      <IconPicker
+        isOpen={isIconPickerOpen}
+        onClose={() => setIsIconPickerOpen(false)}
+        currentIconId={currentIconId}
+        onIconSelect={onIconChange}
+        textColor={textColor}
+        menuColor={menuColor}
+        titleColor={titleColor}
+        globalButtonHover={globalButtonHover}
+      />
     </div>
   );
 }
