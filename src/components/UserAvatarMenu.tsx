@@ -33,6 +33,15 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
+  // Wrapper to log icon changes
+  const handleIconChange = (iconId: number) => {
+    console.log('=== UserAvatarMenu handleIconChange CALLED ===');
+    console.log('Icon ID received:', iconId);
+    console.log('Calling parent onIconChange callback');
+    onIconChange(iconId);
+    console.log('=== UserAvatarMenu handleIconChange COMPLETED ===');
+  };
+
   useEffect(() => {
     console.log('UserAvatarMenu mounted');
     const fetchColors = async () => {
@@ -152,7 +161,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         <div style={{ padding: '5px' }}>
           <IconPickerMini
             currentIconId={currentIconId}
-            onIconSelect={onIconChange}
+            onIconSelect={handleIconChange}
             onMoreClick={() => setIsIconPickerOpen(true)}
             onClearIcon={onClearIcon}
             textColor={textColor}
@@ -218,7 +227,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         isOpen={isIconPickerOpen}
         onClose={() => setIsIconPickerOpen(false)}
         currentIconId={currentIconId}
-        onIconSelect={onIconChange}
+        onIconSelect={handleIconChange}
         textColor={textColor}
         menuColor={menuColor}
         titleColor={titleColor}

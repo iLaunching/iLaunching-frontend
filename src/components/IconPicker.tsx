@@ -52,13 +52,17 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
   // Handle icon selection based on context
   const handleIconSelect = (iconId: number) => {
+    console.log('=== IconPicker handleIconSelect CALLED ===');
     console.log(`Icon selected (id: ${iconId}) from context: ${context}`);
+    console.log('Calling onIconSelect callback with iconId:', iconId);
     
     // Execute context-specific workflow
     switch (context) {
       case 'user-profile':
-        console.log('Executing user-profile icon update workflow');
+        console.log('✅ Executing user-profile icon update workflow');
+        console.log('About to call onIconSelect function:', typeof onIconSelect);
         onIconSelect(iconId);
+        console.log('✅ onIconSelect called successfully');
         break;
       case 'hub-settings':
         console.log('Executing hub-settings icon update workflow');
@@ -69,7 +73,9 @@ const IconPicker: React.FC<IconPickerProps> = ({
         onIconSelect(iconId);
     }
     
+    console.log('Closing IconPicker modal');
     onClose();
+    console.log('=== IconPicker handleIconSelect COMPLETED ===');
   };
 
   // Close modal when clicking outside

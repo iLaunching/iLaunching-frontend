@@ -151,8 +151,11 @@ export default function SmartHub() {
   });
 
   const handleProfileIconChange = (iconId: number) => {
+    console.log('=== SmartHub handleProfileIconChange CALLED ===');
     console.log('Changing profile icon to:', iconId);
+    console.log('Calling updateProfileIconMutation.mutate with iconId:', iconId);
     updateProfileIconMutation.mutate(iconId);
+    console.log('=== SmartHub handleProfileIconChange COMPLETED ===');
   };
 
   // Mutation to clear profile icon
