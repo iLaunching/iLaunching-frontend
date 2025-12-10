@@ -25,6 +25,7 @@ interface IconPickerProps {
   menuColor: string;
   titleColor: string;
   globalButtonHover: string;
+  context?: 'user-profile' | 'hub-settings' | 'other';
 }
 
 const IconPicker: React.FC<IconPickerProps> = ({
@@ -36,6 +37,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
   menuColor,
   titleColor,
   globalButtonHover,
+  context = 'user-profile',
 }) => {
   const [icons, setIcons] = useState<Icon[]>([]);
   const [filteredIcons, setFilteredIcons] = useState<Icon[]>([]);
@@ -43,6 +45,28 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Handle icon selection based on context
+  const handleIconSelect = (iconId: number) => {
+    console.log(`Icon selected (id: ${iconId}) from context: ${context}`);
+    
+    // Execute context-specific workflow
+    switch (context) {
+      case 'user-profile':
+        console.log('Executing user-profile icon update workflow');
+        onIconSelect(iconId);
+        break;
+      case 'hub-settings':
+        console.log('Executing hub-settings icon update workflow');
+        onIconSelect(iconId);
+        break;
+      default:
+        console.log('Executing default icon selection workflow');
+        onIconSelect(iconId);
+    }
+    
+    onClose();
+  };
 
   // Close modal when clicking outside
   useEffect(() => {
@@ -63,21 +87,31 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
   useEffect(() => {
     const fetchIcons = async () => {
+      if (!isOpen) return;
+      
+      setLoading(true);
       try {
-        const response = await api.get('/icons', {
-          params: { limit: 100 } // Load first 100 icons for performance
-        });
-        setIcons(response.data.icons || []);
-        setFilteredIcons(response.data.icons || []);
+        console.log(`IconPicker opened from context: ${context}`);
+        console.log('Fetching icons from API...');
+        const response = await api.get('/icons');
+        console.log('Icons response:', response.data);
+        
+        const iconList = response.data.icons || [];
+        console.log(`Loaded ${iconList.length} icons`);
+        
+        setIcons(iconList);
+        setFilteredIcons(iconList);
       } catch (error) {
         console.error('Failed to fetch icons:', error);
+        setIcons([]);
+        setFilteredIcons([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchIcons();
-  }, []);
+  }, [isOpen, context]);
 
   useEffect(() => {
     let filtered = icons;
@@ -224,10 +258,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
                     return (
                       <button
                         key={icon.id}
-                        onClick={() => {
-                          onIconSelect(icon.id);
-                          onClose();
-                        }}
+                        onClick={() => handleIconSelect(icon.id)}
                         className="flex items-center justify-center rounded-md transition-all"
                         style={{
                           width: '40px',
