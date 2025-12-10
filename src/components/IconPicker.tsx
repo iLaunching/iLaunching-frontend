@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import * as solidIcons from "@fortawesome/free-solid-svg-icons";
@@ -47,8 +47,12 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const [icons, setIcons] = useState<Icon[]>([]);
   const [filteredIcons, setFilteredIcons] = useState<Icon[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalIcons, setTotalIcons] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle icon selection based on context
@@ -101,9 +105,13 @@ const IconPicker: React.FC<IconPickerProps> = ({
       if (!isOpen) return;
       
       setLoading(true);
+      setCurrentPage(1);
+      setIcons([]);
+      setFilteredIcons([]);
+      
       try {
         console.log(`IconPicker opened from context: ${context}`);
-        console.log('Fetching icons from API...');
+        console.log('Fetching initial icons from API...');
         const response = await api.get('/icons');
         console.log('Icons response:', response.data);
         console.log('Total available:', response.data.total);
@@ -111,17 +119,21 @@ const IconPicker: React.FC<IconPickerProps> = ({
         // Map API response to ensure id field is populated from option_value_id
         const iconList = (response.data.icons || []).map((icon: any) => ({
           ...icon,
-          id: icon.option_value_id || icon.id // Use option_value_id if available, fallback to id
+          id: icon.option_value_id || icon.id
         }));
+        
         console.log(`Loaded ${iconList.length} icons`);
-        console.log('First 3 icons (mapped with id):', iconList.slice(0, 3));
         
         setIcons(iconList);
         setFilteredIcons(iconList);
+        setTotalIcons(response.data.total || iconList.length);
+        setHasMore(iconList.length < (response.data.total || 0));
       } catch (error) {
         console.error('Failed to fetch icons:', error);
         setIcons([]);
         setFilteredIcons([]);
+        setTotalIcons(0);
+        setHasMore(false);
       } finally {
         setLoading(false);
       }
@@ -129,6 +141,49 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
     fetchIcons();
   }, [isOpen, context]);
+
+  // Load more icons when scrolling
+  const loadMoreIcons = useCallback(async () => {
+    if (loadingMore || !hasMore || searchQuery || selectedCategory !== 'all') return;
+    
+    setLoadingMore(true);
+    try {
+      const nextPage = currentPage + 1;
+      console.log(`Loading more icons, page ${nextPage}...`);
+      
+      // Try pagination with different parameter formats
+      let response;
+      try {
+        response = await api.get(`/icons?page=${nextPage}`);
+      } catch (err) {
+        // If page parameter doesn't work, try offset
+        const offset = icons.length;
+        response = await api.get(`/icons?offset=${offset}`);
+      }
+      
+      const newIconList = (response.data.icons || []).map((icon: any) => ({
+        ...icon,
+        id: icon.option_value_id || icon.id
+      }));
+      
+      if (newIconList.length > 0) {
+        console.log(`Loaded ${newIconList.length} more icons`);
+        setIcons(prev => [...prev, ...newIconList]);
+        setFilteredIcons(prev => [...prev, ...newIconList]);
+        setCurrentPage(nextPage);
+        setHasMore(icons.length + newIconList.length < totalIcons);
+      } else {
+        console.log('No more icons to load');
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Failed to load more icons:', error);
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, currentPage, icons.length, totalIcons, searchQuery, selectedCategory]);
+
 
   useEffect(() => {
     let filtered = icons;
@@ -202,7 +257,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         style={{
           backgroundColor: menuColor,
           width: '600px',
-          height: '600px',
+          height: '580px',
         }}
       >
         {/* Header */}
@@ -279,8 +334,21 @@ const IconPicker: React.FC<IconPickerProps> = ({
                 ))}
               </div>
 
-              {/* Icon Grid - Scrollable */}
-              <div className="overflow-y-auto flex-1">
+              {/* Icon Grid - Virtualized Infinite Scroll */}
+              <div 
+                className="overflow-y-auto flex-1"
+                onScroll={(e) => {
+                  const target = e.currentTarget;
+                  const scrollTop = target.scrollTop;
+                  const scrollHeight = target.scrollHeight;
+                  const clientHeight = target.clientHeight;
+                  
+                  // Load more when scrolled near bottom (within 200px)
+                  if (scrollHeight - scrollTop - clientHeight < 200 && !loadingMore && hasMore) {
+                    loadMoreIcons();
+                  }
+                }}
+              >
                 {filteredIcons.length === 0 ? (
                   <div className="flex items-center justify-center py-12" style={{ color: textColor }}>
                     No icons found
@@ -291,7 +359,6 @@ const IconPicker: React.FC<IconPickerProps> = ({
                       const iconDef = getIconDefinition(icon);
                       if (!iconDef) return null;
 
-                      // Only mark as selected if currentIconId is defined and matches
                       const isSelected = currentIconId !== undefined && currentIconId === icon.id;
 
                       return (
@@ -334,7 +401,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
                 )}
               </div>
 
-              {/* Footer */}
+              {/* Footer with loading indicator */}
               <div
                 className="text-xs text-center pt-2 border-t"
                 style={{
@@ -344,7 +411,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
                   borderColor: `${textColor}20`,
                 }}
               >
-                Showing {filteredIcons.length} of {icons.length} icons
+                Showing {filteredIcons.length} of {totalIcons} icons
+                {loadingMore && ' • Loading more...'}
               </div>
             </>
           )}
