@@ -53,7 +53,15 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalIcons, setTotalIcons] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [scrollTop, setScrollTop] = useState(0);
   const modalRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Virtualization settings
+  const COLUMN_COUNT = 10;
+  const ICON_SIZE = 44; // 40px + 4px gap
+  const CONTAINER_HEIGHT = 350; // Visible area height
+  const OVERSCAN = 2; // Extra rows to render above/below viewport
 
   // Handle icon selection based on context
   const handleIconSelect = (iconId: number) => {
@@ -184,6 +192,16 @@ const IconPicker: React.FC<IconPickerProps> = ({
     }
   }, [loadingMore, hasMore, currentPage, icons.length, totalIcons, searchQuery, selectedCategory]);
 
+  // Calculate visible range for virtualization
+  const totalRows = Math.ceil(filteredIcons.length / COLUMN_COUNT);
+  const startRow = Math.max(0, Math.floor(scrollTop / ICON_SIZE) - OVERSCAN);
+  const endRow = Math.min(totalRows, Math.ceil((scrollTop + CONTAINER_HEIGHT) / ICON_SIZE) + OVERSCAN);
+  const visibleIcons = filteredIcons.slice(
+    startRow * COLUMN_COUNT,
+    endRow * COLUMN_COUNT
+  );
+  const offsetY = startRow * ICON_SIZE;
+  const totalHeight = totalRows * ICON_SIZE;
 
   useEffect(() => {
     let filtered = icons;
@@ -336,15 +354,19 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
               {/* Icon Grid - Virtualized Infinite Scroll */}
               <div 
+                ref={scrollContainerRef}
                 className="overflow-y-auto flex-1"
                 onScroll={(e) => {
                   const target = e.currentTarget;
-                  const scrollTop = target.scrollTop;
+                  const currentScrollTop = target.scrollTop;
                   const scrollHeight = target.scrollHeight;
                   const clientHeight = target.clientHeight;
                   
+                  // Update scroll position for virtualization
+                  setScrollTop(currentScrollTop);
+                  
                   // Load more when scrolled near bottom (within 200px)
-                  if (scrollHeight - scrollTop - clientHeight < 200 && !loadingMore && hasMore) {
+                  if (scrollHeight - currentScrollTop - clientHeight < 200 && !loadingMore && hasMore) {
                     loadMoreIcons();
                   }
                 }}
@@ -354,49 +376,59 @@ const IconPicker: React.FC<IconPickerProps> = ({
                     No icons found
                   </div>
                 ) : (
-                  <div className="grid grid-cols-10 gap-2">
-                    {filteredIcons.map((icon) => {
-                      const iconDef = getIconDefinition(icon);
-                      if (!iconDef) return null;
+                  <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
+                    <div 
+                      className="grid grid-cols-10 gap-2"
+                      style={{
+                        position: 'absolute',
+                        top: `${offsetY}px`,
+                        left: 0,
+                        right: 0,
+                      }}
+                    >
+                      {visibleIcons.map((icon) => {
+                        const iconDef = getIconDefinition(icon);
+                        if (!iconDef) return null;
 
-                      const isSelected = currentIconId !== undefined && currentIconId === icon.id;
+                        const isSelected = currentIconId !== undefined && currentIconId === icon.id;
 
-                      return (
-                        <button
-                          key={icon.id}
-                          onClick={() => {
-                            console.log('Icon button clicked:', { 
-                              iconId: icon.id, 
-                              iconName: icon.display_name,
-                              iconObject: icon 
-                            });
-                            handleIconSelect(icon.id);
-                          }}
-                          className="flex items-center justify-center rounded-md transition-all"
-                          style={{
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: isSelected ? (toneButtonBkColor || globalButtonHover) : 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            color: isSelected ? (toneButtonTextColor || textColor) : textColor,
-                          }}
-                          title={icon.display_name}
-                          onMouseEnter={(e) => {
-                            if (!isSelected) {
-                              e.currentTarget.style.backgroundColor = globalButtonHover;
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isSelected) {
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                            }
-                          }}
-                        >
-                          <FontAwesomeIcon icon={iconDef} size="lg" />
-                        </button>
-                      );
-                    })}
+                        return (
+                          <button
+                            key={icon.id}
+                            onClick={() => {
+                              console.log('Icon button clicked:', { 
+                                iconId: icon.id, 
+                                iconName: icon.display_name,
+                                iconObject: icon 
+                              });
+                              handleIconSelect(icon.id);
+                            }}
+                            className="flex items-center justify-center rounded-md transition-all"
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              backgroundColor: isSelected ? (toneButtonBkColor || globalButtonHover) : 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: isSelected ? (toneButtonTextColor || textColor) : textColor,
+                            }}
+                            title={icon.display_name}
+                            onMouseEnter={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor = globalButtonHover;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <FontAwesomeIcon icon={iconDef} size="lg" />
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
