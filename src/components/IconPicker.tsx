@@ -120,7 +120,31 @@ const IconPicker: React.FC<IconPickerProps> = ({
       try {
         console.log(`IconPicker opened from context: ${context}`);
         console.log('Fetching initial icons from API...');
-        const response = await api.get('/icons');
+        
+        // Build query params based on filters
+        const params = new URLSearchParams();
+        params.append('limit', '100');
+        params.append('offset', '0');
+        
+        // Map category to prefix for API
+        if (selectedCategory !== 'all') {
+          const prefixMap: { [key: string]: string } = {
+            'solid': 'fas',
+            'regular': 'far',
+            'brands': 'fab'
+          };
+          const prefix = prefixMap[selectedCategory];
+          if (prefix) {
+            params.append('prefix', prefix);
+          }
+        }
+        
+        // Add search if present
+        if (searchQuery) {
+          params.append('search', searchQuery);
+        }
+        
+        const response = await api.get(`/icons?${params.toString()}`);
         console.log('Icons response:', response.data);
         console.log('Total available:', response.data.total);
         
@@ -148,18 +172,41 @@ const IconPicker: React.FC<IconPickerProps> = ({
     };
 
     fetchIcons();
-  }, [isOpen, context]);
+  }, [isOpen, context, selectedCategory, searchQuery]);
 
   // Load more icons when scrolling
   const loadMoreIcons = useCallback(async () => {
-    if (loadingMore || !hasMore || searchQuery || selectedCategory !== 'all') return;
+    if (loadingMore || !hasMore) return;
     
     setLoadingMore(true);
     try {
       const offset = icons.length;
       console.log(`Loading more icons with offset ${offset}...`);
       
-      const response = await api.get(`/icons?offset=${offset}&limit=100`);
+      // Build query params with current filters
+      const params = new URLSearchParams();
+      params.append('limit', '100');
+      params.append('offset', offset.toString());
+      
+      // Map category to prefix for API
+      if (selectedCategory !== 'all') {
+        const prefixMap: { [key: string]: string } = {
+          'solid': 'fas',
+          'regular': 'far',
+          'brands': 'fab'
+        };
+        const prefix = prefixMap[selectedCategory];
+        if (prefix) {
+          params.append('prefix', prefix);
+        }
+      }
+      
+      // Add search if present
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+      
+      const response = await api.get(`/icons?${params.toString()}`);
       
       const newIconList = (response.data.icons || []).map((icon: any) => ({
         ...icon,
@@ -204,35 +251,6 @@ const IconPicker: React.FC<IconPickerProps> = ({
   );
   const offsetY = startRow * ICON_SIZE;
   const totalHeight = totalRows * ICON_SIZE;
-
-  useEffect(() => {
-    let filtered = icons;
-
-    // Filter by category (maps to icon_prefix)
-    if (selectedCategory !== 'all') {
-      // Map category names to icon prefixes
-      const prefixMap: { [key: string]: string } = {
-        'solid': 'fas',
-        'regular': 'far',
-        'brands': 'fab'
-      };
-      const targetPrefix = prefixMap[selectedCategory];
-      
-      if (targetPrefix) {
-        filtered = filtered.filter(icon => icon.icon_prefix === targetPrefix);
-      }
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(icon =>
-        icon.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        icon.icon_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredIcons(filtered);
-  }, [searchQuery, selectedCategory, icons]);
 
   const getIconDefinition = (icon: Icon): IconDefinition | null => {
     try {
