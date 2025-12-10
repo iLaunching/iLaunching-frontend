@@ -9,6 +9,7 @@ import api from "@/lib/api";
 
 interface Icon {
   id: number;
+  option_value_id?: number; // API returns this field
   value_name: string;
   display_name: string;
   icon_name: string;
@@ -106,9 +107,13 @@ const IconPicker: React.FC<IconPickerProps> = ({
         const response = await api.get('/icons');
         console.log('Icons response:', response.data);
         
-        const iconList = response.data.icons || [];
+        // Map API response to ensure id field is populated from option_value_id
+        const iconList = (response.data.icons || []).map((icon: any) => ({
+          ...icon,
+          id: icon.option_value_id || icon.id // Use option_value_id if available, fallback to id
+        }));
         console.log(`Loaded ${iconList.length} icons`);
-        console.log('First 3 icons:', iconList.slice(0, 3));
+        console.log('First 3 icons (mapped with id):', iconList.slice(0, 3));
         
         setIcons(iconList);
         setFilteredIcons(iconList);
