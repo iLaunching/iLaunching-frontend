@@ -156,18 +156,10 @@ const IconPicker: React.FC<IconPickerProps> = ({
     
     setLoadingMore(true);
     try {
-      const nextPage = currentPage + 1;
-      console.log(`Loading more icons, page ${nextPage}...`);
+      const offset = icons.length;
+      console.log(`Loading more icons with offset ${offset}...`);
       
-      // Try pagination with different parameter formats
-      let response;
-      try {
-        response = await api.get(`/icons?page=${nextPage}`);
-      } catch (err) {
-        // If page parameter doesn't work, try offset
-        const offset = icons.length;
-        response = await api.get(`/icons?offset=${offset}`);
-      }
+      const response = await api.get(`/icons?offset=${offset}&limit=100`);
       
       const newIconList = (response.data.icons || []).map((icon: any) => ({
         ...icon,
@@ -175,7 +167,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
       }));
       
       if (newIconList.length > 0) {
-        console.log(`Loaded ${newIconList.length} more icons`);
+        console.log(`Loaded ${newIconList.length} more icons (total: ${icons.length + newIconList.length}/${totalIcons})`);
         
         // Filter out duplicates by checking existing icon IDs
         const existingIds = new Set(icons.map(icon => icon.id));
@@ -184,7 +176,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         if (uniqueNewIcons.length > 0) {
           setIcons(prev => [...prev, ...uniqueNewIcons]);
           setFilteredIcons(prev => [...prev, ...uniqueNewIcons]);
-          setCurrentPage(nextPage);
+          setCurrentPage(currentPage + 1);
           setHasMore(icons.length + uniqueNewIcons.length < totalIcons);
         } else {
           console.log('No new unique icons, stopping pagination');
