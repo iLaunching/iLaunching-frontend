@@ -48,11 +48,6 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
-  // Debug: Log currentIconId whenever it changes
-  useEffect(() => {
-    console.log('IconPicker currentIconId:', currentIconId, 'Type:', typeof currentIconId);
-  }, [currentIconId]);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle icon selection based on context
@@ -153,7 +148,10 @@ const IconPicker: React.FC<IconPickerProps> = ({
         .split('-')
         .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
         .join('');
-      const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
+      
+      // Handle single character names (0-9, a-z) - capitalize first char
+      const capitalizedCamelCase = camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+      const iconKey = `fa${capitalizedCamelCase}`;
 
       let iconDef: IconDefinition | undefined;
       
@@ -280,17 +278,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
                       const iconDef = getIconDefinition(icon);
                       if (!iconDef) return null;
 
-                      const isSelected = currentIconId === icon.id;
-                      
-                      // Debug logging (first 3 icons only)
-                      if (icon.id <= 3) {
-                        console.log(`Icon ${icon.id} (${icon.display_name}):`, {
-                          iconId: icon.id,
-                          currentIconId: currentIconId,
-                          isSelected: isSelected,
-                          comparison: `${currentIconId} === ${icon.id}`
-                        });
-                      }
+                      // Only mark as selected if currentIconId is defined and matches
+                      const isSelected = currentIconId !== undefined && currentIconId === icon.id;
 
                       return (
                         <button
