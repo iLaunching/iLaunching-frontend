@@ -108,6 +108,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         
         const iconList = response.data.icons || [];
         console.log(`Loaded ${iconList.length} icons`);
+        console.log('First 3 icons:', iconList.slice(0, 3));
         
         setIcons(iconList);
         setFilteredIcons(iconList);
@@ -290,7 +291,14 @@ const IconPicker: React.FC<IconPickerProps> = ({
                       return (
                         <button
                           key={icon.id}
-                          onClick={() => handleIconSelect(icon.id)}
+                          onClick={() => {
+                            console.log('Icon button clicked:', { 
+                              iconId: icon.id, 
+                              iconName: icon.display_name,
+                              iconObject: icon 
+                            });
+                            handleIconSelect(icon.id);
+                          }}
                           className="flex items-center justify-center rounded-md transition-all"
                           style={{
                             width: '40px',
