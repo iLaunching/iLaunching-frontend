@@ -103,8 +103,9 @@ const IconPicker: React.FC<IconPickerProps> = ({
       setLoading(true);
       try {
         console.log(`IconPicker opened from context: ${context}`);
-        console.log('Fetching icons from API...');
-        const response = await api.get('/icons');
+        console.log('Fetching all icons from API...');
+        // Request all icons by setting a high limit
+        const response = await api.get('/icons?limit=3000');
         console.log('Icons response:', response.data);
         
         // Map API response to ensure id field is populated from option_value_id
@@ -112,7 +113,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
           ...icon,
           id: icon.option_value_id || icon.id // Use option_value_id if available, fallback to id
         }));
-        console.log(`Loaded ${iconList.length} icons`);
+        console.log(`Loaded ${iconList.length} icons out of ${response.data.total || iconList.length} total`);
         console.log('First 3 icons (mapped with id):', iconList.slice(0, 3));
         
         setIcons(iconList);
@@ -201,7 +202,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         style={{
           backgroundColor: menuColor,
           width: '600px',
-          height: '400px',
+          height: '600px',
         }}
       >
         {/* Header */}
