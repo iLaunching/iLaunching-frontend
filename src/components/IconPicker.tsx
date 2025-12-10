@@ -201,7 +201,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         style={{
           backgroundColor: menuColor,
           width: '600px',
-          maxHeight: '700px',
+          height: '400px',
         }}
       >
         {/* Header */}
@@ -231,7 +231,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col gap-4 p-6 overflow-hidden">
+        <div className="flex flex-col gap-4 p-6 flex-1 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-12" style={{ color: textColor }}>
               Loading icons...
@@ -278,8 +278,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
                 ))}
               </div>
 
-              {/* Icon Grid */}
-              <div className="overflow-y-auto" style={{ maxHeight: '450px' }}>
+              {/* Icon Grid - Scrollable */}
+              <div className="overflow-y-auto flex-1">
                 {filteredIcons.length === 0 ? (
                   <div className="flex items-center justify-center py-12" style={{ color: textColor }}>
                     No icons found
