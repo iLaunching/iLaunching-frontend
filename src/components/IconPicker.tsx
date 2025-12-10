@@ -26,6 +26,8 @@ interface IconPickerProps {
   titleColor: string;
   globalButtonHover: string;
   context?: 'user-profile' | 'hub-settings' | 'other';
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
 const IconPicker: React.FC<IconPickerProps> = ({
@@ -38,12 +40,19 @@ const IconPicker: React.FC<IconPickerProps> = ({
   titleColor,
   globalButtonHover,
   context = 'user-profile',
+  toneButtonBkColor,
+  toneButtonTextColor,
 }) => {
   const [icons, setIcons] = useState<Icon[]>([]);
   const [filteredIcons, setFilteredIcons] = useState<Icon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Debug: Log currentIconId whenever it changes
+  useEffect(() => {
+    console.log('IconPicker currentIconId:', currentIconId, 'Type:', typeof currentIconId);
+  }, [currentIconId]);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle icon selection based on context
@@ -272,6 +281,16 @@ const IconPicker: React.FC<IconPickerProps> = ({
                       if (!iconDef) return null;
 
                       const isSelected = currentIconId === icon.id;
+                      
+                      // Debug logging (first 3 icons only)
+                      if (icon.id <= 3) {
+                        console.log(`Icon ${icon.id} (${icon.display_name}):`, {
+                          iconId: icon.id,
+                          currentIconId: currentIconId,
+                          isSelected: isSelected,
+                          comparison: `${currentIconId} === ${icon.id}`
+                        });
+                      }
 
                       return (
                         <button
@@ -281,11 +300,22 @@ const IconPicker: React.FC<IconPickerProps> = ({
                           style={{
                             width: '40px',
                             height: '40px',
-                            backgroundColor: isSelected ? globalButtonHover : 'transparent',
-                            border: isSelected ? `2px solid ${textColor}` : '2px solid transparent',
-                            color: textColor,
+                            backgroundColor: isSelected ? (toneButtonBkColor || globalButtonHover) : 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            color: isSelected ? (toneButtonTextColor || textColor) : textColor,
                           }}
                           title={icon.display_name}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.backgroundColor = globalButtonHover;
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                          }}
                         >
                           <FontAwesomeIcon icon={iconDef} size="lg" />
                         </button>

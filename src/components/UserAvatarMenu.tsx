@@ -224,6 +224,8 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         titleColor={titleColor}
         globalButtonHover={globalButtonHover}
         context="user-profile"
+        toneButtonBkColor={toneButtonBkColor}
+        toneButtonTextColor={toneButtonTextColor}
       />
     </div>
   );
