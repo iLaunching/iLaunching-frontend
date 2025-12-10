@@ -122,14 +122,18 @@ const IconPicker: React.FC<IconPickerProps> = ({
     const fetchIcons = async () => {
       if (!isOpen) return;
       
-      setLoading(true);
+      // Only show loading spinner on initial open (when there are no icons yet)
+      const isInitialLoad = icons.length === 0;
+      if (isInitialLoad) {
+        setLoading(true);
+      }
+      
       setCurrentPage(1);
-      setIcons([]);
-      setFilteredIcons([]);
+      setHasMore(true);
       
       try {
         console.log(`IconPicker opened from context: ${context}`);
-        console.log('Fetching initial icons from API...');
+        console.log('Fetching icons from API...');
         
         // Build query params based on filters
         const params = new URLSearchParams();
@@ -166,6 +170,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         
         console.log(`Loaded ${iconList.length} icons`);
         
+        // Replace icons with new filtered results
         setIcons(iconList);
         setFilteredIcons(iconList);
         setTotalIcons(response.data.total || iconList.length);
@@ -177,7 +182,9 @@ const IconPicker: React.FC<IconPickerProps> = ({
         setTotalIcons(0);
         setHasMore(false);
       } finally {
-        setLoading(false);
+        if (isInitialLoad) {
+          setLoading(false);
+        }
       }
     };
 
