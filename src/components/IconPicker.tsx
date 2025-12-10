@@ -134,22 +134,35 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
   const getIconDefinition = (icon: Icon): IconDefinition | null => {
     try {
+      // Remove 'fa-' prefix if present
+      const cleanName = icon.icon_name.startsWith('fa-') 
+        ? icon.icon_name.slice(3) 
+        : icon.icon_name;
+      
       // Convert kebab-case to camelCase and add 'fa' prefix
-      const camelCase = icon.icon_name
+      const camelCase = cleanName
         .split('-')
         .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
         .join('');
       const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
 
+      let iconDef: IconDefinition | undefined;
+      
       if (icon.icon_prefix === 'fas') {
-        return solidIcons[iconKey as keyof typeof solidIcons] as IconDefinition;
+        iconDef = solidIcons[iconKey as keyof typeof solidIcons] as IconDefinition;
       } else if (icon.icon_prefix === 'far') {
-        return regularIcons[iconKey as keyof typeof regularIcons] as IconDefinition;
+        iconDef = regularIcons[iconKey as keyof typeof regularIcons] as IconDefinition;
       } else if (icon.icon_prefix === 'fab') {
-        return brandIcons[iconKey as keyof typeof brandIcons] as IconDefinition;
+        iconDef = brandIcons[iconKey as keyof typeof brandIcons] as IconDefinition;
       }
+      
+      if (!iconDef) {
+        console.warn(`Icon not found: ${icon.icon_name} -> ${iconKey} (prefix: ${icon.icon_prefix})`);
+      }
+      
+      return iconDef || null;
     } catch (error) {
-      console.warn(`Icon not found: ${icon.icon_name}`);
+      console.error(`Error loading icon: ${icon.icon_name}`, error);
     }
     return null;
   };
@@ -248,39 +261,36 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
               {/* Icon Grid */}
               <div className="overflow-y-auto" style={{ maxHeight: '450px' }}>
-                <div className="grid grid-cols-10 gap-2">
-                  {filteredIcons.map((icon) => {
-                    const iconDef = getIconDefinition(icon);
-                    if (!iconDef) return null;
-
-                    const isSelected = currentIconId === icon.id;
-
-                    return (
-                      <button
-                        key={icon.id}
-                        onClick={() => handleIconSelect(icon.id)}
-                        className="flex items-center justify-center rounded-md transition-all"
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          backgroundColor: isSelected ? globalButtonHover : 'transparent',
-                          border: isSelected ? `2px solid ${textColor}` : '2px solid transparent',
-                          color: textColor,
-                        }}
-                        title={icon.display_name}
-                      >
-                        <FontAwesomeIcon icon={iconDef} size="lg" />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {filteredIcons.length === 0 && (
-                  <div
-                    className="text-center py-12 text-sm"
-                    style={{ color: textColor, fontFamily: 'Work Sans, sans-serif' }}
-                  >
+                {filteredIcons.length === 0 ? (
+                  <div className="flex items-center justify-center py-12" style={{ color: textColor }}>
                     No icons found
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-10 gap-2">
+                    {filteredIcons.map((icon) => {
+                      const iconDef = getIconDefinition(icon);
+                      if (!iconDef) return null;
+
+                      const isSelected = currentIconId === icon.id;
+
+                      return (
+                        <button
+                          key={icon.id}
+                          onClick={() => handleIconSelect(icon.id)}
+                          className="flex items-center justify-center rounded-md transition-all"
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: isSelected ? globalButtonHover : 'transparent',
+                            border: isSelected ? `2px solid ${textColor}` : '2px solid transparent',
+                            color: textColor,
+                          }}
+                          title={icon.display_name}
+                        >
+                          <FontAwesomeIcon icon={iconDef} size="lg" />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
