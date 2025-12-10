@@ -49,6 +49,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalIcons, setTotalIcons] = useState(0);
@@ -62,6 +63,15 @@ const IconPicker: React.FC<IconPickerProps> = ({
   const ICON_SIZE = 44; // 40px + 4px gap
   const CONTAINER_HEIGHT = 350; // Visible area height
   const OVERSCAN = 2; // Extra rows to render above/below viewport
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Handle icon selection based on context
   const handleIconSelect = (iconId: number) => {
@@ -140,8 +150,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
         }
         
         // Add search if present
-        if (searchQuery) {
-          params.append('search', searchQuery);
+        if (debouncedSearchQuery) {
+          params.append('search', debouncedSearchQuery);
         }
         
         const response = await api.get(`/icons?${params.toString()}`);
@@ -172,7 +182,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
     };
 
     fetchIcons();
-  }, [isOpen, context, selectedCategory, searchQuery]);
+  }, [isOpen, context, selectedCategory, debouncedSearchQuery]);
 
   // Load more icons when scrolling
   const loadMoreIcons = useCallback(async () => {
@@ -202,8 +212,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
       }
       
       // Add search if present
-      if (searchQuery) {
-        params.append('search', searchQuery);
+      if (debouncedSearchQuery) {
+        params.append('search', debouncedSearchQuery);
       }
       
       const response = await api.get(`/icons?${params.toString()}`);
@@ -239,7 +249,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
     } finally {
       setLoadingMore(false);
     }
-  }, [loadingMore, hasMore, currentPage, icons.length, totalIcons, searchQuery, selectedCategory]);
+  }, [loadingMore, hasMore, currentPage, icons.length, totalIcons, debouncedSearchQuery, selectedCategory]);
 
   // Calculate visible range for virtualization
   const totalRows = Math.ceil(filteredIcons.length / COLUMN_COUNT);
