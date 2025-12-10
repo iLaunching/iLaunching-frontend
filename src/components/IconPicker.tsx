@@ -208,9 +208,19 @@ const IconPicker: React.FC<IconPickerProps> = ({
   useEffect(() => {
     let filtered = icons;
 
-    // Filter by category
+    // Filter by category (maps to icon_prefix)
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(icon => icon.icon_category === selectedCategory);
+      // Map category names to icon prefixes
+      const prefixMap: { [key: string]: string } = {
+        'solid': 'fas',
+        'regular': 'far',
+        'brands': 'fab'
+      };
+      const targetPrefix = prefixMap[selectedCategory];
+      
+      if (targetPrefix) {
+        filtered = filtered.filter(icon => icon.icon_prefix === targetPrefix);
+      }
     }
 
     // Filter by search query
