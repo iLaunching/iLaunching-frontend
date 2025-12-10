@@ -176,10 +176,20 @@ const IconPicker: React.FC<IconPickerProps> = ({
       
       if (newIconList.length > 0) {
         console.log(`Loaded ${newIconList.length} more icons`);
-        setIcons(prev => [...prev, ...newIconList]);
-        setFilteredIcons(prev => [...prev, ...newIconList]);
-        setCurrentPage(nextPage);
-        setHasMore(icons.length + newIconList.length < totalIcons);
+        
+        // Filter out duplicates by checking existing icon IDs
+        const existingIds = new Set(icons.map(icon => icon.id));
+        const uniqueNewIcons = newIconList.filter((icon: Icon) => !existingIds.has(icon.id));
+        
+        if (uniqueNewIcons.length > 0) {
+          setIcons(prev => [...prev, ...uniqueNewIcons]);
+          setFilteredIcons(prev => [...prev, ...uniqueNewIcons]);
+          setCurrentPage(nextPage);
+          setHasMore(icons.length + uniqueNewIcons.length < totalIcons);
+        } else {
+          console.log('No new unique icons, stopping pagination');
+          setHasMore(false);
+        }
       } else {
         console.log('No more icons to load');
         setHasMore(false);
@@ -229,13 +239,33 @@ const IconPicker: React.FC<IconPickerProps> = ({
         ? icon.icon_name.slice(3) 
         : icon.icon_name;
       
+      // Handle numeric icons (0-9) - they're just "fa0", "fa1", etc.
+      if (/^\d+$/.test(cleanName)) {
+        const iconKey = `fa${cleanName}`;
+        let iconDef: IconDefinition | undefined;
+        
+        if (icon.icon_prefix === 'fas') {
+          iconDef = solidIcons[iconKey as keyof typeof solidIcons] as IconDefinition;
+        } else if (icon.icon_prefix === 'far') {
+          iconDef = regularIcons[iconKey as keyof typeof regularIcons] as IconDefinition;
+        } else if (icon.icon_prefix === 'fab') {
+          iconDef = brandIcons[iconKey as keyof typeof brandIcons] as IconDefinition;
+        }
+        
+        if (!iconDef) {
+          console.warn(`Icon not found: ${icon.icon_name} -> ${iconKey} (prefix: ${icon.icon_prefix})`);
+        }
+        
+        return iconDef || null;
+      }
+      
       // Convert kebab-case to camelCase and add 'fa' prefix
       const camelCase = cleanName
         .split('-')
         .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
         .join('');
       
-      // Handle single character names (0-9, a-z) - capitalize first char
+      // Capitalize first char
       const capitalizedCamelCase = camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
       const iconKey = `fa${capitalizedCamelCase}`;
 
@@ -386,15 +416,18 @@ const IconPicker: React.FC<IconPickerProps> = ({
                         right: 0,
                       }}
                     >
-                      {visibleIcons.map((icon) => {
+                      {visibleIcons.map((icon, index) => {
                         const iconDef = getIconDefinition(icon);
                         if (!iconDef) return null;
 
                         const isSelected = currentIconId !== undefined && currentIconId === icon.id;
+                        // Use combination of id and original index for unique key
+                        const actualIndex = startRow * COLUMN_COUNT + index;
+                        const uniqueKey = `icon-${icon.id}-${actualIndex}`;
 
                         return (
                           <button
-                            key={icon.id}
+                            key={uniqueKey}
                             onClick={() => {
                               console.log('Icon button clicked:', { 
                                 iconId: icon.id, 
