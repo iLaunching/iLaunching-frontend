@@ -26,6 +26,8 @@ interface UserMenuButtonProps {
   avatarDisplayMode?: number;
   onProfileIconChange: (iconId: number) => void;
   onClearIcon: () => void;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
 export default function UserMenuButton({
@@ -47,9 +49,13 @@ export default function UserMenuButton({
   profileIconPrefix,
   avatarDisplayMode = 24,
   onProfileIconChange,
-  onClearIcon
+  onClearIcon,
+  toneButtonBkColor,
+  toneButtonTextColor,
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  console.log('UserMenuButton - avatarDisplayMode:', avatarDisplayMode, 'profileIconId:', profileIconId, 'profileIconName:', profileIconName);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -71,13 +77,15 @@ export default function UserMenuButton({
     }
     
     try {
-      // Convert kebab-case to camelCase and add 'fa' prefix
-      const camelCase = profileIconName
+      // Remove 'fa-' prefix if present, then convert kebab-case to camelCase and add 'fa' prefix
+      const cleanName = profileIconName.startsWith('fa-') ? profileIconName.slice(3) : profileIconName;
+      const camelCase = cleanName
         .split('-')
         .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
         .join('');
       const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
 
+      console.log('getIconDefinition:', { profileIconName, cleanName, camelCase, iconKey });
       return solidIcons[iconKey as keyof typeof solidIcons] as IconDefinition;
     } catch (error) {
       console.warn(`Icon not found: ${profileIconName}`);
@@ -345,6 +353,8 @@ export default function UserMenuButton({
           onIconChange={onProfileIconChange}
           onClearIcon={onClearIcon}
           borderLineColor={borderLineColor}
+          toneButtonBkColor={toneButtonBkColor}
+          toneButtonTextColor={toneButtonTextColor}
         />
       </div>
     )}

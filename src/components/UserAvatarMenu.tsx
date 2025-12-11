@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react';
 import api from '@/lib/api';
 import IconPickerMini from './IconPickerMini';
 import IconPicker from './IconPicker';
+import AvatarImageUploader from './AvatarImageUploader';
 
 interface ColorOption {
   option_value_id: number;
@@ -24,12 +25,24 @@ interface UserAvatarMenuProps {
   onIconChange: (iconId: number) => void;
   onClearIcon: () => void;
   borderLineColor: string;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
+
+  // Wrapper to log icon changes
+  const handleIconChange = (iconId: number) => {
+    console.log('=== UserAvatarMenu handleIconChange CALLED ===');
+    console.log('Icon ID received:', iconId);
+    console.log('Calling parent onIconChange callback');
+    onIconChange(iconId);
+    console.log('=== UserAvatarMenu handleIconChange COMPLETED ===');
+  };
 
   useEffect(() => {
     console.log('UserAvatarMenu mounted');
@@ -150,11 +163,13 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         <div style={{ padding: '5px' }}>
           <IconPickerMini
             currentIconId={currentIconId}
-            onIconSelect={onIconChange}
+            onIconSelect={handleIconChange}
             onMoreClick={() => setIsIconPickerOpen(true)}
             onClearIcon={onClearIcon}
             textColor={textColor}
             globalButtonHover={globalButtonHover}
+            toneButtonBkColor={toneButtonBkColor}
+            toneButtonTextColor={toneButtonTextColor}
           />
         </div>
       </div>
@@ -181,6 +196,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         }}
       >
         <button
+          onClick={() => setIsAvatarUploaderOpen(true)}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = globalButtonHover;
           }}
@@ -214,11 +230,38 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         isOpen={isIconPickerOpen}
         onClose={() => setIsIconPickerOpen(false)}
         currentIconId={currentIconId}
-        onIconSelect={onIconChange}
+        onIconSelect={handleIconChange}
         textColor={textColor}
         menuColor={menuColor}
         titleColor={titleColor}
         globalButtonHover={globalButtonHover}
+        context="user-profile"
+        toneButtonBkColor={toneButtonBkColor}
+        toneButtonTextColor={toneButtonTextColor}
+      />
+      
+      {/* Avatar Image Uploader Modal */}
+      <AvatarImageUploader
+        isOpen={isAvatarUploaderOpen}
+        onClose={() => setIsAvatarUploaderOpen(false)}
+        onUpload={async (file) => {
+          try {
+            console.log('Uploading avatar:', file);
+            // TODO: Implement backend upload
+            // const formData = new FormData();
+            // formData.append('avatar', file);
+            // await api.post('/profile/avatar', formData);
+            setIsAvatarUploaderOpen(false);
+          } catch (error) {
+            console.error('Failed to upload avatar:', error);
+          }
+        }}
+        textColor={textColor}
+        menuColor={menuColor}
+        titleColor={titleColor}
+        globalButtonHover={globalButtonHover}
+        toneButtonBkColor={toneButtonBkColor}
+        toneButtonTextColor={toneButtonTextColor}
       />
     </div>
   );

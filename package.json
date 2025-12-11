@@ -55,6 +55,7 @@
     "@tiptap/suggestion": "^3.10.7",
     "@types/prismjs": "^1.26.5",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@types/react-window": "^2.0.0",
     "axios": "^1.6.7",
     "i18next": "^25.6.3",
     "i18next-browser-languagedetector": "^8.2.0",
@@ -69,6 +70,7 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.0",
     "react-syntax-highlighter": "^16.1.0",
+    "react-window": "^2.2.3",
     "socket.io-client": "^4.7.4",
     "zod": "^3.22.4",
     "zustand": "^4.5.0"

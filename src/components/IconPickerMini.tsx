@@ -47,6 +47,8 @@ interface IconPickerMiniProps {
   onClearIcon: () => void;
   textColor: string;
   globalButtonHover: string;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
 }
 
 // Pre-defined 35 popular icons with their IDs (will be mapped from API)
@@ -97,6 +99,8 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
   onClearIcon,
   textColor,
   globalButtonHover,
+  toneButtonBkColor,
+  toneButtonTextColor,
 }) => {
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -116,7 +120,8 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
                   width: '28px',
                   height: '28px',
                   backgroundColor: 'transparent',
-                  border: '2px solid transparent',
+                  border: 'none',
+                  outline: 'none',
                   color: textColor,
                 }}
                 title="Clear Icon"
@@ -141,9 +146,10 @@ const IconPickerMini: React.FC<IconPickerMiniProps> = ({
               style={{
                 width: '28px',
                 height: '28px',
-                backgroundColor: isSelected ? globalButtonHover : 'transparent',
-                border: isSelected ? `2px solid ${textColor}` : '2px solid transparent',
-                color: textColor,
+                backgroundColor: isSelected ? (toneButtonBkColor || globalButtonHover) : 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: isSelected ? (toneButtonTextColor || textColor) : textColor,
               }}
               title={item.name}
               onMouseEnter={(e) => {

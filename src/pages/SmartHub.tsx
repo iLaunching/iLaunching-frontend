@@ -29,6 +29,8 @@ interface SmartHubData {
     title_menu_color_light: string;
     border_line_color_light: string;
     global_button_hover: string;
+    tone_button_bk_color?: string;
+    tone_button_text_color?: string;
   } | null;
   profile: {
     id: string;
@@ -149,8 +151,11 @@ export default function SmartHub() {
   });
 
   const handleProfileIconChange = (iconId: number) => {
+    console.log('=== SmartHub handleProfileIconChange CALLED ===');
     console.log('Changing profile icon to:', iconId);
+    console.log('Calling updateProfileIconMutation.mutate with iconId:', iconId);
     updateProfileIconMutation.mutate(iconId);
+    console.log('=== SmartHub handleProfileIconChange COMPLETED ===');
   };
 
   // Mutation to clear profile icon
@@ -243,6 +248,8 @@ export default function SmartHub() {
     global_button_hover: '#d6d6d64d'
   };
   
+  console.log('SmartHub - avatar display mode:', hubData?.profile?.avatar_display_option_value_id, 'icon:', hubData?.profile?.profile_icon);
+  
   return (
     <div 
       className="min-h-screen"
@@ -275,6 +282,8 @@ export default function SmartHub() {
         avatarDisplayMode={hubData.profile.avatar_display_option_value_id || 24}
         onProfileIconChange={handleProfileIconChange}
         onClearIcon={handleClearIcon}
+        toneButtonBkColor={theme.tone_button_bk_color}
+        toneButtonTextColor={theme.tone_button_text_color}
       />
     </div>
   );
