@@ -373,52 +373,53 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
         {/* Content */}
         <div className="flex flex-col gap-4 p-6 flex-1 overflow-hidden">
+          {/* Search Bar - Always visible */}
+          <div className="relative">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2"
+              style={{ color: textColor }}
+            />
+            <input
+              type="text"
+              placeholder="Search icons..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 rounded-lg border-0 outline-none"
+              style={{
+                backgroundColor: `${textColor}10`,
+                color: textColor,
+                fontSize: '14px',
+                fontFamily: 'Work Sans, sans-serif',
+              }}
+            />
+          </div>
+
+          {/* Category Tabs - Always visible */}
+          <div className="flex gap-2">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className="px-4 py-2 rounded-md transition-colors capitalize text-sm font-medium"
+                style={{
+                  backgroundColor: selectedCategory === category ? globalButtonHover : 'transparent',
+                  color: textColor,
+                  fontFamily: 'Work Sans, sans-serif',
+                }}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* Icon Grid - Only this area shows loading */}
           {loading ? (
-            <div className="flex items-center justify-center py-12" style={{ color: textColor }}>
+            <div className="flex items-center justify-center flex-1" style={{ color: textColor }}>
               Loading icons...
             </div>
           ) : (
             <>
-              {/* Search Bar */}
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                  style={{ color: textColor }}
-                />
-                <input
-                  type="text"
-                  placeholder="Search icons..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 rounded-lg border-0 outline-none"
-                  style={{
-                    backgroundColor: `${textColor}10`,
-                    color: textColor,
-                    fontSize: '14px',
-                    fontFamily: 'Work Sans, sans-serif',
-                  }}
-                />
-              </div>
-
-              {/* Category Tabs */}
-              <div className="flex gap-2">
-                {categories.map(category => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className="px-4 py-2 rounded-md transition-colors capitalize text-sm font-medium"
-                    style={{
-                      backgroundColor: selectedCategory === category ? globalButtonHover : 'transparent',
-                      color: textColor,
-                      fontFamily: 'Work Sans, sans-serif',
-                    }}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-
               {/* Icon Grid - Virtualized Infinite Scroll */}
               <div 
                 ref={scrollContainerRef}
