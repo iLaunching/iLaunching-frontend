@@ -352,9 +352,9 @@ const IconPicker: React.FC<IconPickerProps> = ({
         >
           <h3
             className="text-lg font-semibold"
-            style={{ color: titleColor, fontFamily: 'Work Sans, sans-serif' }}
+            style={{ color: textColor, fontFamily: 'Work Sans, sans-serif' }}
           >
-            Select Icon
+            Icon Library
           </h3>
           <button
             onClick={onClose}

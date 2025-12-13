@@ -11,6 +11,7 @@ interface AvatarImageUploaderProps {
   globalButtonHover: string;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  toneButtonBorderColor?: string;
   backgroundColor?: string;
   solidColor?: string;
   feedbackIndicatorBk?: string;
@@ -30,6 +31,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   globalButtonHover,
   toneButtonBkColor,
   toneButtonTextColor,
+  toneButtonBorderColor,
   backgroundColor,
   solidColor,
   feedbackIndicatorBk,
@@ -552,17 +554,19 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
               <div className="flex gap-3 mt-6 pl-6 pr-6 pb-6">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6  rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: `${textColor}10`,
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${toneButtonBorderColor || toneButtonTextColor || textColor}`,
+                    color: toneButtonTextColor || textColor,
+                    fontFamily: 'Work Sans, sans-serif',
+                    height: '40px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}20`;
+                    e.currentTarget.style.backgroundColor = `${toneButtonBorderColor || toneButtonTextColor || textColor}10`;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}10`;
+                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
                   <X className="w-5 h-5" />
