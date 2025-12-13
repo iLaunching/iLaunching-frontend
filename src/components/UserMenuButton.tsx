@@ -291,6 +291,36 @@ export default function UserMenuButton({
                 </div>
               }
             />
+            
+            {/* Set Status Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: `1px solid ${borderLineColor}`,
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '35px',
+                borderRadius: '6px',
+                padding: '0 12px',
+                marginTop: '8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement set status functionality
+                console.log('Set status clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faCircle} style={{ fontSize: '10px' }} />
+              Set status
+            </button>
           </div>
 
           {/* Section 2: Config */}
@@ -319,8 +349,8 @@ export default function UserMenuButton({
             <h3
               style={{
                 fontFamily: 'Work Sans, sans-serif',
-                fontSize: '12px',
-                fontWeight: 600,
+                fontSize: '13px',
+                fontWeight: 400,
                 marginBottom: '12px',
                 color: titleColor
               }}
