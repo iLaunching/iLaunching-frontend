@@ -224,7 +224,14 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         if (blob) {
           const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
           onUpload(file);
-          handleCancel();
+          // Reset state and close modal
+          setImageSrc(null);
+          setPosition({ x: 0, y: 0 });
+          setZoom(1);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          onClose();
         }
       }, 'image/jpeg', 0.95);
     }
