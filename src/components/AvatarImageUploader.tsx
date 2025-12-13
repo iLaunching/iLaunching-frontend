@@ -126,8 +126,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         // Calculate zoom so the smaller dimension fills the circle
         const initialZoom = circleDiameter / smallerDimension;
         
-        setCroppedImage(null);
-        setCroppedBlob(null);
         setPosition({ x: 0, y: 0 });
         setZoom(initialZoom);
       };
@@ -373,7 +371,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
             </div>
           )}
 
-          {imageSrc && !croppedImage && (
+          {imageSrc && (
             <div>
               <div 
                 ref={containerRef}
