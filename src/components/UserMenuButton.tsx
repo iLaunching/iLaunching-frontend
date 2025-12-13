@@ -188,7 +188,7 @@ export default function UserMenuButton({
             minHeight: '400px',
             height: 'fit-content',
             backgroundColor: menuColor,
-            borderRadius: '8px',
+            borderRadius: '10px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             zIndex: 9999,
             overflow: 'visible'
@@ -291,6 +291,69 @@ export default function UserMenuButton({
                 </div>
               }
             />
+            
+            {/* Set Status Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: `1px solid ${borderLineColor}`,
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                marginTop: '10px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement set status functionality
+                console.log('Set status clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faComment} style={{ fontSize: '10px' }} />
+              Set status
+            </button>
+            
+            {/* Mute Notifications Button */}
+            <button
+              className="flex items-center justify-between w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                marginTop: '6px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement mute notifications functionality
+                console.log('Mute notifications clicked');
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={solidIcons.faBell} style={{ fontSize: '14px' }} />
+                <span>Mute notifications</span>
+              </div>
+              <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
+            </button>
           </div>
 
           {/* Section 2: Config */}
@@ -299,11 +362,96 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
+              padding: '8px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
-            {/* Config content will go here */}
+            {/* Settings Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement settings functionality
+                console.log('Settings clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
+              <span>Settings</span>
+            </button>
+            
+            {/* Theme Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement theme functionality
+                console.log('Theme clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faPalette} style={{ fontSize: '14px' }} />
+              <span>Theme</span>
+            </button>
+            
+            {/* Help Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement help functionality
+                console.log('Help clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faCircleQuestion} style={{ fontSize: '14px' }} />
+              <span>Help</span>
+            </button>
           </div>
 
           {/* Section 3: Personal Tools */}
@@ -312,22 +460,134 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
+              padding: '8px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
             <h3
               style={{
                 fontFamily: 'Work Sans, sans-serif',
-                fontSize: '12px',
-                fontWeight: 600,
-                marginBottom: '12px',
+                fontSize: '13px',
+                fontWeight: 400,
+                marginBottom: '10px',
+                marginLeft: '5px',
                 color: titleColor
               }}
             >
               Personal tools
             </h3>
-            {/* Personal tools content will go here */}
+            
+            {/* Note Pad Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Note Pad clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faNoteSticky} style={{ fontSize: '14px' }} />
+              <span>Note Pad</span>
+            </button>
+
+            {/* Record a clip Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Record a clip clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faVideo} style={{ fontSize: '14px' }} />
+              <span>Record a clip</span>
+            </button>
+
+            {/* Create reminder Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Create reminder clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faBell} style={{ fontSize: '14px' }} />
+              <span>Create reminder</span>
+            </button>
+
+            {/* View people Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('View people clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faUsers} style={{ fontSize: '14px' }} />
+              <span>View people</span>
+            </button>
           </div>
 
           {/* Section 4: Account */}
@@ -336,10 +596,64 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px'
+              padding: '8px'
             }}
           >
-            {/* Account content will go here */}
+            {/* Trash Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Trash clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faTrash} style={{ fontSize: '14px' }} />
+              <span>Trash</span>
+            </button>
+
+            {/* Log out Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Log out clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faRightFromBracket} style={{ fontSize: '14px' }} />
+              <span>Log out</span>
+            </button>
           </div>
         </div>
       )}

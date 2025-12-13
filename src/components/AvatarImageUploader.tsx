@@ -272,7 +272,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <h1 
-                className="text-xl font-semibold flex items-center gap-2"
+                className="text-xl font-semimedium flex items-center gap-2"
                 style={{ 
                   color: textColor,
                   fontFamily: 'Work Sans, sans-serif'
