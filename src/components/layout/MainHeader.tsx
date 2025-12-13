@@ -26,6 +26,8 @@ interface MainHeaderProps {
   onClearIcon?: () => void;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  feedbackIndicatorBk?: string;
+  appearanceTextColor?: string;
 }
 
 export default function MainHeader({ 
@@ -54,6 +56,8 @@ export default function MainHeader({
   onClearIcon = () => {},
   toneButtonBkColor,
   toneButtonTextColor,
+  feedbackIndicatorBk,
+  appearanceTextColor,
 }: MainHeaderProps) {
   return (
     <header 
@@ -99,6 +103,9 @@ export default function MainHeader({
           onClearIcon={onClearIcon}
           toneButtonBkColor={toneButtonBkColor}
           toneButtonTextColor={toneButtonTextColor}
+          headerBackgroundColor={headerBackgroundColor}
+          feedbackIndicatorBk={feedbackIndicatorBk}
+          appearanceTextColor={appearanceTextColor}
         />
       </div>
       <div 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Check, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Upload, Check, X, ZoomIn, ZoomOut, ScissorsLineDashed } from 'lucide-react';
 
 interface AvatarImageUploaderProps {
   isOpen: boolean;
@@ -11,6 +11,10 @@ interface AvatarImageUploaderProps {
   globalButtonHover: string;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  backgroundColor?: string;
+  solidColor?: string;
+  feedbackIndicatorBk?: string;
+  appearanceTextColor?: string;
 }
 
 const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
@@ -23,6 +27,10 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   globalButtonHover,
   toneButtonBkColor,
   toneButtonTextColor,
+  backgroundColor,
+  solidColor,
+  feedbackIndicatorBk,
+  appearanceTextColor,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -31,6 +39,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false);
   
   const modalRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -92,21 +101,15 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
           setImageSize({ width: img.width, height: img.height });
         }
         
-        // Calculate initial zoom to fit image in container while maintaining aspect ratio
+        // Calculate initial zoom to fill the circular crop area while maintaining aspect ratio
         const containerSize = 384; // Height of the crop container
-        const imageAspectRatio = (width || img.width) / (height || img.height);
-        let initialZoom;
+        const circleDiameter = containerSize * 0.9; // Circle is 90% of container (45% radius * 2)
+        const finalWidth = width || img.width;
+        const finalHeight = height || img.height;
+        const smallerDimension = Math.min(finalWidth, finalHeight);
         
-        if (imageAspectRatio > 1) {
-          // Landscape image - fit by height
-          initialZoom = containerSize / (height || img.height);
-        } else {
-          // Portrait or square image - fit by width
-          initialZoom = containerSize / (width || img.width);
-        }
-        
-        // Ensure the image covers at least the crop circle
-        initialZoom = Math.max(initialZoom, 1);
+        // Calculate zoom so the smaller dimension fills the circle
+        const initialZoom = circleDiameter / smallerDimension;
         
         setCroppedImage(null);
         setCroppedBlob(null);
@@ -259,13 +262,14 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <h1 
-                className="text-2xl font-bold"
+                className="text-xl font-semibold flex items-center gap-2"
                 style={{ 
-                  color: titleColor,
+                  color: textColor,
                   fontFamily: 'Work Sans, sans-serif'
                 }}
               >
-                Avatar Uploader
+                <Upload size={35} style={{ color: textColor, border: '1px solid', borderRadius: '5px', padding: '4px', borderColor: titleColor }} strokeWidth={2} />
+                Change your avatar
               </h1>
               <p 
                 className="mt-1 text-sm"
@@ -275,7 +279,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   fontFamily: 'Work Sans, sans-serif'
                 }}
               >
-                Upload and crop your profile picture
+                
               </p>
             </div>
             <button
@@ -302,15 +306,16 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 100px)' }}>
+        <div className=" overflow-y-auto" style={{ maxHeight: 'calc(90vh - 100px)' }}>
           {!imageSrc && !croppedImage && (
             <div className="text-center">
               <label className="cursor-pointer">
                 <div 
-                  className="border-2 border-dashed rounded-2xl p-12 transition-colors"
+                  className=" p-12 transition-colors"
                   style={{ 
                     borderColor: `${textColor}40`,
-                    backgroundColor: `${textColor}05`
+                    backgroundColor: `${textColor}05`,
+                    
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = toneButtonBkColor || globalButtonHover;
@@ -342,7 +347,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                       fontFamily: 'Work Sans, sans-serif'
                     }}
                   >
-                    Any size image accepted • Auto-resized for optimal performance
+                    
                   </p>
                 </div>
                 <input
@@ -360,7 +365,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
             <div>
               <div 
                 ref={containerRef}
-                className="relative rounded-xl overflow-hidden cursor-move"
+                className="relative overflow-hidden cursor-move"
                 style={{ 
                   height: '384px',
                   backgroundColor: '#1a1a1a'
@@ -378,7 +383,9 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     left: `calc(50% + ${position.x}px)`,
                     top: `calc(50% + ${position.y}px)`,
                     transform: 'translate(-50%, -50%)',
-                    pointerEvents: 'none'
+                    pointerEvents: 'none',
+                    maxWidth: 'none',
+                    maxHeight: 'none'
                   }}
                 />
                 <div className="absolute inset-0 pointer-events-none">
@@ -413,7 +420,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 pl-6 pr-6">
                 <label 
                   className="block text-sm font-medium mb-2 flex items-center justify-center gap-2"
                   style={{ 
@@ -425,19 +432,95 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   Zoom
                   <ZoomIn className="w-4 h-4" />
                 </label>
+                <div className="relative">
+                  {/* Zoom Percentage Indicator */}
+                  <div 
+                    className="absolute -top-10 transition-all duration-200"
+                    style={{
+                      left: `${((zoom - 0.2) / (3 - 0.2)) * 100}%`,
+                      transform: 'translateX(-50%)',
+                      opacity: showZoomIndicator ? 1 : 0,
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <div 
+                      className="px-3 py-1.5 rounded-lg font-semibold text-sm shadow-lg"
+                      style={{
+                        backgroundColor: feedbackIndicatorBk || backgroundColor || menuColor,
+                        color: appearanceTextColor || textColor,
+                        fontFamily: 'Work Sans, sans-serif'
+                      }}
+                    >
+                      {Math.round(zoom * 100)}%
+                    </div>
+                    {/* Arrow pointing down */}
+                    <div 
+                      className="absolute left-1/2 transform -translate-x-1/2 w-0 h-0"
+                      style={{
+                        borderLeft: '6px solid transparent',
+                        borderRight: '6px solid transparent',
+                        borderTop: `6px solid ${feedbackIndicatorBk || backgroundColor || menuColor}`,
+                        bottom: '-6px'
+                      }}
+                    />
+                  </div>
+                  
+                <style>{`
+                  .custom-zoom-slider {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 100%;
+                    height: 4px;
+                    border-radius: 2px;
+                    outline: none;
+                  }
+                  .custom-zoom-slider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: ${backgroundColor || menuColor};
+                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                  }
+                  .custom-zoom-slider::-webkit-slider-thumb:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+                  }
+                  .custom-zoom-slider::-moz-range-thumb {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: ${backgroundColor || menuColor};
+                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+                  }
+                  .custom-zoom-slider::-moz-range-thumb:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+                  }
+                `}</style>
                 <input
                   type="range"
-                  min={0.5}
+                  min={0.2}
                   max={3}
                   step={0.1}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  onMouseDown={() => setShowZoomIndicator(true)}
+                  onMouseUp={() => setShowZoomIndicator(false)}
+                  onMouseLeave={() => setShowZoomIndicator(false)}
+                  className="custom-zoom-slider"
                   style={{
-                    backgroundColor: `${textColor}20`,
-                    accentColor: toneButtonBkColor || globalButtonHover
+                    backgroundColor: `${textColor}20`
                   }}
                 />
+                </div>
               </div>
 
               <p 
@@ -451,7 +534,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                 Drag to reposition • Use slider to zoom
               </p>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-6 pl-6 pr-6 pb-6">
                 <button
                   onClick={handleCancel}
                   className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"

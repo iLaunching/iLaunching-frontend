@@ -27,9 +27,13 @@ interface UserAvatarMenuProps {
   borderLineColor: string;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  backgroundColor?: string;
+  solidColor?: string;
+  feedbackIndicatorBk?: string;
+  appearanceTextColor?: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -262,6 +266,10 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         globalButtonHover={globalButtonHover}
         toneButtonBkColor={toneButtonBkColor}
         toneButtonTextColor={toneButtonTextColor}
+        backgroundColor={backgroundColor}
+        solidColor={solidColor}
+        feedbackIndicatorBk={feedbackIndicatorBk}
+        appearanceTextColor={appearanceTextColor}
       />
     </div>
   );
