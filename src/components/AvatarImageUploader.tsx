@@ -319,7 +319,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
 
         {/* Content */}
         <div className=" overflow-y-auto" style={{ maxHeight: 'calc(90vh - 100px)' }}>
-          {!imageSrc && !croppedImage && (
+          {!imageSrc && (
             <div className="text-center">
               <label className="cursor-pointer">
                 <div 
