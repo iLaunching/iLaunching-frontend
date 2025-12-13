@@ -569,7 +569,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  <X className="w-5 h-5" />
                   Cancel
                 </button>
                 <button
@@ -578,7 +577,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   style={{
                     backgroundColor: buttonBkColor || toneButtonBkColor || globalButtonHover,
                     color: buttonTextColor || toneButtonTextColor || textColor,
-                    fontFamily: 'Work Sans, sans-serif'
+                    fontFamily: 'Work Sans, sans-serif',
+                    height: '40px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = buttonHoverColor || buttonBkColor || toneButtonBkColor || globalButtonHover;
