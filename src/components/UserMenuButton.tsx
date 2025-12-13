@@ -333,7 +333,7 @@ export default function UserMenuButton({
                 height: '33px',
                 borderRadius: '8px',
                 padding: '0 12px',
-                marginTop: '4px',
+                marginTop: '6px',
                 fontSize: '14px',
                 cursor: 'pointer'
               }}
@@ -366,7 +366,34 @@ export default function UserMenuButton({
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
-            {/* Config content will go here */}
+            {/* Settings Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '33px',
+                borderRadius: '8px',
+                padding: '0 12px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement settings functionality
+                console.log('Settings clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
+              <span>Settings</span>
+            </button>
           </div>
 
           {/* Section 3: Personal Tools */}
