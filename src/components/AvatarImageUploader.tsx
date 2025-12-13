@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Check, X, ZoomIn, ZoomOut, ScissorsLineDashed } from 'lucide-react';
+import { Upload, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface AvatarImageUploaderProps {
   isOpen: boolean;
@@ -11,10 +11,14 @@ interface AvatarImageUploaderProps {
   globalButtonHover: string;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  toneButtonBorderColor?: string;
   backgroundColor?: string;
   solidColor?: string;
   feedbackIndicatorBk?: string;
   appearanceTextColor?: string;
+  buttonBkColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
 }
 
 const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
@@ -27,14 +31,16 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   globalButtonHover,
   toneButtonBkColor,
   toneButtonTextColor,
+  toneButtonBorderColor,
   backgroundColor,
   solidColor,
   feedbackIndicatorBk,
   appearanceTextColor,
+  buttonBkColor,
+  buttonTextColor,
+  buttonHoverColor,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
-  const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -46,6 +52,15 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Debug: Log button colors
+  console.log('AvatarImageUploader button colors:', {
+    buttonBkColor,
+    buttonTextColor,
+    buttonHoverColor,
+    toneButtonBkColor,
+    toneButtonTextColor
+  });
 
   // Close modal when clicking outside
   useEffect(() => {
@@ -111,8 +126,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         // Calculate zoom so the smaller dimension fills the circle
         const initialZoom = circleDiameter / smallerDimension;
         
-        setCroppedImage(null);
-        setCroppedBlob(null);
         setPosition({ x: 0, y: 0 });
         setZoom(initialZoom);
       };
@@ -204,12 +217,19 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         outputSize
       );
 
-      // Convert to blob
+      // Convert to blob and upload immediately
       canvas.toBlob((blob) => {
         if (blob) {
-          const url = URL.createObjectURL(blob);
-          setCroppedImage(url);
-          setCroppedBlob(blob);
+          const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+          onUpload(file);
+          // Reset state and close modal
+          setImageSrc(null);
+          setPosition({ x: 0, y: 0 });
+          setZoom(1);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          onClose();
         }
       }, 'image/jpeg', 0.95);
     }
@@ -217,22 +237,12 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
 
   const handleCancel = () => {
     setImageSrc(null);
-    setCroppedImage(null);
-    setCroppedBlob(null);
     setPosition({ x: 0, y: 0 });
     setZoom(1);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     onClose();
-  };
-
-  const handleUploadAvatar = () => {
-    if (croppedBlob) {
-      const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
-      onUpload(file);
-      handleCancel();
-    }
   };
 
   if (!isOpen) return null;
@@ -307,7 +317,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
 
         {/* Content */}
         <div className=" overflow-y-auto" style={{ maxHeight: 'calc(90vh - 100px)' }}>
-          {!imageSrc && !croppedImage && (
+          {!imageSrc && (
             <div className="text-center">
               <label className="cursor-pointer">
                 <div 
@@ -327,11 +337,11 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   }}
                 >
                   <Upload 
-                    className="w-16 h-16 mx-auto mb-4" 
+                    className="w-14 h-14 mx-auto mb-4" 
                     style={{ color: textColor, opacity: 0.5 }}
                   />
                   <p 
-                    className="text-lg font-semibold mb-2"
+                    className="text-lg font-regular mb-2"
                     style={{ 
                       color: textColor,
                       fontFamily: 'Work Sans, sans-serif'
@@ -361,7 +371,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
             </div>
           )}
 
-          {imageSrc && !croppedImage && (
+          {imageSrc && (
             <div>
               <div 
                 ref={containerRef}
@@ -537,125 +547,40 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
               <div className="flex gap-3 mt-6 pl-6 pr-6 pb-6">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6  rounded-lg font-regular transition-colors flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: `${textColor}10`,
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${toneButtonBorderColor || toneButtonTextColor || textColor}`,
+                    color: toneButtonTextColor || textColor,
+                    fontFamily: 'Work Sans, sans-serif',
+                    height: '40px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}20`;
+                    e.currentTarget.style.backgroundColor = `${toneButtonBorderColor || toneButtonTextColor || textColor}10`;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}10`;
+                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  <X className="w-5 h-5" />
                   Cancel
                 </button>
                 <button
                   onClick={createCroppedImage}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 rounded-lg font-regular transition-colors flex items-center justify-center gap-2"
                   style={{
-                    backgroundColor: toneButtonBkColor || globalButtonHover,
-                    color: toneButtonTextColor || textColor,
-                    fontFamily: 'Work Sans, sans-serif'
+                    backgroundColor: buttonBkColor || toneButtonBkColor || globalButtonHover,
+                    color: buttonTextColor || toneButtonTextColor || textColor,
+                    fontFamily: 'Work Sans, sans-serif',
+                    height: '40px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.backgroundColor = buttonHoverColor || buttonBkColor || toneButtonBkColor || globalButtonHover;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.backgroundColor = buttonBkColor || toneButtonBkColor || globalButtonHover;
                   }}
                 >
-                  <Check className="w-5 h-5" />
-                  Crop Image
-                </button>
-              </div>
-            </div>
-          )}
-
-          {croppedImage && (
-            <div className="text-center">
-              <div className="mb-6">
-                <div 
-                  className="inline-block p-2 rounded-full"
-                  style={{
-                    background: toneButtonBkColor || globalButtonHover
-                  }}
-                >
-                  <img
-                    src={croppedImage}
-                    alt="Cropped avatar"
-                    className="w-48 h-48 rounded-full"
-                    style={{ border: `4px solid ${menuColor}` }}
-                  />
-                </div>
-              </div>
-
-              <div 
-                className="border rounded-lg p-4 mb-6"
-                style={{
-                  backgroundColor: `${toneButtonBkColor || globalButtonHover}20`,
-                  borderColor: `${toneButtonBkColor || globalButtonHover}40`
-                }}
-              >
-                <p 
-                  className="font-semibold flex items-center justify-center gap-2"
-                  style={{ 
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                >
-                  <Check className="w-5 h-5" />
-                  Avatar ready! (512x512px)
-                </p>
-                <p 
-                  className="text-sm mt-1"
-                  style={{ 
-                    color: textColor,
-                    opacity: 0.7,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                >
-                  Your cropped image is optimized and ready to upload
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors"
-                  style={{
-                    backgroundColor: `${textColor}10`,
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}20`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}10`;
-                  }}
-                >
-                  Upload Different Image
-                </button>
-                <button
-                  onClick={handleUploadAvatar}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors"
-                  style={{
-                    backgroundColor: toneButtonBkColor || globalButtonHover,
-                    color: toneButtonTextColor || textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                  }}
-                >
-                  Upload Avatar
+                  Save
                 </button>
               </div>
             </div>

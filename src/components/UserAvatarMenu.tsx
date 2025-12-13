@@ -27,13 +27,17 @@ interface UserAvatarMenuProps {
   borderLineColor: string;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  toneButtonBorderColor?: string;
   backgroundColor?: string;
   solidColor?: string;
   feedbackIndicatorBk?: string;
   appearanceTextColor?: string;
+  buttonBkColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor }: UserAvatarMenuProps) {
+export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: UserAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -266,10 +270,14 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         globalButtonHover={globalButtonHover}
         toneButtonBkColor={toneButtonBkColor}
         toneButtonTextColor={toneButtonTextColor}
+        toneButtonBorderColor={toneButtonBorderColor}
         backgroundColor={backgroundColor}
         solidColor={solidColor}
         feedbackIndicatorBk={feedbackIndicatorBk}
         appearanceTextColor={appearanceTextColor}
+        buttonBkColor={buttonBkColor}
+        buttonTextColor={buttonTextColor}
+        buttonHoverColor={buttonHoverColor}
       />
     </div>
   );

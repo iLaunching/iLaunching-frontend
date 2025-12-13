@@ -31,7 +31,11 @@ interface SmartHubData {
     global_button_hover: string;
     tone_button_bk_color?: string;
     tone_button_text_color?: string;
+    tone_button_border_color?: string;
     feedback_indicator_bk?: string;
+    button_bk_color?: string;
+    button_text_color?: string;
+    button_hover_color?: string;
   } | null;
   profile: {
     id: string;
@@ -285,8 +289,12 @@ export default function SmartHub() {
         onClearIcon={handleClearIcon}
         toneButtonBkColor={theme.tone_button_bk_color}
         toneButtonTextColor={theme.tone_button_text_color}
+        toneButtonBorderColor={theme.tone_button_border_color}
         feedbackIndicatorBk={theme.feedback_indicator_bk}
         appearanceTextColor={theme.text}
+        ithemeButtonBkColor={theme.button_bk_color}
+        ithemeButtonTextColor={theme.button_text_color}
+        ithemeButtonHoverColor={theme.button_hover_color}
       />
     </div>
   );

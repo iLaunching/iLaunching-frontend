@@ -28,9 +28,13 @@ interface UserMenuButtonProps {
   onClearIcon: () => void;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
+  toneButtonBorderColor?: string;
   headerBackgroundColor?: string;
   feedbackIndicatorBk?: string;
   appearanceTextColor?: string;
+  ithemeButtonBkColor?: string;
+  ithemeButtonTextColor?: string;
+  ithemeButtonHoverColor?: string;
 }
 
 export default function UserMenuButton({
@@ -55,9 +59,13 @@ export default function UserMenuButton({
   onClearIcon,
   toneButtonBkColor,
   toneButtonTextColor,
+  toneButtonBorderColor,
   headerBackgroundColor,
   feedbackIndicatorBk,
   appearanceTextColor,
+  ithemeButtonBkColor,
+  ithemeButtonTextColor,
+  ithemeButtonHoverColor,
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -361,10 +369,14 @@ export default function UserMenuButton({
           borderLineColor={borderLineColor}
           toneButtonBkColor={toneButtonBkColor}
           toneButtonTextColor={toneButtonTextColor}
+          toneButtonBorderColor={toneButtonBorderColor}
           backgroundColor={menuColor}
           solidColor={headerBackgroundColor}
           feedbackIndicatorBk={feedbackIndicatorBk}
           appearanceTextColor={appearanceTextColor}
+          buttonBkColor={ithemeButtonBkColor}
+          buttonTextColor={ithemeButtonTextColor}
+          buttonHoverColor={ithemeButtonHoverColor}
         />
       </div>
     )}
