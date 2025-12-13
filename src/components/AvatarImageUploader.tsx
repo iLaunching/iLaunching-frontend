@@ -41,8 +41,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   buttonHoverColor,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
-  const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -221,12 +219,12 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
         outputSize
       );
 
-      // Convert to blob
+      // Convert to blob and upload immediately
       canvas.toBlob((blob) => {
         if (blob) {
-          const url = URL.createObjectURL(blob);
-          setCroppedImage(url);
-          setCroppedBlob(blob);
+          const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+          onUpload(file);
+          handleCancel();
         }
       }, 'image/jpeg', 0.95);
     }
@@ -234,22 +232,12 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
 
   const handleCancel = () => {
     setImageSrc(null);
-    setCroppedImage(null);
-    setCroppedBlob(null);
     setPosition({ x: 0, y: 0 });
     setZoom(1);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     onClose();
-  };
-
-  const handleUploadAvatar = () => {
-    if (croppedBlob) {
-      const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
-      onUpload(file);
-      handleCancel();
-    }
   };
 
   if (!isOpen) return null;
@@ -554,7 +542,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
               <div className="flex gap-3 mt-6 pl-6 pr-6 pb-6">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 px-6  rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6  rounded-lg font-regular transition-colors flex items-center justify-center gap-2"
                   style={{
                     backgroundColor: 'transparent',
                     border: `1px solid ${toneButtonBorderColor || toneButtonTextColor || textColor}`,
@@ -573,7 +561,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                 </button>
                 <button
                   onClick={createCroppedImage}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 rounded-lg font-regular transition-colors flex items-center justify-center gap-2"
                   style={{
                     backgroundColor: buttonBkColor || toneButtonBkColor || globalButtonHover,
                     color: buttonTextColor || toneButtonTextColor || textColor,
@@ -588,91 +576,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   }}
                 >
                   Save
-                </button>
-              </div>
-            </div>
-          )}
-
-          {croppedImage && (
-            <div className="text-center">
-              <div className="mb-6">
-                <div 
-                  className="inline-block p-2 rounded-full"
-                  style={{
-                    background: toneButtonBkColor || globalButtonHover
-                  }}
-                >
-                  <img
-                    src={croppedImage}
-                    alt="Cropped avatar"
-                    className="w-48 h-48 rounded-full"
-                    style={{ border: `4px solid ${menuColor}` }}
-                  />
-                </div>
-              </div>
-
-              <div 
-                className="border rounded-lg p-4 mb-6"
-                style={{
-                  backgroundColor: `${toneButtonBkColor || globalButtonHover}20`,
-                  borderColor: `${toneButtonBkColor || globalButtonHover}40`
-                }}
-              >
-                <p 
-                  className="font-semibold flex items-center justify-center gap-2"
-                  style={{ 
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                >
-                  Avatar ready! (512x512px)
-                </p>
-                <p 
-                  className="text-sm mt-1"
-                  style={{ 
-                    color: textColor,
-                    opacity: 0.7,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                >
-                  Your cropped image is optimized and ready to upload
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors"
-                  style={{
-                    backgroundColor: `${textColor}10`,
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}20`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${textColor}10`;
-                  }}
-                >
-                  Upload Different Image
-                </button>
-                <button
-                  onClick={handleUploadAvatar}
-                  className="flex-1 px-6 py-3 rounded-lg font-semibold transition-colors"
-                  style={{
-                    backgroundColor: toneButtonBkColor || globalButtonHover,
-                    color: toneButtonTextColor || textColor,
-                    fontFamily: 'Work Sans, sans-serif'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                  }}
-                >
-                  Upload Avatar
                 </button>
               </div>
             </div>
