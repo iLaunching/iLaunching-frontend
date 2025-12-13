@@ -188,7 +188,7 @@ export default function UserMenuButton({
             minHeight: '400px',
             height: 'fit-content',
             backgroundColor: menuColor,
-            borderRadius: '8px',
+            borderRadius: '10px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             zIndex: 9999,
             overflow: 'visible'
@@ -300,10 +300,10 @@ export default function UserMenuButton({
                 border: `1px solid ${borderLineColor}`,
                 color: textColor,
                 fontFamily: 'Work Sans, sans-serif',
-                height: '35px',
-                borderRadius: '6px',
+                height: '33px',
+                borderRadius: '8px',
                 padding: '0 12px',
-                marginTop: '8px',
+                marginTop: '10px',
                 fontSize: '14px',
                 cursor: 'pointer'
               }}
@@ -318,8 +318,41 @@ export default function UserMenuButton({
                 console.log('Set status clicked');
               }}
             >
-              <FontAwesomeIcon icon={solidIcons.faCircle} style={{ fontSize: '10px' }} />
+              <FontAwesomeIcon icon={solidIcons.faComment} style={{ fontSize: '10px' }} />
               Set status
+            </button>
+            
+            {/* Mute Notifications Button */}
+            <button
+              className="flex items-center justify-between w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '33px',
+                borderRadius: '8px',
+                padding: '0 12px',
+                marginTop: '4px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                // TODO: Implement mute notifications functionality
+                console.log('Mute notifications clicked');
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={solidIcons.faBell} style={{ fontSize: '14px' }} />
+                <span>Mute notifications</span>
+              </div>
+              <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
             </button>
           </div>
 
