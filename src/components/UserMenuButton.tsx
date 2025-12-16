@@ -2,9 +2,11 @@ import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import UserProfileButton from './UserProfileButton';
 import UserAvatarMenu from './UserAvatarMenu';
+import ThemePicker from './ThemePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -68,9 +70,12 @@ export default function UserMenuButton({
   ithemeButtonHoverColor,
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const { logout } = useAuth();
   
   console.log('UserMenuButton - avatarDisplayMode:', avatarDisplayMode, 'profileIconId:', profileIconId, 'profileIconName:', profileIconName);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const prevAvatarMenuOpen = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
@@ -110,22 +115,37 @@ export default function UserMenuButton({
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        buttonRef.current &&
-        avatarMenuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node) &&
-        !avatarMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        setIsAvatarMenuOpen(false);
+      const clickedInsideButton = buttonRef.current?.contains(event.target as Node);
+      const clickedInsideMenu = menuRef.current?.contains(event.target as Node);
+      const clickedInsideAvatarMenu = avatarMenuRef.current?.contains(event.target as Node);
+
+      // If clicked outside all menus
+      if (!clickedInsideButton && !clickedInsideMenu && !clickedInsideAvatarMenu) {
+        // If avatar menu is open, close only the avatar menu (keep user menu open)
+        if (isAvatarMenuOpen) {
+          setIsAvatarMenuOpen(false);
+        } 
+        // If avatar menu is not open, close the user menu
+        else if (isOpen) {
+          setIsOpen(false);
+        }
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isAvatarMenuOpen, isOpen]);
+
+  // Close user menu when avatar menu closes
+  useEffect(() => {
+    // Only close user menu if avatar menu was previously open and is now closing
+    if (prevAvatarMenuOpen.current && !isAvatarMenuOpen && isOpen) {
+      // DO NOT auto-close user menu when avatar menu closes
+      // User must click outside again to close the user menu
+    }
+    // Update the previous state
+    prevAvatarMenuOpen.current = isAvatarMenuOpen;
+  }, [isAvatarMenuOpen, isOpen]);
 
   return (
     <>
@@ -416,8 +436,8 @@ export default function UserMenuButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                // TODO: Implement theme functionality
-                console.log('Theme clicked');
+                setIsThemePickerOpen(true);
+                setIsOpen(false);
               }}
             >
               <FontAwesomeIcon icon={solidIcons.faPalette} style={{ fontSize: '14px' }} />
@@ -445,8 +465,8 @@ export default function UserMenuButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                // TODO: Implement help functionality
-                console.log('Help clicked');
+                setIsThemePickerOpen(true);
+                setIsOpen(false);
               }}
             >
               <FontAwesomeIcon icon={solidIcons.faCircleQuestion} style={{ fontSize: '14px' }} />
@@ -648,7 +668,8 @@ export default function UserMenuButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                console.log('Log out clicked');
+                console.log('Logging out user...');
+                logout();
               }}
             >
               <FontAwesomeIcon icon={solidIcons.faRightFromBracket} style={{ fontSize: '14px' }} />
@@ -694,6 +715,22 @@ export default function UserMenuButton({
         />
       </div>
     )}
+
+    {/* Theme Picker Popup */}
+    <ThemePicker
+      isOpen={isThemePickerOpen}
+      onClose={() => setIsThemePickerOpen(false)}
+      menuColor={menuColor}
+      textColor={textColor}
+      borderLineColor={borderLineColor}
+      globalHoverColor={globalButtonHover}
+      currentAppearanceId={6}
+      currentIthemeId={10}
+      onThemeChange={(appearanceId, ithemeId) => {
+        console.log('Theme changed:', { appearanceId, ithemeId });
+        // TODO: Call API to update user theme preferences
+      }}
+    />
     </>
   );
 }
