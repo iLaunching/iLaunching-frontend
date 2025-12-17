@@ -197,6 +197,90 @@ export default function SmartHub() {
     console.log('Clearing profile icon');
     clearProfileIconMutation.mutate();
   };
+
+  // Mutation to update appearance
+  const updateAppearanceMutation = useMutation({
+    mutationFn: async (appearanceId: number) => {
+      console.log('Calling API to update appearance:', appearanceId);
+      const response = await api.patch(`/profile/appearance?appearance_id=${appearanceId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Appearance updated successfully:', data);
+      // Refetch the smart hub data to get updated theme - this should trigger a re-render with new theme
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update appearance:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleAppearanceChange = (appearanceId: number) => {
+    console.log('Changing appearance to:', appearanceId);
+    updateAppearanceMutation.mutate(appearanceId);
+  };
+
+  // Mutation to update itheme
+  const updateIthemeMutation = useMutation({
+    mutationFn: async (ithemeId: number) => {
+      console.log('Calling API to update itheme:', ithemeId);
+      const response = await api.patch(`/profile/itheme?itheme_id=${ithemeId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('iTheme updated successfully:', data);
+      // Refetch the smart hub data to get updated theme
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update itheme:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleIthemeChange = (ithemeId: number) => {
+    console.log('Changing itheme to:', ithemeId);
+    updateIthemeMutation.mutate(ithemeId);
+  };
+
+  // Mutation to update smart hub color
+  const updateSmartHubColorMutation = useMutation({
+    mutationFn: async ({ colorId, smartHubId }: { colorId: number; smartHubId: string }) => {
+      console.log('Calling API to update smart hub color:', { colorId, smartHubId });
+      const response = await api.patch(`/smart-hub/color?smart_hub_id=${smartHubId}&hub_color_id=${colorId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Smart hub color updated successfully:', data);
+      // Refetch the smart hub data to get updated color
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update smart hub color:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleSmartHubColorChange = (colorId: number) => {
+    console.log('=== SmartHub: handleSmartHubColorChange CALLED ===');
+    console.log('Color ID:', colorId);
+    console.log('Smart Hub ID:', hubData?.smart_hub?.id);
+    
+    if (!hubData?.smart_hub?.id) {
+      console.error('No smart hub ID available');
+      return;
+    }
+    
+    console.log('Changing smart hub color to:', colorId);
+    updateSmartHubColorMutation.mutate({ 
+      colorId, 
+      smartHubId: hubData.smart_hub.id 
+    });
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -311,6 +395,26 @@ export default function SmartHub() {
         journey={hubData.smart_hub.journey}
         currentSmartHubId={hubData.smart_hub.id}
         smartHubs={hubData.profile.smart_hubs || []}
+        currentAppearanceId={hubData.profile.appearance?.id}
+        currentIthemeId={hubData.profile.itheme?.id}
+        onAppearanceChange={handleAppearanceChange}
+        onIthemeChange={handleIthemeChange}
+        ithemeBgOpacity={theme.bg_opacity}
+        smartHubColorId={hubData.smart_hub.hub_color_id}
+        onSmartHubColorChange={handleSmartHubColorChange}
+        smartHubIconId={undefined}
+        onSmartHubIconChange={(iconId) => {
+          console.log('SmartHub icon change:', iconId);
+          // TODO: Implement smart hub icon change mutation
+        }}
+        onClearSmartHubIcon={() => {
+          console.log('Clear smart hub icon');
+          // TODO: Implement clear smart hub icon mutation
+        }}
+        solidColor={theme.solid_color}
+        buttonBkColor={theme.button_bk_color}
+        buttonTextColor={theme.button_text_color}
+        buttonHoverColor={theme.button_hover_color}
       />
     </div>
   );

@@ -14,7 +14,7 @@ interface ColorOption {
   };
 }
 
-interface UserAvatarMenuProps {
+interface SmartHubAvatarMenuProps {
   menuColor: string;
   titleColor: string;
   currentColorId: number;
@@ -37,7 +37,7 @@ interface UserAvatarMenuProps {
   buttonHoverColor?: string;
 }
 
-export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: UserAvatarMenuProps) {
+export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: SmartHubAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
@@ -45,15 +45,15 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
 
   // Wrapper to log icon changes
   const handleIconChange = (iconId: number) => {
-    console.log('=== UserAvatarMenu handleIconChange CALLED ===');
+    console.log('=== SmartHubAvatarMenu handleIconChange CALLED ===');
     console.log('Icon ID received:', iconId);
     console.log('Calling parent onIconChange callback');
     onIconChange(iconId);
-    console.log('=== UserAvatarMenu handleIconChange COMPLETED ===');
+    console.log('=== SmartHubAvatarMenu handleIconChange COMPLETED ===');
   };
 
   useEffect(() => {
-    console.log('UserAvatarMenu mounted');
+    console.log('SmartHubAvatarMenu mounted');
     const fetchColors = async () => {
       try {
         console.log('Fetching colors from API...');
@@ -71,7 +71,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
     fetchColors();
   }, []);
 
-  console.log('Rendering UserAvatarMenu, colors:', colors.length, 'loading:', loading);
+  console.log('Rendering SmartHubAvatarMenu, colors:', colors.length, 'loading:', loading);
 
   return (
     <div
@@ -130,7 +130,10 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
             colors.map((color) => (
               <div
                 key={color.option_value_id}
-                onClick={() => onColorChange(color.option_value_id)}
+                onClick={() => {
+                  console.log('=== SmartHubAvatarMenu: Color circle clicked ===', color.option_value_id, color.display_name);
+                  onColorChange(color.option_value_id);
+                }}
                 style={{
                   width: '23px',
                   height: '23px',
