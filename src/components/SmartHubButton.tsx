@@ -317,9 +317,6 @@ export default function SmartHubButton({
                     globalButtonHover={globalHoverColor}
                     textColor={textColor}
                     currentIconId={currentIconId}
-                    currentIconName={currentIconName}
-                    currentIconPrefix={currentIconPrefix}
-                    avatarDisplayMode={avatarDisplayMode}
                     onIconChange={(iconId) => {
                       onIconChange(iconId);
                       setIsAvatarMenuOpen(false);
@@ -329,6 +326,7 @@ export default function SmartHubButton({
                       setIsAvatarMenuOpen(false);
                     }}
                     borderLineColor={borderLineColor}
+                    smartHubId={currentSmartHubId ? Number(currentSmartHubId) : null}
                     toneButtonBkColor={toneButtonBkColor}
                     toneButtonTextColor={toneButtonTextColor}
                     toneButtonBorderColor={toneButtonBorderColor}

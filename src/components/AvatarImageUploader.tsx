@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api from '@/lib/api';
 
 interface AvatarImageUploaderProps {
   isOpen: boolean;

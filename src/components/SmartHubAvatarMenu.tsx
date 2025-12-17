@@ -25,6 +25,7 @@ interface SmartHubAvatarMenuProps {
   onIconChange: (iconId: number) => void;
   onClearIcon: () => void;
   borderLineColor: string;
+  smartHubId: number | null;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
   toneButtonBorderColor?: string;
@@ -37,7 +38,7 @@ interface SmartHubAvatarMenuProps {
   buttonHoverColor?: string;
 }
 
-export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: SmartHubAvatarMenuProps) {
+export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, smartHubId, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: SmartHubAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
