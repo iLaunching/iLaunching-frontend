@@ -540,7 +540,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     height: 20px;
                     border-radius: 50%;
                     background: ${backgroundColor || menuColor};
-                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
+                    border: 5px solid ${toneButtonBkColor || solidColor || globalButtonHover};
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
@@ -554,7 +554,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     height: 20px;
                     border-radius: 50%;
                     background: ${backgroundColor || menuColor};
-                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
+                    border: 5px solid ${toneButtonBkColor || solidColor || globalButtonHover};
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
