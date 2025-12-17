@@ -8,7 +8,7 @@ interface AvatarImageUploaderProps {
   onClose: () => void;
   context: 'user-profile' | 'hub-settings';
   smart_hub_id?: number | null;
-  onUpload?: (file: File) => void; // Optional for backward compatibility
+  // Theme props
   textColor: string;
   menuColor: string;
   titleColor: string;
@@ -19,7 +19,6 @@ interface AvatarImageUploaderProps {
   backgroundColor?: string;
   solidColor?: string;
   feedbackIndicatorBk?: string;
-  appearanceTextColor?: string;
   buttonBkColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
@@ -30,7 +29,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   onClose,
   context,
   smart_hub_id,
-  onUpload,
   textColor,
   menuColor,
   titleColor,
@@ -41,7 +39,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   backgroundColor,
   solidColor,
   feedbackIndicatorBk,
-  appearanceTextColor,
   buttonBkColor,
   buttonTextColor,
   buttonHoverColor,
@@ -268,11 +265,6 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
               await uploadUserAvatarMutation.mutateAsync(file);
             } else if (context === 'hub-settings') {
               await uploadSmartHubAvatarMutation.mutateAsync(file);
-            }
-            
-            // Call legacy onUpload if provided (for backward compatibility)
-            if (onUpload) {
-              onUpload(file);
             }
             
             // Reset state and close modal
@@ -514,7 +506,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                       className="px-3 py-1.5 rounded-lg font-semibold text-sm shadow-lg"
                       style={{
                         backgroundColor: feedbackIndicatorBk || backgroundColor || menuColor,
-                        color: appearanceTextColor || textColor,
+                        color: textColor,
                         fontFamily: 'Work Sans, sans-serif'
                       }}
                     >

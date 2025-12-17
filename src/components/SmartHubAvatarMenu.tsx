@@ -269,7 +269,6 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
         backgroundColor={backgroundColor}
         solidColor={solidColor}
         feedbackIndicatorBk={feedbackIndicatorBk}
-        appearanceTextColor={appearanceTextColor}
         buttonBkColor={buttonBkColor}
         buttonTextColor={buttonTextColor}
         buttonHoverColor={buttonHoverColor}

@@ -264,7 +264,6 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
         backgroundColor={backgroundColor}
         solidColor={solidColor}
         feedbackIndicatorBk={feedbackIndicatorBk}
-        appearanceTextColor={appearanceTextColor}
         buttonBkColor={buttonBkColor}
         buttonTextColor={buttonTextColor}
         buttonHoverColor={buttonHoverColor}
