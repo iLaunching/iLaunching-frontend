@@ -51,6 +51,9 @@ interface MainHeaderProps {
   smartHubColorId?: number;
   onSmartHubColorChange?: (colorId: number) => void;
   smartHubIconId?: number;
+  smartHubIconName?: string;
+  smartHubIconPrefix?: 'fas' | 'far' | 'fab';
+  smartHubAvatarDisplayMode?: number;
   onSmartHubIconChange?: (iconId: number) => void;
   onClearSmartHubIcon?: () => void;
   solidColor?: string;
@@ -104,6 +107,9 @@ export default function MainHeader({
   smartHubColorId = 1,
   onSmartHubColorChange = () => {},
   smartHubIconId,
+  smartHubIconName,
+  smartHubIconPrefix,
+  smartHubAvatarDisplayMode = 24,
   onSmartHubIconChange = () => {},
   onClearSmartHubIcon = () => {},
   solidColor,
@@ -187,6 +193,9 @@ export default function MainHeader({
           currentColorId={smartHubColorId}
           onColorChange={onSmartHubColorChange}
           currentIconId={smartHubIconId}
+          currentIconName={smartHubIconName}
+          currentIconPrefix={smartHubIconPrefix}
+          avatarDisplayMode={smartHubAvatarDisplayMode}
           onIconChange={onSmartHubIconChange}
           onClearIcon={onClearSmartHubIcon}
           toneButtonBkColor={toneButtonBkColor}

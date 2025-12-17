@@ -15,6 +15,13 @@ interface SmartHubData {
     hub_color_id?: number;  // FK to option_values (smarthub_color_scheme)
     smartHub_icon_id?: number;  // FK to option_values for hub icon
     avatar_display_option_value_id?: number;  // Avatar display mode
+    smartHub_icon?: {
+      id: number;
+      value_name: string;
+      display_name: string;
+      icon_name: string;
+      icon_prefix: string;
+    } | null;
     journey: string;  // Per-hub journey tier
     owner_id: string;
     your_role: string;
@@ -473,6 +480,9 @@ export default function SmartHub() {
         smartHubColorId={hubData.smart_hub.hub_color_id}
         onSmartHubColorChange={handleSmartHubColorChange}
         smartHubIconId={hubData.smart_hub.smartHub_icon_id}
+        smartHubIconName={hubData.smart_hub.smartHub_icon?.icon_name}
+        smartHubIconPrefix={hubData.smart_hub.smartHub_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
+        smartHubAvatarDisplayMode={hubData.smart_hub.avatar_display_option_value_id || 24}
         onSmartHubIconChange={handleSmartHubIconChange}
         onClearSmartHubIcon={handleClearSmartHubIcon}
         solidColor={theme.solid_color}
