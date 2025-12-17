@@ -74,10 +74,6 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
 
   console.log('Rendering SmartHubAvatarMenu, colors:', colors.length, 'loading:', loading);
 
-  // Get current smart hub color for consistent styling
-  const currentColor = colors.find(c => c.option_value_id === currentColorId);
-  const currentHubColor = currentColor?.metadata?.color || toneButtonBkColor || globalButtonHover;
-
   return (
     <div
       style={{
@@ -267,13 +263,14 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
         menuColor={menuColor}
         titleColor={titleColor}
         globalButtonHover={globalButtonHover}
-        toneButtonBkColor={currentHubColor}
+        toneButtonBkColor={toneButtonBkColor}
         toneButtonTextColor={toneButtonTextColor}
         toneButtonBorderColor={toneButtonBorderColor}
         backgroundColor={backgroundColor}
-        solidColor={currentHubColor}
-        feedbackIndicatorBk={currentHubColor}
-        buttonBkColor={currentHubColor}
+        solidColor={solidColor}
+        feedbackIndicatorBk={feedbackIndicatorBk}
+        appearanceTextColor={appearanceTextColor}
+        buttonBkColor={buttonBkColor}
         buttonTextColor={buttonTextColor}
         buttonHoverColor={buttonHoverColor}
       />

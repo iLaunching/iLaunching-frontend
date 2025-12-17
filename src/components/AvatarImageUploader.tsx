@@ -19,6 +19,7 @@ interface AvatarImageUploaderProps {
   backgroundColor?: string;
   solidColor?: string;
   feedbackIndicatorBk?: string;
+  appearanceTextColor?: string;
   buttonBkColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
@@ -39,6 +40,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   backgroundColor,
   solidColor,
   feedbackIndicatorBk,
+  appearanceTextColor,
   buttonBkColor,
   buttonTextColor,
   buttonHoverColor,
@@ -506,7 +508,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                       className="px-3 py-1.5 rounded-lg font-semibold text-sm shadow-lg"
                       style={{
                         backgroundColor: feedbackIndicatorBk || backgroundColor || menuColor,
-                        color: textColor,
+                        color: appearanceTextColor || textColor,
                         fontFamily: 'Work Sans, sans-serif'
                       }}
                     >
@@ -540,7 +542,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     height: 20px;
                     border-radius: 50%;
                     background: ${backgroundColor || menuColor};
-                    border: 5px solid ${toneButtonBkColor || solidColor || globalButtonHover};
+                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
@@ -554,7 +556,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     height: 20px;
                     border-radius: 50%;
                     background: ${backgroundColor || menuColor};
-                    border: 5px solid ${toneButtonBkColor || solidColor || globalButtonHover};
+                    border: 5px solid ${solidColor || toneButtonBkColor || globalButtonHover};
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
