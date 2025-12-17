@@ -117,6 +117,8 @@ export default function MainHeader({
   buttonTextColor,
   buttonHoverColor,
 }: MainHeaderProps) {
+  console.log('🔍 MainHeader solidColor:', solidColor);
+  
   return (
     <header 
       className="sticky top-0 z-50 flex flex-col w-full"
