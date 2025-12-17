@@ -96,8 +96,6 @@ export default function SmartHubButton({
     smartHubName
   }, null, 2));
   console.log('SmartHubButton solidColor:', solidColor);
-    smartHubName
-  }, null, 2));
 
   // Get initials from smart hub name
   const getInitials = () => {
