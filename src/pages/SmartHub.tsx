@@ -13,6 +13,8 @@ interface SmartHubData {
     avatar?: string;
     hub_color?: string;  // Color value extracted from hub_color relationship
     hub_color_id?: number;  // FK to option_values (smarthub_color_scheme)
+    smartHub_icon_id?: number;  // FK to option_values for hub icon
+    avatar_display_option_value_id?: number;  // Avatar display mode
     journey: string;  // Per-hub journey tier
     owner_id: string;
     your_role: string;
@@ -281,6 +283,74 @@ export default function SmartHub() {
       smartHubId: hubData.smart_hub.id 
     });
   };
+
+  // Mutation to update smart hub icon
+  const updateSmartHubIconMutation = useMutation({
+    mutationFn: async ({ iconId, smartHubId }: { iconId: number; smartHubId: string }) => {
+      console.log('Calling API to update smart hub icon:', { iconId, smartHubId });
+      const response = await api.patch(`/smart-hub/icon?smart_hub_id=${smartHubId}&smartHub_icon_id=${iconId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Smart hub icon updated successfully:', data);
+      // Refetch the smart hub data to get updated icon
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update smart hub icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleSmartHubIconChange = (iconId: number) => {
+    console.log('=== SmartHub: handleSmartHubIconChange CALLED ===');
+    console.log('Icon ID:', iconId);
+    console.log('Smart Hub ID:', hubData?.smart_hub?.id);
+    
+    if (!hubData?.smart_hub?.id) {
+      console.error('No smart hub ID available');
+      return;
+    }
+    
+    console.log('Changing smart hub icon to:', iconId);
+    updateSmartHubIconMutation.mutate({ 
+      iconId, 
+      smartHubId: hubData.smart_hub.id 
+    });
+  };
+
+  // Mutation to clear smart hub icon
+  const clearSmartHubIconMutation = useMutation({
+    mutationFn: async (smartHubId: string) => {
+      console.log('Calling API to clear smart hub icon for hub:', smartHubId);
+      const response = await api.delete(`/smart-hub/icon?smart_hub_id=${smartHubId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Smart hub icon cleared successfully:', data);
+      // Refetch the smart hub data
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear smart hub icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleClearSmartHubIcon = () => {
+    console.log('=== SmartHub: handleClearSmartHubIcon CALLED ===');
+    console.log('Smart Hub ID:', hubData?.smart_hub?.id);
+    
+    if (!hubData?.smart_hub?.id) {
+      console.error('No smart hub ID available');
+      return;
+    }
+    
+    console.log('Clearing smart hub icon');
+    clearSmartHubIconMutation.mutate(hubData.smart_hub.id);
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -402,15 +472,9 @@ export default function SmartHub() {
         ithemeBgOpacity={theme.bg_opacity}
         smartHubColorId={hubData.smart_hub.hub_color_id}
         onSmartHubColorChange={handleSmartHubColorChange}
-        smartHubIconId={undefined}
-        onSmartHubIconChange={(iconId) => {
-          console.log('SmartHub icon change:', iconId);
-          // TODO: Implement smart hub icon change mutation
-        }}
-        onClearSmartHubIcon={() => {
-          console.log('Clear smart hub icon');
-          // TODO: Implement clear smart hub icon mutation
-        }}
+        smartHubIconId={hubData.smart_hub.smartHub_icon_id}
+        onSmartHubIconChange={handleSmartHubIconChange}
+        onClearSmartHubIcon={handleClearSmartHubIcon}
         solidColor={theme.solid_color}
         buttonBkColor={theme.button_bk_color}
         buttonTextColor={theme.button_text_color}
