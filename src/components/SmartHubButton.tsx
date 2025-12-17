@@ -30,6 +30,9 @@ interface SmartHubButtonProps {
   currentColorId?: number;
   onColorChange?: (colorId: number) => void;
   currentIconId?: number;
+  currentIconName?: string;
+  currentIconPrefix?: 'fas' | 'far' | 'fab';
+  avatarDisplayMode?: number;
   onIconChange?: (iconId: number) => void;
   onClearIcon?: () => void;
   toneButtonBkColor?: string;
@@ -59,6 +62,9 @@ export default function SmartHubButton({
   currentColorId = 1,
   onColorChange = () => {},
   currentIconId,
+  currentIconName,
+  currentIconPrefix,
+  avatarDisplayMode = 24,
   onIconChange = () => {},
   onClearIcon = () => {},
   toneButtonBkColor,
@@ -267,6 +273,9 @@ export default function SmartHubButton({
                     globalButtonHover={globalHoverColor}
                     textColor={textColor}
                     currentIconId={currentIconId}
+                    currentIconName={currentIconName}
+                    currentIconPrefix={currentIconPrefix}
+                    avatarDisplayMode={avatarDisplayMode}
                     onIconChange={(iconId) => {
                       onIconChange(iconId);
                       setIsAvatarMenuOpen(false);
