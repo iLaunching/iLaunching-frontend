@@ -232,7 +232,7 @@ export default function SmartHubButton({
             width: '330px',
             minHeight: '300px',
             height: 'fit-content',
-            backgroundColor: menuColor,
+            backgroundColor: backgroundColor || menuColor,
             borderRadius: '10px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             zIndex: 9999,
