@@ -427,8 +427,18 @@ export default function SmartHub() {
     user_button_icon: '#000000',
     title_menu_color_light: '#d6d6d6',
     border_line_color_light: '#d6d6d680',
-    global_button_hover: '#d6d6d64d'
+    global_button_hover: '#d6d6d64d',
+    solid_color: '#7F77F1',
+    button_bk_color: '#7F77F1',
+    button_text_color: '#ffffff',
+    button_hover_color: '#6B69D6',
+    feedback_indicator_bk: '#7F77F1',
+    appearance_text_color: '#000000',
+    bg_opacity: '1'
   };
+  
+  console.log('🎨 SmartHub theme.solid_color:', theme.solid_color);
+  console.log('🎨 SmartHub hubData?.theme:', hubData?.theme);
   
   console.log('SmartHub - avatar display mode:', hubData?.profile?.avatar_display_option_value_id, 'icon:', hubData?.profile?.profile_icon);
   console.log('SmartHub - SMART HUB avatar data:', JSON.stringify({
