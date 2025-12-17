@@ -59,16 +59,15 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Debug: Log theme props
-  console.log('=== AvatarImageUploader Theme Props ===', {
-    context,
-    solidColor,
-    feedbackIndicatorBk,
-    appearanceTextColor,
-    toneButtonBkColor,
-    backgroundColor,
-    textColor
-  });
+  // Debug: Log theme props with actual values
+  console.log('=== AvatarImageUploader Theme Props ===');
+  console.log('context:', context);
+  console.log('solidColor:', solidColor);
+  console.log('feedbackIndicatorBk:', feedbackIndicatorBk);
+  console.log('appearanceTextColor:', appearanceTextColor);
+  console.log('toneButtonBkColor:', toneButtonBkColor);
+  console.log('backgroundColor:', backgroundColor);
+  console.log('textColor:', textColor);
 
   // Mutation for uploading user profile avatar
   const uploadUserAvatarMutation = useMutation({
