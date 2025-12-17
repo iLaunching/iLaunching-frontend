@@ -415,7 +415,7 @@ export default function SmartHub() {
     );
   }
 
-  const theme = hubData?.theme || {
+  const themeDefaults = {
     header_overlay: '#00000080',
     header_background: '#7F77F1',
     background: '#ffffff',
@@ -436,6 +436,9 @@ export default function SmartHub() {
     appearance_text_color: '#000000',
     bg_opacity: '1'
   };
+  
+  // Merge API theme with defaults to ensure all properties exist
+  const theme = { ...themeDefaults, ...hubData?.theme };
   
   console.log('🎨 SmartHub theme.solid_color:', theme.solid_color);
   console.log('🎨 SmartHub hubData?.theme:', hubData?.theme);
