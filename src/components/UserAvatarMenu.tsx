@@ -101,10 +101,10 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
           style={{
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
-            fontSize: '14px',
+            fontSize: '13px',
             marginBottom: '',
             marginLeft:'5px',
-            fontWeight: 600
+            fontWeight: 400
           }}
         >
           Avatar Color
@@ -160,9 +160,9 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
           style={{
             fontFamily: 'Work Sans, sans-serif',
             color: titleColor,
-            fontSize: '14px',
+            fontSize: '13px',
             marginLeft: '5px',
-            fontWeight: 600
+            fontWeight: 400
           }}
         >
           Avatar Icon

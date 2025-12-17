@@ -2,9 +2,11 @@ import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import UserProfileButton from './UserProfileButton';
 import UserAvatarMenu from './UserAvatarMenu';
+import ThemePicker from './ThemePicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserMenuButtonProps {
   firstName: string;
@@ -68,9 +70,12 @@ export default function UserMenuButton({
   ithemeButtonHoverColor,
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const { logout } = useAuth();
   
   console.log('UserMenuButton - avatarDisplayMode:', avatarDisplayMode, 'profileIconId:', profileIconId, 'profileIconName:', profileIconName);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const prevAvatarMenuOpen = useRef(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
@@ -110,22 +115,37 @@ export default function UserMenuButton({
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        buttonRef.current &&
-        avatarMenuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node) &&
-        !avatarMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        setIsAvatarMenuOpen(false);
+      const clickedInsideButton = buttonRef.current?.contains(event.target as Node);
+      const clickedInsideMenu = menuRef.current?.contains(event.target as Node);
+      const clickedInsideAvatarMenu = avatarMenuRef.current?.contains(event.target as Node);
+
+      // If clicked outside all menus
+      if (!clickedInsideButton && !clickedInsideMenu && !clickedInsideAvatarMenu) {
+        // If avatar menu is open, close only the avatar menu (keep user menu open)
+        if (isAvatarMenuOpen) {
+          setIsAvatarMenuOpen(false);
+        } 
+        // If avatar menu is not open, close the user menu
+        else if (isOpen) {
+          setIsOpen(false);
+        }
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isAvatarMenuOpen, isOpen]);
+
+  // Close user menu when avatar menu closes
+  useEffect(() => {
+    // Only close user menu if avatar menu was previously open and is now closing
+    if (prevAvatarMenuOpen.current && !isAvatarMenuOpen && isOpen) {
+      // DO NOT auto-close user menu when avatar menu closes
+      // User must click outside again to close the user menu
+    }
+    // Update the previous state
+    prevAvatarMenuOpen.current = isAvatarMenuOpen;
+  }, [isAvatarMenuOpen, isOpen]);
 
   return (
     <>
@@ -300,9 +320,9 @@ export default function UserMenuButton({
                 border: `1px solid ${borderLineColor}`,
                 color: textColor,
                 fontFamily: 'Work Sans, sans-serif',
-                height: '33px',
+                height: '30px',
                 borderRadius: '8px',
-                padding: '0 12px',
+                padding: '0 8px',
                 marginTop: '10px',
                 fontSize: '14px',
                 cursor: 'pointer'
@@ -330,9 +350,9 @@ export default function UserMenuButton({
                 border: 'none',
                 color: textColor,
                 fontFamily: 'Work Sans, sans-serif',
-                height: '33px',
+                height: '30px',
                 borderRadius: '8px',
-                padding: '0 12px',
+                padding: '0 8px',
                 marginTop: '6px',
                 fontSize: '14px',
                 cursor: 'pointer'
@@ -362,7 +382,7 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
+              padding: '8px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
@@ -374,9 +394,9 @@ export default function UserMenuButton({
                 border: 'none',
                 color: textColor,
                 fontFamily: 'Work Sans, sans-serif',
-                height: '33px',
+                height: '30px',
                 borderRadius: '8px',
-                padding: '0 12px',
+                padding: '0 8px',
                 fontSize: '14px',
                 cursor: 'pointer'
               }}
@@ -394,6 +414,64 @@ export default function UserMenuButton({
               <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
               <span>Settings</span>
             </button>
+            
+            {/* Theme Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                setIsThemePickerOpen(true);
+                setIsOpen(false);
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faPalette} style={{ fontSize: '14px' }} />
+              <span>Theme</span>
+            </button>
+            
+            {/* Help Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                setIsThemePickerOpen(true);
+                setIsOpen(false);
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faCircleQuestion} style={{ fontSize: '14px' }} />
+              <span>Help</span>
+            </button>
           </div>
 
           {/* Section 3: Personal Tools */}
@@ -402,7 +480,7 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px',
+              padding: '8px',
               borderBottom: `1px solid ${borderLineColor}`
             }}
           >
@@ -411,13 +489,125 @@ export default function UserMenuButton({
                 fontFamily: 'Work Sans, sans-serif',
                 fontSize: '13px',
                 fontWeight: 400,
-                marginBottom: '12px',
+                marginBottom: '10px',
+                marginLeft: '5px',
                 color: titleColor
               }}
             >
               Personal tools
             </h3>
-            {/* Personal tools content will go here */}
+            
+            {/* Note Pad Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Note Pad clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faNoteSticky} style={{ fontSize: '14px' }} />
+              <span>Note Pad</span>
+            </button>
+
+            {/* Record a clip Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Record a clip clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faVideo} style={{ fontSize: '14px' }} />
+              <span>Record a clip</span>
+            </button>
+
+            {/* Create reminder Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Create reminder clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faBell} style={{ fontSize: '14px' }} />
+              <span>Create reminder</span>
+            </button>
+
+            {/* View people Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('View people clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faUsers} style={{ fontSize: '14px' }} />
+              <span>View people</span>
+            </button>
           </div>
 
           {/* Section 4: Account */}
@@ -426,10 +616,65 @@ export default function UserMenuButton({
             style={{
               minHeight: '100px',
               height: 'fit-content',
-              padding: '16px'
+              padding: '8px'
             }}
           >
-            {/* Account content will go here */}
+            {/* Trash Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Trash clicked');
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faTrash} style={{ fontSize: '14px' }} />
+              <span>Trash</span>
+            </button>
+
+            {/* Log out Button */}
+            <button
+              className="flex items-center gap-2 w-full transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: textColor,
+                fontFamily: 'Work Sans, sans-serif',
+                height: '30px',
+                borderRadius: '8px',
+                padding: '0 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = globalButtonHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              onClick={() => {
+                console.log('Logging out user...');
+                logout();
+              }}
+            >
+              <FontAwesomeIcon icon={solidIcons.faRightFromBracket} style={{ fontSize: '14px' }} />
+              <span>Log out</span>
+            </button>
           </div>
         </div>
       )}
@@ -470,6 +715,22 @@ export default function UserMenuButton({
         />
       </div>
     )}
+
+    {/* Theme Picker Popup */}
+    <ThemePicker
+      isOpen={isThemePickerOpen}
+      onClose={() => setIsThemePickerOpen(false)}
+      menuColor={menuColor}
+      textColor={textColor}
+      borderLineColor={borderLineColor}
+      globalHoverColor={globalButtonHover}
+      currentAppearanceId={6}
+      currentIthemeId={10}
+      onThemeChange={(appearanceId, ithemeId) => {
+        console.log('Theme changed:', { appearanceId, ithemeId });
+        // TODO: Call API to update user theme preferences
+      }}
+    />
     </>
   );
 }

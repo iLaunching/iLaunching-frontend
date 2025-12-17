@@ -10,6 +10,10 @@ interface SmartHubData {
     id: string;
     name: string;
     description?: string;
+    avatar?: string;
+    hub_color?: string;  // Color value extracted from hub_color relationship
+    hub_color_id?: number;  // FK to option_values (smarthub_color_scheme)
+    journey: string;  // Per-hub journey tier
     owner_id: string;
     your_role: string;
     team_members: any[];
@@ -45,6 +49,13 @@ interface SmartHubData {
     timezone: string;
     language: string;
     onboarding_completed: boolean;
+    smart_hubs?: Array<{
+      id: string;
+      name: string;
+      hub_color_id: number;
+      color?: string;
+      journey?: string;
+    }>;
     appearance: {
       id: number;
       value_name: string;
@@ -295,6 +306,11 @@ export default function SmartHub() {
         ithemeButtonBkColor={theme.button_bk_color}
         ithemeButtonTextColor={theme.button_text_color}
         ithemeButtonHoverColor={theme.button_hover_color}
+        smartHubName={hubData.smart_hub.name}
+        smartHubColor={hubData.smart_hub.hub_color || '#7F77F1'}
+        journey={hubData.smart_hub.journey}
+        currentSmartHubId={hubData.smart_hub.id}
+        smartHubs={hubData.profile.smart_hubs || []}
       />
     </div>
   );

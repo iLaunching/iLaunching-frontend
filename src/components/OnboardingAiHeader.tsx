@@ -37,7 +37,7 @@ export default function OnboardingAiHeader({
         
         {/* AI Acknowledge (only show if not empty) */}
         {acknowledgeMessage && (
-          <div className="onboarding-ai-acknowledge">
+          <div key={acknowledgeMessage} className="onboarding-ai-acknowledge">
             {renderAcknowledgeWords(acknowledgeMessage)}
           </div>
         )}

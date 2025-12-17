@@ -1,4 +1,5 @@
 import UserMenuButton from '@/components/UserMenuButton';
+import SmartHubButton from '@/components/SmartHubButton';
 
 interface MainHeaderProps {
   borderColor?: string;
@@ -32,6 +33,16 @@ interface MainHeaderProps {
   ithemeButtonBkColor?: string;
   ithemeButtonTextColor?: string;
   ithemeButtonHoverColor?: string;
+  smartHubName?: string;
+  smartHubColor?: string;
+  journey?: string;
+  currentSmartHubId?: string;
+  smartHubs?: Array<{
+    id: string;
+    name: string;
+    hub_color_id: number;
+    color?: string;
+  }>;
 }
 
 export default function MainHeader({ 
@@ -66,6 +77,11 @@ export default function MainHeader({
   ithemeButtonBkColor,
   ithemeButtonTextColor,
   ithemeButtonHoverColor,
+  smartHubName = 'Smart Hub',
+  smartHubColor = '#7F77F1',
+  journey = 'Validate Journey',
+  currentSmartHubId,
+  smartHubs = [],
 }: MainHeaderProps) {
   return (
     <header 
@@ -121,10 +137,21 @@ export default function MainHeader({
         />
       </div>
       <div 
-        className="min-h-[50px] w-full flex items-center"
-        style={{ backgroundColor }}
+        className="min-h-[50px] w-full flex items-center "
+        style={{ backgroundColor, paddingRight:'8px', paddingLeft:'5px'}}
       >
-        {/* Second div - height fits content, minimum 50px */}
+        <SmartHubButton
+          smartHubName={smartHubName}
+          hubColor={smartHubColor}
+          globalHoverColor={globalButtonHover}
+          menuColor={menuColor}
+          borderLineColor={borderLineColor}
+          textColor={textColor}
+          titleMenuColorLight={titleColor}
+          journey={journey}
+          currentSmartHubId={currentSmartHubId}
+          smartHubs={smartHubs}
+        />
       </div>
     </header>
   );
