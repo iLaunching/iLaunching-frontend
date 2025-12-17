@@ -247,7 +247,7 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
         menuColor={menuColor}
         titleColor={titleColor}
         globalButtonHover={globalButtonHover}
-        context="user-profile"
+        context="hub-settings"
         toneButtonBkColor={toneButtonBkColor}
         toneButtonTextColor={toneButtonTextColor}
       />
