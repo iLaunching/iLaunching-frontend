@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../services/api';
 
 interface AvatarImageUploaderProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File) => void;
+  context: 'user-profile' | 'hub-settings';
+  smart_hub_id?: number | null;
+  onUpload?: (file: File) => void; // Optional for backward compatibility
   textColor: string;
   menuColor: string;
   titleColor: string;
@@ -24,6 +28,8 @@ interface AvatarImageUploaderProps {
 const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   isOpen,
   onClose,
+  context,
+  smart_hub_id,
   onUpload,
   textColor,
   menuColor,
@@ -40,6 +46,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   buttonTextColor,
   buttonHoverColor,
 }) => {
+  const queryClient = useQueryClient();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -52,6 +59,39 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mutation for uploading user profile avatar
+  const uploadUserAvatarMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const response = await api.post('/profile/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    }
+  });
+
+  // Mutation for uploading smart hub avatar
+  const uploadSmartHubAvatarMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!smart_hub_id) throw new Error('Smart hub ID is required');
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const response = await api.post(`/smart-hub/avatar?smart_hub_id=${smart_hub_id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['smartHub', smart_hub_id] });
+      queryClient.invalidateQueries({ queryKey: ['smartHubs'] });
+    }
+  });
 
   // Debug: Log button colors
   console.log('AvatarImageUploader button colors:', {
@@ -218,18 +258,35 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
       );
 
       // Convert to blob and upload immediately
-      canvas.toBlob((blob) => {
+      canvas.toBlob(async (blob) => {
         if (blob) {
           const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
-          onUpload(file);
-          // Reset state and close modal
-          setImageSrc(null);
-          setPosition({ x: 0, y: 0 });
-          setZoom(1);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+          
+          try {
+            // Use context to determine which upload endpoint to call
+            if (context === 'user-profile') {
+              await uploadUserAvatarMutation.mutateAsync(file);
+            } else if (context === 'hub-settings') {
+              await uploadSmartHubAvatarMutation.mutateAsync(file);
+            }
+            
+            // Call legacy onUpload if provided (for backward compatibility)
+            if (onUpload) {
+              onUpload(file);
+            }
+            
+            // Reset state and close modal
+            setImageSrc(null);
+            setPosition({ x: 0, y: 0 });
+            setZoom(1);
+            if (fileInputRef.current) {
+              fileInputRef.current.value = '';
+            }
+            onClose();
+          } catch (error) {
+            console.error(`Failed to upload ${context} avatar:`, error);
+            // Keep modal open on error so user can try again
           }
-          onClose();
         }
       }, 'image/jpeg', 0.95);
     }
