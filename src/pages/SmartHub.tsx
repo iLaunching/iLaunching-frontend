@@ -13,6 +13,15 @@ interface SmartHubData {
     avatar?: string;
     hub_color?: string;  // Color value extracted from hub_color relationship
     hub_color_id?: number;  // FK to option_values (smarthub_color_scheme)
+    smartHub_icon_id?: number;  // FK to option_values for hub icon
+    avatar_display_option_value_id?: number;  // Avatar display mode
+    smartHub_icon?: {
+      id: number;
+      value_name: string;
+      display_name: string;
+      icon_name: string;
+      icon_prefix: string;
+    } | null;
     journey: string;  // Per-hub journey tier
     owner_id: string;
     your_role: string;
@@ -117,6 +126,11 @@ export default function SmartHub() {
       // Call API server endpoint - includes JWT token automatically
       const response = await api.get('/users/me/current-smart-hub');
       console.log('📊 Smart Hub data loaded:', response.data);
+      console.log('🎨 Smart Hub Icon Data:', JSON.stringify({
+        smartHub_icon_id: response.data?.smart_hub?.smartHub_icon_id,
+        smartHub_icon: response.data?.smart_hub?.smartHub_icon,
+        avatar_display_option_value_id: response.data?.smart_hub?.avatar_display_option_value_id
+      }, null, 2));
       return response.data;
     },
     retry: false,
@@ -281,6 +295,74 @@ export default function SmartHub() {
       smartHubId: hubData.smart_hub.id 
     });
   };
+
+  // Mutation to update smart hub icon
+  const updateSmartHubIconMutation = useMutation({
+    mutationFn: async ({ iconId, smartHubId }: { iconId: number; smartHubId: string }) => {
+      console.log('Calling API to update smart hub icon:', { iconId, smartHubId });
+      const response = await api.patch(`/smart-hub/icon?smart_hub_id=${smartHubId}&smartHub_icon_id=${iconId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Smart hub icon updated successfully:', data);
+      // Refetch the smart hub data to get updated icon
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update smart hub icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleSmartHubIconChange = (iconId: number) => {
+    console.log('=== SmartHub: handleSmartHubIconChange CALLED ===');
+    console.log('Icon ID:', iconId);
+    console.log('Smart Hub ID:', hubData?.smart_hub?.id);
+    
+    if (!hubData?.smart_hub?.id) {
+      console.error('No smart hub ID available');
+      return;
+    }
+    
+    console.log('Changing smart hub icon to:', iconId);
+    updateSmartHubIconMutation.mutate({ 
+      iconId, 
+      smartHubId: hubData.smart_hub.id 
+    });
+  };
+
+  // Mutation to clear smart hub icon
+  const clearSmartHubIconMutation = useMutation({
+    mutationFn: async (smartHubId: string) => {
+      console.log('Calling API to clear smart hub icon for hub:', smartHubId);
+      const response = await api.delete(`/smart-hub/icon?smart_hub_id=${smartHubId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log('Smart hub icon cleared successfully:', data);
+      // Refetch the smart hub data
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear smart hub icon:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleClearSmartHubIcon = () => {
+    console.log('=== SmartHub: handleClearSmartHubIcon CALLED ===');
+    console.log('Smart Hub ID:', hubData?.smart_hub?.id);
+    
+    if (!hubData?.smart_hub?.id) {
+      console.error('No smart hub ID available');
+      return;
+    }
+    
+    console.log('Clearing smart hub icon');
+    clearSmartHubIconMutation.mutate(hubData.smart_hub.id);
+  };
   
   // Handle authentication errors
   useEffect(() => {
@@ -333,7 +415,7 @@ export default function SmartHub() {
     );
   }
 
-  const theme = hubData?.theme || {
+  const themeDefaults = {
     header_overlay: '#00000080',
     header_background: '#7F77F1',
     background: '#ffffff',
@@ -345,10 +427,29 @@ export default function SmartHub() {
     user_button_icon: '#000000',
     title_menu_color_light: '#d6d6d6',
     border_line_color_light: '#d6d6d680',
-    global_button_hover: '#d6d6d64d'
+    global_button_hover: '#d6d6d64d',
+    solid_color: '#7F77F1',
+    button_bk_color: '#7F77F1',
+    button_text_color: '#ffffff',
+    button_hover_color: '#6B69D6',
+    feedback_indicator_bk: '#7F77F1',
+    appearance_text_color: '#000000',
+    bg_opacity: '1'
   };
   
+  // Merge API theme with defaults to ensure all properties exist
+  const theme = { ...themeDefaults, ...hubData?.theme };
+  
+  console.log('🎨 SmartHub theme.solid_color:', theme.solid_color);
+  console.log('🎨 SmartHub hubData?.theme:', hubData?.theme);
+  
   console.log('SmartHub - avatar display mode:', hubData?.profile?.avatar_display_option_value_id, 'icon:', hubData?.profile?.profile_icon);
+  console.log('SmartHub - SMART HUB avatar data:', JSON.stringify({
+    smartHub_icon_id: hubData?.smart_hub?.smartHub_icon_id,
+    icon_name: hubData?.smart_hub?.smartHub_icon?.icon_name,
+    icon_prefix: hubData?.smart_hub?.smartHub_icon?.icon_prefix,
+    avatar_display_mode: hubData?.smart_hub?.avatar_display_option_value_id
+  }, null, 2));
   
   return (
     <div 
@@ -402,15 +503,12 @@ export default function SmartHub() {
         ithemeBgOpacity={theme.bg_opacity}
         smartHubColorId={hubData.smart_hub.hub_color_id}
         onSmartHubColorChange={handleSmartHubColorChange}
-        smartHubIconId={undefined}
-        onSmartHubIconChange={(iconId) => {
-          console.log('SmartHub icon change:', iconId);
-          // TODO: Implement smart hub icon change mutation
-        }}
-        onClearSmartHubIcon={() => {
-          console.log('Clear smart hub icon');
-          // TODO: Implement clear smart hub icon mutation
-        }}
+        smartHubIconId={hubData.smart_hub.smartHub_icon_id}
+        smartHubIconName={hubData.smart_hub.smartHub_icon?.icon_name}
+        smartHubIconPrefix={hubData.smart_hub.smartHub_icon?.icon_prefix as 'fas' | 'far' | 'fab' | undefined}
+        smartHubAvatarDisplayMode={hubData.smart_hub.avatar_display_option_value_id || 24}
+        onSmartHubIconChange={handleSmartHubIconChange}
+        onClearSmartHubIcon={handleClearSmartHubIcon}
         solidColor={theme.solid_color}
         buttonBkColor={theme.button_bk_color}
         buttonTextColor={theme.button_text_color}

@@ -253,18 +253,7 @@ export default function UserAvatarMenu({ menuColor, titleColor, currentColorId, 
       <AvatarImageUploader
         isOpen={isAvatarUploaderOpen}
         onClose={() => setIsAvatarUploaderOpen(false)}
-        onUpload={async (file) => {
-          try {
-            console.log('Uploading avatar:', file);
-            // TODO: Implement backend upload
-            // const formData = new FormData();
-            // formData.append('avatar', file);
-            // await api.post('/profile/avatar', formData);
-            setIsAvatarUploaderOpen(false);
-          } catch (error) {
-            console.error('Failed to upload avatar:', error);
-          }
-        }}
+        context="user-profile"
         textColor={textColor}
         menuColor={menuColor}
         titleColor={titleColor}

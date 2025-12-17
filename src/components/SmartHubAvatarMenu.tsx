@@ -25,6 +25,7 @@ interface SmartHubAvatarMenuProps {
   onIconChange: (iconId: number) => void;
   onClearIcon: () => void;
   borderLineColor: string;
+  smartHubId: number | null;
   toneButtonBkColor?: string;
   toneButtonTextColor?: string;
   toneButtonBorderColor?: string;
@@ -37,11 +38,19 @@ interface SmartHubAvatarMenuProps {
   buttonHoverColor?: string;
 }
 
-export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: SmartHubAvatarMenuProps) {
+export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColorId, onColorChange, globalButtonHover, textColor, currentIconId, onIconChange, onClearIcon, borderLineColor, smartHubId, toneButtonBkColor, toneButtonTextColor, toneButtonBorderColor, backgroundColor, solidColor, feedbackIndicatorBk, appearanceTextColor, buttonBkColor, buttonTextColor, buttonHoverColor }: SmartHubAvatarMenuProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
+
+  // Debug: Log props received
+  console.log('🔍 SmartHubAvatarMenu received props:', {
+    solidColor,
+    feedbackIndicatorBk,
+    appearanceTextColor,
+    toneButtonBkColor
+  });
 
   // Wrapper to log icon changes
   const handleIconChange = (iconId: number) => {
@@ -247,7 +256,7 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
         menuColor={menuColor}
         titleColor={titleColor}
         globalButtonHover={globalButtonHover}
-        context="user-profile"
+        context="hub-settings"
         toneButtonBkColor={toneButtonBkColor}
         toneButtonTextColor={toneButtonTextColor}
       />
@@ -256,18 +265,8 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
       <AvatarImageUploader
         isOpen={isAvatarUploaderOpen}
         onClose={() => setIsAvatarUploaderOpen(false)}
-        onUpload={async (file) => {
-          try {
-            console.log('Uploading avatar:', file);
-            // TODO: Implement backend upload
-            // const formData = new FormData();
-            // formData.append('avatar', file);
-            // await api.post('/profile/avatar', formData);
-            setIsAvatarUploaderOpen(false);
-          } catch (error) {
-            console.error('Failed to upload avatar:', error);
-          }
-        }}
+        context="hub-settings"
+        smart_hub_id={smartHubId}
         textColor={textColor}
         menuColor={menuColor}
         titleColor={titleColor}
