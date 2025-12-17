@@ -517,8 +517,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     <div 
                       className="px-3 py-1.5 rounded-lg font-semibold text-sm shadow-lg"
                       style={{
-                        backgroundColor: feedbackIndicatorBk || backgroundColor || menuColor,
-                        color: appearanceTextColor || textColor,
+                        backgroundColor: backgroundColor ||  menuColor,
+                        color: textColor,
                         fontFamily: 'Work Sans, sans-serif'
                       }}
                     >
@@ -530,7 +530,7 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                       style={{
                         borderLeft: '6px solid transparent',
                         borderRight: '6px solid transparent',
-                        borderTop: `6px solid ${feedbackIndicatorBk || backgroundColor || menuColor}`,
+                        borderTop: `6px solid ${ backgroundColor || menuColor}`,
                         bottom: '-6px'
                       }}
                     />

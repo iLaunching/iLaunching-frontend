@@ -44,6 +44,14 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
 
+  // Debug: Log props received
+  console.log('🔍 SmartHubAvatarMenu received props:', {
+    solidColor,
+    feedbackIndicatorBk,
+    appearanceTextColor,
+    toneButtonBkColor
+  });
+
   // Wrapper to log icon changes
   const handleIconChange = (iconId: number) => {
     console.log('=== SmartHubAvatarMenu handleIconChange CALLED ===');
