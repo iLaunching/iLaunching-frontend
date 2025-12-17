@@ -37,6 +37,11 @@ interface UserMenuButtonProps {
   ithemeButtonBkColor?: string;
   ithemeButtonTextColor?: string;
   ithemeButtonHoverColor?: string;
+  currentAppearanceId?: number;
+  currentIthemeId?: number;
+  onAppearanceChange?: (appearanceId: number) => void;
+  onIthemeChange?: (ithemeId: number) => void;
+  ithemeBgOpacity?: string;
 }
 
 export default function UserMenuButton({
@@ -68,6 +73,11 @@ export default function UserMenuButton({
   ithemeButtonBkColor,
   ithemeButtonTextColor,
   ithemeButtonHoverColor,
+  currentAppearanceId,
+  currentIthemeId,
+  onAppearanceChange,
+  onIthemeChange,
+  ithemeBgOpacity,
 }: UserMenuButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
@@ -79,6 +89,7 @@ export default function UserMenuButton({
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+  const avatarButtonRef = useRef<HTMLDivElement>(null);
 
   const getInitials = () => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase() || '';
@@ -179,7 +190,9 @@ export default function UserMenuButton({
             fontFamily: 'Work Sans, sans-serif',
             fontSize: '12px',
             fontWeight: 600,
-            color: '#ffffff'
+            color: '#ffffff',
+            userSelect: 'none',
+          
           }}
         >
           {avatarDisplayMode === 26 && getIconDefinition() ? (
@@ -200,12 +213,20 @@ export default function UserMenuButton({
       {isOpen && (
         <div
           ref={menuRef}
+          onClick={(e) => {
+            // Close avatar menu when clicking anywhere in the dropdown (except avatar and avatar menu)
+            const clickedOnAvatar = avatarButtonRef.current?.contains(e.target as Node);
+            const clickedInAvatarMenu = avatarMenuRef.current?.contains(e.target as Node);
+            
+            if (!clickedOnAvatar && !clickedInAvatarMenu && isAvatarMenuOpen) {
+              setIsAvatarMenuOpen(false);
+            }
+          }}
           style={{
             position: 'absolute',
             top: 'calc(100% + 10px)',
             right: 0,
             width: '300px',
-            minHeight: '400px',
             height: 'fit-content',
             backgroundColor: menuColor,
             borderRadius: '10px',
@@ -228,6 +249,7 @@ export default function UserMenuButton({
               globalButtonHover={globalButtonHover}
               section1Content={
                 <div
+                  ref={avatarButtonRef}
                   className="flex items-center justify-center tooltip-trigger tooltip-top"
                   data-tooltip={`${firstName} ${surname}`}
                   onClick={(e) => {
@@ -243,7 +265,11 @@ export default function UserMenuButton({
                     fontSize: '14px',
                     fontWeight: 600,
                     color: '#ffffff',
-                    cursor: 'pointer'
+            userSelect: 'none',
+                    cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none',
+                    userSelect: 'none'
                   }}
                 >
                   {avatarDisplayMode === 26 && getIconDefinition() ? (
@@ -262,7 +288,8 @@ export default function UserMenuButton({
                       fontWeight: 400,
                       lineHeight: 1,
                       margin: 0,
-                      padding: 0
+                      padding: 0,
+                      userSelect: 'none'
                     }}
                   >
                     {firstName} {surname}
@@ -276,7 +303,8 @@ export default function UserMenuButton({
                       opacity: 0.7,
                       margin: 0,
                       padding: 0,
-                      lineHeight: 1
+                      lineHeight: 1,
+                      userSelect: 'none'
                     }}
                   >
                     placeholder
@@ -298,7 +326,11 @@ export default function UserMenuButton({
                     paddingBottom: '2px',
                     borderRadius: '10px',
                     cursor: 'pointer',
-                    marginRight:'5px'
+                userSelect: 'none',
+            userSelect: 'none',
+                    marginRight:'5px',
+                    userSelect: 'none',
+                    userSelect: 'none'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -325,7 +357,10 @@ export default function UserMenuButton({
                 padding: '0 8px',
                 marginTop: '10px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none',
+                userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -355,7 +390,10 @@ export default function UserMenuButton({
                 padding: '0 8px',
                 marginTop: '6px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none',
+                userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -398,7 +436,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -427,7 +467,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -456,7 +498,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -491,7 +535,8 @@ export default function UserMenuButton({
                 fontWeight: 400,
                 marginBottom: '10px',
                 marginLeft: '5px',
-                color: titleColor
+                color: titleColor,
+                userSelect: 'none'
               }}
             >
               Personal tools
@@ -509,7 +554,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -537,7 +584,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -565,7 +614,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+           
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -593,7 +644,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+           
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -614,9 +667,9 @@ export default function UserMenuButton({
           <div
             className="flex flex-col"
             style={{
-              minHeight: '100px',
               height: 'fit-content',
-              padding: '8px'
+              padding: '8px',
+             
             }}
           >
             {/* Trash Button */}
@@ -631,7 +684,9 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
+            
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -659,7 +714,8 @@ export default function UserMenuButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                userSelect: 'none',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -724,12 +780,13 @@ export default function UserMenuButton({
       textColor={textColor}
       borderLineColor={borderLineColor}
       globalHoverColor={globalButtonHover}
-      currentAppearanceId={6}
-      currentIthemeId={10}
-      onThemeChange={(appearanceId, ithemeId) => {
-        console.log('Theme changed:', { appearanceId, ithemeId });
-        // TODO: Call API to update user theme preferences
-      }}
+      currentAppearanceId={currentAppearanceId}
+      currentIthemeId={currentIthemeId}
+      onAppearanceChange={onAppearanceChange}
+      onIthemeChange={onIthemeChange}
+      ithemeButtonBkColor={ithemeButtonBkColor}
+      ithemeButtonTextColor={ithemeButtonTextColor}
+      ithemeBgOpacity={ithemeBgOpacity}
     />
     </>
   );

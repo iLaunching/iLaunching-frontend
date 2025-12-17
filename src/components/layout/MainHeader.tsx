@@ -43,6 +43,20 @@ interface MainHeaderProps {
     hub_color_id: number;
     color?: string;
   }>;
+  currentAppearanceId?: number;
+  currentIthemeId?: number;
+  onAppearanceChange?: (appearanceId: number) => void;
+  onIthemeChange?: (ithemeId: number) => void;
+  ithemeBgOpacity?: string;
+  smartHubColorId?: number;
+  onSmartHubColorChange?: (colorId: number) => void;
+  smartHubIconId?: number;
+  onSmartHubIconChange?: (iconId: number) => void;
+  onClearSmartHubIcon?: () => void;
+  solidColor?: string;
+  buttonBkColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
 }
 
 export default function MainHeader({ 
@@ -82,6 +96,20 @@ export default function MainHeader({
   journey = 'Validate Journey',
   currentSmartHubId,
   smartHubs = [],
+  currentAppearanceId,
+  currentIthemeId,
+  onAppearanceChange,
+  onIthemeChange,
+  ithemeBgOpacity,
+  smartHubColorId = 1,
+  onSmartHubColorChange = () => {},
+  smartHubIconId,
+  onSmartHubIconChange = () => {},
+  onClearSmartHubIcon = () => {},
+  solidColor,
+  buttonBkColor,
+  buttonTextColor,
+  buttonHoverColor,
 }: MainHeaderProps) {
   return (
     <header 
@@ -134,6 +162,11 @@ export default function MainHeader({
           ithemeButtonBkColor={ithemeButtonBkColor}
           ithemeButtonTextColor={ithemeButtonTextColor}
           ithemeButtonHoverColor={ithemeButtonHoverColor}
+          currentAppearanceId={currentAppearanceId}
+          currentIthemeId={currentIthemeId}
+          onAppearanceChange={onAppearanceChange}
+          onIthemeChange={onIthemeChange}
+          ithemeBgOpacity={ithemeBgOpacity}
         />
       </div>
       <div 
@@ -151,6 +184,21 @@ export default function MainHeader({
           journey={journey}
           currentSmartHubId={currentSmartHubId}
           smartHubs={smartHubs}
+          currentColorId={smartHubColorId}
+          onColorChange={onSmartHubColorChange}
+          currentIconId={smartHubIconId}
+          onIconChange={onSmartHubIconChange}
+          onClearIcon={onClearSmartHubIcon}
+          toneButtonBkColor={toneButtonBkColor}
+          toneButtonTextColor={toneButtonTextColor}
+          toneButtonBorderColor={toneButtonBorderColor}
+          backgroundColor={backgroundColor}
+          solidColor={solidColor}
+          feedbackIndicatorBk={feedbackIndicatorBk}
+          appearanceTextColor={appearanceTextColor}
+          buttonBkColor={buttonBkColor}
+          buttonTextColor={buttonTextColor}
+          buttonHoverColor={buttonHoverColor}
         />
       </div>
     </header>

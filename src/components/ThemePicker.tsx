@@ -1,5 +1,7 @@
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import AppearanceSelector from './AppearanceSelector';
+import IThemeSelector from './iThemeSelector';
 
 interface ThemePickerProps {
   isOpen: boolean;
@@ -10,7 +12,11 @@ interface ThemePickerProps {
   globalHoverColor: string;
   currentAppearanceId?: number;
   currentIthemeId?: number;
-  onThemeChange?: (appearanceId: number, ithemeId: number) => void;
+  onAppearanceChange?: (appearanceId: number) => void;
+  onIthemeChange?: (ithemeId: number) => void;
+  ithemeButtonBkColor?: string;
+  ithemeButtonTextColor?: string;
+  ithemeBgOpacity?: string;
 }
 
 interface ThemeOption {
@@ -29,52 +35,14 @@ export default function ThemePicker({
   globalHoverColor,
   currentAppearanceId,
   currentIthemeId,
-  onThemeChange
+  onAppearanceChange,
+  onIthemeChange,
+  ithemeButtonBkColor,
+  ithemeButtonTextColor,
+  ithemeBgOpacity
 }: ThemePickerProps) {
-  const [selectedAppearance, setSelectedAppearance] = useState<number | undefined>(currentAppearanceId);
-  const [selectedItheme, setSelectedItheme] = useState<number | undefined>(currentIthemeId);
+  console.log('🎨 ThemePicker: onAppearanceChange =', onAppearanceChange);
   const [activeTab, setActiveTab] = useState<'appearance' | 'itheme'>('appearance');
-  const [appearances, setAppearances] = useState<ThemeOption[]>([]);
-  const [ithemes, setIthemes] = useState<ThemeOption[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Reset state when popup opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedAppearance(currentAppearanceId);
-      setSelectedItheme(currentIthemeId);
-      // TODO: Fetch available themes from API
-      loadThemes();
-    }
-  }, [isOpen, currentAppearanceId, currentIthemeId]);
-
-  const loadThemes = async () => {
-    setLoading(true);
-    try {
-      // TODO: Replace with actual API calls
-      // Mock data for now
-      setAppearances([
-        { id: 6, value_name: 'light', display_name: 'Light Mode' },
-        { id: 7, value_name: 'dark', display_name: 'Dark Mode' }
-      ]);
-      setIthemes([
-        { id: 10, value_name: 'ipurple', display_name: 'iPurple' },
-        { id: 11, value_name: 'iblue', display_name: 'iBlue' },
-        { id: 12, value_name: 'igreen', display_name: 'iGreen' }
-      ]);
-    } catch (error) {
-      console.error('Failed to load themes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleApply = () => {
-    if (selectedAppearance && selectedItheme && onThemeChange) {
-      onThemeChange(selectedAppearance, selectedItheme);
-    }
-    onClose();
-  };
 
   if (!isOpen) return null;
 
@@ -147,16 +115,17 @@ export default function ThemePicker({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '8px'
+              marginBottom: '0px'
             }}
           >
             <h2
               style={{
                 fontFamily: 'Work Sans, sans-serif',
                 fontSize: '20px',
-                fontWeight: 600,
+                fontWeight: 500,
                 color: textColor,
-                margin: 0
+                margin: 0,
+                userSelect: 'none'
               }}
             >
               Theme
@@ -192,10 +161,11 @@ export default function ThemePicker({
               color: textColor,
               opacity: 0.7,
               margin: 0,
-              marginBottom: '20px'
+              marginBottom: '20px',
+              userSelect: 'none'
             }}
           >
-            Personalise your look
+            Personalise your iLaunching experience by selecting your preferred appearance and iTheme.
           </p>
 
           {/* Navigation Tabs */}
@@ -203,23 +173,29 @@ export default function ThemePicker({
             style={{
               display: 'flex',
               gap: '8px',
-              marginBottom: '20px'
+              marginBottom: '0px',
+              backgroundColor: ithemeBgOpacity || borderLineColor,
+              padding: '4px',
+              borderRadius: '18px' 
             }}
           >
             <button
               onClick={() => setActiveTab('appearance')}
               style={{
                 flex: 1,
-                padding: '10px 16px',
-                borderRadius: '8px',
+                padding: '5px 5px',
+                borderRadius: '15px',
                 border: `1px solid ${borderLineColor}`,
-                backgroundColor: activeTab === 'appearance' ? textColor : 'transparent',
-                color: activeTab === 'appearance' ? menuColor : textColor,
+                backgroundColor: activeTab === 'appearance' ? (ithemeButtonBkColor || textColor) : 'transparent',
+                color: activeTab === 'appearance' ? (ithemeButtonTextColor || menuColor) : textColor,
                 fontFamily: 'Work Sans, sans-serif',
                 fontSize: '14px',
-                fontWeight: 500,
+                fontWeight: 400,
                 cursor: 'pointer',
-                transition: 'all 0.2s'
+                userSelect: 'none',
+                transition: 'all 0.2s',
+                height: '33px',
+                
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'appearance') {
@@ -238,16 +214,19 @@ export default function ThemePicker({
               onClick={() => setActiveTab('itheme')}
               style={{
                 flex: 1,
-                padding: '10px 16px',
-                borderRadius: '8px',
+                padding: '5px 5px',
+                borderRadius: '15px',
                 border: `1px solid ${borderLineColor}`,
-                backgroundColor: activeTab === 'itheme' ? textColor : 'transparent',
-                color: activeTab === 'itheme' ? menuColor : textColor,
+                backgroundColor: activeTab === 'itheme' ? (ithemeButtonBkColor || textColor) : 'transparent',
+                color: activeTab === 'itheme' ? (ithemeButtonTextColor || menuColor) : textColor,
                 fontFamily: 'Work Sans, sans-serif',
                 fontSize: '14px',
-                fontWeight: 500,
+                fontWeight: 400,
                 cursor: 'pointer',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                height: '33px',
+                userSelect: 'none'
+
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'itheme') {
@@ -275,141 +254,25 @@ export default function ThemePicker({
         >
           {/* Appearance Section */}
           {activeTab === 'appearance' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
-              {appearances.map((appearance) => (
-                <button
-                  key={appearance.id}
-                  onClick={() => setSelectedAppearance(appearance.id)}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: `2px solid ${selectedAppearance === appearance.id ? '#7F77F1' : borderLineColor}`,
-                    backgroundColor: selectedAppearance === appearance.id ? 'rgba(127, 119, 241, 0.1)' : 'transparent',
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    textAlign: 'center'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedAppearance !== appearance.id) {
-                      e.currentTarget.style.backgroundColor = globalHoverColor;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedAppearance !== appearance.id) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }
-                  }}
-                >
-                  {appearance.display_name}
-                </button>
-              ))}
-            </div>
+            <AppearanceSelector
+              currentAppearanceId={currentAppearanceId ?? null}
+              onAppearanceChange={onAppearanceChange}
+              textColor={textColor}
+              borderLineColor={borderLineColor}
+              globalHoverColor={globalHoverColor}
+            />
           )}
 
           {/* iTheme Section */}
           {activeTab === 'itheme' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
-              {ithemes.map((itheme) => (
-                <button
-                  key={itheme.id}
-                  onClick={() => setSelectedItheme(itheme.id)}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: `2px solid ${selectedItheme === itheme.id ? '#7F77F1' : borderLineColor}`,
-                    backgroundColor: selectedItheme === itheme.id ? 'rgba(127, 119, 241, 0.1)' : 'transparent',
-                    color: textColor,
-                    fontFamily: 'Work Sans, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    textAlign: 'center'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedItheme !== itheme.id) {
-                      e.currentTarget.style.backgroundColor = globalHoverColor;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedItheme !== itheme.id) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }
-                  }}
-                >
-                  {itheme.display_name}
-                </button>
-              ))}
-            </div>
+            <IThemeSelector
+              currentIthemeId={currentIthemeId ?? null}
+              onIthemeChange={onIthemeChange}
+              textColor={textColor}
+              borderLineColor={borderLineColor}
+              globalHoverColor={globalHoverColor}
+            />
           )}
-        </div>
-
-        {/* Footer */}
-        <div
-          style={{
-            padding: '20px 24px',
-            borderTop: `1px solid ${borderLineColor}`,
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end'
-          }}
-        >
-          <button
-            onClick={onClose}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '8px',
-              border: `1px solid ${borderLineColor}`,
-              backgroundColor: 'transparent',
-              color: textColor,
-              fontFamily: 'Work Sans, sans-serif',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = globalHoverColor;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleApply}
-            disabled={!selectedAppearance || !selectedItheme}
-            style={{
-              padding: '10px 20px',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: selectedAppearance && selectedItheme ? '#7F77F1' : '#cccccc',
-              color: '#ffffff',
-              fontFamily: 'Work Sans, sans-serif',
-              fontSize: '14px',
-              fontWeight: 500,
-              cursor: selectedAppearance && selectedItheme ? 'pointer' : 'not-allowed',
-              transition: 'background-color 0.2s',
-              opacity: selectedAppearance && selectedItheme ? 1 : 0.6
-            }}
-            onMouseEnter={(e) => {
-              if (selectedAppearance && selectedItheme) {
-                e.currentTarget.style.backgroundColor = '#6B63DD';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (selectedAppearance && selectedItheme) {
-                e.currentTarget.style.backgroundColor = '#7F77F1';
-              }
-            }}
-          >
-            Apply Theme
-          </button>
         </div>
       </div>
     </>

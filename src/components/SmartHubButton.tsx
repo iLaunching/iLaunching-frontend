@@ -1,9 +1,10 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Edit } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import SmartHubCreator from './SmartHubCreator';
+import SmartHubAvatarMenu from './SmartHubAvatarMenu';
 import api from '@/lib/api';
 
 interface SmartHub {
@@ -26,6 +27,21 @@ interface SmartHubButtonProps {
   smartHubs?: SmartHub[];
   currentSmartHubId?: string;
   onClick?: () => void;
+  currentColorId?: number;
+  onColorChange?: (colorId: number) => void;
+  currentIconId?: number;
+  onIconChange?: (iconId: number) => void;
+  onClearIcon?: () => void;
+  toneButtonBkColor?: string;
+  toneButtonTextColor?: string;
+  toneButtonBorderColor?: string;
+  backgroundColor?: string;
+  solidColor?: string;
+  feedbackIndicatorBk?: string;
+  appearanceTextColor?: string;
+  buttonBkColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
 }
 
 export default function SmartHubButton({
@@ -39,13 +55,32 @@ export default function SmartHubButton({
   journey = 'Validate Journey',
   smartHubs = [],
   currentSmartHubId,
-  onClick
+  onClick,
+  currentColorId = 1,
+  onColorChange = () => {},
+  currentIconId,
+  onIconChange = () => {},
+  onClearIcon = () => {},
+  toneButtonBkColor,
+  toneButtonTextColor,
+  toneButtonBorderColor,
+  backgroundColor,
+  solidColor,
+  feedbackIndicatorBk,
+  appearanceTextColor,
+  buttonBkColor,
+  buttonTextColor,
+  buttonHoverColor
 }: SmartHubButtonProps) {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+  const avatarMenuRef = useRef<HTMLDivElement>(null);
 
   // Mutation to switch smart hub
   const switchHubMutation = useMutation({
@@ -72,19 +107,26 @@ export default function SmartHubButton({
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        buttonRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
+      const clickedInsideButton = buttonRef.current?.contains(event.target as Node);
+      const clickedInsideMenu = menuRef.current?.contains(event.target as Node);
+      const clickedInsideAvatarMenu = avatarMenuRef.current?.contains(event.target as Node);
+
+      // If clicked outside all menus
+      if (!clickedInsideButton && !clickedInsideMenu && !clickedInsideAvatarMenu) {
+        // If avatar menu is open, close only the avatar menu (keep smart hub menu open)
+        if (isAvatarMenuOpen) {
+          setIsAvatarMenuOpen(false);
+        } 
+        // If avatar menu is not open, close the smart hub menu
+        else if (isOpen) {
+          setIsOpen(false);
+        }
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isAvatarMenuOpen, isOpen]);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -127,6 +169,15 @@ export default function SmartHubButton({
       {isOpen && (
         <div
           ref={menuRef}
+          onClick={(e) => {
+            // Close avatar menu when clicking anywhere in the dropdown (except avatar and avatar menu)
+            const clickedOnAvatar = avatarRef.current?.contains(e.target as Node);
+            const clickedInAvatarMenu = avatarMenuRef.current?.contains(e.target as Node);
+            
+            if (!clickedOnAvatar && !clickedInAvatarMenu && isAvatarMenuOpen) {
+              setIsAvatarMenuOpen(false);
+            }
+          }}
           style={{
             position: 'absolute',
             top: 'calc(100% + 15px)',
@@ -156,17 +207,89 @@ export default function SmartHubButton({
             <div className="flex items-center gap-3 pr-2 pt-2 pb-2">
               {/* Smart Hub Avatar */}
               <div
-                className="flex items-center justify-center rounded-md text-white font-semibold"
+                ref={avatarRef}
+                className="flex items-center justify-center text-white font-semibold"
                 style={{
                   width: '40px',
                   height: '40px',
                   backgroundColor: hubColor,
                   fontFamily: 'Work Sans, sans-serif',
-                  fontSize: '15px'
+                  fontSize: '15px',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  borderRadius: '8px',
+                }}
+                onMouseEnter={() => setIsAvatarHovered(true)}
+                onMouseLeave={() => setIsAvatarHovered(false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAvatarMenuOpen(!isAvatarMenuOpen);
                 }}
               >
                 {avatarText}
+                
+                {/* Overlay with Edit Icon */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: isAvatarHovered ? 1 : 0,
+                    transition: 'opacity 0.2s ease',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <Edit size={18} color="#ffffff" />
+                </div>
               </div>
+              
+              
+              {/* SmartHub Avatar Menu */}
+              {isAvatarMenuOpen && (
+                <div ref={avatarMenuRef} style={{ position: 'absolute', top: '10px', left: '50px', zIndex: 10001 }}>
+                  <SmartHubAvatarMenu
+                    menuColor={menuColor}
+                    titleColor={titleMenuColorLight}
+                    currentColorId={currentColorId}
+                    onColorChange={(colorId) => {
+                      console.log('=== SmartHubButton: Color clicked ===', colorId);
+                      console.log('onColorChange function:', onColorChange);
+                      onColorChange(colorId);
+                      setIsAvatarMenuOpen(false);
+                    }}
+                    globalButtonHover={globalHoverColor}
+                    textColor={textColor}
+                    currentIconId={currentIconId}
+                    onIconChange={(iconId) => {
+                      onIconChange(iconId);
+                      setIsAvatarMenuOpen(false);
+                    }}
+                    onClearIcon={() => {
+                      onClearIcon();
+                      setIsAvatarMenuOpen(false);
+                    }}
+                    borderLineColor={borderLineColor}
+                    toneButtonBkColor={toneButtonBkColor}
+                    toneButtonTextColor={toneButtonTextColor}
+                    toneButtonBorderColor={toneButtonBorderColor}
+                    backgroundColor={backgroundColor}
+                    solidColor={solidColor}
+                    feedbackIndicatorBk={feedbackIndicatorBk}
+                    appearanceTextColor={appearanceTextColor}
+                    buttonBkColor={buttonBkColor}
+                    buttonTextColor={buttonTextColor}
+                    buttonHoverColor={buttonHoverColor}
+                  />
+                </div>
+              )}
+
 
               {/* Smart Hub Name */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -176,7 +299,8 @@ export default function SmartHubButton({
                     fontSize: '17px',
                     fontWeight: 400,
                     color: textColor,
-                    lineHeight: 1
+                    lineHeight: 1,
+                      userSelect: 'none'
                   }}
                 >
                   {smartHubName}
@@ -195,7 +319,8 @@ export default function SmartHubButton({
                       fontWeight: 300,
                       color: textColor,
                       opacity: 0.7,
-                      lineHeight: 1
+                      lineHeight: 1,
+                      userSelect: 'none'
                     }}
                   >
                     {journey}
@@ -221,6 +346,9 @@ export default function SmartHubButton({
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                      
                       fontFamily: 'Work Sans, sans-serif',
                       fontSize: '14px',
@@ -282,6 +410,9 @@ export default function SmartHubButton({
                   padding: '0 8px',
                   fontSize: '14px',
                   cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
@@ -311,6 +442,9 @@ export default function SmartHubButton({
                   padding: '0 8px',
                   fontSize: '14px',
                   cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
@@ -362,6 +496,9 @@ export default function SmartHubButton({
                 padding: '0 6px',
                 fontSize: '14px',
                 cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -392,6 +529,9 @@ export default function SmartHubButton({
                 marginTop: '4px',
                 fontSize: '14px',
                 cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -422,6 +562,9 @@ export default function SmartHubButton({
                 marginTop: '4px',
                 fontSize: '14px',
                 cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -452,6 +595,9 @@ export default function SmartHubButton({
                 marginTop: '4px',
                 fontSize: '14px',
                 cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -508,6 +654,9 @@ export default function SmartHubButton({
                       padding: '5px 6px',
                       fontSize: '14px',
                       cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none',
                       textAlign: 'left'
                     }}
                     onMouseEnter={(e) => {
@@ -566,7 +715,10 @@ export default function SmartHubButton({
                 borderRadius: '8px',
                 padding: '0 8px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                  userSelect: 'none',
+                userSelect: 'none',
+            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalHoverColor;
