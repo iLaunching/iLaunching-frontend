@@ -126,6 +126,11 @@ export default function SmartHub() {
       // Call API server endpoint - includes JWT token automatically
       const response = await api.get('/users/me/current-smart-hub');
       console.log('📊 Smart Hub data loaded:', response.data);
+      console.log('🎨 Smart Hub Icon Data:', {
+        smartHub_icon_id: response.data?.smart_hub?.smartHub_icon_id,
+        smartHub_icon: response.data?.smart_hub?.smartHub_icon,
+        avatar_display_option_value_id: response.data?.smart_hub?.avatar_display_option_value_id
+      });
       return response.data;
     },
     retry: false,
@@ -426,6 +431,12 @@ export default function SmartHub() {
   };
   
   console.log('SmartHub - avatar display mode:', hubData?.profile?.avatar_display_option_value_id, 'icon:', hubData?.profile?.profile_icon);
+  console.log('SmartHub - SMART HUB avatar data:', {
+    smartHub_icon_id: hubData?.smart_hub?.smartHub_icon_id,
+    icon_name: hubData?.smart_hub?.smartHub_icon?.icon_name,
+    icon_prefix: hubData?.smart_hub?.smartHub_icon?.icon_prefix,
+    avatar_display_mode: hubData?.smart_hub?.avatar_display_option_value_id
+  });
   
   return (
     <div 
