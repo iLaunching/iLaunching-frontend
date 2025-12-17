@@ -88,13 +88,13 @@ export default function SmartHubButton({
   const avatarRef = useRef<HTMLDivElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
 
-  console.log('SmartHubButton props:', {
+  console.log('SmartHubButton props:', JSON.stringify({
     currentIconId,
     currentIconName,
     currentIconPrefix,
     avatarDisplayMode,
     smartHubName
-  });
+  }, null, 2));
 
   // Get initials from smart hub name
   const getInitials = () => {
