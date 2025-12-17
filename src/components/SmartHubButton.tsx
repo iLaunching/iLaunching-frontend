@@ -88,6 +88,37 @@ export default function SmartHubButton({
   const avatarRef = useRef<HTMLDivElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
 
+  // Get initials from smart hub name
+  const getInitials = () => {
+    return smartHubName.charAt(0).toUpperCase();
+  };
+
+  // Get icon definition from icon name and prefix
+  const getIconDefinition = (): any => {
+    if (!currentIconName || !currentIconPrefix) return null;
+    
+    // For now, only support solid icons since we only have that package installed
+    if (currentIconPrefix !== 'fas') {
+      console.warn(`Only solid icons are currently supported. Prefix: ${currentIconPrefix}`);
+      return null;
+    }
+    
+    try {
+      // Remove 'fa-' prefix if present, then convert kebab-case to camelCase and add 'fa' prefix
+      const cleanName = currentIconName.startsWith('fa-') ? currentIconName.slice(3) : currentIconName;
+      const camelCase = cleanName
+        .split('-')
+        .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+        .join('');
+      const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
+
+      return solidIcons[iconKey as keyof typeof solidIcons];
+    } catch (error) {
+      console.warn(`Icon not found: ${currentIconName}`);
+    }
+    return null;
+  };
+
   // Mutation to switch smart hub
   const switchHubMutation = useMutation({
     mutationFn: async (hubId: string) => {
@@ -106,9 +137,6 @@ export default function SmartHubButton({
       console.error('Error response:', error.response?.data);
     }
   });
-
-  // Truncate smart hub name to first character
-  const avatarText = smartHubName.charAt(0).toUpperCase();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -159,7 +187,11 @@ export default function SmartHubButton({
           className="flex items-center justify-center w-6 h-6 rounded-md text-white text-sm font-semibold"
           style={{ backgroundColor: hubColor }}
         >
-          {avatarText}
+          {avatarDisplayMode === 26 && getIconDefinition() ? (
+            <FontAwesomeIcon icon={getIconDefinition()} size="xs" />
+          ) : (
+            getInitials()
+          )}
         </div>
 
         {/* Smart Hub Name */}
@@ -232,7 +264,11 @@ export default function SmartHubButton({
                   setIsAvatarMenuOpen(!isAvatarMenuOpen);
                 }}
               >
-                {avatarText}
+                {avatarDisplayMode === 26 && getIconDefinition() ? (
+                  <FontAwesomeIcon icon={getIconDefinition()} size="lg" />
+                ) : (
+                  getInitials()
+                )}
                 
                 {/* Overlay with Edit Icon */}
                 <div
