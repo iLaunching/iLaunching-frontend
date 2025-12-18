@@ -313,6 +313,7 @@ export default function Onboarding() {
                   <div className="w-full animate-fade-in mt-8">
                     <SmartHubAvatarColorPicker
                       userName={firstName}
+                      hubName={hubName}
                       selectedColorId={selectedColorId}
                       onColorSelect={handleColorSelect}
                     />

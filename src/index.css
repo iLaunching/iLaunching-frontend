@@ -679,7 +679,10 @@ p[contenteditable]:focus {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.025em;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 200px;
+  width: max-content;
+  text-align: center;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -761,8 +764,8 @@ p[contenteditable]:focus {
 }
 
 .use-case-option.selected {
-  border-color: #000000;
-  background-color: #000000;
+  border-color: var(--use-case-selected-color, #000000);
+  background-color: var(--use-case-selected-color, #000000);
   color: #ffffff;
   font-weight: 600;
 }
@@ -883,7 +886,6 @@ p[contenteditable]:focus {
 .acknowledge-box {
   font-size: 16px;
   font-weight: 500;
-  color: rgba(17, 15, 117, 1);
   padding: 12px 24px;
   border-radius: 12px;
   line-height: 1.4;

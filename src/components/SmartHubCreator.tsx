@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import OnboardingAiHeader from './OnboardingAiHeader';
@@ -18,6 +18,12 @@ interface SmartHubCreatorProps {
   textColor: string;
   borderLineColor: string;
   globalHoverColor: string;
+  chatBk1?: string;
+  solidColor?: string;
+  buttonHoverColor?: string;
+  promptBk?: string;
+  promptTextColor?: string;
+  aiAcknowledgeTextColor?: string;
 }
 
 export default function SmartHubCreator({
@@ -26,9 +32,26 @@ export default function SmartHubCreator({
   menuColor,
   textColor,
   borderLineColor,
-  globalHoverColor
+  globalHoverColor,
+  chatBk1,
+  solidColor,
+  buttonHoverColor,
+  promptBk,
+  promptTextColor,
+  aiAcknowledgeTextColor
 }: SmartHubCreatorProps) {
   const queryClient = useQueryClient();
+  
+  // Debug: Log the ai_acknowledge_text_color value
+  console.log('🎨 SmartHubCreator aiAcknowledgeTextColor:', aiAcknowledgeTextColor);
+  console.log('🎨 SmartHubCreator ALL COLORS:', { 
+    aiAcknowledgeTextColor, 
+    promptBk, 
+    promptTextColor,
+    textColor,
+    solidColor
+  });
+  
   const [currentStage, setCurrentStage] = useState<'use_case' | 'hub_name' | 'hub_color' | 'journey' | 'smart_matrix_name' | 'invite_people' | 'thankyou'>('use_case');
   const [showPrompt, setShowPrompt] = useState(false);
   const [showTypewriter, setShowTypewriter] = useState(false);
@@ -47,6 +70,10 @@ export default function SmartHubCreator({
   const [showMovingAi, setShowMovingAi] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
   const [acknowledgeStepMessage, setAcknowledgeStepMessage] = useState<string>('Almost there...');
+  const [isStartingOver, setIsStartingOver] = useState(false);
+  const [isReturningFromMatrix, setIsReturningFromMatrix] = useState(false);
+  const [isReturningToMatrix, setIsReturningToMatrix] = useState(false);
+  const [isReturningToJourney, setIsReturningToJourney] = useState(false);
   const hasCompletedRef = useRef(false);
   const teamMembersScrollRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +95,10 @@ export default function SmartHubCreator({
       setEmailInput('');
       setEmailError('');
       setErrorTypewriterMessage('');
+      setIsStartingOver(false);
+      setIsReturningFromMatrix(false);
+      setIsReturningToMatrix(false);
+      setIsReturningToJourney(false);
       hasCompletedRef.current = false;
       
       // Fetch user profile for first name
@@ -108,6 +139,7 @@ export default function SmartHubCreator({
       setShowMovingAi(false);
       setShowAcknowledge(false);
       setAcknowledgeStepMessage('Almost there...');
+      setIsStartingOver(false);
       hasCompletedRef.current = false;
     }
   }, [isOpen]);
@@ -127,15 +159,27 @@ export default function SmartHubCreator({
     
     switch (currentStage) {
       case 'use_case':
-        return 'What will you use this Smart Hub for?';
+        return isStartingOver 
+          ? `No problem, ${firstName}! Let's start fresh. What will you use this Smart Hub for?` 
+          : 'What will you use this Smart Hub for?';
       case 'hub_name':
-        return ONBOARDING_HUB_NAME_QUESTION[0];
+        return hubName 
+          ? `I see you previously chose "${hubName}". Feel free to change it, keep it as is, or use the "Start Over" button below to begin from scratch!` 
+          : `${ONBOARDING_HUB_NAME_QUESTION[0]} (You can also use the "Start Over" button below if you need to start fresh!)`;
       case 'hub_color':
-        return ONBOARDING_HUB_COLOR_QUESTION[0];
+        return isReturningFromMatrix
+          ? `Sure, ${firstName}! Let's change your Smart Hub color. Pick a new one below!`
+          : ONBOARDING_HUB_COLOR_QUESTION[0];
       case 'journey':
-        return 'Which journey best fits your goals?';
+        return isReturningToJourney && selectedJourney
+          ? `Sure, ${firstName}! Let's change your journey. You had selected "${selectedJourney}". Feel free to choose a different one!`
+          : 'Which journey best fits your goals?';
       case 'smart_matrix_name':
-        return ONBOARDING_SMART_MATRIX_NAME_QUESTION[0];
+        return isReturningToMatrix && matrixName
+          ? `Sure, ${firstName}! Let's rename your Smart Matrix. It was "${matrixName}". What would you like to call it now?`
+          : matrixName 
+          ? `I see you previously chose "${matrixName}". Feel free to change it, keep it as is, or use the "Change Smart Hub Color" button below to go back!` 
+          : `${ONBOARDING_SMART_MATRIX_NAME_QUESTION[0]} (You can also use the "Change Smart Hub Color" button below if you need to change your hub color!)`;
       case 'invite_people':
         return "Who's joining us in this Smart Hub?";
       case 'thankyou':
@@ -143,7 +187,7 @@ export default function SmartHubCreator({
       default:
         return '';
     }
-  }, [currentStage, errorTypewriterMessage, firstName]);
+  }, [currentStage, errorTypewriterMessage, firstName, hubName, matrixName, isStartingOver, isReturningFromMatrix, isReturningToMatrix, isReturningToJourney, selectedJourney]);
 
   // Create acknowledge message with first name
   const acknowledgeMessage = useMemo(() => {
@@ -169,6 +213,7 @@ export default function SmartHubCreator({
   const handleUseCaseContinue = useCallback(() => {
     console.log('Use Case Continue - Selected:', selectedUseCaseId, selectedUseCaseName);
     setShowPrompt(false);
+    setIsStartingOver(false);
     setCurrentStage('hub_name');
   }, [selectedUseCaseId, selectedUseCaseName]);
 
@@ -191,6 +236,7 @@ export default function SmartHubCreator({
   const handleContinue = useCallback(() => {
     console.log('Continue clicked - Hub Name:', hubName, 'Color ID:', selectedColorId, 'Color:', selectedColor);
     setShowPrompt(false);
+    setIsReturningFromMatrix(false);
     setCurrentStage('smart_matrix_name');
   }, [hubName, selectedColorId, selectedColor]);
 
@@ -202,8 +248,89 @@ export default function SmartHubCreator({
   const handleJourneyContinue = useCallback(() => {
     console.log('Journey Continue - Selected:', selectedJourney);
     setShowPrompt(false);
+    setIsReturningToJourney(false);
     setCurrentStage('invite_people');
   }, [selectedJourney]);
+
+  // Handle back button navigation
+  const handleBack = useCallback(() => {
+    setShowPrompt(false);
+    setShowTypewriter(false);
+    hasCompletedRef.current = false;
+    
+    switch (currentStage) {
+      case 'hub_name':
+        setCurrentStage('use_case');
+        break;
+      case 'hub_color':
+        setCurrentStage('hub_name');
+        break;
+      case 'journey':
+        setIsReturningToMatrix(true);
+        setCurrentStage('smart_matrix_name');
+        break;
+      case 'smart_matrix_name':
+        setCurrentStage('journey');
+        break;
+      case 'invite_people':
+        setIsReturningToJourney(true);
+        setCurrentStage('journey');
+        break;
+      default:
+        break;
+    }
+    
+    // Retrigger typewriter after stage changes
+    setTimeout(() => {
+      setShowTypewriter(true);
+    }, 100);
+  }, [currentStage]);
+
+  // Get back button text based on current stage
+  const getBackButtonText = useCallback(() => {
+    switch (currentStage) {
+      case 'hub_name':
+        return 'Change use case';
+      case 'hub_color':
+        return 'Change smart hub name';
+      case 'journey':
+        return 'Rename Smart Matrix';
+      case 'smart_matrix_name':
+        return 'Change journey';
+      case 'invite_people':
+        return 'Change journey';
+      default:
+        return 'Back';
+    }
+  }, [currentStage]);
+
+  // Handle start over button - go back to stage 1
+  const handleStartOver = useCallback(() => {
+    setShowPrompt(false);
+    setShowTypewriter(false);
+    hasCompletedRef.current = false;
+    setIsStartingOver(true);
+    setCurrentStage('use_case');
+    
+    // Retrigger typewriter after stage changes
+    setTimeout(() => {
+      setShowTypewriter(true);
+    }, 100);
+  }, []);
+
+  // Handle back to color button - for smart_matrix_name stage
+  const handleBackToColor = useCallback(() => {
+    setShowPrompt(false);
+    setShowTypewriter(false);
+    hasCompletedRef.current = false;
+    setIsReturningFromMatrix(true);
+    setCurrentStage('hub_color');
+    
+    // Retrigger typewriter after stage changes
+    setTimeout(() => {
+      setShowTypewriter(true);
+    }, 100);
+  }, []);
 
   const createSmartHubAndMatrix = useCallback(async () => {
     try {
@@ -355,6 +482,7 @@ export default function SmartHubCreator({
   const handleMatrixNameSubmit = useCallback((message: string) => {
     setMatrixName(message);
     setShowPrompt(false);
+    setIsReturningToMatrix(false);
     console.log('Matrix name submitted:', message);
     // Move to journey selection
     setCurrentStage('journey');
@@ -385,22 +513,23 @@ export default function SmartHubCreator({
           background-color: ${globalHoverColor};
         }
         .creator-continue-btn {
-          padding: 12px 32px;
-          background-color: #000000;
+          padding: 10px 32px;
+          background-color: ${solidColor};
           color: #FFFFFF;
           border-radius: 8px;
-          font-weight: 600;
+          font-weight: 400;
           border: none;
           cursor: pointer;
           font-family: 'Work Sans', sans-serif;
-          font-size: 15px;
-          transition: all 0.2s;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          font-size: 16px;
+          height: fit-content;
+          
+          
         }
         .creator-continue-btn:hover {
-          background-color: #1f2937;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          background-color: ${buttonHoverColor};
+        
+          
         }
       `}</style>
       {/* Backdrop */}
@@ -413,13 +542,12 @@ export default function SmartHubCreator({
           bottom: 0,
           
           
-         background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.93) 38%, rgba(255, 255, 255, 0.84) 82%)',
+          background: chatBk1,
           zIndex: 10000,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
         }}
-        onClick={onClose}
       >
         {/* Popup - Match onboarding dimensions */}
         <div
@@ -464,6 +592,7 @@ export default function SmartHubCreator({
             <OnboardingAiHeader 
               aiName="iLaunching"
               acknowledgeMessage={acknowledgeMessage}
+              aiAcknowledgeTextColor={aiAcknowledgeTextColor}
             />
           )}
 
@@ -517,8 +646,15 @@ export default function SmartHubCreator({
                 {/* Acknowledge box appears below AI after animation */}
                 {showAcknowledge && (
                   <div style={{ marginTop: '24px' }} className="animate-acknowledge-fade-in">
-                    <div className="acknowledge-box">
-                      <span className="acknowledge-text">{acknowledgeStepMessage}</span>
+                    <div 
+                      className="acknowledge-box"
+                      style={{ 
+                        color: aiAcknowledgeTextColor || 'rgba(17, 15, 117, 1)'
+                      }}
+                    >
+                      <span className="acknowledge-text">
+                        {acknowledgeStepMessage}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -538,6 +674,7 @@ export default function SmartHubCreator({
                   textColor={textColor}
                   borderLineColor={borderLineColor}
                   globalHoverColor={globalHoverColor}
+                  solidColor={solidColor}
                 />
               </div>
             )}
@@ -551,8 +688,10 @@ export default function SmartHubCreator({
               }}>
                 <SmartHubAvatarColorPicker
                   userName={firstName}
+                  hubName={hubName}
                   selectedColorId={selectedColorId}
                   onColorSelect={handleColorSelect}
+                  textColor={textColor}
                 />
               </div>
             )}
@@ -593,11 +732,11 @@ export default function SmartHubCreator({
                       padding: '12px 16px',
                       borderRadius: '8px',
                       border: `1px solid ${emailError ? '#ef4444' : borderLineColor}`,
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
                       color: textColor,
                       fontFamily: 'Work Sans, sans-serif',
                       fontSize: '14px',
-                      outline: 'none'
+                      outline: 'none',
+                      backgroundColor: 'transparent',
                     }}
                     onFocus={(e) => {
                       if (!emailError) {
@@ -637,7 +776,7 @@ export default function SmartHubCreator({
                   marginTop: '0px',
                   borderRadius: '8px',
                   border: `1px solid ${borderLineColor}`,
-                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                 
                   overflow: 'hidden'
                 }}>
                   {/* Fixed title */}
@@ -647,7 +786,7 @@ export default function SmartHubCreator({
                     color: textColor,
                     padding: '16px 16px 12px 16px',
                     fontFamily: 'Work Sans, sans-serif',
-                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                   
                     borderBottom: `1px solid ${borderLineColor}`
                   }}>
                     Team Members
@@ -797,9 +936,18 @@ export default function SmartHubCreator({
                 <OnboardingPrompt
                   onSubmit={currentStage === 'hub_name' ? handleSubmit : handleMatrixNameSubmit}
                   placeholder={currentStage === 'hub_name' ? "Type your Smart Hub name here..." : "Type your Smart Matrix name here..."}
+                  initialValue={currentStage === 'hub_name' ? hubName : matrixName}
                   containerStyle={{
-                    backgroundColor: 'white'
+                    backgroundColor: promptBk || 'white'
                   }}
+                  textColor={promptTextColor || '#000000'}
+                  showStartOverButton={true}
+                  onStartOverClick={currentStage === 'hub_name' ? handleStartOver : handleBackToColor}
+                  startOverButtonText={currentStage === 'hub_name' ? 'Start Over' : 'Change Smart Hub Color'}
+                  startOverButtonBgColor="transparent"
+                  startOverButtonHoverColor={globalHoverColor}
+                  startOverButtonTextColor={textColor}
+                  startOverButtonBorderColor={borderLineColor}
                 />
               </div>
             ) : null}
@@ -813,13 +961,36 @@ export default function SmartHubCreator({
               left: 0,
               right: 0,
               padding: '20px 32px',
-              backgroundColor: menuColor,
               borderTop: `1px solid ${borderLineColor}`,
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: currentStage === 'use_case' ? 'center' : 'space-between',
               alignItems: 'center',
               zIndex: 10
             }}>
+              {/* Back Button - Hidden on first stage */}
+              {currentStage !== 'use_case' && (
+                <button
+                  onClick={handleBack}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: textColor,
+                    border: `1px solid ${textColor}40`,
+                    fontSize: '14px',
+                    fontFamily: 'Work Sans, sans-serif'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${textColor}10`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <ArrowLeft size={16} />
+                  {getBackButtonText()}
+                </button>
+              )}
+              
               <button
                 onClick={
                   currentStage === 'use_case' 
@@ -843,13 +1014,34 @@ export default function SmartHubCreator({
               left: 0,
               right: 0,
               padding: '20px 32px',
-              backgroundColor: menuColor,
               borderTop: `1px solid ${borderLineColor}`,
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
               alignItems: 'center',
               zIndex: 10
             }}>
+              {/* Back Button */}
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: textColor,
+                  border: `1px solid ${textColor}40`,
+                  fontSize: '14px',
+                  fontFamily: 'Work Sans, sans-serif'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = `${textColor}10`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <ArrowLeft size={16} />
+                {getBackButtonText()}
+              </button>
+              
               <button
                 onClick={handleSkipInvite}
                 className="creator-continue-btn"

@@ -1,5 +1,6 @@
 import { ChevronDown, Edit } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
@@ -45,6 +46,10 @@ interface SmartHubButtonProps {
   buttonBkColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
+  chatBk1?: string;
+  promptBk?: string;
+  promptTextColor?: string;
+  aiAcknowledgeTextColor?: string;
 }
 
 export default function SmartHubButton({
@@ -76,9 +81,14 @@ export default function SmartHubButton({
   appearanceTextColor,
   buttonBkColor,
   buttonTextColor,
-  buttonHoverColor
+  buttonHoverColor,
+  chatBk1,
+  promptBk,
+  promptTextColor,
+  aiAcknowledgeTextColor
 }: SmartHubButtonProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
@@ -182,13 +192,18 @@ export default function SmartHubButton({
         className="flex items-center gap-2 h-[30px] px-1 bg-transparent transition-colors duration-200 rounded-lg"
         style={{
           fontFamily: 'Work Sans, sans-serif',
-          ['--hover-bg' as any]: globalHoverColor
+          ['--hover-bg' as any]: globalHoverColor,
+          backgroundColor: isOpen ? globalHoverColor : 'transparent'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = globalHoverColor;
+          if (!isOpen) {
+            e.currentTarget.style.backgroundColor = globalHoverColor;
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          if (!isOpen) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
         }}
       >
         {/* Avatar */}
@@ -209,7 +224,13 @@ export default function SmartHubButton({
         </span>
 
         {/* Arrow */}
-        <ChevronDown className="w-4 h-4 ml-auto flex-shrink-0" />
+        <ChevronDown 
+          className="w-4 h-4 ml-auto flex-shrink-0" 
+          style={{
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}
+        />
       </button>
 
       {/* Dropdown Menu */}
@@ -474,7 +495,8 @@ export default function SmartHubButton({
                   e.currentTarget.style.backgroundColor = 'transparent';
                 }}
                 onClick={() => {
-                  console.log('Settings clicked');
+                  navigate('/smart-hub/settings/general');
+                  setIsOpen(false);
                 }}
               >
                 <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
@@ -798,6 +820,12 @@ export default function SmartHubButton({
         textColor={textColor}
         borderLineColor={borderLineColor}
         globalHoverColor={globalHoverColor}
+        chatBk1={chatBk1}
+        solidColor={solidColor}
+        buttonHoverColor={buttonHoverColor}
+        promptBk={promptBk}
+        promptTextColor={promptTextColor}
+        aiAcknowledgeTextColor={aiAcknowledgeTextColor}
       />
       
       <style>{`

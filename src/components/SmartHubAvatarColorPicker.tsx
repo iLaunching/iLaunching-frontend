@@ -12,14 +12,18 @@ interface ColorOption {
 
 interface SmartHubAvatarColorPickerProps {
   userName: string;
+  hubName?: string;
   selectedColorId?: number;
   onColorSelect: (colorId: number, color: string) => void;
+  textColor?: string;
 }
 
 export default function SmartHubAvatarColorPicker({
   userName,
+  hubName,
   selectedColorId,
   onColorSelect,
+  textColor = '#000000',
 }: SmartHubAvatarColorPickerProps) {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>('#80b918'); // Default to highlight green
@@ -113,25 +117,25 @@ export default function SmartHubAvatarColorPicker({
     onColorSelect(option.option_value_id, option.metadata.color);
   };
 
-  // Get first letter of user name
-  const avatarLetter = userName.charAt(0).toUpperCase();
+  // Get first letter of hub name if provided, otherwise use user name
+  const avatarLetter = (hubName || userName).charAt(0).toUpperCase();
 
   return (
     <div className="flex flex-row gap-8 items-start justify-center w-full max-w-5xl mx-auto px-6">
       {/* Left: Avatar Preview */}
       <div className="flex flex-col items-center gap-4">
         <div
-          className="w-32 h-32 rounded-full flex items-center justify-center text-5xl font-bold text-white transition-all duration-300 shadow-lg"
-          style={{ backgroundColor: selectedColor, fontFamily: 'Work Sans, sans-serif' }}
+          className="w-32 h-32 flex items-center justify-center text-5xl font-bold text-white transition-all duration-300 shadow-lg"
+          style={{ backgroundColor: selectedColor, fontFamily: 'Work Sans, sans-serif', borderRadius: '20px' }}
         >
           {avatarLetter}
         </div>
-        <p className="text-sm text-gray-600" style={{ fontFamily: 'Work Sans, sans-serif' }}>Preview</p>
+        <p className="text-sm" style={{ fontFamily: 'Work Sans, sans-serif', color: textColor }}>Preview</p>
       </div>
 
       {/* Right: Color Grid */}
       <div className="flex-1 max-w-2xl">
-        <h3 className="text-lg font-semibold text-black mb-4" style={{ fontFamily: 'Work Sans, sans-serif' }}>Select Hub Color</h3>
+        <h3 className="text-lg font-medium mb-4" style={{ fontFamily: 'Work Sans, sans-serif', color: textColor }}>Select Hub Color</h3>
         
         {error && (
           <div className="mb-3 px-2 py-1.5 bg-gray-700/50 border border-gray-600 rounded text-gray-300 text-xs">

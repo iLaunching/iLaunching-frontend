@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
 import api from '@/lib/api';
@@ -49,6 +49,10 @@ interface SmartHubData {
     button_bk_color?: string;
     button_text_color?: string;
     button_hover_color?: string;
+    chat_bk_1?: string;  // Chat background gradient from appearance theme
+    prompt_bk?: string;  // Prompt background color from appearance theme
+    prompt_text_color?: string;  // Prompt text color from appearance theme
+    ai_acknowledge_text_color?: string;  // AI acknowledgment text color from appearance theme
   } | null;
   profile: {
     id: string;
@@ -513,7 +517,12 @@ export default function SmartHub() {
         buttonBkColor={theme.button_bk_color}
         buttonTextColor={theme.button_text_color}
         buttonHoverColor={theme.button_hover_color}
+        chatBk1={theme.chat_bk_1}
+        promptBk={theme.prompt_bk}
+        promptTextColor={theme.prompt_text_color}
+        aiAcknowledgeTextColor={theme.ai_acknowledge_text_color}
       />
+      <Outlet />
     </div>
   );
 }

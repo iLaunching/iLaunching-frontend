@@ -12,6 +12,9 @@ import SignupInterface from './pages/SignupInterface';
 import SmartHub from './pages/SmartHub';
 import Onboarding from './pages/Onboarding';
 import EssentialInformation from './pages/EssentialInformation';
+import Settings from './pages/Settings';
+import General from './pages/settings/General';
+import Member from './pages/settings/Member';
 
 // ========================
 // REACT QUERY CLIENT
@@ -84,7 +87,12 @@ function App() {
                 <SmartHub />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="settings" element={<Settings />}>
+              <Route path="general" element={<General />} />
+              <Route path="member" element={<Member />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

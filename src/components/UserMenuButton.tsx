@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import UserProfileButton from './UserProfileButton';
 import UserAvatarMenu from './UserAvatarMenu';
 import ThemePicker from './ThemePicker';
@@ -79,6 +80,7 @@ export default function UserMenuButton({
   onIthemeChange,
   ithemeBgOpacity,
 }: UserMenuButtonProps) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
   const { logout } = useAuth();
@@ -205,7 +207,11 @@ export default function UserMenuButton({
         {/* Arrow Icon */}
         <ChevronDown
           size={14}
-          style={{ color: iconColor }}
+          style={{ 
+            color: iconColor,
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}
         />
       </button>
 
@@ -447,8 +453,8 @@ export default function UserMenuButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                // TODO: Implement settings functionality
-                console.log('Settings clicked');
+                navigate('/smart-hub/settings/member');
+                setIsOpen(false);
               }}
             >
               <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
