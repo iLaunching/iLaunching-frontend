@@ -35,6 +35,7 @@ interface SmartHubData {
     background: string;
     text: string;
     menu: string;
+    menu_bg_opacity?: string;  // From itheme
     border: string;
     user_button_color: string;
     user_button_hover: string;
@@ -522,7 +523,7 @@ export default function SmartHub() {
         promptTextColor={theme.prompt_text_color}
         aiAcknowledgeTextColor={theme.ai_acknowledge_text_color}
       />
-      <Outlet />
+      <Outlet context={{ theme }} />
     </div>
   );
 }
