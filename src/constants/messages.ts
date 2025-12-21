@@ -145,6 +145,65 @@ export const getRandomMicrosoftSignupMessage = (): string => {
   return MICROSOFT_SIGNUP_SUCCESS_MESSAGES[randomIndex];
 };
 
+/**
+ * Delete Confirmation Messages - Randomly selected
+ * Shown when user attempts to delete their Smart Hub workspace
+ * Use ==text== for highlighting (requires highlightColor prop)
+ * Use {{text}} for custom colored text (requires customColor prop)
+ * {smartHubName} will be replaced with the actual smart hub name
+ * {userName} will be replaced with the actual user name
+ */
+export const DELETE_SMART_HUB_MESSAGES = [
+  `**Wait, are you sure?**\n\nDeleting =={smartHubName}== means losing all your files, tasks, and history for good. This action is permanent, so we want to make sure you're ready to proceed.\n\n{{{userName}, you will not be able to recover "{smartHubName}". Please be certain—once you confirm, this cannot be undone.}}`,
+  
+  `**Hold on a second!**\n\nDeleting =={smartHubName}== will permanently erase all your files, tasks, and history. There's no undo button for this one. Are you absolutely certain?\n\n{{{userName}, listen carefully: "{smartHubName}" will be gone forever. Once you confirm, there's no turning back.}}`,
+  
+  `**Whoa there!**\n\nOnce you delete =={smartHubName}==, it's gone forever—files, tasks, history, the whole package. This can't be reversed. Ready to proceed?\n\n{{{userName}, I need you to be 100% sure about deleting "{smartHubName}". The moment you confirm, this action will execute permanently.}}`,
+  
+  `**This is serious.**\n\nDeleting =={smartHubName}== means all your data disappears permanently. No backups, no recovery. Double-check before you proceed.\n\n{{{userName}, once you confirm, "{smartHubName}" is gone. No recovery, no backups, no second chances.}}`,
+  
+  `**Are you really, really sure?**\n\n=={smartHubName}== contains all your files, tasks, and history. Delete it, and it's gone for good. There's no coming back from this.\n\n{{{userName}, this is your final warning: "{smartHubName}" will be permanently deleted. Once you confirm, there's no turning back.}}`,
+  
+  `**Let's pump the brakes.**\n\nDeleting =={smartHubName}== is irreversible. All files, tasks, and history will be permanently erased. No exceptions, no recovery.\n\n{{{userName}, think carefully before proceeding. "{smartHubName}" will be completely removed—this decision is final.}}`,
+  `**One moment, please.**\n\nYou're about to permanently delete =={smartHubName}==. Every file, every task, every piece of history—gone. Are you prepared for that?\n\n{{{userName}, I need explicit confirmation. Deleting "{smartHubName}" is irreversible and immediate.}}`,
+  
+  `**Stop right there.**\n\n=={smartHubName}== is about to be deleted permanently. All your data will vanish with no way to retrieve it. Is this really what you want?\n\n{{{userName}, once this is done, it's done. "{smartHubName}" and everything in it will be erased forever.}}`,
+  
+  `**Careful now.**\n\nDeleting =={smartHubName}== will wipe out all associated files, tasks, and history. This is a one-way street—no backups, no recovery options.\n\n{{{userName}, you're about to lose "{smartHubName}" permanently. Please confirm you understand this cannot be reversed.}}`,
+  
+  `**Hold up!**\n\nYou're requesting permanent deletion of =={smartHubName}==. Everything inside will be lost forever—files, tasks, all of it. Ready to pull the trigger?\n\n{{{userName}, last chance to reconsider. "{smartHubName}" will be completely and permanently erased.}}`,
+  
+  `**Not so fast.**\n\n=={smartHubName}== contains valuable data. Deleting it means saying goodbye to all files, tasks, and history permanently. No do-overs.\n\n{{{userName}, are you absolutely certain? Once "{smartHubName}" is deleted, recovery is impossible.}}`,
+  
+  `**Pause for a moment.**\n\nDeleting =={smartHubName}== is a permanent action. All your files, tasks, and history will be erased with no possibility of recovery.\n\n{{{userName}, this is serious. "{smartHubName}" will be gone forever—confirm only if you're completely sure.}}`,
+  
+  `**Think twice.**\n\n=={smartHubName}== deletion is permanent and immediate. Files, tasks, history—all gone. There's no safety net here.\n\n{{{userName}, you won't be able to undo this. "{smartHubName}" will be permanently removed the moment you confirm.}}`,
+  
+  `**Final check.**\n\nYou're about to permanently delete =={smartHubName}==. Every file, every task, every bit of history—all of it will disappear forever.\n\n{{{userName}, I need you to be absolutely certain. Deleting "{smartHubName}" is irreversible and complete.}}`,
+  `**Are we doing this?**\n\nDeleting =={smartHubName}== means permanent loss of all data. Files, tasks, history—everything vanishes. No recovery possible.\n\n{{{userName}, confirm only if you're ready. "{smartHubName}" will be erased permanently and immediately.}}}`,
+  
+  `**Slow down.**\n\n=={smartHubName}== is about to be deleted forever. All associated data will be permanently erased. This action cannot be undone.\n\n{{{userName}, please be certain. Once "{smartHubName}" is deleted, there's no getting it back.}}`,
+  
+  `**Red alert!**\n\nDeleting =={smartHubName}== will permanently destroy all files, tasks, and history. No backups exist. No recovery is possible.\n\n{{{userName}, this is irreversible. "{smartHubName}" will be completely erased the moment you confirm.}}`,
+  
+  `**Listen up.**\n\n=={smartHubName}== is about to be permanently deleted. All data inside will be lost forever—files, tasks, everything. Are you ready?\n\n{{{userName}, there's no undo for this. "{smartHubName}" will be permanently removed once you proceed.}}`,
+  
+  `**Before you proceed...**\n\nDeleting =={smartHubName}== is permanent. All your files, tasks, and history will be erased with no way to recover them.\n\n{{{userName}, please confirm you understand. "{smartHubName}" and all its contents will be gone forever.}}`,
+  
+  `**Last warning.**\n\n=={smartHubName}== contains all your data. Delete it, and everything disappears permanently. No exceptions, no recovery.\n\n{{{userName}, this is final. Once you confirm, "{smartHubName}" will be completely and permanently erased.}}}`,
+] as const;
+
+/**
+ * Helper function to get a random delete confirmation message
+ * @param smartHubName - The name of the smart hub being deleted
+ * @param userName - The name of the user
+ */
+export const getRandomDeleteMessage = (smartHubName: string = 'this Smart Hub', userName: string = 'User'): string => {
+  const randomIndex = Math.floor(Math.random() * DELETE_SMART_HUB_MESSAGES.length);
+  const message = DELETE_SMART_HUB_MESSAGES[randomIndex];
+  return message.replace(/{smartHubName}/g, smartHubName).replace(/{userName}/g, userName);
+};
+
 
 
 

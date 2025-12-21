@@ -117,55 +117,80 @@ export default function SmartHubAvatarColorPicker({
     onColorSelect(option.option_value_id, option.metadata.color);
   };
 
-  // Get first letter of hub name if provided, otherwise use user name
-  const avatarLetter = (hubName || userName).charAt(0).toUpperCase();
-
   return (
-    <div className="flex flex-row gap-8 items-start justify-center w-full max-w-5xl mx-auto px-6">
-      {/* Left: Avatar Preview */}
-      <div className="flex flex-col items-center gap-4">
-        <div
-          className="w-32 h-32 flex items-center justify-center text-5xl font-bold text-white transition-all duration-300 shadow-lg"
-          style={{ backgroundColor: selectedColor, fontFamily: 'Work Sans, sans-serif', borderRadius: '20px' }}
-        >
-          {avatarLetter}
+    <div className= "w-full" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '35px', justifyContent: 'space-between', paddingLeft: '10px', paddingRight: '10px' }}>
+      {/* Left Side - Avatar Preview */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', flex: '0 0 auto' }}>
+        {/* Avatar Circle with First Letter */}
+        <div style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '15px',
+          backgroundColor: selectedColor,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#ffffff',
+          fontSize: '36px',
+          fontWeight: 600,
+          fontFamily: 'Work Sans, sans-serif',
+          boxShadow: `0 4px 12px ${selectedColor}40`,
+          transition: 'all 0.3s ease'
+        }}>
+          {(hubName || userName).charAt(0).toUpperCase()}
         </div>
-        <p className="text-sm" style={{ fontFamily: 'Work Sans, sans-serif', color: textColor }}>Preview</p>
+
+        {/* Preview Text */}
+        <div style={{
+          fontFamily: 'Work Sans, sans-serif',
+          fontSize: '14px',
+          fontWeight: 400,
+          color: textColor,
+          opacity: 0.7,
+          textAlign: 'center'
+        }}>
+          Preview
+        </div>
       </div>
 
-      {/* Right: Color Grid */}
-      <div className="flex-1 max-w-2xl">
-        <h3 className="text-lg font-medium mb-4" style={{ fontFamily: 'Work Sans, sans-serif', color: textColor }}>Select Hub Color</h3>
-        
+      {/* Right Side - Color Picker */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: '1' }}>
+        {/* Select a color title */}
+        <div style={{
+          fontFamily: 'Work Sans, sans-serif',
+          fontSize: '16px',
+          fontWeight: 500,
+          color: textColor
+        }}>
+          Select a color
+        </div>
+
+        {/* Error Message */}
         {error && (
           <div className="mb-3 px-2 py-1.5 bg-gray-700/50 border border-gray-600 rounded text-gray-300 text-xs">
             ℹ️ {error}
           </div>
         )}
         
-        <div className="grid grid-cols-9 gap-4 mt-[10px]">
+        {/* Color Circles */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '100%' }}>
           {colors.map((option) => (
             <button
               key={option.option_value_id}
               onClick={() => handleColorClick(option)}
-              className={`
-                w-[25px] h-[25px] rounded-full transition-all duration-200 
-                relative
-                ${
-                  selectedColor === option.metadata.color
-                    ? 'ring-2 ring-white scale-125'
-                    : ''
-                }
-              `}
+              className="w-[25px] h-[25px] rounded-full transition-all duration-200 relative"
               style={{ 
                 backgroundColor: option.metadata.color,
+                border: selectedColor === option.metadata.color 
+                  ? '2px solid transparent' 
+                  : '1px solid rgba(255, 255, 255, 0.2)',
                 boxShadow: selectedColor === option.metadata.color 
-                  ? `0 0 0 1px ${option.metadata.color}` 
+                  ? `0 0 0 2px ${option.metadata.color}80` 
                   : 'none'
               }}
               onMouseEnter={(e) => {
                 if (selectedColor !== option.metadata.color) {
-                  e.currentTarget.style.boxShadow = `0 0 0 1px ${option.metadata.color}`;
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${option.metadata.color}40`;
                 }
               }}
               onMouseLeave={(e) => {

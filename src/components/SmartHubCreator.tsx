@@ -237,7 +237,7 @@ export default function SmartHubCreator({
     console.log('Continue clicked - Hub Name:', hubName, 'Color ID:', selectedColorId, 'Color:', selectedColor);
     setShowPrompt(false);
     setIsReturningFromMatrix(false);
-    setCurrentStage('smart_matrix_name');
+    setCurrentStage('journey');
   }, [hubName, selectedColorId, selectedColor]);
 
   const handleJourneySelect = useCallback((journey: string) => {
@@ -249,7 +249,7 @@ export default function SmartHubCreator({
     console.log('Journey Continue - Selected:', selectedJourney);
     setShowPrompt(false);
     setIsReturningToJourney(false);
-    setCurrentStage('invite_people');
+    setCurrentStage('smart_matrix_name');
   }, [selectedJourney]);
 
   // Handle back button navigation
@@ -484,8 +484,8 @@ export default function SmartHubCreator({
     setShowPrompt(false);
     setIsReturningToMatrix(false);
     console.log('Matrix name submitted:', message);
-    // Move to journey selection
-    setCurrentStage('journey');
+    // Move to invite people stage
+    setCurrentStage('invite_people');
   }, []);
 
   if (!isOpen) return null;
