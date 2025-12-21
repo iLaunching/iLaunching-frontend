@@ -152,7 +152,7 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
                   backgroundColor: color.metadata?.color || '#4361EE',
                   cursor: 'pointer',
                   border: currentColorId === color.option_value_id ? '2px solid #ffffff' : '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: currentColorId === color.option_value_id ? '0 0 0 2px rgba(67, 97, 238, 0.5)' : 'none',
+                  boxShadow: currentColorId === color.option_value_id ? `0 0 0 2px ${color.metadata?.color || '#4361EE'}80` : 'none',
                   transition: 'all 0.2s ease'
                 }}
                 title={color.display_name}

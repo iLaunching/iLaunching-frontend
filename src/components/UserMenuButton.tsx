@@ -453,7 +453,7 @@ export default function UserMenuButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                navigate('/smart-hub/settings/member');
+                navigate('/smart-hub/settings/my-settings');
                 setIsOpen(false);
               }}
             >

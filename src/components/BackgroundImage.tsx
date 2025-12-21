@@ -15,7 +15,7 @@ const BackgroundImage = ({
 }: BackgroundImageProps) => {
   
   useEffect(() => {
-    // Additional preload for dynamic image URLs (if different from default)
+        // Additional preload for dynamic image URLs (if different from default)
     if (imageUrl !== '/interface background.png') {
       const link = document.createElement('link');
       link.rel = 'preload';

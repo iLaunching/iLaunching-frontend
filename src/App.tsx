@@ -15,6 +15,15 @@ import EssentialInformation from './pages/EssentialInformation';
 import Settings from './pages/Settings';
 import General from './pages/settings/General';
 import Member from './pages/settings/Member';
+import Upgrade from './pages/settings/Upgrade';
+import Members from './pages/settings/Members';
+import Teams from './pages/settings/Teams';
+import Matrix from './pages/settings/Matrix';
+import Security from './pages/settings/Security';
+import Trash from './pages/settings/Trash';
+import MySettings from './pages/settings/MySettings';
+import Membership from './pages/settings/Membership';
+import Notifications from './pages/settings/Notifications';
 
 // ========================
 // REACT QUERY CLIENT
@@ -90,7 +99,16 @@ function App() {
           >
             <Route path="settings" element={<Settings />}>
               <Route path="general" element={<General />} />
+              <Route path="upgrade" element={<Upgrade />} />
+              <Route path="members" element={<Members />} />
+              <Route path="teams" element={<Teams />} />
+              <Route path="matrix" element={<Matrix />} />
+              <Route path="security" element={<Security />} />
+              <Route path="trash" element={<Trash />} />
               <Route path="member" element={<Member />} />
+              <Route path="my-settings" element={<MySettings />} />
+              <Route path="membership" element={<Membership />} />
+              <Route path="notifications" element={<Notifications />} />
             </Route>
           </Route>
         </Routes>

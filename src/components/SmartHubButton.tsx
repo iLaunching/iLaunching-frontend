@@ -14,6 +14,7 @@ interface SmartHub {
   hub_color_id: number;
   color?: string;
   journey?: string;
+  order_number?: number;
 }
 
 interface SmartHubButtonProps {
@@ -709,6 +710,12 @@ export default function SmartHubButton({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {smartHubs
                   .filter(hub => hub.id !== currentSmartHubId)
+                  .sort((a, b) => {
+                    // Sort by order_number (ascending), with fallback to 0 if undefined
+                    const orderA = a.order_number ?? 999999;
+                    const orderB = b.order_number ?? 999999;
+                    return orderA - orderB;
+                  })
                   .map((hub) => {
                 const avatarText = hub.name.charAt(0).toUpperCase();
                 const hubColor = hub.color || '#4169E1';

@@ -232,26 +232,6 @@ export default function DeleteMenu({
         }, 1200);
         return;
       }
-      
-      // Check if it's the default smart hub
-      if (isDefaultSmartHub) {
-        setShowMovingAi(true);
-        setShowPrompt(false);
-        setShowTypewriter(false);
-        setAnimationComplete(false);
-        
-        setTimeout(() => {
-          setAnimationComplete(true);
-          setShowAcknowledge(true);
-          setAcknowledgeMessage('Cannot delete default Smart Hub');
-          
-          // Close modal after showing message
-          setTimeout(() => {
-            onClose();
-          }, 2000);
-        }, 1200);
-        return;
-      }
     }
     
     // Trigger AI animation first
@@ -270,35 +250,29 @@ export default function DeleteMenu({
       if (context === 'smart-hub') {
         setTimeout(async () => {
           try {
-            // Since it's not default, find the default smart hub and switch to it
-            const defaultHub = smartHubs.find(hub => hub.id !== smartHubId);
+            console.log('🗑️ FRONTEND FLOW: Starting smart hub deletion');
+            console.log('🗑️ Hub ID to delete:', smartHubId);
+            console.log('🗑️ Total hubs:', smartHubsCount);
             
-            if (defaultHub) {
-              setAcknowledgeMessage('Switching to default Smart Hub...');
-              
-              // Switch current smart hub to the default one
-              await api.post(`/smart-hubs/${defaultHub.id}/switch`);
-              
-              setAcknowledgeMessage('Deleting Smart Hub...');
-              
-              // Delete the smart hub (will cascade delete matrices)
-              await api.delete(`/smart-hubs/${smartHubId}`);
-              
-              setAcknowledgeMessage('Smart Hub deleted successfully');
-              
-              // Close modal and trigger parent callback after short delay
-              setTimeout(() => {
-                onConfirm(currentStage.requiresInput ? inputValue : undefined);
-                onClose();
-              }, 1500);
-            } else {
-              setAcknowledgeMessage('Error: No default hub found');
-              setTimeout(() => {
-                onClose();
-              }, 2000);
-            }
+            setAcknowledgeMessage('Deleting Smart Hub...');
+            
+            // Delete the smart hub - backend handles default status transfer and navigation update
+            console.log('🗑️ FRONTEND FLOW: Calling DELETE /smart-hubs/' + smartHubId);
+            const response = await api.delete(`/smart-hubs/${smartHubId}`);
+            console.log('🗑️ FRONTEND FLOW: Delete successful', response.data);
+            
+            setAcknowledgeMessage('Smart Hub deleted successfully');
+            
+            // Close modal and trigger parent callback after short delay
+            setTimeout(() => {
+              console.log('🗑️ FRONTEND FLOW: Calling onConfirm callback');
+              onConfirm(currentStage.requiresInput ? inputValue : undefined);
+              console.log('🗑️ FRONTEND FLOW: Closing modal');
+              onClose();
+            }, 1500);
           } catch (error: any) {
-            console.error('Failed to delete smart hub:', error);
+            console.error('🗑️ FRONTEND FLOW: Failed to delete smart hub:', error);
+            console.error('🗑️ Error details:', error.response?.data);
             setAcknowledgeMessage(`Error: ${error.response?.data?.detail || error.message || 'Failed to delete'}`);
             setTimeout(() => {
               onClose();
@@ -316,7 +290,7 @@ export default function DeleteMenu({
         }, 500);
       }
     }, 1200); // Wait for animation to complete
-  }, [context, smartHubsCount, isDefaultSmartHub, smartHubId, smartHubs, currentStageIndex, activeStages.length, currentStage, inputValue, onConfirm, onClose]);
+  }, [context, smartHubsCount, smartHubId, currentStageIndex, activeStages.length, currentStage, inputValue, onConfirm, onClose]);
 
   const handleBack = useCallback(() => {
     if (currentStageIndex > 0) {
