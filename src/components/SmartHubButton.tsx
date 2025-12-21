@@ -45,6 +45,7 @@ interface SmartHubButtonProps {
   buttonBkColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
+  chatBk1?: string;
 }
 
 export default function SmartHubButton({
@@ -76,7 +77,8 @@ export default function SmartHubButton({
   appearanceTextColor,
   buttonBkColor,
   buttonTextColor,
-  buttonHoverColor
+  buttonHoverColor,
+  chatBk1
 }: SmartHubButtonProps) {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
@@ -232,7 +234,7 @@ export default function SmartHubButton({
             width: '330px',
             minHeight: '300px',
             height: 'fit-content',
-            backgroundColor: menuColor,
+            backgroundColor: backgroundColor || menuColor,
             borderRadius: '10px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             zIndex: 9999,
@@ -798,6 +800,9 @@ export default function SmartHubButton({
         textColor={textColor}
         borderLineColor={borderLineColor}
         globalHoverColor={globalHoverColor}
+        chatBk1={chatBk1}
+        solidColor={solidColor}
+        buttonHoverColor={buttonHoverColor}
       />
       
       <style>{`

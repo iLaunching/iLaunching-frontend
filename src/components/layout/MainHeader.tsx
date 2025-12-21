@@ -60,6 +60,7 @@ interface MainHeaderProps {
   buttonBkColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
+  chatBk1?: string;
 }
 
 export default function MainHeader({ 
@@ -116,6 +117,7 @@ export default function MainHeader({
   buttonBkColor,
   buttonTextColor,
   buttonHoverColor,
+  chatBk1
 }: MainHeaderProps) {
   console.log('🔍 MainHeader solidColor:', solidColor);
   
@@ -210,6 +212,7 @@ export default function MainHeader({
           buttonBkColor={buttonBkColor}
           buttonTextColor={buttonTextColor}
           buttonHoverColor={buttonHoverColor}
+          chatBk1={chatBk1}
         />
       </div>
     </header>

@@ -49,6 +49,7 @@ interface SmartHubData {
     button_bk_color?: string;
     button_text_color?: string;
     button_hover_color?: string;
+    chat_bk_1?: string;  // Chat background gradient from appearance theme
   } | null;
   profile: {
     id: string;
@@ -513,6 +514,7 @@ export default function SmartHub() {
         buttonBkColor={theme.button_bk_color}
         buttonTextColor={theme.button_text_color}
         buttonHoverColor={theme.button_hover_color}
+        chatBk1={theme.chat_bk_1}
       />
     </div>
   );

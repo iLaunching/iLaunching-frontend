@@ -13,6 +13,7 @@ interface SmartHubUserCaseProps {
   textColor?: string;
   borderLineColor?: string;
   globalHoverColor?: string;
+  solidColor?: string;
 }
 
 export default function SmartHubUserCase({
@@ -20,7 +21,8 @@ export default function SmartHubUserCase({
   selectedOptionId,
   textColor = '#000000',
   borderLineColor = 'rgba(0, 0, 0, 0.15)',
-  globalHoverColor = 'rgba(0, 0, 0, 0.05)'
+  globalHoverColor = 'rgba(0, 0, 0, 0.05)',
+  solidColor = '#7F77F1'
 }: SmartHubUserCaseProps) {
   const [options, setOptions] = useState<UseCaseOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +43,16 @@ export default function SmartHubUserCase({
           
           if (data.options && data.options.length > 0) {
             setOptions(data.options);
+            
+            // Set default selection to "start a business" if no selection exists
+            if (!selectedOptionId) {
+              const startBusinessOption = data.options.find(
+                (opt: UseCaseOption) => opt.value_name === 'start_business'
+              );
+              if (startBusinessOption) {
+                onSelect(startBusinessOption.option_value_id, startBusinessOption.value_name);
+              }
+            }
           } else {
             setError('No use case options available');
           }
@@ -117,7 +129,8 @@ export default function SmartHubUserCase({
       margin: '0 auto',
       padding: '0 24px',
       '--use-case-border-color': borderLineColor,
-      '--use-case-hover-color': globalHoverColor
+      '--use-case-hover-color': globalHoverColor,
+      '--use-case-selected-color': solidColor
     } as React.CSSProperties}>
       <div style={{
         display: 'flex',

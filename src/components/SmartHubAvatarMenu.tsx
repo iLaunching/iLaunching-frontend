@@ -86,6 +86,8 @@ export default function SmartHubAvatarMenu({ menuColor, titleColor, currentColor
     <div
       style={{
         position: 'absolute',
+        left: '30px',
+        top: 'calc(100% + 15px)',
         width: '185px',
         height: 'fit-content',
         minHeight: '200px',
