@@ -523,7 +523,6 @@ export default function GeneralMenu({
                 {context === 'delete_account' && showPrompt && (
                   <button
                     onClick={handleConfirm}
-                    disabled={!inputValue.trim()}
                     style={{
                       marginTop: '24px',
                       padding: '12px 24px',
@@ -534,20 +533,16 @@ export default function GeneralMenu({
                       fontSize: '14px',
                       fontWeight: 500,
                       fontFamily: 'Work Sans, sans-serif',
-                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
-                      opacity: inputValue.trim() ? 1 : 0.5,
+                      cursor: 'pointer',
                       transition: 'all 0.2s',
                       animation: 'fadeIn 0.5s ease-in-out'
                     }}
                     onMouseEnter={(e) => {
-                      if (inputValue.trim()) {
-                        e.currentTarget.style.opacity = '0.9';
-                      }
+                      e.currentTarget.style.opacity = '0.9';
                     }}
                     onMouseLeave={(e) => {
-                      if (inputValue.trim()) {
-                        e.currentTarget.style.opacity = '1';
-                      }
+                      e.currentTarget.style.opacity = '1';
+                    }}
                     }}
                   >
                     Delete Account
