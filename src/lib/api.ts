@@ -211,7 +211,7 @@ export const authApi = {
    * Send verification code for account deletion
    */
   sendDeletionCode: async (): Promise<{ success: boolean; message: string; expires_in_minutes: number }> => {
-    const response = await api.post('/api/v1/account/send-deletion-code');
+    const response = await api.post('/account/send-deletion-code');
     return response.data;
   },
   
@@ -219,7 +219,7 @@ export const authApi = {
    * Verify deletion code
    */
   verifyDeletionCode: async (code: string): Promise<{ verified: boolean; message: string }> => {
-    const response = await api.post('/api/v1/account/verify-deletion-code', { code });
+    const response = await api.post('/account/verify-deletion-code', { code });
     return response.data;
   },
   
@@ -227,7 +227,7 @@ export const authApi = {
    * Delete account
    */
   deleteAccount: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await api.delete('/api/v1/account/delete');
+    const response = await api.delete('/account/delete');
     return response.data;
   },
 };
