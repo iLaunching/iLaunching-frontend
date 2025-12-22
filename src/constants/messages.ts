@@ -252,7 +252,7 @@ We'll stop future billing for any Smart Hubs deleted with your account. For othe
 
 All your user data will be queued for permanent deletion after **30 days**.
 
-Need a special GDPR deletion? Check out [this article](#).
+Need a special GDPR deletion? Check out [this article](/essential-information).
 
 ---
 

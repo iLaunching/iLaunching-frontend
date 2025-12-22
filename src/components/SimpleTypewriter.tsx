@@ -8,6 +8,7 @@ interface SimpleTypewriterProps {
   onComplete?: () => void;
   highlightColor?: string;
   customColor?: string;
+  linkColor?: string;
 }
 
 export default function SimpleTypewriter({ 
@@ -17,7 +18,8 @@ export default function SimpleTypewriter({
   style = {},
   onComplete,
   highlightColor,
-  customColor
+  customColor,
+  linkColor
 }: SimpleTypewriterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasTypedRef = useRef(false);
@@ -50,6 +52,7 @@ export default function SimpleTypewriter({
       underline?: boolean;
       highlight?: boolean;
       colored?: boolean;
+      link?: string;
     }
     
     const parseMarkdown = (text: string): TextSegment[] => {
@@ -57,8 +60,8 @@ export default function SimpleTypewriter({
       
       // Combined regex to match all markdown patterns
       // Order matters: more specific patterns first
-      // ==text== for highlight, {{text}} for color, **text** for bold, *text* for italic, etc.
-      const markdownRegex = /(==(.+?)==)|(\{\{(.+?)\}\})|(\*\*\*(.+?)\*\*\*)|(\*\*(.+?)\*\*)|(\*(.+?)\*)|(~~(.+?)~~)|(__(.+?)__)|(_(.+?)_)|(`(.+?)`)/g;
+      // [text](url) for links, ==text== for highlight, {{text}} for color, **text** for bold, *text* for italic, etc.
+      const markdownRegex = /(\[(.+?)\]\((.+?)\))|(==(.+?)==)|(\{\{(.+?)\}\})|(\*\*\*(.+?)\*\*\*)|(\*\*(.+?)\*\*)|(\*(.+?)\*)|(~~(.+?)~~)|(__(.+?)__)|(_(. +?)_)|(`(.+?)`)/g;
       
       let lastIndex = 0;
       let match;
@@ -71,32 +74,35 @@ export default function SimpleTypewriter({
         
         // Determine which markdown pattern matched and add the styled segment
         if (match[1]) {
+          // [text](url) - link
+          segments.push({ text: match[2], link: match[3] });
+        } else if (match[4]) {
           // ==text== - highlight
-          segments.push({ text: match[2], highlight: true });
-        } else if (match[3]) {
+          segments.push({ text: match[5], highlight: true });
+        } else if (match[6]) {
           // {{text}} - custom color
-          segments.push({ text: match[4], colored: true });
-        } else if (match[5]) {
+          segments.push({ text: match[7], colored: true });
+        } else if (match[8]) {
           // ***text*** - bold and italic
-          segments.push({ text: match[6], bold: true, italic: true });
-        } else if (match[7]) {
+          segments.push({ text: match[9], bold: true, italic: true });
+        } else if (match[10]) {
           // **text** - bold
-          segments.push({ text: match[8], bold: true });
-        } else if (match[9]) {
+          segments.push({ text: match[11], bold: true });
+        } else if (match[12]) {
           // *text* - italic
-          segments.push({ text: match[10], italic: true });
-        } else if (match[11]) {
+          segments.push({ text: match[13], italic: true });
+        } else if (match[14]) {
           // ~~text~~ - strikethrough
-          segments.push({ text: match[12], strikethrough: true });
-        } else if (match[13]) {
+          segments.push({ text: match[15], strikethrough: true });
+        } else if (match[16]) {
           // __text__ - underline
-          segments.push({ text: match[14], underline: true });
-        } else if (match[15]) {
+          segments.push({ text: match[17], underline: true });
+        } else if (match[18]) {
           // _text_ - italic (alternative)
-          segments.push({ text: match[16], italic: true });
-        } else if (match[17]) {
+          segments.push({ text: match[19], italic: true });
+        } else if (match[20]) {
           // `code` - inline code
-          segments.push({ text: match[18], code: true });
+          segments.push({ text: match[21], code: true });
         }
         
         lastIndex = markdownRegex.lastIndex;
@@ -115,6 +121,24 @@ export default function SimpleTypewriter({
     
     // Process each segment
     segments.forEach((segment) => {
+      // Special handling for links - keep them as one unit
+      if (segment.link) {
+        const linkElement = document.createElement('a');
+        linkElement.className = 'wave-word';
+        linkElement.style.animationDelay = `${wordCount * 0.03}s`;
+        linkElement.textContent = segment.text;
+        linkElement.href = segment.link;
+        linkElement.target = '_blank';
+        linkElement.rel = 'noopener noreferrer';
+        linkElement.style.color = linkColor || '#7F77F1';
+        linkElement.style.textDecoration = 'underline';
+        linkElement.style.cursor = 'pointer';
+        
+        container.appendChild(linkElement);
+        wordCount++;
+        return; // Skip the rest of the processing for this segment
+      }
+      
       // Special handling for highlighted segments - keep them as one unit
       if (segment.highlight && highlightColor) {
         // For highlighted text, keep the whole segment together

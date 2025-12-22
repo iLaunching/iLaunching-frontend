@@ -515,6 +515,7 @@ export default function GeneralMenu({
                     }}
                     highlightColor={dangerButtonColor}
                     customColor={dangerBkSolidColor}
+                    linkColor={solidColor}
                   />
                 )}
               </div>
