@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, Trash2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -815,7 +815,7 @@ const MySettings: React.FC = () => {
         }}
         > 
         <h2 style={{ 
-          fontSize: '16px', 
+          fontSize: '18px', 
           fontWeight: 500, 
           marginBottom: '5px',
           color: theme.danger_tone_text,
@@ -843,7 +843,7 @@ const MySettings: React.FC = () => {
           fontSize: '16px', 
           fontWeight: 400, 
           marginBottom: '5px',
-          color: theme.text,
+          color: theme.danger_tone_text,
           fontFamily: 'Work Sans, sans-serif'
         }}
       >
@@ -854,6 +854,52 @@ const MySettings: React.FC = () => {
         onClick={() => {
           // TODO: Implement logout all sessions functionality
           console.log('Log out all sessions clicked');
+        }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          marginTop: '12px',
+          backgroundColor: theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)',
+          border: `1px solid ${theme.danger_tone_border || 'rgba(198, 42, 47, 0.38)'}`,
+          borderRadius: '8px',
+          color: theme.danger_tone_text,
+          fontSize: '14px',
+          fontWeight: 400,
+          fontFamily: 'Work Sans, sans-serif',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_button_hover || 'rgba(198, 42, 47, 0.25)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
+        }}
+      >
+        <Lock size={16} />
+        Log out of all sessions
+      </button>
+
+    <h2
+        style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginTop: '30px',
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}
+      >
+        Delete my account and all associated data
+
+    </h2>
+
+      <button
+        onClick={() => {
+          // TODO: Implement delete account functionality
+          console.log('Delete account clicked');
         }}
         style={{
           display: 'flex',
@@ -878,10 +924,9 @@ const MySettings: React.FC = () => {
           e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
         }}
       >
-        <Lock size={16} />
-        Log out of all sessions
+        <Trash2 size={16} />
+        Delete account
       </button>
-
 
       </div>
 
