@@ -42,6 +42,14 @@ const EssentialInformation = () => {
       icon: Info,
       color: 'pink',
       link: '/legal/cookies'
+    },
+    {
+      id: 'security-policy',
+      title: 'Security Policy',
+      description: 'Our security practices and support access permissions',
+      icon: Lock,
+      color: 'red',
+      link: '/legal/security-policy'
     }
   ];
 
@@ -51,7 +59,8 @@ const EssentialInformation = () => {
       green: { bg: 'bg-green-50', icon: 'text-green-600', hover: 'hover:bg-green-100' },
       purple: { bg: 'bg-purple-50', icon: 'text-purple-600', hover: 'hover:bg-purple-100' },
       orange: { bg: 'bg-orange-50', icon: 'text-orange-600', hover: 'hover:bg-orange-100' },
-      pink: { bg: 'bg-pink-50', icon: 'text-pink-600', hover: 'hover:bg-pink-100' }
+      pink: { bg: 'bg-pink-50', icon: 'text-pink-600', hover: 'hover:bg-pink-100' },
+      red: { bg: 'bg-red-50', icon: 'text-red-600', hover: 'hover:bg-red-100' }
     };
     return colors[color] || colors.blue;
   };
