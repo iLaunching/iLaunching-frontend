@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Send, Mic } from 'lucide-react';
 
 interface OnboardingPromptProps {
@@ -34,7 +34,7 @@ interface OnboardingPromptProps {
   startOverButtonBorderColor?: string;
 }
 
-export default function OnboardingPrompt({ 
+const OnboardingPrompt = memo(function OnboardingPrompt({ 
   onSubmit, 
   placeholder = "Type your email here...",
   initialValue = '',
@@ -67,22 +67,24 @@ export default function OnboardingPrompt({
 }: OnboardingPromptProps) {
   const [message, setMessage] = useState(initialValue);
 
-  console.log('🔍 OnboardingPrompt showStartOverButton:', showStartOverButton, 'onStartOverClick:', !!onStartOverClick);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
       onSubmit(message.trim());
       setMessage('');
     }
-  };
+  }, [message, onSubmit]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
-  };
+  }, [handleSubmit]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  }, []);
 
   return (
     <div className="w-full max-w-[800px] mx-auto px-4">
@@ -103,7 +105,7 @@ export default function OnboardingPrompt({
             <input
               type={type}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               className={`w-full outline-none placeholder-gray-400 text-base bg-transparent ${inputClassName}`}
@@ -338,4 +340,6 @@ export default function OnboardingPrompt({
       `}</style>
     </div>
   );
-}
+});
+
+export default OnboardingPrompt;

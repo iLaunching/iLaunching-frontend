@@ -1,9 +1,6 @@
 export default function ConnectedMindsBackground() {
   return (
     <div className="connected-minds-container">
-      {/* Animated gradient overlay */}
-      <div className="animated-gradient" />
-      
       {/* Lightening overlay for left side where editor is */}
       <div
         className="absolute inset-0 w-full h-full pointer-events-none"

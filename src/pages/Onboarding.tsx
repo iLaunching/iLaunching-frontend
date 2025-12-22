@@ -1,26 +1,33 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OnboardingBackground from '../components/OnboardingBackground';
+import ConnectedMindsBackground from '@/components/layout/ConnectedMindsBackground';
 import Header from '@/components/layout/Header';
 import OnboardingPrompt from '@/components/OnboardingPrompt';
 import SimpleTypewriter from '@/components/SimpleTypewriter';
 import OnboardingAiHeader from '@/components/OnboardingAiHeader';
 import SmartHubAvatarColorPicker from '@/components/SmartHubAvatarColorPicker';
 import OnboardingMarketingOptions from '@/components/OnboardingMarketingOptions';
+import SmartHubUserCase from '@/components/SmartHubUserCase';
 import { ONBOARDING_HUB_NAME_QUESTION, ONBOARDING_HUB_COLOR_QUESTION, ONBOARDING_SMART_MATRIX_NAME_QUESTION, ONBOARDING_MARKETTING_QUESTION, ONBOARDING_THANKYOU_MESSAGE } from '@/constants/messages';
 import { APP_CONFIG } from '@/constants';
 import { authApi } from '../api/auth';
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [currentStage, setCurrentStage] = useState<'hub_name' | 'hub_color' | 'smart_matrix_name' | 'marketing' | 'thankyou' | 'complete'>('hub_name');
+  const [currentStage, setCurrentStage] = useState<'use_case' | 'hub_name' | 'hub_color' | 'smart_matrix_name' | 'marketing' | 'invite_people' | 'thankyou' | 'complete'>('use_case');
   const [showPrompt, setShowPrompt] = useState(false);
+  const [selectedUseCaseId, setSelectedUseCaseId] = useState<number | undefined>(undefined);
+  const [selectedUseCaseName, setSelectedUseCaseName] = useState<string>('');
   const [hubName, setHubName] = useState('');
-  const [selectedColorId, setSelectedColorId] = useState<number>(1); // Default to color ID 1
-  const [selectedColor, setSelectedColor] = useState<string>('#FF6B6B'); // Default color
+  const [selectedColorId, setSelectedColorId] = useState<number>(27); // Default to highlight green
+  const [selectedColor, setSelectedColor] = useState<string>('#80b918'); // Default to highlight green
   const [matrixName, setMatrixName] = useState('');
   const [selectedMarketingId, setSelectedMarketingId] = useState<number | undefined>(undefined);
-  const [, setSelectedMarketingName] = useState<string>('');
+  const [selectedMarketingName, setSelectedMarketingName] = useState<string>('');
+  const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
+  const [emailInput, setEmailInput] = useState<string>('');
+  const [emailError, setEmailError] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
   const [firstName, setFirstName] = useState('there');
   const [showMovingAi, setShowMovingAi] = useState(false);
@@ -28,6 +35,7 @@ export default function Onboarding() {
   const [, setHubId] = useState<string>('');
   const [acknowledgeStepMessage, setAcknowledgeStepMessage] = useState<string>('Almost there...');
   const hasCompletedRef = useRef(false);
+  const teamMembersScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Check if user is authenticated and fetch their data
@@ -87,6 +95,8 @@ export default function Onboarding() {
   // Memoize the message to prevent unnecessary recalculations
   const currentMessage = useMemo(() => {
     switch (currentStage) {
+      case 'use_case':
+        return 'What will you use this Smart Hub for?';
       case 'hub_name':
         return ONBOARDING_HUB_NAME_QUESTION[0];
       case 'hub_color':
@@ -95,6 +105,8 @@ export default function Onboarding() {
         return ONBOARDING_SMART_MATRIX_NAME_QUESTION[0];
       case 'marketing':
         return ONBOARDING_MARKETTING_QUESTION[Math.floor(Math.random() * ONBOARDING_MARKETTING_QUESTION.length)];
+      case 'invite_people':
+        return "Who's joining us in this Smart Hub?";
       case 'thankyou':
         return ONBOARDING_THANKYOU_MESSAGE[Math.floor(Math.random() * ONBOARDING_THANKYOU_MESSAGE.length)];
       case 'complete':
@@ -109,7 +121,25 @@ export default function Onboarding() {
     return `Welcome ${firstName}!`;
   }, [firstName]);
 
-  console.log('Onboarding render - isInitialized:', isInitialized, 'currentMessage:', currentMessage, 'stage:', currentStage);
+  // Memoize containerStyle to prevent recreating on every render
+  const promptContainerStyle = useMemo(() => ({
+    background: 'rgba(255, 255, 255, 0.65)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+    boxShadow: '0 2px 8px rgba(147, 51, 234, 0.15), 0 1px 4px rgba(37, 99, 235, 0.15)',
+  }), []);
+
+  const handleUseCaseSelect = useCallback((optionId: number, optionName: string) => {
+    setSelectedUseCaseId(optionId);
+    setSelectedUseCaseName(optionName);
+    console.log('Selected use case:', optionId, optionName);
+  }, []);
+
+  const handleUseCaseContinue = useCallback(() => {
+    console.log('Use Case Continue - Selected:', selectedUseCaseId, selectedUseCaseName);
+    setShowPrompt(false);
+    setCurrentStage('hub_name');
+  }, [selectedUseCaseId, selectedUseCaseName]);
 
   const handleSubmit = useCallback((message: string) => {
     if (currentStage === 'hub_name') {
@@ -144,6 +174,58 @@ export default function Onboarding() {
     setSelectedMarketingId(optionId);
     setSelectedMarketingName(optionName);
     console.log('Marketing option selected:', optionId, optionName);
+  }, []);
+
+  const handleMarketingContinue = useCallback(() => {
+    console.log('Marketing Continue - Selected:', selectedMarketingId, selectedMarketingName);
+    setShowPrompt(false);
+    setCurrentStage('invite_people');
+  }, [selectedMarketingId, selectedMarketingName]);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
+
+  const handleEmailKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && emailInput.trim()) {
+      e.preventDefault();
+      const trimmedEmail = emailInput.trim();
+      
+      if (!validateEmail(trimmedEmail)) {
+        setEmailError('Please enter a valid email address');
+        return;
+      }
+      
+      if (invitedEmails.includes(trimmedEmail)) {
+        setEmailError('This email has already been added');
+        return;
+      }
+      
+      setInvitedEmails([...invitedEmails, trimmedEmail]);
+      setEmailInput('');
+      setEmailError('');
+      
+      // Scroll to bottom after adding email
+      setTimeout(() => {
+        if (teamMembersScrollRef.current) {
+          teamMembersScrollRef.current.scrollTop = teamMembersScrollRef.current.scrollHeight;
+        }
+      }, 100);
+    }
+  }, [emailInput, invitedEmails]);
+
+  const handleEmailInputChange = useCallback((value: string) => {
+    setEmailInput(value);
+    setEmailError('');
+  }, []);
+
+  const handleRemoveEmail = useCallback((emailToRemove: string) => {
+    setInvitedEmails(invitedEmails.filter(email => email !== emailToRemove));
+  }, [invitedEmails]);
+
+  const handleSkipInvite = useCallback(() => {
+    console.log('Skipping invite - proceeding to thank you');
     setShowPrompt(false);
     setCurrentStage('thankyou');
   }, []);
@@ -153,18 +235,37 @@ export default function Onboarding() {
       const token = localStorage.getItem('access_token');
       const API_URL = 'https://ilaunching-servers-production.up.railway.app';
       
+      console.log('=== ONBOARDING CREATION START ===');
+      console.log('All values:', { 
+        hubName, 
+        selectedColorId, 
+        selectedColor,
+        matrixName, 
+        selectedMarketingId, 
+        selectedMarketingName,
+        selectedUseCaseId,
+        selectedUseCaseName
+      });
+      
       // Validate required data
-      if (!hubName || !selectedColorId || !matrixName || !selectedMarketingId) {
-        console.error('Missing required data:', { hubName, selectedColorId, matrixName, selectedMarketingId });
-        setAcknowledgeStepMessage('Error: Missing required information');
+      if (!hubName || !selectedColorId || !matrixName || !selectedMarketingId || !selectedUseCaseId) {
+        const missingFields = [];
+        if (!hubName) missingFields.push('Hub Name');
+        if (!selectedColorId) missingFields.push('Hub Color');
+        if (!matrixName) missingFields.push('Matrix Name');
+        if (!selectedMarketingId) missingFields.push('Marketing Option');
+        if (!selectedUseCaseId) missingFields.push('Use Case');
+        
+        console.error('Missing required data:', { hubName, selectedColorId, matrixName, selectedMarketingId, selectedUseCaseId });
+        setAcknowledgeStepMessage(`Error: Missing ${missingFields.join(', ')}`);
         return;
       }
       
-      console.log('Starting onboarding with:', { hubName, selectedColorId, matrixName, selectedMarketingId });
+      console.log('Starting onboarding with:', { hubName, selectedColorId, matrixName, selectedMarketingId, selectedUseCaseId });
       
-      // Step 1: Create Smart Hub
+      // Step 1: Create Smart Hub with use case
       setAcknowledgeStepMessage('Creating your Smart Hub...');
-      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}`, {
+      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}&use_case_id=${selectedUseCaseId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -234,26 +335,20 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen relative">
-      {/* Onboarding Background */}
-      <OnboardingBackground shouldFadeWhite={showAcknowledge} />
+      {/* Connected Minds Background */}
+      <ConnectedMindsBackground />
       
-      {/* Header with white text and logo only - fixed at top - hide during thankyou */}
+      {/* Header with black text and logo only - fixed at top - hide during thankyou */}
       {!showMovingAi && (
-        <Header aiActive={false} hideLogo={true} textColor="text-white" hideLanguageSwitcher={true} />
+        <Header aiActive={false} hideLogo={true} textColor="text-black" hideLanguageSwitcher={true} />
       )}
       
       {isInitialized && (
         <div className="min-h-screen flex items-center justify-center p-4">
           <div 
-            className={`w-[60%] h-[70vh] max-w-5xl rounded-2xl overflow-hidden relative z-10 flex flex-col transition-all duration-1000`}
+            className={`w-[60%] h-[80vh] max-w-5xl rounded-2xl overflow-hidden relative z-10 flex flex-col transition-all duration-1000`}
             style={{
-              background: showAcknowledge 
-                ? 'transparent' 
-                : 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.68) 50%, rgba(255, 255, 255, 0.78) 100%)',
-              backdropFilter: showAcknowledge ? 'none' : 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: showAcknowledge ? 'none' : 'blur(20px) saturate(180%)',
-              border: showAcknowledge ? 'none' : '1px solid rgba(255, 255, 255, 0.25)',
-              boxShadow: showAcknowledge ? 'none' : '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)',
+              background: 'transparent',
             }}
           >
             {/* AI Header with icon and acknowledge message */}
@@ -307,6 +402,33 @@ export default function Onboarding() {
                 </div>
               )}
               
+              {/* Show use case selector for use_case stage after typewriter completes */}
+              {currentStage === 'use_case' && showPrompt && (
+                <>
+                  <div className="w-full animate-fade-in mt-8">
+                    <SmartHubUserCase
+                      selectedOptionId={selectedUseCaseId}
+                      onSelect={handleUseCaseSelect}
+                      textColor="#000000"
+                      borderLineColor="rgba(0, 0, 0, 0.15)"
+                      globalHoverColor="rgba(0, 0, 0, 0.05)"
+                      solidColor="#7F77F1"
+                    />
+                  </div>
+                  
+                  {/* Continue Button for use_case stage */}
+                  <div className="w-full flex justify-center mt-8">
+                    <button
+                      onClick={handleUseCaseContinue}
+                      className="px-6 py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
+                      style={{ fontFamily: 'Work Sans, sans-serif' }}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </>
+              )}
+              
               {/* Show color picker for hub_color stage after typewriter completes */}
               {currentStage === 'hub_color' && showPrompt && (
                 <>
@@ -334,11 +456,232 @@ export default function Onboarding() {
               
               {/* Show marketing options for marketing stage after typewriter completes */}
               {currentStage === 'marketing' && showPrompt && (
-                <div className="w-full animate-fade-in mt-8">
-                  <OnboardingMarketingOptions
-                    onSelect={handleMarketingSelect}
-                    selectedOptionId={selectedMarketingId}
-                  />
+                <>
+                  <div className="w-full animate-fade-in mt-8">
+                    <OnboardingMarketingOptions
+                      onSelect={handleMarketingSelect}
+                      selectedOptionId={selectedMarketingId}
+                      textColor="#000000"
+                      borderLineColor="rgba(0, 0, 0, 0.15)"
+                      globalHoverColor="rgba(0, 0, 0, 0.05)"
+                      solidColor="#7F77F1"
+                    />
+                  </div>
+                  
+                  {selectedMarketingId && (
+                    <div className="w-full flex justify-center mt-8">
+                      <button
+                        onClick={handleMarketingContinue}
+                        className="bg-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-200"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Show invite people input for invite_people stage after typewriter completes */}
+              {currentStage === 'invite_people' && showPrompt && (
+                <div className="w-full animate-fade-in mt-8" style={{ maxWidth: '700px', margin: '32px auto 0' }}>
+                  {/* Email input */}
+                  <div>
+                    <input
+                      type="email"
+                      value={emailInput}
+                      onChange={(e) => handleEmailInputChange(e.target.value)}
+                      onKeyDown={handleEmailKeyDown}
+                      placeholder="Enter email address"
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        border: `1px solid ${emailError ? '#ef4444' : 'rgba(0, 0, 0, 0.15)'}`,
+                        color: '#000000',
+                        fontFamily: 'Work Sans, sans-serif',
+                        fontSize: '14px',
+                        outline: 'none',
+                        backgroundColor: 'transparent',
+                      }}
+                    />
+                    
+                    {/* Show "Press ENTER to add" when input has value and no error */}
+                    <div style={{
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      color: 'rgba(0, 0, 0, 0.5)',
+                      fontFamily: 'Work Sans, sans-serif',
+                      opacity: emailInput.trim() && !emailError ? 1 : 0,
+                      visibility: emailInput.trim() && !emailError ? 'visible' : 'hidden',
+                      height: '15px',
+                      transition: 'opacity 0.2s ease'
+                    }}>
+                      Press ENTER to add
+                    </div>
+                    
+                    {/* Error message */}
+                    {emailError && (
+                      <div style={{
+                        marginTop: '8px',
+                        fontSize: '12px',
+                        color: '#ef4444',
+                        fontFamily: 'Work Sans, sans-serif',
+                      }}>
+                        {emailError}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Team members list */}
+                  <div style={{
+                    marginTop: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0, 0, 0, 0.15)',
+                    overflow: 'hidden'
+                  }}>
+                    {/* Fixed title */}
+                    <div style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: '#000000',
+                      padding: '16px 16px 12px 16px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      borderBottom: '1px solid rgba(0, 0, 0, 0.15)'
+                    }}>
+                      Team Members
+                    </div>
+
+                    {/* Scrollable content */}
+                    <div 
+                      ref={teamMembersScrollRef}
+                      style={{
+                        maxHeight: '150px',
+                        overflowY: 'auto',
+                        padding: '0 16px 16px 16px'
+                      }}
+                    >
+                      {/* You (Owner) */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '8px 0'
+                      }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: selectedColor || '#FF6B6B',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          fontSize: '14px',
+                          fontFamily: 'Work Sans, sans-serif'
+                        }}>
+                          {firstName.charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{
+                          fontFamily: 'Work Sans, sans-serif',
+                          fontSize: '14px',
+                          color: '#000000'
+                        }}>
+                          You (Owner)
+                        </div>
+                      </div>
+
+                      {/* iLaunching */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '8px 0'
+                      }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: '#000000',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          fontSize: '14px',
+                          fontFamily: 'Work Sans, sans-serif'
+                        }}>
+                          i
+                        </div>
+                        <div style={{
+                          fontFamily: 'Work Sans, sans-serif',
+                          fontSize: '14px',
+                          color: '#000000'
+                        }}>
+                          iLaunching
+                        </div>
+                      </div>
+
+                      {/* Added invited emails */}
+                      {invitedEmails.map((email, index) => (
+                        <div key={index} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '8px 0'
+                        }}>
+                          <div style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: '#9ca3af',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#ffffff',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            fontFamily: 'Work Sans, sans-serif'
+                          }}>
+                            {email.charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{
+                            fontFamily: 'Work Sans, sans-serif',
+                            fontSize: '14px',
+                            color: '#000000',
+                            flex: 1
+                          }}>
+                            {email}
+                          </div>
+                          <button
+                            onClick={() => handleRemoveEmail(email)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              fontSize: '18px',
+                              padding: '0 4px',
+                              lineHeight: 1
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Skip button */}
+                  <div className="w-full flex justify-center mt-8">
+                    <button
+                      onClick={handleSkipInvite}
+                      className="px-6 py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
+                      style={{ fontFamily: 'Work Sans, sans-serif' }}
+                    >
+                      {invitedEmails.length > 0 ? 'Continue' : 'Skip for now'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -349,13 +692,7 @@ export default function Onboarding() {
                 <OnboardingPrompt 
                   onSubmit={currentStage === 'hub_name' ? handleSubmit : handleMatrixNameSubmit}
                   placeholder={currentStage === 'hub_name' ? "Type your Smart Hub name here..." : "Type your Smart Matrix name here..."}
-                  containerStyle={{
-                    background: 'rgba(255, 255, 255, 0.65)',
-                    backdropFilter: 'none',
-                    WebkitBackdropFilter: 'none',
-                    boxShadow: '0 2px 8px rgba(147, 51, 234, 0.08), 0 1px 4px rgba(37, 99, 235, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                  }}
+                  containerStyle={promptContainerStyle}
                 />
               </div>
             )}

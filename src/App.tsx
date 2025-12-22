@@ -99,10 +99,10 @@ function App() {
           >
             <Route path="settings" element={<Settings />}>
               <Route path="general" element={<General />} />
-              <Route path="upgrade" element={<Upgrade />} />
+              <Route path="upgrade/*" element={<Upgrade />} />
               <Route path="members" element={<Members />} />
               <Route path="teams" element={<Teams />} />
-              <Route path="matrix" element={<Matrix />} />
+              <Route path="matrix/*" element={<Matrix />} />
               <Route path="security" element={<Security />} />
               <Route path="trash" element={<Trash />} />
               <Route path="member" element={<Member />} />
