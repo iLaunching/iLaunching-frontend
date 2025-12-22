@@ -4,8 +4,7 @@ import { createPortal } from 'react-dom';
 import OnboardingAiHeader from './OnboardingAiHeader';
 import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
-import api from '@/lib/api';
-import { authApi } from '@/api/auth';
+import api, { authApi } from '@/lib/api';
 
 type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'delete_account' | 'generic';
 
