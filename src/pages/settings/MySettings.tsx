@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Trash2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
@@ -42,6 +42,8 @@ const MySettings: React.FC = () => {
   const { theme, profile } = useOutletContext<SmartHubContextType>();
   const user = useAuthStore((state) => state.user);
   const setAuth = useAuthStore((state) => state.setAuth);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
   const queryClient = useQueryClient();
@@ -851,9 +853,22 @@ const MySettings: React.FC = () => {
       </h2>
 
       <button
-        onClick={() => {
-          // TODO: Implement logout all sessions functionality
-          console.log('Log out all sessions clicked');
+        onClick={async () => {
+          try {
+            // Call logout API to revoke refresh token
+            await authApi.logout();
+            
+            // Clear auth store
+            logout();
+            
+            // Redirect to login
+            navigate('/login');
+          } catch (error) {
+            console.error('Failed to logout:', error);
+            // Even if API fails, clear local state and redirect
+            logout();
+            navigate('/login');
+          }
         }}
         style={{
           display: 'flex',
@@ -872,10 +887,12 @@ const MySettings: React.FC = () => {
           transition: 'all 0.2s',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = theme.danger_button_hover || 'rgba(198, 42, 47, 0.25)';
+          e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
+          e.currentTarget.style.color = theme.danger_bk_solid_text_color;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
+          e.currentTarget.style.color = theme.danger_tone_text;
         }}
       >
         <Lock size={16} />
@@ -886,9 +903,9 @@ const MySettings: React.FC = () => {
         style={{ 
           fontSize: '16px', 
           fontWeight: 400, 
-          marginTop: '30px',
+          marginTop: '50px',
           marginBottom: '5px',
-          color: theme.text,
+          color: theme.danger_tone_text,
           fontFamily: 'Work Sans, sans-serif'
         }}
       >
@@ -907,10 +924,10 @@ const MySettings: React.FC = () => {
           gap: '8px',
           padding: '10px 16px',
           marginTop: '12px',
-          backgroundColor: theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)',
+          backgroundColor: theme.danger_bk_solid_color,
           border: `1px solid ${theme.danger_tone_border || 'rgba(198, 42, 47, 0.38)'}`,
           borderRadius: '8px',
-          color: theme.danger_tone_text || '#C62A2F',
+          color: theme.danger_bk_solid_text_color,
           fontSize: '14px',
           fontWeight: 400,
           fontFamily: 'Work Sans, sans-serif',
@@ -921,7 +938,7 @@ const MySettings: React.FC = () => {
           e.currentTarget.style.backgroundColor = theme.danger_button_hover || 'rgba(198, 42, 47, 0.25)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
+          e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
         }}
       >
         <Trash2 size={16} />
