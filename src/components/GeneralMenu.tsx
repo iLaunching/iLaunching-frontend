@@ -275,29 +275,27 @@ export default function GeneralMenu({
         setAcknowledgeMessage('Verifying code...');
         
         try {
-          const user = authApi.getCurrentUser();
-          if (user?.email) {
-            const result = await authApi.verifyCode(user.email, inputValue.trim());
-            if (result.verified) {
-              setAcknowledgeMessage('Code verified. Deleting account...');
-              // TODO: Call delete account API endpoint
-              setTimeout(() => {
-                setAcknowledgeMessage('Account deleted successfully');
-                setTimeout(() => {
-                  onConfirm();
-                  onClose();
-                }, 1500);
-              }, 1000);
-            } else {
-              setAcknowledgeMessage('Invalid verification code');
-              setTimeout(() => {
-                onClose();
-              }, 2000);
-            }
+          // Verify deletion code via API
+          const result = await authApi.verifyDeletionCode(inputValue.trim());
+          if (result.verified) {
+            setAcknowledgeMessage('Code verified. Deleting account...');
+            // Call delete account API endpoint
+            await authApi.deleteAccount();
+            setAcknowledgeMessage('Account queued for deletion');
+            setTimeout(() => {
+              onConfirm();
+              onClose();
+            }, 1500);
+          } else {
+            setAcknowledgeMessage('Invalid verification code');
+            setTimeout(() => {
+              onClose();
+            }, 2000);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to verify code:', error);
-          setAcknowledgeMessage('Verification failed. Please try again.');
+          const errorMessage = error.response?.data?.detail || 'Verification failed. Please try again.';
+          setAcknowledgeMessage(errorMessage);
           setTimeout(() => {
             onClose();
           }, 2000);
@@ -680,19 +678,16 @@ export default function GeneralMenu({
                       if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT') {
                         setIsSendingCode(true);
                         try {
-                          // Get user email from storage or API
-                          const user = authApi.getCurrentUser();
-                          if (user?.email) {
-                            await authApi.sendVerificationCode(user.email);
-                            setDeleteStage(2);
-                            setInputValue(''); // Clear input for code entry
-                            setShowTypewriter(false);
-                            setShowPrompt(false);
-                            // Restart typewriter for stage 2
-                            setTimeout(() => {
-                              setShowTypewriter(true);
-                            }, 300);
-                          }
+                          // Send deletion verification code via API
+                          await authApi.sendDeletionCode();
+                          setDeleteStage(2);
+                          setInputValue(''); // Clear input for code entry
+                          setShowTypewriter(false);
+                          setShowPrompt(false);
+                          // Restart typewriter for stage 2
+                          setTimeout(() => {
+                            setShowTypewriter(true);
+                          }, 300);
                         } catch (error) {
                           console.error('Failed to send verification code:', error);
                           alert('Failed to send verification code. Please try again.');

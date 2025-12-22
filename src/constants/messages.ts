@@ -260,6 +260,10 @@ Need a special GDPR deletion? Check out [this article](/essential-information).
 
 **Ready to proceed?**
 
+This action is permanent. Please type **DELETE MY ACCOUNT** below to continue.
+
+**Ready to proceed?**
+
 This action is permanent. Please type **delete account** below to continue.`;
 
 
