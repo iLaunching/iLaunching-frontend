@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { authApi } from '@/api/auth';
+import GeneralMenu from '@/components/GeneralMenu';
+import { ADD_PASSWORD_MESSAGES } from '@/constants/messages';
 
 interface SmartHubContextType {
   theme: {
@@ -25,6 +28,32 @@ interface SmartHubContextType {
 const MySettings: React.FC = () => {
   const { theme, profile } = useOutletContext<SmartHubContextType>();
   const user = useAuthStore((state) => state.user);
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState('');
+
+  // Fetch fresh user data on component mount to ensure we have latest fields
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await authApi.getMe();
+        if (response.user) {
+          const accessToken = useAuthStore.getState().accessToken;
+          const refreshToken = useAuthStore.getState().refreshToken;
+          if (accessToken && refreshToken) {
+            setAuth(response.user as any, accessToken, refreshToken);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+    fetchUserData();
+  }, [setAuth]);
+
+  console.log('MySettings - user object:', user);
+  console.log('MySettings - use_password value:', user?.use_password);
+  console.log('MySettings - oauth_provider value:', user?.oauth_provider);
 
   const avatarColor = profile?.avatar_color?.color || '#7F77F1';
   const avatarText = `${profile?.first_name?.charAt(0) || ''}${profile?.surname?.charAt(0) || ''}`.toUpperCase();
@@ -275,6 +304,71 @@ const MySettings: React.FC = () => {
                   'iLaunching'
                 }
               </div>
+
+              {/* Add Password Login Button - Only show for OAuth users without password */}
+              {user?.use_password === false && (
+
+                <div style={{ 
+                  marginTop: '8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+                 }}>
+
+                <p
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 300,
+                    color: theme.text,
+                    fontStyle: 'italic',
+                    fontFamily: 'Work Sans, sans-serif',
+                    opacity: 0.7,
+                    lineHeight: '1.4'
+                  }}
+                
+                >
+                  Want a backup? Add a password so you can sign in either way
+                </p>
+
+                <button
+                  onClick={() => {
+                    // Pick a random password message
+                    const randomIndex = Math.floor(Math.random() * ADD_PASSWORD_MESSAGES.length);
+                    const message = ADD_PASSWORD_MESSAGES[randomIndex].replace(/{username}/g, profile?.first_name || 'there');
+                    setPasswordMessage(message);
+                    setIsPasswordMenuOpen(true);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.global_button_hover_color || 'rgba(0, 0, 0, 0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    fontFamily: 'Work Sans, sans-serif',
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${theme.border}`,
+                    color: theme.text,
+                    cursor: 'pointer',
+                    borderRadius: '6px',
+                    transition: 'background-color 0.2s ease',
+                    marginTop: '4px',
+                    height: '33px',
+                    width: 'fit-content'
+                  }}
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Add password login</span>
+                </button>
+                </div>
+              )}
             </div>
 
             {/* Password Input - Only show if user has password authentication */}
@@ -332,6 +426,58 @@ const MySettings: React.FC = () => {
           Account Settings
         </h2>
       </div>
+
+      {/* GeneralMenu for Adding Password */}
+      <GeneralMenu
+        isOpen={isPasswordMenuOpen}
+        onClose={() => setIsPasswordMenuOpen(false)}
+        onConfirm={async (password?: string) => {
+          if (!password) return;
+          
+          try {
+            console.log('Adding password to account...');
+            await authApi.addPassword(password);
+            console.log('Password added successfully');
+            
+            // Fetch fresh user data to update use_password field
+            const response = await authApi.getMe();
+            if (response.user) {
+              const accessToken = useAuthStore.getState().accessToken;
+              const refreshToken = useAuthStore.getState().refreshToken;
+              if (accessToken && refreshToken) {
+                setAuth(response.user as any, accessToken, refreshToken);
+              }
+            }
+            
+            setIsPasswordMenuOpen(false);
+          } catch (error: any) {
+            console.error('Failed to add password:', error);
+            alert(error.response?.data?.detail || 'Failed to add password. Please try again.');
+          }
+        }}
+        menuColor={theme.background}
+        textColor={theme.text}
+        borderLineColor={theme.border}
+        globalHoverColor={theme.global_button_hover}
+        chatBk1={theme.chat_bk_1}
+        solidColor={theme.header_background}
+        buttonHoverColor={theme.button_hover_color}
+        aiAcknowledgeTextColor={theme.text}
+        dangerButtonColor={theme.tone_button_bk_color || theme.background}
+        dangerButtonTextColor={theme.text}
+        dangerButtonHoverColor={theme.button_hover_color || theme.global_button_hover}
+        dangerButtonSolidColor={theme.header_background}
+        dangerToneBk={theme.background}
+        dangerToneBorder={theme.border}
+        dangerToneText={theme.text}
+        dangerBkLightColor={theme.background}
+        dangerBkSolidColor={theme.header_background}
+        dangerBkSolidTextColor={theme.text}
+        context="password"
+        customMessage={passwordMessage}
+        confirmButtonText="Add Password"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 };
