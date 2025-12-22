@@ -591,104 +591,6 @@ export default function GeneralMenu({
                     linkColor={solidColor}
                   />
                 )}
-                
-                {/* Delete Account Buttons - 2-stage process */}
-                {context === 'delete_account' && showPrompt && deleteStage === 1 && (
-                  <button
-                    onClick={async () => {
-                      // Stage 1: Validate text and send verification code
-                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT') {
-                        setIsSendingCode(true);
-                        try {
-                          // Get user email from storage or API
-                          const user = authApi.getCurrentUser();
-                          if (user?.email) {
-                            await authApi.sendVerificationCode(user.email);
-                            setDeleteStage(2);
-                            setInputValue(''); // Clear input for code entry
-                            setShowTypewriter(false);
-                            setShowPrompt(false);
-                            // Restart typewriter for stage 2
-                            setTimeout(() => {
-                              setShowTypewriter(true);
-                            }, 300);
-                          }
-                        } catch (error) {
-                          console.error('Failed to send verification code:', error);
-                          alert('Failed to send verification code. Please try again.');
-                        } finally {
-                          setIsSendingCode(false);
-                        }
-                      }
-                    }}
-                    disabled={inputValue.trim().toUpperCase() !== 'DELETE MY ACCOUNT' || isSendingCode}
-                    style={{
-                      marginTop: '24px',
-                      padding: '12px 24px',
-                      backgroundColor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) 
-                        ? (dangerBkSolidColor || '#C62A2FFF')
-                        : '#6B7280',
-                      color: dangerBkSolidTextColor || '#ffffff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      fontFamily: 'Work Sans, sans-serif',
-                      cursor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 'pointer' : 'not-allowed',
-                      opacity: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 1 : 0.5,
-                      transition: 'all 0.2s',
-                      animation: 'fadeIn 0.5s ease-in-out'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
-                        e.currentTarget.style.opacity = '0.9';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
-                        e.currentTarget.style.opacity = '1';
-                      }
-                    }}
-                  >
-                    {isSendingCode ? 'Sending code...' : 'Confirm'}
-                  </button>
-                )}
-                
-                {context === 'delete_account' && showPrompt && deleteStage === 2 && (
-                  <button
-                    onClick={handleConfirm}
-                    disabled={!inputValue.trim()}
-                    style={{
-                      marginTop: '24px',
-                      padding: '12px 24px',
-                      backgroundColor: inputValue.trim() 
-                        ? (dangerBkSolidColor || '#C62A2FFF')
-                        : '#6B7280',
-                      color: dangerBkSolidTextColor || '#ffffff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      fontFamily: 'Work Sans, sans-serif',
-                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
-                      opacity: inputValue.trim() ? 1 : 0.5,
-                      transition: 'all 0.2s',
-                      animation: 'fadeIn 0.5s ease-in-out'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (inputValue.trim()) {
-                        e.currentTarget.style.opacity = '0.9';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (inputValue.trim()) {
-                        e.currentTarget.style.opacity = '1';
-                      }
-                    }}
-                  >
-                    Delete Account
-                  </button>
-                )}
               </div>
             )}
 
@@ -769,6 +671,104 @@ export default function GeneralMenu({
                     e.currentTarget.style.borderColor = borderLineColor;
                   }}
                 />
+                
+                {/* Delete Account Buttons - 2-stage process */}
+                {deleteStage === 1 && (
+                  <button
+                    onClick={async () => {
+                      // Stage 1: Validate text and send verification code
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT') {
+                        setIsSendingCode(true);
+                        try {
+                          // Get user email from storage or API
+                          const user = authApi.getCurrentUser();
+                          if (user?.email) {
+                            await authApi.sendVerificationCode(user.email);
+                            setDeleteStage(2);
+                            setInputValue(''); // Clear input for code entry
+                            setShowTypewriter(false);
+                            setShowPrompt(false);
+                            // Restart typewriter for stage 2
+                            setTimeout(() => {
+                              setShowTypewriter(true);
+                            }, 300);
+                          }
+                        } catch (error) {
+                          console.error('Failed to send verification code:', error);
+                          alert('Failed to send verification code. Please try again.');
+                        } finally {
+                          setIsSendingCode(false);
+                        }
+                      }
+                    }}
+                    disabled={inputValue.trim().toUpperCase() !== 'DELETE MY ACCOUNT' || isSendingCode}
+                    style={{
+                      marginTop: '24px',
+                      padding: '12px 24px',
+                      backgroundColor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) 
+                        ? (dangerBkSolidColor || '#C62A2FFF')
+                        : '#6B7280',
+                      color: dangerBkSolidTextColor || '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Work Sans, sans-serif',
+                      cursor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 'pointer' : 'not-allowed',
+                      opacity: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 1 : 0.5,
+                      transition: 'all 0.2s',
+                      animation: 'fadeIn 0.5s ease-in-out'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
+                        e.currentTarget.style.opacity = '0.9';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                  >
+                    {isSendingCode ? 'Sending code...' : 'Confirm'}
+                  </button>
+                )}
+                
+                {deleteStage === 2 && (
+                  <button
+                    onClick={handleConfirm}
+                    disabled={!inputValue.trim()}
+                    style={{
+                      marginTop: '24px',
+                      padding: '12px 24px',
+                      backgroundColor: inputValue.trim() 
+                        ? (dangerBkSolidColor || '#C62A2FFF')
+                        : '#6B7280',
+                      color: dangerBkSolidTextColor || '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Work Sans, sans-serif',
+                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
+                      opacity: inputValue.trim() ? 1 : 0.5,
+                      transition: 'all 0.2s',
+                      animation: 'fadeIn 0.5s ease-in-out'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '0.9';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                  >
+                    Delete Account
+                  </button>
+                )}
               </div>
             )}
 
