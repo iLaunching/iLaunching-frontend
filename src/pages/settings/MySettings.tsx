@@ -145,6 +145,7 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
                 First Name
@@ -180,6 +181,7 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
                 Surname
@@ -215,6 +217,7 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
                 Email
@@ -242,7 +245,7 @@ const MySettings: React.FC = () => {
               />
             </div>
 
-            {/* Password Input */}
+            {/* Auth Provider Display */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label
                 style={{
@@ -250,19 +253,12 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
-                Password
+                Authentication Provider
               </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                onBlur={(e) => {
-                  e.target.style.border = `1px solid ${theme.border}`;
-                }}
-                onFocus={(e) => {
-                  e.target.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
-                }}
+              <div
                 style={{
                   padding: '10px 12px',
                   fontSize: '14px',
@@ -271,10 +267,52 @@ const MySettings: React.FC = () => {
                   borderRadius: '6px',
                   backgroundColor: theme.background,
                   color: theme.text,
-                  outline: 'none',
+                  opacity: 0.7,
                 }}
-              />
+              >
+                {user?.oauth_provider ? 
+                  `${user.oauth_provider.charAt(0).toUpperCase()}${user.oauth_provider.slice(1)}` : 
+                  'iLaunching'
+                }
+              </div>
             </div>
+
+            {/* Password Input - Only show if user has password authentication */}
+            {user?.use_password && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: theme.text,
+                    fontFamily: 'Work Sans, sans-serif',
+                    userSelect: 'none'
+                  }}
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  onBlur={(e) => {
+                    e.target.style.border = `1px solid ${theme.border}`;
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+                  }}
+                  style={{
+                    padding: '10px 12px',
+                    fontSize: '14px',
+                    fontFamily: 'Work Sans, sans-serif',
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: '6px',
+                    backgroundColor: theme.background,
+                    color: theme.text,
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
