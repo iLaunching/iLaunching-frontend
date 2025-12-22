@@ -510,7 +510,7 @@ export default function GeneralMenu({
                     className="text-gray-900"
                     style={{ 
                       fontFamily: 'Work Sans, sans-serif',
-                      fontSize: '26px',
+                      fontSize: '20px',
                       color: textColor
                     }}
                     highlightColor={dangerButtonColor}

@@ -137,7 +137,7 @@ const LoginPermissionsSelector: React.FC<LoginPermissionsSelectorProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
+        gap: '0px',
       }}
     >
       {permissions.map((permission) => (
@@ -148,9 +148,10 @@ const LoginPermissionsSelector: React.FC<LoginPermissionsSelectorProps> = ({
             display: 'flex',
             alignItems: 'flex-start',
             gap: '12px',
-            padding: '16px',
-            borderRadius: '8px',
-            border: `1px solid ${borderLineColor}`,
+            paddingLeft: '0px',
+            paddingRight: '16px',
+            marginBottom: '5px',
+            borderRadius: '8px',   
             backgroundColor: 'transparent',
             cursor: 'pointer',
             transition: 'all 0.2s',
@@ -158,7 +159,7 @@ const LoginPermissionsSelector: React.FC<LoginPermissionsSelectorProps> = ({
             width: '100%',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = `${borderLineColor}40`;
+            e.currentTarget.style.backgroundColor = 'transparent';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
@@ -196,8 +197,8 @@ const LoginPermissionsSelector: React.FC<LoginPermissionsSelectorProps> = ({
             <div
               style={{
                 fontFamily: 'Work Sans, sans-serif',
-                fontSize: '15px',
-                fontWeight: 500,
+                fontSize: '14px',
+                fontWeight: 400,
                 color: textColor,
                 marginBottom: '4px',
                 userSelect: 'none',
