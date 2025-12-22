@@ -4,7 +4,12 @@ import { User, Mail, Lock } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
+import AppearanceSelector from '@/components/AppearanceSelector';
+import IThemeSelector from '@/components/iThemeSelector';
+import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
 import { ADD_PASSWORD_MESSAGES } from '@/constants/messages';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '@/lib/api';
 
 interface SmartHubContextType {
   theme: {
@@ -31,6 +36,7 @@ const MySettings: React.FC = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
+  const queryClient = useQueryClient();
 
   // Fetch fresh user data on component mount to ensure we have latest fields
   useEffect(() => {
@@ -54,9 +60,129 @@ const MySettings: React.FC = () => {
   console.log('MySettings - user object:', user);
   console.log('MySettings - use_password value:', user?.use_password);
   console.log('MySettings - oauth_provider value:', user?.oauth_provider);
+  console.log('MySettings - profile object:', profile);
+  console.log('MySettings - appearance:', profile?.appearance);
+  console.log('MySettings - theme object:', theme);
 
   const avatarColor = profile?.avatar_color?.color || '#7F77F1';
   const avatarText = `${profile?.first_name?.charAt(0) || ''}${profile?.surname?.charAt(0) || ''}`.toUpperCase();
+
+  // Mutation to update appearance
+  const updateAppearanceMutation = useMutation({
+    mutationFn: async (appearanceId: number) => {
+      console.log('Calling API to update appearance:', appearanceId);
+      const response = await api.patch(`/profile/appearance?appearance_id=${appearanceId}`);
+      console.log('API response:', response.data);
+      return { appearanceId, data: response.data };
+    },
+    onSuccess: async ({ appearanceId, data }) => {
+      console.log('Appearance updated successfully:', data);
+      
+      // Optimistically update the cache with the new appearance
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            appearance: {
+              ...oldData.profile.appearance,
+              id: appearanceId
+            }
+          }
+        };
+      });
+      
+      // Refetch the smart hub data to get updated theme and full profile
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update appearance:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleAppearanceChange = (appearanceId: number) => {
+    console.log('Changing appearance to:', appearanceId);
+    updateAppearanceMutation.mutate(appearanceId);
+  };
+
+  // Mutation to update iTheme
+  const updateIthemeMutation = useMutation({
+    mutationFn: async (ithemeId: number) => {
+      console.log('Calling API to update itheme:', ithemeId);
+      const response = await api.patch(`/profile/itheme?itheme_id=${ithemeId}`);
+      console.log('API response:', response.data);
+      return { ithemeId, data: response.data };
+    },
+    onSuccess: async ({ ithemeId, data }) => {
+      console.log('iTheme updated successfully:', data);
+      
+      // Optimistically update the cache with the new itheme
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            itheme: {
+              ...oldData.profile.itheme,
+              id: ithemeId
+            }
+          }
+        };
+      });
+      
+      // Refetch the smart hub data to get updated theme
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update itheme:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleIthemeChange = (ithemeId: number) => {
+    console.log('Changing itheme to:', ithemeId);
+    updateIthemeMutation.mutate(ithemeId);
+  };
+
+  // Mutation to update login permissions
+  const updateLoginPermissionsMutation = useMutation({
+    mutationFn: async (permissionId: number) => {
+      console.log('Calling API to update login permissions:', permissionId);
+      const response = await api.patch(`/profile/login-permissions?permission_id=${permissionId}`);
+      console.log('API response:', response.data);
+      return { permissionId, data: response.data };
+    },
+    onSuccess: async ({ permissionId, data }) => {
+      console.log('Login permissions updated successfully:', data);
+      
+      // Optimistically update the cache with the new login permission
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            login_permissions_option_value_id: permissionId
+          }
+        };
+      });
+      
+      // Refetch the smart hub data
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update login permissions:', error);
+      console.error('Error response:', error.response?.data);
+    }
+  });
+
+  const handleLoginPermissionsChange = (permissionId: number) => {
+    console.log('Changing login permissions to:', permissionId);
+    updateLoginPermissionsMutation.mutate(permissionId);
+  };
 
   return (
     <div className="flex flex-col" style={{ 
@@ -79,9 +205,9 @@ const MySettings: React.FC = () => {
       </h1>
       
       <div style={{ 
-        marginBottom: '40px',
+        marginBottom: '20px',
         borderBottom: `1px solid ${theme.border}`,
-        paddingBottom: '16px'
+        paddingBottom: '40px'
         
         }}>
 
@@ -409,23 +535,268 @@ const MySettings: React.FC = () => {
             )}
           </div>
         </div>
-
-
-
-
       </div>
 
-      <div style={{ marginBottom: '40px' }}>
+
+      {/* Appearance Section */}
+      <div style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        >
         <h2 style={{ 
-          fontSize: '20px', 
-          fontWeight: 600, 
-          marginBottom: '16px',
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
           color: theme.text,
           fontFamily: 'Work Sans, sans-serif'
         }}>
-          Account Settings
+          Appearance
         </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Personalise your iLaunching experience by selecting your preferred appearance
+        </p>
+
+        {/* AppearanceSelector Component */}
+        <AppearanceSelector
+          currentAppearanceId={profile?.appearance?.id ?? null}
+          onAppearanceChange={handleAppearanceChange}
+          textColor={theme.text}
+          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        />
       </div>
+
+
+      {/* itheme  Section */}
+      <div
+        style={{
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          iTheme
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Personalise your iLaunching experience by selecting your preferred iTheme
+        </p>
+
+        {/* IThemeSelector Component */}
+        <IThemeSelector
+          currentIthemeId={profile?.itheme?.id ?? null}
+          onIthemeChange={handleIthemeChange}
+          textColor={theme.text}
+          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        />
+      </div>
+
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Launguage & Region
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Customize your language and region.
+        </p>
+
+        {/* Future security settings can be added here */}
+
+      </div>
+
+
+      {/*Time & Date format Section */}
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Time & Date format
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Select the way times & dates are displayed.
+        </p>
+
+        {/* time zone content  */}
+    
+      </div>
+
+      {/*preferences Section */}
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Preferences
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Manage your in-app preferences.
+        </p>
+
+        {/* future preference content can be added here */}
+
+      </div>
+
+     {/*login permissions Section */}
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Login Permissions for iluanching Support
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          If login permissions are granted, our trained Support Specialists can access your account to troubleshoot specific issues you raise in a support ticket. Read more about our{' '}
+          <a
+            href="/legal/security-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: theme.solid_color || '#7F77F1',
+              textDecoration: 'none',
+              fontWeight: 400,
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = 'underline';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = 'none';
+            }}
+          >
+            Security Policy here
+          </a>.
+        </p>
+
+        {/* LoginPermissionsSelector Component */}
+        <LoginPermissionsSelector
+          currentPermissionId={profile?.login_permissions_option_value_id ?? null}
+          onPermissionChange={handleLoginPermissionsChange}
+          textColor={theme.text}
+          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+          solidColor={theme.solid_color || '#7F77F1'}
+        />
+      </div>
+
+
 
       {/* GeneralMenu for Adding Password */}
       <GeneralMenu
@@ -457,8 +828,8 @@ const MySettings: React.FC = () => {
         }}
         menuColor={theme.background}
         textColor={theme.text}
-        borderLineColor={theme.border}
-        globalHoverColor={theme.global_button_hover}
+        borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+        globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
         chatBk1={theme.chat_bk_1}
         solidColor={theme.header_background}
         buttonHoverColor={theme.button_hover_color}

@@ -12,6 +12,7 @@ import SignupInterface from './pages/SignupInterface';
 import SmartHub from './pages/SmartHub';
 import Onboarding from './pages/Onboarding';
 import EssentialInformation from './pages/EssentialInformation';
+import SecurityPolicy from './pages/legal/SecurityPolicy';
 import Settings from './pages/Settings';
 import General from './pages/settings/General';
 import Member from './pages/settings/Member';
@@ -63,6 +64,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/signup-interface" element={<SignupInterface />} />
           <Route path="/essential-information" element={<EssentialInformation />} />
+          <Route path="/legal/security-policy" element={<SecurityPolicy />} />
           <Route
             path="/login"
             element={
