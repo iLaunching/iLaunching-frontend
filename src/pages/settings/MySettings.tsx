@@ -46,7 +46,36 @@ const MySettings: React.FC = () => {
   const navigate = useNavigate();
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
+  const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  const DELETE_ACCOUNT_MESSAGE = `**Confirm Deletion**
+
+Hey, before you go - let's make sure you know what happens when you delete your account. **This is permanent and can't be undone.**
+
+**Smart Hubs 🏢**
+
+Any single-user Smart Hubs you own will be queued for permanent deletion after **30 days**. You'll be immediately removed from all other Smart Hubs and lose access right away.
+
+**Heads up:** If you own Smart Hubs with multiple users, you'll need to **transfer ownership** or **delete them** first to avoid disrupting others. You can manage all your Smart Hubs [here](#).
+
+**Billing 💳**
+
+We'll stop future billing for any Smart Hubs deleted with your account. For other Smart Hubs you're part of, billing continues as normal.
+
+**Your User Data 📦**
+
+All your user data will be queued for permanent deletion after **30 days**.
+
+Need a special GDPR deletion? Check out [this article](#).
+
+---
+
+**Important:** If you use Single-Sign-On to login, please leave all Smart Hubs before deleting your account.
+
+**Ready to proceed?**
+
+This action is permanent. Please type **delete account** below to continue.`;
 
   // Fetch fresh user data on component mount to ensure we have latest fields
   useEffect(() => {
@@ -915,8 +944,7 @@ const MySettings: React.FC = () => {
 
       <button
         onClick={() => {
-          // TODO: Implement delete account functionality
-          console.log('Delete account clicked');
+          setIsDeleteAccountMenuOpen(true);
         }}
         style={{
           display: 'flex',
@@ -997,6 +1025,53 @@ const MySettings: React.FC = () => {
         context="password"
         customMessage={passwordMessage}
         confirmButtonText="Add Password"
+        cancelButtonText="Cancel"
+      />
+
+      {/* GeneralMenu for Delete Account */}
+      <GeneralMenu
+        isOpen={isDeleteAccountMenuOpen}
+        onClose={() => setIsDeleteAccountMenuOpen(false)}
+        onConfirm={async (inputValue?: string) => {
+          if (inputValue?.toLowerCase() !== 'delete account') {
+            alert('Please type "delete account" to confirm.');
+            return;
+          }
+          
+          try {
+            console.log('Deleting account...');
+            // TODO: Call delete account API endpoint
+            // await authApi.deleteAccount();
+            
+            // For now, just close the menu
+            setIsDeleteAccountMenuOpen(false);
+            alert('Account deletion feature coming soon!');
+          } catch (error: any) {
+            console.error('Failed to delete account:', error);
+            alert(error.response?.data?.detail || 'Failed to delete account. Please try again.');
+          }
+        }}
+        menuColor={theme.background}
+        textColor={theme.text}
+        borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+        globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        chatBk1={theme.chat_bk_1}
+        solidColor={theme.header_background}
+        buttonHoverColor={theme.button_hover_color}
+        aiAcknowledgeTextColor={theme.text}
+        dangerButtonColor={theme.danger_tone_bk || theme.background}
+        dangerButtonTextColor={theme.danger_tone_text || theme.text}
+        dangerButtonHoverColor={theme.danger_button_hover || theme.global_button_hover}
+        dangerButtonSolidColor={theme.danger_button_solid_color || theme.header_background}
+        dangerToneBk={theme.danger_tone_bk || theme.background}
+        dangerToneBorder={theme.danger_tone_border || theme.border}
+        dangerToneText={theme.danger_tone_text || theme.text}
+        dangerBkLightColor={theme.danger_bk_light_color || theme.background}
+        dangerBkSolidColor={theme.danger_bk_solid_color || theme.header_background}
+        dangerBkSolidTextColor={theme.danger_bk_solid_text_color || theme.text}
+        context="delete_account"
+        customMessage={DELETE_ACCOUNT_MESSAGE}
+        confirmButtonText="Delete Account"
         cancelButtonText="Cancel"
       />
     </div>

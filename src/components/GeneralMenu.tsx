@@ -6,7 +6,7 @@ import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
 import api from '@/lib/api';
 
-type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'generic';
+type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'delete_account' | 'generic';
 
 interface DeleteStageConfig {
   message: string;
@@ -159,6 +159,14 @@ export default function GeneralMenu({
           {
             message: customMessage || `Add a password to your account for additional sign-in options.`,
             confirmButtonText: propConfirmButtonText || 'Add Password',
+            cancelButtonText: propCancelButtonText || 'Cancel'
+          }
+        ];
+      case 'delete_account':
+        return [
+          {
+            message: customMessage || `Are you sure you want to delete your account?`,
+            confirmButtonText: propConfirmButtonText || 'Delete Account',
             cancelButtonText: propCancelButtonText || 'Cancel'
           }
         ];
