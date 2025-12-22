@@ -381,6 +381,19 @@ export const authApi = {
       throw error;
     }
   },
+
+  /**
+   * Add password to OAuth account
+   */
+  async addPassword(password: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await apiClient.post('/auth/add-password', { password });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add password:', error);
+      throw error;
+    }
+  },
 };
 
 export default apiClient;

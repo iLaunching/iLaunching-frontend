@@ -167,7 +167,23 @@ const SignupPopup = ({ isOpen, onClose, initialView = 'main', userName = '' }: S
       // Use React Router for smooth transition (no full page reload)
       navigate('/signup-interface?action=signup&provider=email');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Verification failed');
+      // Extract error message from various possible formats
+      let errorMessage = 'Verification failed';
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (typeof data === 'string') {
+          errorMessage = data;
+        } else if (data.detail) {
+          errorMessage = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+        } else if (data.message) {
+          errorMessage = typeof data.message === 'string' ? data.message : JSON.stringify(data.message);
+        } else if (data.errors) {
+          errorMessage = typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors);
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

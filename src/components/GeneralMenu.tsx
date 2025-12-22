@@ -6,7 +6,7 @@ import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
 import api from '@/lib/api';
 
-type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'generic';
+type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'generic';
 
 interface DeleteStageConfig {
   message: string;
@@ -18,7 +18,7 @@ interface DeleteStageConfig {
   additionalContent?: React.ReactNode;
 }
 
-interface DeleteMenuProps {
+interface GeneralMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (inputValue?: string) => void;
@@ -58,7 +58,7 @@ interface DeleteMenuProps {
   }>;
 }
 
-export default function DeleteMenu({
+export default function GeneralMenu({
   isOpen,
   onClose,
   onConfirm,
@@ -90,11 +90,13 @@ export default function DeleteMenu({
   isDefaultSmartHub = false,
   smartHubId,
   smartHubs = []
-}: DeleteMenuProps) {
+}: GeneralMenuProps) {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [showTypewriter, setShowTypewriter] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showMovingAi, setShowMovingAi] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -152,6 +154,14 @@ export default function DeleteMenu({
             cancelButtonText: propCancelButtonText || 'Cancel'
           }
         ];
+      case 'password':
+        return [
+          {
+            message: customMessage || `Add a password to your account for additional sign-in options.`,
+            confirmButtonText: propConfirmButtonText || 'Add Password',
+            cancelButtonText: propCancelButtonText || 'Cancel'
+          }
+        ];
       case 'generic':
       default:
         return [
@@ -173,6 +183,8 @@ export default function DeleteMenu({
       setShowTypewriter(false);
       setShowPrompt(false);
       setInputValue('');
+      setPassword('');
+      setConfirmPassword('');
       setShowMovingAi(false);
       setShowAcknowledge(false);
       setAnimationComplete(false);
@@ -188,6 +200,8 @@ export default function DeleteMenu({
       setShowTypewriter(false);
       setShowPrompt(false);
       setInputValue('');
+      setPassword('');
+      setConfirmPassword('');
       setShowMovingAi(false);
       setShowAcknowledge(false);
       setAnimationComplete(false);
@@ -279,6 +293,15 @@ export default function DeleteMenu({
             }, 3000);
           }
         }, 500);
+      } else if (context === 'password') {
+        // For password context, pass the password value
+        setTimeout(() => {
+          setAcknowledgeMessage('Adding password...');
+          setTimeout(() => {
+            onConfirm(password);
+            onClose();
+          }, 1000);
+        }, 500);
       } else {
         // For other contexts, call the original onConfirm
         setTimeout(() => {
@@ -290,7 +313,7 @@ export default function DeleteMenu({
         }, 500);
       }
     }, 1200); // Wait for animation to complete
-  }, [context, smartHubsCount, smartHubId, currentStageIndex, activeStages.length, currentStage, inputValue, onConfirm, onClose]);
+  }, [context, smartHubsCount, smartHubId, currentStageIndex, activeStages.length, currentStage, inputValue, password, onConfirm, onClose]);
 
   const handleBack = useCallback(() => {
     if (currentStageIndex > 0) {
@@ -305,7 +328,7 @@ export default function DeleteMenu({
   const modalContent = (
     <>
       <style>{`
-        .delete-close-btn {
+        .general-close-btn {
           position: absolute;
           top: 16px;
           right: 16px;
@@ -321,10 +344,10 @@ export default function DeleteMenu({
           z-index: 10;
           transition: background-color 0.2s;
         }
-        .delete-close-btn:hover {
+        .general-close-btn:hover {
           background-color: ${globalHoverColor};
         }
-        .delete-danger-btn {
+        .general-danger-btn {
           padding: 10px 32px;
           
           color: ${dangerToneText};
@@ -335,10 +358,11 @@ export default function DeleteMenu({
           font-family: 'Work Sans', sans-serif;
           font-size: 16px;
           height: fit-content;
+          transition: none;
         }
-        .delete-danger-btn:hover {
+        .general-danger-btn:hover {
           background-color: ${dangerBkSolidColor};
-          color: ${dangerButtonTextColor};
+          color: #ffffff;
         }
       
       `}</style>
@@ -375,7 +399,7 @@ export default function DeleteMenu({
           {/* Close Button - Top Right Corner */}
           <button
             onClick={onClose}
-            className="delete-close-btn flex-shrink-0 p-1.5 rounded-full transition-all group"
+            className="general-close-btn flex-shrink-0 p-1.5 rounded-full transition-all group"
             style={{
               backgroundColor: `${textColor}10`,
             }}
@@ -533,6 +557,103 @@ export default function DeleteMenu({
                 />
               </div>
             )}
+
+            {/* Password Input Fields - Only for password context */}
+            {!showMovingAi && showPrompt && context === 'password' && (
+              <div style={{
+                width: '100%',
+                maxWidth: '700px',
+                marginBottom: '24px',
+                animation: 'fadeIn 0.5s ease-in-out',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: textColor,
+                      fontFamily: 'Work Sans, sans-serif'
+                    }}
+                  >
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your new password"
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      border: `1px solid ${borderLineColor}`,
+                      backgroundColor: 'transparent',
+                      color: textColor,
+                      fontSize: '16px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = textColor;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = borderLineColor;
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: textColor,
+                      fontFamily: 'Work Sans, sans-serif'
+                    }}
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your new password"
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      border: `1px solid ${borderLineColor}`,
+                      backgroundColor: 'transparent',
+                      color: textColor,
+                      fontSize: '16px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = textColor;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = borderLineColor;
+                    }}
+                  />
+                </div>
+
+                {/* Show error if passwords don't match */}
+                {password && confirmPassword && password !== confirmPassword && (
+                  <p style={{
+                    fontSize: '13px',
+                    color: '#ef4444',
+                    fontFamily: 'Work Sans, sans-serif',
+                    marginTop: '-8px'
+                  }}>
+                    Passwords do not match
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sticky Footer - Buttons */}
@@ -551,8 +672,11 @@ export default function DeleteMenu({
             }}>
               <button
                 onClick={handleConfirm}
-                disabled={currentStage.requiresInput && !inputValue.trim()}
-                className="delete-danger-btn"
+                disabled={
+                  (currentStage.requiresInput && !inputValue.trim()) ||
+                  (context === 'password' && (!password || !confirmPassword || password !== confirmPassword))
+                }
+                className="general-danger-btn"
               >
                 {currentStage.confirmButtonText || 'Delete'}
               </button>

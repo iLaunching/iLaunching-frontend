@@ -206,6 +206,39 @@ export const getRandomDeleteMessage = (smartHubName: string = 'this Smart Hub', 
 
 
 
+/** add password messages  */
+
+export const ADD_PASSWORD_MESSAGES = [
+  `**Perfect, {username}!** 🎯
+Let's get that password set up.
+You can still use Google to sign in - this is just an extra option for you. 🔑`,
+
+  `**Got it, {username}!** 🔐
+Time to add a password to your account.
+Don't worry - your Google sign-in stays active. This is just a backup. ✨`,
+
+  `**Sounds good, {username}!** 💪
+Let's create that password.
+You'll keep your Google login - think of this as a safety net. 🛡️`,
+
+  `**Nice choice, {username}!** 👍
+Let's set up your password.
+Your Google sign-in isn't going anywhere - this just gives you more flexibility. 🔓`,
+
+  `**Awesome, {username}!** ⚡
+Let's add a password for you.
+You can still use Google to sign in - this is just another way in. 🚪`,
+
+  `**Great, {username}!** 🌟
+Time to set up that password.
+Keep using Google or switch to password login - totally up to you. 🎨`
+] as const;
+
+
+
+
+
+
 
 export const ACKNOWLEDGE_MESSAGE_OLD = [
   "Thank you! Just a moment while I check that.",

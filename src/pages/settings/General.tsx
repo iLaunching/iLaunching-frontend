@@ -8,7 +8,7 @@ import { Ban } from 'lucide-react';
 import api from '@/lib/api';
 import AvatarImageUploader from '@/components/AvatarImageUploader';
 import IconPicker from '@/components/IconPicker';
-import DeleteMenu from '@/components/DeleteMenu';
+import GeneralMenu from '@/components/GeneralMenu';
 import { getRandomDeleteMessage } from '@/constants/messages';
 import {
   faUser,
@@ -167,7 +167,7 @@ export default function General() {
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loadingColors, setLoadingColors] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
-  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState(false);
+  const [isGeneralMenuOpen, setIsGeneralMenuOpen] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState('');
 
   // Update local state when smart_hub changes
@@ -347,9 +347,9 @@ export default function General() {
     console.log('📋 GENERAL: Invalidating current-smart-hub query cache');
     // Invalidate cache to refetch current hub data (including the new current hub after switch)
     queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
-    console.log('📋 GENERAL: Query invalidated, closing delete menu');
-    setIsDeleteMenuOpen(false);
-    console.log('📋 GENERAL: Delete menu closed, UI should refresh automatically');
+    console.log('📋 GENERAL: Query invalidated, closing general menu');
+    setIsGeneralMenuOpen(false);
+    console.log('📋 GENERAL: General menu closed, UI should refresh automatically');
   };
 
   return (
@@ -969,10 +969,10 @@ export default function General() {
                   e.currentTarget.style.border = `1px solid ${theme.danger_tone_border}`;
                 }}
                 onClick={() => {
-                  // Pick a random message when opening the delete menu
+                  // Pick a random message when opening the general menu
                   const userName = profile?.first_name || 'User';
                   setDeleteMessage(getRandomDeleteMessage(smart_hub?.name || 'this Smart Hub', userName));
-                  setIsDeleteMenuOpen(true);
+                  setIsGeneralMenuOpen(true);
                 }}
               >
                 Delete Smart Hub
@@ -1016,10 +1016,10 @@ export default function General() {
         buttonTextColor={theme.button_text_color}
         buttonHoverColor={theme.button_hover_color}
       />
-      {/* DeleteMenu Modal */}
-      <DeleteMenu
-        isOpen={isDeleteMenuOpen}
-        onClose={() => setIsDeleteMenuOpen(false)}
+      {/* GeneralMenu Modal */}
+      <GeneralMenu
+        isOpen={isGeneralMenuOpen}
+        onClose={() => setIsGeneralMenuOpen(false)}
         onConfirm={handleDeleteSmartHub}
         menuColor={theme.background}
         textColor={theme.text}
