@@ -18,6 +18,14 @@ interface SmartHubContextType {
     background_opacity: string;
     menu_bg_opacity?: string;
     border?: string;
+    danger_color?: string;
+    global_button_hover?: string;
+    danger_button_bk_color?: string;
+    dander_button_hover_color?: string;
+    danger_button_text_color?: string;
+    danger_button_border_color?: string;
+    danger_button_hover_border_color?: string;
+    danger_button_bk_hover_color?: string;
     [key: string]: any;
   };
   profile: {
@@ -795,7 +803,43 @@ const MySettings: React.FC = () => {
           solidColor={theme.solid_color || '#7F77F1'}
         />
       </div>
+      
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.danger_button_bk_color,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Danger
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Manage your data and privacy settings.
+        </p>
 
+        {/* future data & privacy content can be added here */}  
+
+
+      </div>
 
 
       {/* GeneralMenu for Adding Password */}
@@ -834,16 +878,16 @@ const MySettings: React.FC = () => {
         solidColor={theme.header_background}
         buttonHoverColor={theme.button_hover_color}
         aiAcknowledgeTextColor={theme.text}
-        dangerButtonColor={theme.tone_button_bk_color || theme.background}
-        dangerButtonTextColor={theme.text}
-        dangerButtonHoverColor={theme.button_hover_color || theme.global_button_hover}
-        dangerButtonSolidColor={theme.header_background}
-        dangerToneBk={theme.background}
-        dangerToneBorder={theme.border}
-        dangerToneText={theme.text}
-        dangerBkLightColor={theme.background}
-        dangerBkSolidColor={theme.header_background}
-        dangerBkSolidTextColor={theme.text}
+        dangerButtonColor={theme.danger_tone_bk || theme.background}
+        dangerButtonTextColor={theme.danger_tone_text || theme.text}
+        dangerButtonHoverColor={theme.danger_button_hover || theme.global_button_hover}
+        dangerButtonSolidColor={theme.danger_button_solid_color || theme.header_background}
+        dangerToneBk={theme.danger_tone_bk || theme.background}
+        dangerToneBorder={theme.danger_tone_border || theme.border}
+        dangerToneText={theme.danger_tone_text || theme.text}
+        dangerBkLightColor={theme.danger_bk_light_color || theme.background}
+        dangerBkSolidColor={theme.danger_bk_solid_color || theme.header_background}
+        dangerBkSolidTextColor={theme.danger_bk_solid_text_color || theme.text}
         context="password"
         customMessage={passwordMessage}
         confirmButtonText="Add Password"
