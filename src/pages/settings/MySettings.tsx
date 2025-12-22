@@ -7,7 +7,7 @@ import GeneralMenu from '@/components/GeneralMenu';
 import AppearanceSelector from '@/components/AppearanceSelector';
 import IThemeSelector from '@/components/iThemeSelector';
 import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
-import { ADD_PASSWORD_MESSAGES } from '@/constants/messages';
+import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
@@ -48,34 +48,6 @@ const MySettings: React.FC = () => {
   const [passwordMessage, setPasswordMessage] = useState('');
   const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
   const queryClient = useQueryClient();
-
-  const DELETE_ACCOUNT_MESSAGE = `**Confirm Deletion**
-
-Hey, before you go - let's make sure you know what happens when you delete your account. **This is permanent and can't be undone.**
-
-**Smart Hubs 🏢**
-
-Any single-user Smart Hubs you own will be queued for permanent deletion after **30 days**. You'll be immediately removed from all other Smart Hubs and lose access right away.
-
-**Heads up:** If you own Smart Hubs with multiple users, you'll need to **transfer ownership** or **delete them** first to avoid disrupting others. You can manage all your Smart Hubs [here](#).
-
-**Billing 💳**
-
-We'll stop future billing for any Smart Hubs deleted with your account. For other Smart Hubs you're part of, billing continues as normal.
-
-**Your User Data 📦**
-
-All your user data will be queued for permanent deletion after **30 days**.
-
-Need a special GDPR deletion? Check out [this article](#).
-
----
-
-**Important:** If you use Single-Sign-On to login, please leave all Smart Hubs before deleting your account.
-
-**Ready to proceed?**
-
-This action is permanent. Please type **delete account** below to continue.`;
 
   // Fetch fresh user data on component mount to ensure we have latest fields
   useEffect(() => {
