@@ -804,6 +804,8 @@ const MySettings: React.FC = () => {
         />
       </div>
       
+
+      {/* Danger Section */}
       <div
         style={{ 
         marginBottom: '30px',
@@ -814,9 +816,9 @@ const MySettings: React.FC = () => {
         > 
         <h2 style={{ 
           fontSize: '16px', 
-          fontWeight: 400, 
+          fontWeight: 500, 
           marginBottom: '5px',
-          color: theme.danger_button_bk_color,
+          color: theme.danger_tone_text,
           fontFamily: 'Work Sans, sans-serif'
         }}>
           Danger
@@ -825,7 +827,7 @@ const MySettings: React.FC = () => {
         style={{
           fontSize: '14px',
           fontWeight: 300,
-          color: theme.text,
+          color: theme.danger_tone_text,
           fontFamily: 'Work Sans, sans-serif',
           opacity: 0.7,
           lineHeight: '1.5',
@@ -833,10 +835,52 @@ const MySettings: React.FC = () => {
         }}
         
         >
-          Manage your data and privacy settings.
+         Proceed with caution.
         </p>
 
-        {/* future data & privacy content can be added here */}  
+      <h2
+        style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}
+      >
+        Log out all sessions including any session on mobile, iPad, and other browsers
+      </h2>
+
+      <button
+        onClick={() => {
+          // TODO: Implement logout all sessions functionality
+          console.log('Log out all sessions clicked');
+        }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          marginTop: '12px',
+          backgroundColor: theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)',
+          border: `1px solid ${theme.danger_tone_border || 'rgba(198, 42, 47, 0.38)'}`,
+          borderRadius: '8px',
+          color: theme.danger_tone_text || '#C62A2F',
+          fontSize: '14px',
+          fontWeight: 400,
+          fontFamily: 'Work Sans, sans-serif',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_button_hover || 'rgba(198, 42, 47, 0.25)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
+        }}
+      >
+        <Lock size={16} />
+        Log out of all sessions
+      </button>
 
 
       </div>
