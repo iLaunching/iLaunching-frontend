@@ -518,6 +518,41 @@ export default function GeneralMenu({
                     linkColor={solidColor}
                   />
                 )}
+                
+                {/* Delete Account Button - shown after typewriter completes */}
+                {context === 'delete_account' && showPrompt && (
+                  <button
+                    onClick={handleConfirm}
+                    disabled={!inputValue.trim()}
+                    style={{
+                      marginTop: '24px',
+                      padding: '12px 24px',
+                      backgroundColor: dangerBkSolidColor || '#C62A2FFF',
+                      color: dangerBkSolidTextColor || '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Work Sans, sans-serif',
+                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
+                      opacity: inputValue.trim() ? 1 : 0.5,
+                      transition: 'all 0.2s',
+                      animation: 'fadeIn 0.5s ease-in-out'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '0.9';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                  >
+                    Delete Account
+                  </button>
+                )}
               </div>
             )}
 
@@ -666,7 +701,7 @@ export default function GeneralMenu({
           </div>
 
           {/* Sticky Footer - Buttons */}
-          {!showMovingAi && showPrompt && (
+          {!showMovingAi && showPrompt && context !== 'delete_account' && (
             <div style={{
               position: 'absolute',
               bottom: 0,
