@@ -61,6 +61,9 @@ interface MainHeaderProps {
   buttonTextColor?: string;
   buttonHoverColor?: string;
   chatBk1?: string;
+  promptBk?: string;
+  promptTextColor?: string;
+  aiAcknowledgeTextColor?: string;
 }
 
 export default function MainHeader({ 
@@ -117,7 +120,10 @@ export default function MainHeader({
   buttonBkColor,
   buttonTextColor,
   buttonHoverColor,
-  chatBk1
+  chatBk1,
+  promptBk,
+  promptTextColor,
+  aiAcknowledgeTextColor
 }: MainHeaderProps) {
   console.log('🔍 MainHeader solidColor:', solidColor);
   
@@ -213,6 +219,9 @@ export default function MainHeader({
           buttonTextColor={buttonTextColor}
           buttonHoverColor={buttonHoverColor}
           chatBk1={chatBk1}
+          promptBk={promptBk}
+          promptTextColor={promptTextColor}
+          aiAcknowledgeTextColor={aiAcknowledgeTextColor}
         />
       </div>
     </header>

@@ -49,10 +49,10 @@ export default function Settings() {
 
   const menuItems = [
     { label: 'Settings', icon: solidIcons.faGear, path: '/smart-hub/settings/general' },
-    { label: 'Upgrade', icon: solidIcons.faArrowUp, path: '/smart-hub/settings/upgrade' },
+    { label: 'Upgrade', icon: solidIcons.faArrowUp, path: '/smart-hub/settings/upgrade/journey' },
     { label: 'Members', icon: regularIcons.faUser, path: '/smart-hub/settings/members' },
     { label: 'Teams', icon: solidIcons.faUsers, path: '/smart-hub/settings/teams' },
-    { label: 'Matrix', icon: solidIcons.faTableCells, path: '/smart-hub/settings/matrix' },
+    { label: 'Matrix', icon: solidIcons.faTableCells, path: '/smart-hub/settings/matrix/active' },
     { label: 'Security & Permissions', icon: solidIcons.faShield, path: '/smart-hub/settings/security' },
     { label: 'Trash', icon: regularIcons.faTrashCan, path: '/smart-hub/settings/trash' }
   ];
@@ -105,7 +105,9 @@ export default function Settings() {
         </h2>
 
         {menuItems.map((item, index) => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname === item.path || 
+            (item.label === 'Upgrade' && location.pathname.startsWith('/smart-hub/settings/upgrade')) ||
+            (item.label === 'Matrix' && location.pathname.startsWith('/smart-hub/settings/matrix'));
           return (
             <button
               key={index}

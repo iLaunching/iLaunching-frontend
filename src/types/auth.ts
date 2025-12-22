@@ -31,6 +31,7 @@ export interface User {
   name: string;
   created_at?: string;
   onboarding_completed?: boolean;
+  use_password?: boolean;
 }
 
 export interface AuthResponse {

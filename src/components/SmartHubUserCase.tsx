@@ -50,7 +50,12 @@ export default function SmartHubUserCase({
                 (opt: UseCaseOption) => opt.value_name === 'start_business'
               );
               if (startBusinessOption) {
+                console.log('Setting default use case:', startBusinessOption.option_value_id, startBusinessOption.value_name);
                 onSelect(startBusinessOption.option_value_id, startBusinessOption.value_name);
+              } else if (data.options.length > 0) {
+                // Fallback to first option if start_business not found
+                console.log('Setting fallback use case (first option):', data.options[0].option_value_id, data.options[0].value_name);
+                onSelect(data.options[0].option_value_id, data.options[0].value_name);
               }
             }
           } else {
@@ -75,7 +80,7 @@ export default function SmartHubUserCase({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [selectedOptionId, onSelect]);
 
   const handleOptionClick = useMemo(() => (optionId: number, valueName: string) => {
     onSelect(optionId, valueName);

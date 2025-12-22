@@ -85,6 +85,8 @@ export interface User {
   created_at: string;
   last_login?: string;
   onboarding_completed?: boolean;
+  oauth_provider?: string | null;
+  use_password?: boolean;
 }
 
 export interface CheckEmailResponse {

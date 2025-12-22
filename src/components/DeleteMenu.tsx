@@ -250,20 +250,29 @@ export default function DeleteMenu({
       if (context === 'smart-hub') {
         setTimeout(async () => {
           try {
+            console.log('🗑️ FRONTEND FLOW: Starting smart hub deletion');
+            console.log('🗑️ Hub ID to delete:', smartHubId);
+            console.log('🗑️ Total hubs:', smartHubsCount);
+            
             setAcknowledgeMessage('Deleting Smart Hub...');
             
             // Delete the smart hub - backend handles default status transfer and navigation update
-            await api.delete(`/smart-hubs/${smartHubId}`);
+            console.log('🗑️ FRONTEND FLOW: Calling DELETE /smart-hubs/' + smartHubId);
+            const response = await api.delete(`/smart-hubs/${smartHubId}`);
+            console.log('🗑️ FRONTEND FLOW: Delete successful', response.data);
             
             setAcknowledgeMessage('Smart Hub deleted successfully');
             
             // Close modal and trigger parent callback after short delay
             setTimeout(() => {
+              console.log('🗑️ FRONTEND FLOW: Calling onConfirm callback');
               onConfirm(currentStage.requiresInput ? inputValue : undefined);
+              console.log('🗑️ FRONTEND FLOW: Closing modal');
               onClose();
             }, 1500);
           } catch (error: any) {
-            console.error('Failed to delete smart hub:', error);
+            console.error('🗑️ FRONTEND FLOW: Failed to delete smart hub:', error);
+            console.error('🗑️ Error details:', error.response?.data);
             setAcknowledgeMessage(`Error: ${error.response?.data?.detail || error.message || 'Failed to delete'}`);
             setTimeout(() => {
               onClose();

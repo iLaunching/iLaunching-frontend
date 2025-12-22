@@ -343,10 +343,13 @@ export default function General() {
 
   // Handle delete smart hub
   const handleDeleteSmartHub = () => {
-    console.log('Smart hub deleted, refreshing data...');
+    console.log('📋 GENERAL: handleDeleteSmartHub called');
+    console.log('📋 GENERAL: Invalidating current-smart-hub query cache');
     // Invalidate cache to refetch current hub data (including the new current hub after switch)
     queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    console.log('📋 GENERAL: Query invalidated, closing delete menu');
     setIsDeleteMenuOpen(false);
+    console.log('📋 GENERAL: Delete menu closed, UI should refresh automatically');
   };
 
   return (

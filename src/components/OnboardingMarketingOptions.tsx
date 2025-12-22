@@ -10,11 +10,19 @@ interface MarketingOption {
 interface OnboardingMarketingOptionsProps {
   onSelect: (optionId: number, optionName: string) => void;
   selectedOptionId?: number;
+  textColor?: string;
+  borderLineColor?: string;
+  globalHoverColor?: string;
+  solidColor?: string;
 }
 
 export default function OnboardingMarketingOptions({
   onSelect,
   selectedOptionId,
+  textColor = '#000000',
+  borderLineColor = 'rgba(0, 0, 0, 0.15)',
+  globalHoverColor = 'rgba(0, 0, 0, 0.05)',
+  solidColor = '#7F77F1'
 }: OnboardingMarketingOptionsProps) {
   const [options, setOptions] = useState<MarketingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +39,12 @@ export default function OnboardingMarketingOptions({
           
           if (data.options && data.options.length > 0) {
             setOptions(data.options);
+            
+            // Set default selection to first option if no selection exists
+            if (!selectedOptionId && data.options.length > 0) {
+              console.log('Setting default marketing option:', data.options[0].option_value_id, data.options[0].value_name);
+              onSelect(data.options[0].option_value_id, data.options[0].value_name);
+            }
           } else {
             setError('No marketing options available');
           }
@@ -46,7 +60,7 @@ export default function OnboardingMarketingOptions({
     };
 
     fetchOptions();
-  }, []);
+  }, [selectedOptionId, onSelect]);
 
   const handleOptionClick = (option: MarketingOption) => {
     onSelect(option.option_value_id, option.value_name);
@@ -70,25 +84,30 @@ export default function OnboardingMarketingOptions({
 
   return (
     <div className="w-full max-w-2xl mx-auto px-6">
-      <div className="grid grid-cols-2 gap-3">
-        {options.map((option) => (
-          <button
-            key={option.option_value_id}
-            onClick={() => handleOptionClick(option)}
-            className={`
-              px-4 py-3 rounded-lg text-left transition-all duration-200
-              border-2
-              ${
-                selectedOptionId === option.option_value_id
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-gray-900 border-gray-300 hover:border-gray-900 hover:bg-gray-50'
-              }
-            `}
-            style={{ fontFamily: 'Work Sans, sans-serif' }}
-          >
-            <span className="text-sm font-medium">{option.display_name}</span>
-          </button>
-        ))}
+      <div 
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px',
+          justifyContent: 'center',
+          '--use-case-border-color': borderLineColor,
+          '--use-case-hover-color': globalHoverColor,
+          '--use-case-selected-color': solidColor
+        } as React.CSSProperties}
+      >
+        {options.map((option) => {
+          const isSelected = selectedOptionId === option.option_value_id;
+          return (
+            <button
+              key={option.option_value_id}
+              onClick={() => handleOptionClick(option)}
+              className={`use-case-option ${isSelected ? 'selected' : ''}`}
+              style={{ color: isSelected ? '#ffffff' : textColor }}
+            >
+              {option.display_name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

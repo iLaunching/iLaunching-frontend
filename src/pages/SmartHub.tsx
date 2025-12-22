@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
 import api from '@/lib/api';
@@ -35,6 +35,7 @@ interface SmartHubData {
     background: string;
     text: string;
     menu: string;
+    menu_bg_opacity?: string;  // From itheme
     border: string;
     user_button_color: string;
     user_button_hover: string;
@@ -50,6 +51,17 @@ interface SmartHubData {
     button_text_color?: string;
     button_hover_color?: string;
     chat_bk_1?: string;  // Chat background gradient from appearance theme
+    prompt_bk?: string;  // Prompt background color from appearance theme
+    prompt_text_color?: string;  // Prompt text color from appearance theme
+    ai_acknowledge_text_color?: string;  // AI acknowledgment text color from appearance theme
+    danger_button_solid_color?: string;  // Danger solid button color
+    danger_button_hover?: string;  // Danger button hover color
+    danger_tone_bk?: string;  // Danger tone background
+    danger_tone_border?: string;  // Danger tone border
+    danger_tone_text?: string;  // Danger tone text
+    danger_bk_light_color?: string;  // Danger light background
+    danger_bk_solid_color?: string;  // Danger solid background
+    danger_bk_solid_text_color?: string;  // Danger solid background text
   } | null;
   profile: {
     id: string;
@@ -65,6 +77,7 @@ interface SmartHubData {
       hub_color_id: number;
       color?: string;
       journey?: string;
+      order_number?: number;
     }>;
     appearance: {
       id: number;
@@ -454,10 +467,13 @@ export default function SmartHub() {
   
   return (
     <div 
-      className="min-h-screen"
       style={{ 
         backgroundColor: theme.background,
-        color: theme.text
+        color: theme.text,
+        height: '100vh',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       <MainHeader 
@@ -515,7 +531,11 @@ export default function SmartHub() {
         buttonTextColor={theme.button_text_color}
         buttonHoverColor={theme.button_hover_color}
         chatBk1={theme.chat_bk_1}
+        promptBk={theme.prompt_bk}
+        promptTextColor={theme.prompt_text_color}
+        aiAcknowledgeTextColor={theme.ai_acknowledge_text_color}
       />
+      <Outlet context={{ theme, profile: hubData.profile, smart_hub: hubData.smart_hub }} />
     </div>
   );
 }

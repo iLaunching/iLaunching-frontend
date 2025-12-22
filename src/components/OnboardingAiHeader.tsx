@@ -1,11 +1,13 @@
 interface OnboardingAiHeaderProps {
   aiName?: string;
   acknowledgeMessage?: string;
+  aiAcknowledgeTextColor?: string;
 }
 
 export default function OnboardingAiHeader({ 
   aiName = 'AI Assistant',
-  acknowledgeMessage = ''
+  acknowledgeMessage = '',
+  aiAcknowledgeTextColor
 }: OnboardingAiHeaderProps) {
   // Split acknowledge message into words for animation
   const renderAcknowledgeWords = (message: string) => {
@@ -140,7 +142,7 @@ export default function OnboardingAiHeader({
         .onboarding-ai-acknowledge {
           font-size: 14px;
           font-weight: 500;
-          color: rgba(17, 15, 117, 1);
+          color: ${aiAcknowledgeTextColor || 'rgba(17, 15, 117, 1)'};
           padding: 2px 6px;
           border-radius: 4px;
           line-height: 1.2;

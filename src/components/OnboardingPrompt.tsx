@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { Send, Mic } from 'lucide-react';
 
 interface OnboardingPromptProps {
   onSubmit: (message: string) => void;
   placeholder?: string;
+  initialValue?: string;
   type?: 'text' | 'password' | 'email';
   className?: string;
   containerStyle?: React.CSSProperties;
   inputClassName?: string;
+  inputStyle?: React.CSSProperties;
+  textColor?: string;
   buttonClassName?: string;
   overlayColor?: string;
   showSignupButton?: boolean;
@@ -22,15 +25,25 @@ interface OnboardingPromptProps {
   onGoogleClick?: () => void;
   showFacebookButton?: boolean;
   onFacebookClick?: () => void;
+  showStartOverButton?: boolean;
+  onStartOverClick?: () => void;
+  startOverButtonText?: string;
+  startOverButtonBgColor?: string;
+  startOverButtonHoverColor?: string;
+  startOverButtonTextColor?: string;
+  startOverButtonBorderColor?: string;
 }
 
-export default function OnboardingPrompt({ 
+const OnboardingPrompt = memo(function OnboardingPrompt({ 
   onSubmit, 
   placeholder = "Type your email here...",
+  initialValue = '',
   type = "text",
   className = "",
   containerStyle,
   inputClassName = "",
+  inputStyle,
+  textColor,
   buttonClassName = "",
   showSignupButton = false,
   onSignupClick,
@@ -43,24 +56,35 @@ export default function OnboardingPrompt({
   showGoogleButton = false,
   onGoogleClick,
   showFacebookButton = false,
-  onFacebookClick
+  onFacebookClick,
+  showStartOverButton = false,
+  onStartOverClick,
+  startOverButtonText = 'Start Over',
+  startOverButtonBgColor = 'transparent',
+  startOverButtonHoverColor = '#4b5563',
+  startOverButtonTextColor = '#4b5563',
+  startOverButtonBorderColor = '#e5e7eb'
 }: OnboardingPromptProps) {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(initialValue);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
       onSubmit(message.trim());
       setMessage('');
     }
-  };
+  }, [message, onSubmit]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
-  };
+  }, [handleSubmit]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  }, []);
 
   return (
     <div className="w-full max-w-[800px] mx-auto px-4">
@@ -81,16 +105,44 @@ export default function OnboardingPrompt({
             <input
               type={type}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
-              className={`w-full outline-none text-gray-900 placeholder-gray-400 text-base bg-transparent ${inputClassName}`}
-              style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '18px' }}
+              className={`w-full outline-none placeholder-gray-400 text-base bg-transparent ${inputClassName}`}
+              style={{ 
+                fontFamily: 'work sans, sans-serif', 
+                fontWeight: '400',
+                fontSize: '18px',
+                color: textColor || '#000000',
+                ...inputStyle
+              }}
             />
           </div>
 
           {/* Button Area */}
           <div className="relative flex items-center gap-2 px-4" style={{ paddingTop: '10px', paddingBottom: '20px' }}>
+            {/* Start Over Button - Show when showStartOverButton is true */}
+            {showStartOverButton && onStartOverClick && (
+              <button
+                type="button"
+                onClick={onStartOverClick}
+                className="flex items-center justify-center h-8 px-5 rounded-full border text-sm font-medium cursor-pointer transition-all duration-200 shadow-sm whitespace-nowrap"
+                style={{
+                  backgroundColor: startOverButtonBgColor,
+                  color: startOverButtonTextColor,
+                  borderColor: startOverButtonBorderColor
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = startOverButtonHoverColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = startOverButtonBgColor;
+                }}
+              >
+                {startOverButtonText}
+              </button>
+            )}
+            
             {/* Sales Demo Button - Show when showSalesDemoButton is true */}
             {showSalesDemoButton && onSalesDemoClick && (
               <button
@@ -130,7 +182,7 @@ export default function OnboardingPrompt({
             {/* Voice Button */}
             <button
               type="button"
-              className="flex-shrink-0 w-9 h-9 rounded-full bg-white border border-gray-200 hover:border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-md tooltip-trigger"
+              className="flex-shrink-0 w-9 h-9 rounded-full bg-white border border-gray-200 hover:border-gray-300 flex items-center justify-center transition-all duration-200 hover:shadow-md prompt-tooltip-trigger"
               data-tooltip="Chat using voice"
             >
               <Mic className="w-4 h-4 text-gray-600" />
@@ -143,7 +195,7 @@ export default function OnboardingPrompt({
               className={`flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600
                        text-white flex items-center justify-center transition-all duration-200
                        hover:shadow-lg hover:scale-105 active:scale-95
-                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 tooltip-trigger ${buttonClassName}`}
+                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 prompt-tooltip-trigger ${buttonClassName}`}
               data-tooltip="Submit"
             >
               <Send className="w-5 h-5" />
@@ -201,11 +253,11 @@ export default function OnboardingPrompt({
       
       {/* Tooltip Styles */}
       <style>{`
-        .tooltip-trigger {
+        .prompt-tooltip-trigger {
           position: relative;
         }
 
-        .tooltip-trigger::before {
+        .prompt-tooltip-trigger::before {
           content: attr(data-tooltip);
           position: absolute;
           bottom: calc(100% + 18px);
@@ -218,7 +270,10 @@ export default function OnboardingPrompt({
           font-size: 11px;
           font-weight: 500;
           letter-spacing: 0.025em;
-          white-space: nowrap;
+          white-space: normal;
+          max-width: 180px;
+          width: max-content;
+          text-align: center;
           opacity: 0;
           visibility: hidden;
           pointer-events: none;
@@ -230,7 +285,7 @@ export default function OnboardingPrompt({
           border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .tooltip-trigger::after {
+        .prompt-tooltip-trigger::after {
           content: '';
           position: absolute;
           bottom: calc(100% + 13px);
@@ -250,21 +305,21 @@ export default function OnboardingPrompt({
           pointer-events: none;
         }
 
-        .tooltip-trigger:hover::before,
-        .tooltip-trigger:hover::after {
+        .prompt-tooltip-trigger:hover::before,
+        .prompt-tooltip-trigger:hover::after {
           opacity: 1;
           visibility: visible;
         }
 
-        .tooltip-trigger:disabled:hover::before,
-        .tooltip-trigger:disabled:hover::after {
+        .prompt-tooltip-trigger:disabled:hover::before,
+        .prompt-tooltip-trigger:disabled:hover::after {
           opacity: 0;
           visibility: hidden;
         }
 
         /* Submit button tooltip always shows, even when disabled */
-        .tooltip-trigger[type="submit"]:disabled:hover::before,
-        .tooltip-trigger[type="submit"]:disabled:hover::after {
+        .prompt-tooltip-trigger[type="submit"]:disabled:hover::before,
+        .prompt-tooltip-trigger[type="submit"]:disabled:hover::after {
           opacity: 1 !important;
           visibility: visible !important;
         }
@@ -285,4 +340,6 @@ export default function OnboardingPrompt({
       `}</style>
     </div>
   );
-}
+});
+
+export default OnboardingPrompt;
