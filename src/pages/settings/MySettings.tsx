@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { User, Mail, Lock, Trash2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
 import AppearanceSelector from '@/components/AppearanceSelector';
 import IThemeSelector from '@/components/iThemeSelector';
 import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
-import { ADD_PASSWORD_MESSAGES } from '@/constants/messages';
+import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
@@ -18,6 +18,14 @@ interface SmartHubContextType {
     background_opacity: string;
     menu_bg_opacity?: string;
     border?: string;
+    danger_color?: string;
+    global_button_hover?: string;
+    danger_button_bk_color?: string;
+    dander_button_hover_color?: string;
+    danger_button_text_color?: string;
+    danger_button_border_color?: string;
+    danger_button_hover_border_color?: string;
+    danger_button_bk_hover_color?: string;
     [key: string]: any;
   };
   profile: {
@@ -34,8 +42,11 @@ const MySettings: React.FC = () => {
   const { theme, profile } = useOutletContext<SmartHubContextType>();
   const user = useAuthStore((state) => state.user);
   const setAuth = useAuthStore((state) => state.setAuth);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
+  const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch fresh user data on component mount to ensure we have latest fields
@@ -795,7 +806,146 @@ const MySettings: React.FC = () => {
           solidColor={theme.solid_color || '#7F77F1'}
         />
       </div>
+      
 
+      {/* Danger Section */}
+      <div
+        style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '18px', 
+          fontWeight: 500, 
+          marginBottom: '5px',
+          color: theme.danger_tone_text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Danger
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.danger_tone_text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+         Proceed with caution.
+        </p>
+
+      <h2
+        style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.danger_tone_text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}
+      >
+        Log out all sessions including any session on mobile, iPad, and other browsers
+      </h2>
+
+      <button
+        onClick={async () => {
+          try {
+            // Call logout API to revoke refresh token
+            await authApi.logout();
+            
+            // Clear auth store
+            logout();
+            
+            // Redirect to login
+            navigate('/login');
+          } catch (error) {
+            console.error('Failed to logout:', error);
+            // Even if API fails, clear local state and redirect
+            logout();
+            navigate('/login');
+          }
+        }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          marginTop: '12px',
+          backgroundColor: theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)',
+          border: `1px solid ${theme.danger_tone_border || 'rgba(198, 42, 47, 0.38)'}`,
+          borderRadius: '8px',
+          color: theme.danger_tone_text,
+          fontSize: '14px',
+          fontWeight: 400,
+          fontFamily: 'Work Sans, sans-serif',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
+          e.currentTarget.style.color = theme.danger_bk_solid_text_color;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_tone_bk || 'rgba(198, 42, 47, 0.15)';
+          e.currentTarget.style.color = theme.danger_tone_text;
+        }}
+      >
+        <Lock size={16} />
+        Log out of all sessions
+      </button>
+
+    <h2
+        style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginTop: '50px',
+          marginBottom: '5px',
+          color: theme.danger_tone_text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}
+      >
+        Delete my account and all associated data
+
+    </h2>
+
+      <button
+        onClick={() => {
+          setIsDeleteAccountMenuOpen(true);
+        }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          marginTop: '12px',
+          backgroundColor: theme.danger_bk_solid_color,
+          border: `1px solid ${theme.danger_tone_border || 'rgba(198, 42, 47, 0.38)'}`,
+          borderRadius: '8px',
+          color: theme.danger_bk_solid_text_color,
+          fontSize: '14px',
+          fontWeight: 400,
+          fontFamily: 'Work Sans, sans-serif',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_button_hover || 'rgba(198, 42, 47, 0.25)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
+        }}
+      >
+        <Trash2 size={16} />
+        Delete account
+      </button>
+
+      </div>
 
 
       {/* GeneralMenu for Adding Password */}
@@ -834,19 +984,66 @@ const MySettings: React.FC = () => {
         solidColor={theme.header_background}
         buttonHoverColor={theme.button_hover_color}
         aiAcknowledgeTextColor={theme.text}
-        dangerButtonColor={theme.tone_button_bk_color || theme.background}
-        dangerButtonTextColor={theme.text}
-        dangerButtonHoverColor={theme.button_hover_color || theme.global_button_hover}
-        dangerButtonSolidColor={theme.header_background}
-        dangerToneBk={theme.background}
-        dangerToneBorder={theme.border}
-        dangerToneText={theme.text}
-        dangerBkLightColor={theme.background}
-        dangerBkSolidColor={theme.header_background}
-        dangerBkSolidTextColor={theme.text}
+        dangerButtonColor={theme.danger_tone_bk || theme.background}
+        dangerButtonTextColor={theme.danger_tone_text || theme.text}
+        dangerButtonHoverColor={theme.danger_button_hover || theme.global_button_hover}
+        dangerButtonSolidColor={theme.danger_button_solid_color || theme.header_background}
+        dangerToneBk={theme.danger_tone_bk || theme.background}
+        dangerToneBorder={theme.danger_tone_border || theme.border}
+        dangerToneText={theme.danger_tone_text || theme.text}
+        dangerBkLightColor={theme.danger_bk_light_color || theme.background}
+        dangerBkSolidColor={theme.danger_bk_solid_color || theme.header_background}
+        dangerBkSolidTextColor={theme.danger_bk_solid_text_color || theme.text}
         context="password"
         customMessage={passwordMessage}
         confirmButtonText="Add Password"
+        cancelButtonText="Cancel"
+      />
+
+      {/* GeneralMenu for Delete Account */}
+      <GeneralMenu
+        isOpen={isDeleteAccountMenuOpen}
+        onClose={() => setIsDeleteAccountMenuOpen(false)}
+        onConfirm={async (inputValue?: string) => {
+          if (inputValue?.toLowerCase() !== 'delete account') {
+            alert('Please type "delete account" to confirm.');
+            return;
+          }
+          
+          try {
+            console.log('Deleting account...');
+            // TODO: Call delete account API endpoint
+            // await authApi.deleteAccount();
+            
+            // For now, just close the menu
+            setIsDeleteAccountMenuOpen(false);
+            alert('Account deletion feature coming soon!');
+          } catch (error: any) {
+            console.error('Failed to delete account:', error);
+            alert(error.response?.data?.detail || 'Failed to delete account. Please try again.');
+          }
+        }}
+        menuColor={theme.background}
+        textColor={theme.text}
+        borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+        globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        chatBk1={theme.chat_bk_1}
+        solidColor={theme.header_background}
+        buttonHoverColor={theme.button_hover_color}
+        aiAcknowledgeTextColor={theme.text}
+        dangerButtonColor={theme.danger_tone_bk || theme.background}
+        dangerButtonTextColor={theme.danger_tone_text || theme.text}
+        dangerButtonHoverColor={theme.danger_button_hover || theme.global_button_hover}
+        dangerButtonSolidColor={theme.danger_button_solid_color || theme.header_background}
+        dangerToneBk={theme.danger_tone_bk || theme.background}
+        dangerToneBorder={theme.danger_tone_border || theme.border}
+        dangerToneText={theme.danger_tone_text || theme.text}
+        dangerBkLightColor={theme.danger_bk_light_color || theme.background}
+        dangerBkSolidColor={theme.danger_bk_solid_color || theme.header_background}
+        dangerBkSolidTextColor={theme.danger_bk_solid_text_color || theme.text}
+        context="delete_account"
+        customMessage={DELETE_ACCOUNT_MESSAGE}
+        confirmButtonText="Delete Account"
         cancelButtonText="Cancel"
       />
     </div>

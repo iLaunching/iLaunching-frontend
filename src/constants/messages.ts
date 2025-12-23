@@ -234,6 +234,38 @@ Time to set up that password.
 Keep using Google or switch to password login - totally up to you. 🎨`
 ] as const;
 
+export const DELETE_ACCOUNT_MESSAGE = `**Confirm Deletion**
+
+Hey, before you go - let's make sure you know what happens when you delete your account. **This is permanent and can't be undone.**
+
+**Smart Hubs 🏢**
+
+Any single-user Smart Hubs you own will be queued for permanent deletion after **30 days**. You'll be immediately removed from all other Smart Hubs and lose access right away.
+
+**Heads up:** If you own Smart Hubs with multiple users, you'll need to **transfer ownership** or **delete them** first to avoid disrupting others. You can manage all your Smart Hubs [here](#).
+
+**Billing 💳**
+
+We'll stop future billing for any Smart Hubs deleted with your account. For other Smart Hubs you're part of, billing continues as normal.
+
+**Your User Data 📦**
+
+All your user data will be queued for permanent deletion after **30 days**.
+
+Need a special GDPR deletion? Check out [this article](/essential-information).
+
+---
+
+**Important:** If you use Single-Sign-On to login, please leave all Smart Hubs before deleting your account.
+
+**Ready to proceed?**
+
+This action is permanent. Please type **DELETE MY ACCOUNT** below to continue.
+
+**Ready to proceed?**
+
+This action is permanent. Please type **delete account** below to continue.`;
+
 
 
 

@@ -4,9 +4,9 @@ import { createPortal } from 'react-dom';
 import OnboardingAiHeader from './OnboardingAiHeader';
 import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
-import api from '@/lib/api';
+import api, { authApi } from '@/lib/api';
 
-type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'generic';
+type DeleteContext = 'smart-hub' | 'user' | 'project' | 'team-member' | 'matrix' | 'journey' | 'password' | 'delete_account' | 'generic';
 
 interface DeleteStageConfig {
   message: string;
@@ -98,6 +98,9 @@ export default function GeneralMenu({
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showMovingAi, setShowMovingAi] = useState(false);
+  const [deleteStage, setDeleteStage] = useState<1 | 2>(1);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isSendingCode, setIsSendingCode] = useState(false);
   const [showAcknowledge, setShowAcknowledge] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [acknowledgeMessage, setAcknowledgeMessage] = useState('Processing...');
@@ -162,6 +165,28 @@ export default function GeneralMenu({
             cancelButtonText: propCancelButtonText || 'Cancel'
           }
         ];
+      case 'delete_account':
+        if (deleteStage === 1) {
+          return [
+            {
+              message: customMessage || `**Confirm Deletion**\n\nHey, before you go - let's make sure you know what happens...\n\n**Smart Hubs 🏢**\nAny single-user Smart Hubs you own will be queued for permanent deletion after **30 days**...\n\n**Your User Data 📦**\nAll your user data will be queued for permanent deletion after **30 days**.\nNeed a special GDPR deletion? Check out [this article](/essential-information).\n\n**Ready to proceed?**\nPlease type **DELETE MY ACCOUNT** below to continue.`,
+              confirmButtonText: 'Confirm',
+              cancelButtonText: propCancelButtonText || 'Cancel',
+              requiresInput: true,
+              inputPlaceholder: 'Type DELETE MY ACCOUNT'
+            }
+          ];
+        } else {
+          return [
+            {
+              message: `**Verification Required**\n\nWe've sent a verification code to your email address.\n\nPlease enter the code below to complete the deletion process.`,
+              confirmButtonText: 'Delete Account',
+              cancelButtonText: propCancelButtonText || 'Cancel',
+              requiresInput: true,
+              inputPlaceholder: 'Enter verification code'
+            }
+          ];
+        }
       case 'generic':
       default:
         return [
@@ -172,7 +197,7 @@ export default function GeneralMenu({
           }
         ];
     }
-  }, [context, itemName, customMessage, propConfirmButtonText, propCancelButtonText]);
+  }, [context, itemName, customMessage, propConfirmButtonText, propCancelButtonText, deleteStage]);
 
   const activeStages = stages || getDefaultStages();
   const currentStage = activeStages[currentStageIndex];
@@ -206,6 +231,9 @@ export default function GeneralMenu({
       setShowAcknowledge(false);
       setAnimationComplete(false);
       hasCompletedRef.current = false;
+      setDeleteStage(1);
+      setVerificationCode('');
+      setIsSendingCode(false);
     }
   }, [isOpen, currentStageIndex]);
 
@@ -214,6 +242,14 @@ export default function GeneralMenu({
     setShowPrompt(false);
     hasCompletedRef.current = false;
   }, [currentStageIndex]);
+
+  // Reset and restart typewriter when delete stage changes
+  useEffect(() => {
+    if (context === 'delete_account' && deleteStage === 2) {
+      setShowPrompt(false);
+      hasCompletedRef.current = false;
+    }
+  }, [context, deleteStage]);
 
   const handleTypewriterComplete = useCallback(() => {
     if (!hasCompletedRef.current) {
@@ -224,7 +260,49 @@ export default function GeneralMenu({
     }
   }, []);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
+    // Handle delete account stage 2 - verify code
+    if (context === 'delete_account' && deleteStage === 2) {
+      setShowMovingAi(true);
+      setShowPrompt(false);
+      setShowTypewriter(false);
+      setAnimationComplete(false);
+      
+      setTimeout(async () => {
+        setAnimationComplete(true);
+        setShowAcknowledge(true);
+        setAcknowledgeMessage('Verifying code...');
+        
+        try {
+          // Verify deletion code via API
+          const result = await authApi.verifyDeletionCode(inputValue.trim());
+          if (result.verified) {
+            setAcknowledgeMessage('Code verified. Deleting account...');
+            // Call delete account API endpoint
+            await authApi.deleteAccount();
+            setAcknowledgeMessage('Account queued for deletion');
+            setTimeout(() => {
+              onConfirm();
+              onClose();
+            }, 1500);
+          } else {
+            setAcknowledgeMessage('Invalid verification code');
+            setTimeout(() => {
+              onClose();
+            }, 2000);
+          }
+        } catch (error: any) {
+          console.error('Failed to verify code:', error);
+          const errorMessage = error.response?.data?.detail || 'Verification failed. Please try again.';
+          setAcknowledgeMessage(errorMessage);
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+        }
+      }, 1200);
+      return;
+    }
+    
     // Validation for smart hub deletion
     if (context === 'smart-hub') {
       // Check if there's only one smart hub
@@ -313,7 +391,7 @@ export default function GeneralMenu({
         }, 500);
       }
     }, 1200); // Wait for animation to complete
-  }, [context, smartHubsCount, smartHubId, currentStageIndex, activeStages.length, currentStage, inputValue, password, onConfirm, onClose]);
+  }, [context, deleteStage, inputValue, smartHubsCount, smartHubId, currentStageIndex, activeStages.length, currentStage, password, onConfirm, onClose]);
 
   const handleBack = useCallback(() => {
     if (currentStageIndex > 0) {
@@ -502,11 +580,12 @@ export default function GeneralMenu({
                     className="text-gray-900"
                     style={{ 
                       fontFamily: 'Work Sans, sans-serif',
-                      fontSize: '26px',
+                      fontSize: '20px',
                       color: textColor
                     }}
                     highlightColor={dangerButtonColor}
                     customColor={dangerBkSolidColor}
+                    linkColor={solidColor}
                   />
                 )}
               </div>
@@ -524,8 +603,8 @@ export default function GeneralMenu({
               </div>
             )}
 
-            {/* Input Field (if required) */}
-            {!showMovingAi && showPrompt && currentStage.requiresInput && (
+            {/* Input Field (if required) - exclude delete_account as it has custom inputs */}
+            {!showMovingAi && showPrompt && currentStage.requiresInput && context !== 'delete_account' && (
               <div style={{
                 width: '100%',
                 maxWidth: '700px',
@@ -555,6 +634,135 @@ export default function GeneralMenu({
                     e.currentTarget.style.borderColor = borderLineColor;
                   }}
                 />
+              </div>
+            )}
+
+            {/* Delete Account Input Field */}
+            {!showMovingAi && showPrompt && context === 'delete_account' && (
+              <div style={{
+                width: '100%',
+                maxWidth: '700px',
+                marginBottom: '24px',
+                animation: 'fadeIn 0.5s ease-in-out'
+              }}>
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={currentStage.inputPlaceholder || 'Type to confirm...'}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    border: `1px solid ${borderLineColor}`,
+                    backgroundColor: 'transparent',
+                    color: textColor,
+                    fontSize: '16px',
+                    fontFamily: 'Work Sans, sans-serif',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = textColor;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = borderLineColor;
+                  }}
+                />
+                
+                {/* Delete Account Buttons - 2-stage process */}
+                {deleteStage === 1 && (
+                  <button
+                    onClick={async () => {
+                      // Stage 1: Validate text and send verification code
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT') {
+                        setIsSendingCode(true);
+                        try {
+                          // Send deletion verification code via API
+                          await authApi.sendDeletionCode();
+                          setDeleteStage(2);
+                          setInputValue(''); // Clear input for code entry
+                          setShowTypewriter(false);
+                          setShowPrompt(false);
+                          // Restart typewriter for stage 2
+                          setTimeout(() => {
+                            setShowTypewriter(true);
+                          }, 300);
+                        } catch (error) {
+                          console.error('Failed to send verification code:', error);
+                          alert('Failed to send verification code. Please try again.');
+                        } finally {
+                          setIsSendingCode(false);
+                        }
+                      }
+                    }}
+                    disabled={inputValue.trim().toUpperCase() !== 'DELETE MY ACCOUNT' || isSendingCode}
+                    style={{
+                      marginTop: '24px',
+                      padding: '12px 24px',
+                      backgroundColor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) 
+                        ? (dangerBkSolidColor || '#C62A2FFF')
+                        : '#6B7280',
+                      color: dangerBkSolidTextColor || '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Work Sans, sans-serif',
+                      cursor: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 'pointer' : 'not-allowed',
+                      opacity: (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) ? 1 : 0.5,
+                      transition: 'all 0.2s',
+                      animation: 'fadeIn 0.5s ease-in-out'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
+                        e.currentTarget.style.opacity = '0.9';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (inputValue.trim().toUpperCase() === 'DELETE MY ACCOUNT' && !isSendingCode) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                  >
+                    {isSendingCode ? 'Sending code...' : 'Confirm'}
+                  </button>
+                )}
+                
+                {deleteStage === 2 && (
+                  <button
+                    onClick={handleConfirm}
+                    disabled={!inputValue.trim()}
+                    style={{
+                      marginTop: '24px',
+                      padding: '12px 24px',
+                      backgroundColor: inputValue.trim() 
+                        ? (dangerBkSolidColor || '#C62A2FFF')
+                        : '#6B7280',
+                      color: dangerBkSolidTextColor || '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      fontFamily: 'Work Sans, sans-serif',
+                      cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
+                      opacity: inputValue.trim() ? 1 : 0.5,
+                      transition: 'all 0.2s',
+                      animation: 'fadeIn 0.5s ease-in-out'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '0.9';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (inputValue.trim()) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                  >
+                    Delete Account
+                  </button>
+                )}
               </div>
             )}
 
@@ -657,7 +865,7 @@ export default function GeneralMenu({
           </div>
 
           {/* Sticky Footer - Buttons */}
-          {!showMovingAi && showPrompt && (
+          {!showMovingAi && showPrompt && context !== 'delete_account' && (
             <div style={{
               position: 'absolute',
               bottom: 0,

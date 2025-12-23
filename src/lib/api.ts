@@ -206,6 +206,30 @@ export const authApi = {
     const response = await authApiClient.post<LogoutResponse>('/auth/logout', data);
     return response.data;
   },
+  
+  /**
+   * Send verification code for account deletion
+   */
+  sendDeletionCode: async (): Promise<{ success: boolean; message: string; expires_in_minutes: number }> => {
+    const response = await api.post('/account/send-deletion-code');
+    return response.data;
+  },
+  
+  /**
+   * Verify deletion code
+   */
+  verifyDeletionCode: async (code: string): Promise<{ verified: boolean; message: string }> => {
+    const response = await api.post('/account/verify-deletion-code', { code });
+    return response.data;
+  },
+  
+  /**
+   * Delete account
+   */
+  deleteAccount: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete('/account/delete');
+    return response.data;
+  },
 };
 
 export default api;
