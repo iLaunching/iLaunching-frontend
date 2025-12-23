@@ -50,6 +50,8 @@ const MySettings: React.FC = () => {
   const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
   const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+  const [avatarColors, setAvatarColors] = useState<Array<{ option_value_id: number; value_name: string; display_name: string; metadata: { color: string } }>>([]);
+  const [loadingColors, setLoadingColors] = useState(true);
   const queryClient = useQueryClient();
 
   // Fetch fresh user data on component mount to ensure we have latest fields
@@ -70,6 +72,23 @@ const MySettings: React.FC = () => {
     };
     fetchUserData();
   }, [setAuth]);
+
+  // Fetch avatar colors from API
+  useEffect(() => {
+    const fetchAvatarColors = async () => {
+      try {
+        const response = await api.get('/avatar-colors');
+        console.log('Avatar colors fetched:', response.data);
+        setAvatarColors(response.data.colors);
+      } catch (error) {
+        console.error('Failed to fetch avatar colors:', error);
+      } finally {
+        setLoadingColors(false);
+      }
+    };
+
+    fetchAvatarColors();
+  }, []);
 
   console.log('MySettings - user object:', user);
   console.log('MySettings - use_password value:', user?.use_password);
@@ -196,6 +215,30 @@ const MySettings: React.FC = () => {
   const handleLoginPermissionsChange = (permissionId: number) => {
     console.log('Changing login permissions to:', permissionId);
     updateLoginPermissionsMutation.mutate(permissionId);
+  };
+
+  // Mutation to update avatar color
+  const updateAvatarColorMutation = useMutation({
+    mutationFn: async (colorId: number) => {
+      console.log('Calling API to update avatar color:', colorId);
+      const response = await api.patch(`/profile/avatar-color?avatar_color_id=${colorId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Avatar color updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Avatar color updated and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to update avatar color:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleAvatarColorSelect = (colorId: number) => {
+    console.log('Avatar color selected:', colorId);
+    updateAvatarColorMutation.mutate(colorId);
   };
 
   return (
@@ -329,8 +372,85 @@ const MySettings: React.FC = () => {
                 }} />
               </div>
             </div>
-          </div>
 
+        {/* Avatar Color Section */}
+        <div style={{
+          marginTop: '32px',
+          paddingTop: '32px',
+          borderTop: `1px solid ${theme.border}`
+        }}>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+          }}>
+            Avatar Color
+          </h2>
+          <p style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px'
+          }}>
+            Choose a color for your avatar background.
+          </p>
+
+          {/* Color Picker */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            width: '100%'
+          }}>
+            {loadingColors ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>Loading colors...</div>
+            ) : avatarColors.length === 0 ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>No colors available</div>
+            ) : (
+              avatarColors.map((color) => {
+                const isSelected = profile?.avatar_color?.color === color.metadata?.color;
+                return (
+                  <button
+                    key={color.option_value_id}
+                    onClick={() => handleAvatarColorSelect(color.option_value_id)}
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      borderRadius: '50%',
+                      backgroundColor: color.metadata?.color || '#7F77F1',
+                      cursor: 'pointer',
+                      border: isSelected 
+                        ? '2px solid #ffffff' 
+                        : '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: isSelected 
+                        ? `0 0 0 2px ${color.metadata?.color || '#7F77F1'}80` 
+                        : 'none',
+                      transition: 'all 0.2s ease',
+                      padding: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = `0 0 0 2px ${color.metadata?.color || '#7F77F1'}40`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }
+                    }}
+                    title={color.display_name}
+                    aria-label={`Select ${color.display_name} color`}
+                  />
+                );
+              })
+            )}
+          </div>
+        </div>
           {/* Form Column */}
           <div style={{
             display: 'flex',
@@ -582,6 +702,38 @@ const MySettings: React.FC = () => {
             )}
           </div>
         </div>
+      
+      <h2
+      
+        style={{
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          marginTop: '60px'
+        }}  
+      >
+      Avatar Colors
+
+      </h2>
+      <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+          }}
+          >
+        Choose a color that represents you.
+      </p>
+
+
+
+
       </div>
 
 
