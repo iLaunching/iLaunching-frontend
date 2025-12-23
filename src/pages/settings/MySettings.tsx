@@ -861,13 +861,12 @@ const MySettings: React.FC = () => {
             Choose an icon to display on your avatar.
           </p>
 
-          {/* Icon Selector - 6 column grid like IconPickerMini */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 28px)',
-            gap: '8px',
-            width: 'fit-content',
-            marginBottom: '16px'
+          {/* Icon Selector */}
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: '16px',
+            width: '100%'
           }}>
             {popularIcons.map((item) => {
               const isSelected = profile?.profile_icon?.id === item.id;
@@ -900,28 +899,29 @@ const MySettings: React.FC = () => {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 );
               }
 
+              // Regular icon button
               return (
                 <button
                   key={item.id}
-                  onClick={() => handleIconSelect(item.id!)}
+                  onClick={() => item.id && handleIconSelect(item.id)}
                   style={{
                     width: '28px',
                     height: '28px',
-                    backgroundColor: isSelected ? theme.solid_color : 'transparent',
+                    backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
                     border: 'none',
                     outline: 'none',
-                    color: isSelected ? '#ffffff' : theme.text,
+                    color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
                     cursor: 'pointer',
                     borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'background-color 0.2s ease',
+                    transition: 'all 0.2s ease',
                   }}
                   title={item.name}
                   onMouseEnter={(e) => {
@@ -945,7 +945,7 @@ const MySettings: React.FC = () => {
           <button
             onClick={() => setIsIconPickerOpen(true)}
             style={{
-              width: '200px',
+              width: '20%',
               height: '35px',
               backgroundColor: 'transparent',
               color: theme.text,
@@ -956,6 +956,7 @@ const MySettings: React.FC = () => {
               fontWeight: 500,
               cursor: 'pointer',
               transition: 'background-color 0.2s ease',
+              marginTop: '15px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = theme.global_button_hover;
