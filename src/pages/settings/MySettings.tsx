@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Trash2, Camera } from 'lucide-react';
+import { User, Mail, Lock, Trash2, Camera, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -8,9 +8,13 @@ import AppearanceSelector from '@/components/AppearanceSelector';
 import IThemeSelector from '@/components/iThemeSelector';
 import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
 import AvatarImageUploader from '@/components/AvatarImageUploader';
+import IconPicker from '@/components/IconPicker';
 import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import { faUser, faHeart, faStar, faHome, faBriefcase, faLightbulb, faBolt, faCog, faRocket, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 
 interface SmartHubContextType {
   theme: {
@@ -52,7 +56,23 @@ const MySettings: React.FC = () => {
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const [avatarColors, setAvatarColors] = useState<Array<{ option_value_id: number; value_name: string; display_name: string; metadata: { color: string } }>>([]);
   const [loadingColors, setLoadingColors] = useState(true);
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  // Popular icons for profile avatar
+  const popularIcons: { icon?: any; name: string; id: number | null; isClear?: boolean }[] = [
+    { name: 'clear', id: null, isClear: true },
+    { icon: faUser, name: 'user', id: 1174 },
+    { icon: faHeart, name: 'heart', id: 484 },
+    { icon: faStar, name: 'star', id: 1491 },
+    { icon: faHome, name: 'home', id: 1111 },
+    { icon: faBriefcase, name: 'briefcase', id: 1843 },
+    { icon: faLightbulb, name: 'lightbulb', id: 1360 },
+    { icon: faBolt, name: 'bolt', id: 1793 },
+    { icon: faCog, name: 'cog', id: 408 },
+    { icon: faRocket, name: 'rocket', id: 1409 },
+    { icon: faGraduationCap, name: 'graduation-cap', id: 1076 },
+  ];
 
   // Fetch fresh user data on component mount to ensure we have latest fields
   useEffect(() => {
@@ -239,6 +259,54 @@ const MySettings: React.FC = () => {
   const handleAvatarColorSelect = (colorId: number) => {
     console.log('Avatar color selected:', colorId);
     updateAvatarColorMutation.mutate(colorId);
+  };
+
+  // Mutation to update profile icon
+  const updateProfileIconMutation = useMutation({
+    mutationFn: async (iconId: number) => {
+      console.log('Calling API to update profile icon:', iconId);
+      const response = await api.patch(`/profile/icon?profile_icon_id=${iconId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Profile icon updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Profile icon updated and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to update profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleIconSelect = (iconId: number) => {
+    console.log('Icon selected:', iconId);
+    updateProfileIconMutation.mutate(iconId);
+  };
+
+  // Mutation to clear profile icon
+  const clearProfileIconMutation = useMutation({
+    mutationFn: async () => {
+      console.log('Calling API to clear profile icon');
+      const response = await api.delete(`/profile/icon`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Profile icon cleared successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Profile icon cleared and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleClearIcon = () => {
+    console.log('Clear profile icon clicked');
+    clearProfileIconMutation.mutate();
   };
 
   return (
@@ -703,72 +771,140 @@ const MySettings: React.FC = () => {
               })
             )}
           </div>
+        </div>
 
-          {/* Avatar Preview */}
-          <div style={{
-            marginTop: '30px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
+        {/* Avatar Icon Section */}
+        <div style={{
+          marginTop: '32px',
+          paddingTop: '32px',
+          borderTop: `1px solid ${theme.border}`
+        }}>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
           }}>
-            {/* User Avatar */}
-            <div
-              style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '15px',
-                backgroundColor: avatarColor,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '32px',
-                fontWeight: 600,
-                color: '#ffffff',
-                flexShrink: 0,
-                fontFamily: 'Work Sans, sans-serif',
-              }}
-            >
-              {profile?.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt="User avatar"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '15px',
-                    objectFit: 'cover'
-                  }}
-                />
-              ) : (
-                `${profile?.first_name?.charAt(0)?.toUpperCase() || ''}${profile?.surname?.charAt(0)?.toUpperCase() || ''}`
-              )}
-            </div>
+            Avatar Icon
+          </h2>
+          <p style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px'
+          }}>
+            Choose an icon to display on your avatar.
+          </p>
 
-            {/* User Details */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <div style={{
-                fontSize: '18px',
-                fontWeight: 500,
-                color: theme.text,
-                fontFamily: 'Work Sans, sans-serif',
-              }}>
-                {profile?.first_name} {profile?.surname}
-              </div>
-              <div style={{
-                fontSize: '14px',
-                fontWeight: 300,
-                color: theme.text,
-                fontFamily: 'Work Sans, sans-serif',
-                opacity: 0.7
-              }}>
-                {user?.email}
-              </div>
-            </div>
+          {/* Icon Selector */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            width: '100%',
+            marginBottom: '16px'
+          }}>
+            {popularIcons.map((item) => {
+              const isSelected = profile?.profile_icon?.id === item.id;
+
+              // Special handling for clear button
+              if (item.isClear) {
+                return (
+                  <button
+                    key="clear"
+                    onClick={handleClearIcon}
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      color: theme.text,
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'background-color 0.2s ease',
+                    }}
+                    title="Clear Icon"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <X size={18} />
+                  </button>
+                );
+              }
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleIconSelect(item.id!)}
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    backgroundColor: isSelected ? theme.solid_color : 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: isSelected ? '#ffffff' : theme.text,
+                    cursor: 'pointer',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                  title={item.name}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  {item.icon && <FontAwesomeIcon icon={item.icon} size="sm" />}
+                </button>
+              );
+            })}
           </div>
+
+          {/* More Icons Button */}
+          <button
+            onClick={() => setIsIconPickerOpen(true)}
+            style={{
+              width: '20%',
+              height: '35px',
+              backgroundColor: 'transparent',
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              border: `1px solid ${theme.text}40`,
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = theme.global_button_hover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            More Icons
+          </button>
         </div>
       </div>
 
