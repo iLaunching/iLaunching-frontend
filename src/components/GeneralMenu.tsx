@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import { authSync } from '@/lib/auth-sync';
 import OnboardingAiHeader from './OnboardingAiHeader';
 import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
@@ -285,6 +286,9 @@ export default function GeneralMenu({
             // Call delete account API endpoint
             const deleteResult = await authApi.deleteAccount();
             setAcknowledgeMessage('Account queued for deletion. Logging out...');
+            
+            // Broadcast logout to all tabs
+            authSync.broadcast({ type: 'LOGOUT' });
             
             // Logout user
             setTimeout(() => {
