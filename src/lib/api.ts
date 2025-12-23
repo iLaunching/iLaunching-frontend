@@ -95,6 +95,19 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    // Handle 403 errors (account deleted/forbidden)
+    if (error.response?.status === 403) {
+      // Clear auth state and redirect to login
+      localStorage.removeItem('auth-storage');
+      
+      // Broadcast logout to all tabs
+      authSync.broadcast({ type: 'LOGOUT' });
+      
+      window.location.href = '/login';
+      
+      return Promise.reject(error);
+    }
+
     // If error is not 401 or request already retried, reject immediately
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
