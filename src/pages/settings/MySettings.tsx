@@ -702,38 +702,85 @@ const MySettings: React.FC = () => {
             )}
           </div>
         </div>
-      
-      <h2
-      
-        style={{
-          fontSize: '16px', 
-          fontWeight: 400, 
-          marginBottom: '5px',
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif',
-          marginTop: '60px'
-        }}  
-      >
-      Avatar Colors
 
-      </h2>
-      <p
-        style={{
-          fontSize: '14px',
-          fontWeight: 300,
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif',
-          opacity: 0.7,
-          lineHeight: '1.5',
-          marginBottom: '20px'
-          }}
-          >
-        Choose a color that represents you.
-      </p>
+        {/* Avatar Color Section */}
+        <div style={{
+          marginTop: '32px',
+          paddingTop: '32px',
+          borderTop: `1px solid ${theme.border}`
+        }}>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+          }}>
+            Avatar Color
+          </h2>
+          <p style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px'
+          }}>
+            Choose a color for your avatar background.
+          </p>
 
-
-
-
+          {/* Color Picker */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            width: '100%'
+          }}>
+            {loadingColors ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>Loading colors...</div>
+            ) : avatarColors.length === 0 ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>No colors available</div>
+            ) : (
+              avatarColors.map((color) => {
+                const isSelected = profile?.avatar_color?.color === color.metadata?.color;
+                return (
+                  <button
+                    key={color.option_value_id}
+                    onClick={() => handleAvatarColorSelect(color.option_value_id)}
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      borderRadius: '50%',
+                      backgroundColor: color.metadata?.color || '#7F77F1',
+                      cursor: 'pointer',
+                      border: isSelected 
+                        ? '2px solid #ffffff' 
+                        : '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: isSelected 
+                        ? `0 0 0 2px ${color.metadata?.color || '#7F77F1'}80` 
+                        : 'none',
+                      transition: 'all 0.2s ease',
+                      padding: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = `0 0 0 2px ${color.metadata?.color || '#7F77F1'}40`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }
+                    }}
+                    title={color.display_name}
+                    aria-label={`Select ${color.display_name} color`}
+                  />
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
 
 
