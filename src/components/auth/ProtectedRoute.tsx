@@ -50,6 +50,11 @@ export const ProtectedRoute = ({ children, requireOnboarding = true }: Protected
         // Handle 403 errors (account deleted) by logging out and redirecting to login
         if (axios.isAxiosError(error) && error.response?.status === 403) {
           console.log('Account deleted or forbidden, redirecting to login');
+          
+          // Open Essential Information page in new tab to show deletion notice
+          window.open('/essential-information#delete-membership', '_blank');
+          
+          // Logout and redirect current tab
           logout();
           setShouldRedirectToLogin(true);
           return;

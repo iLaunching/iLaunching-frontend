@@ -97,12 +97,16 @@ api.interceptors.response.use(
 
     // Handle 403 errors (account deleted/forbidden)
     if (error.response?.status === 403) {
-      // Clear auth state and redirect to login
+      // Open Essential Information page in new tab to show deletion notice
+      window.open('/essential-information#delete-membership', '_blank');
+      
+      // Clear auth state
       localStorage.removeItem('auth-storage');
       
       // Broadcast logout to all tabs
       authSync.broadcast({ type: 'LOGOUT' });
       
+      // Redirect current tab to login
       window.location.href = '/login';
       
       return Promise.reject(error);
