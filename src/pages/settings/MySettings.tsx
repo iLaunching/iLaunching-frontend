@@ -78,8 +78,11 @@ const MySettings: React.FC = () => {
     const fetchAvatarColors = async () => {
       try {
         const response = await api.get('/avatar-colors');
-        console.log('Avatar colors fetched:', response.data);
-        setAvatarColors(response.data.colors);
+        console.log('Avatar colors response:', response.data);
+        console.log('Avatar colors array:', response.data.colors);
+        console.log('First color example:', response.data.colors?.[0]);
+        console.log('First color metadata:', response.data.colors?.[0]?.metadata);
+        setAvatarColors(response.data.colors || []);
       } catch (error) {
         console.error('Failed to fetch avatar colors:', error);
       } finally {
