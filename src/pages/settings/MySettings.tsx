@@ -1490,6 +1490,21 @@ const MySettings: React.FC = () => {
         buttonTextColor={theme.button_text_color || theme.text}
         buttonHoverColor={theme.button_hover_color || theme.global_button_hover}
       />
+
+      {/* IconPicker for User Profile */}
+      <IconPicker
+        isOpen={isIconPickerOpen}
+        onClose={() => setIsIconPickerOpen(false)}
+        currentIconId={profile?.profile_icon?.id}
+        onIconSelect={handleIconSelect}
+        textColor={theme.text}
+        menuColor={theme.background}
+        titleColor={theme.text}
+        globalButtonHover={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        context="user-profile"
+        toneButtonBkColor={theme.tone_button_bk_color}
+        toneButtonTextColor={theme.tone_button_text_color}
+      />
     </div>
   );
 };
