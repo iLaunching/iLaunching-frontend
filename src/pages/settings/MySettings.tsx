@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Trash2 } from 'lucide-react';
+import { User, Mail, Lock, Trash2, Camera } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
 import AppearanceSelector from '@/components/AppearanceSelector';
 import IThemeSelector from '@/components/iThemeSelector';
 import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
+import AvatarImageUploader from '@/components/AvatarImageUploader';
 import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
@@ -47,6 +48,8 @@ const MySettings: React.FC = () => {
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
   const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
+  const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
+  const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch fresh user data on component mount to ensure we have latest fields
@@ -273,25 +276,58 @@ const MySettings: React.FC = () => {
             >
               Avatar
             </label>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              backgroundColor: avatarColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <span style={{
-                fontSize: '28px',
-                fontWeight: 600,
-                color: '#ffffff',
-                fontFamily: 'Work Sans, sans-serif',
-                userSelect: 'none'
+            <div 
+              style={{
+                position: 'relative',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={() => setIsAvatarHovered(true)}
+              onMouseLeave={() => setIsAvatarHovered(false)}
+              onClick={() => setIsAvatarUploaderOpen(true)}
+            >
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: avatarColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'opacity 0.2s ease'
               }}>
-                {avatarText}
-              </span>
+                <span style={{
+                  fontSize: '28px',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
+                }}>
+                  {avatarText}
+                </span>
+              </div>
+              {/* Camera Icon Overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: isAvatarHovered ? 1 : 0,
+                transition: 'opacity 0.2s ease',
+                pointerEvents: 'none'
+              }}>
+                <Camera style={{
+                  width: '28px',
+                  height: '28px',
+                  color: '#ffffff'
+                }} />
+              </div>
             </div>
           </div>
 
@@ -1045,6 +1081,28 @@ const MySettings: React.FC = () => {
         customMessage={DELETE_ACCOUNT_MESSAGE}
         confirmButtonText="Delete Account"
         cancelButtonText="Cancel"
+      />
+
+      {/* AvatarImageUploader for User Profile */}
+      <AvatarImageUploader
+        isOpen={isAvatarUploaderOpen}
+        onClose={() => setIsAvatarUploaderOpen(false)}
+        context="user-profile"
+        smart_hub_id={null}
+        textColor={theme.text}
+        menuColor={theme.background}
+        titleColor={theme.text}
+        globalButtonHover={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        toneButtonBkColor={theme.background}
+        toneButtonTextColor={theme.text}
+        toneButtonBorderColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+        backgroundColor={theme.background}
+        solidColor={theme.header_background}
+        feedbackIndicatorBk={theme.feedback_indicator_bk || theme.background}
+        appearanceTextColor={theme.text}
+        buttonBkColor={theme.button_bk_color || theme.header_background}
+        buttonTextColor={theme.button_text_color || theme.text}
+        buttonHoverColor={theme.button_hover_color || theme.global_button_hover}
       />
     </div>
   );
