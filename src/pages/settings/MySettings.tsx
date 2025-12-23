@@ -703,6 +703,72 @@ const MySettings: React.FC = () => {
               })
             )}
           </div>
+
+          {/* Avatar Preview */}
+          <div style={{
+            marginTop: '30px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            {/* User Avatar */}
+            <div
+              style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '15px',
+                backgroundColor: avatarColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '32px',
+                fontWeight: 600,
+                color: '#ffffff',
+                flexShrink: 0,
+                fontFamily: 'Work Sans, sans-serif',
+              }}
+            >
+              {profile?.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt="User avatar"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '15px',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                `${profile?.first_name?.charAt(0)?.toUpperCase() || ''}${profile?.surname?.charAt(0)?.toUpperCase() || ''}`
+              )}
+            </div>
+
+            {/* User Details */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              <div style={{
+                fontSize: '18px',
+                fontWeight: 500,
+                color: theme.text,
+                fontFamily: 'Work Sans, sans-serif',
+              }}>
+                {profile?.first_name} {profile?.surname}
+              </div>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: 300,
+                color: theme.text,
+                fontFamily: 'Work Sans, sans-serif',
+                opacity: 0.7
+              }}>
+                {user?.email}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
