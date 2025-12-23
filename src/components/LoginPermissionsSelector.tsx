@@ -80,7 +80,19 @@ const LoginPermissionsSelector: React.FC<LoginPermissionsSelectorProps> = ({
                 }
               };
             }
+            
+            // Silently handle 404s for missing theme configs
+            if (configResponse.status === 404) {
+              return {
+                ...perm,
+                config: {
+                  name: perm.display_name,
+                  description: ''
+                }
+              };
+            }
           } catch (err) {
+            // Only log non-404 errors
             console.error('Error fetching config for permission:', perm.id, err);
           }
           
