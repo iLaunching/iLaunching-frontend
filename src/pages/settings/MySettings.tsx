@@ -14,7 +14,43 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-import { faUser, faHeart, faStar, faHome, faBriefcase, faLightbulb, faBolt, faCog, faRocket, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faHeart,
+  faStar,
+  faHome,
+  faBriefcase,
+  faGraduationCap,
+  faCamera,
+  faMusic,
+  faGamepad,
+  faCoffee,
+  faPizzaSlice,
+  faBicycle,
+  faCar,
+  faPlane,
+  faRocket,
+  faPalette,
+  faCode,
+  faLaptop,
+  faMobileAlt,
+  faHeadphones,
+  faBook,
+  faPencilAlt,
+  faLightbulb,
+  faTrophy,
+  faMedal,
+  faCrown,
+  faGem,
+  faFire,
+  faBolt,
+  faMagic,
+  faTree,
+  faDog,
+  faCat,
+  faFish,
+  faBug,
+} from '@fortawesome/free-solid-svg-icons';
 
 interface SmartHubContextType {
   theme: {
@@ -59,7 +95,7 @@ const MySettings: React.FC = () => {
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  // Popular icons for profile avatar
+  // Popular icons for profile avatar (same as IconPickerMini)
   const popularIcons: { icon?: any; name: string; id: number | null; isClear?: boolean }[] = [
     { name: 'clear', id: null, isClear: true },
     { icon: faUser, name: 'user', id: 1174 },
@@ -67,11 +103,36 @@ const MySettings: React.FC = () => {
     { icon: faStar, name: 'star', id: 1491 },
     { icon: faHome, name: 'home', id: 1111 },
     { icon: faBriefcase, name: 'briefcase', id: 1843 },
-    { icon: faLightbulb, name: 'lightbulb', id: 1360 },
-    { icon: faBolt, name: 'bolt', id: 1793 },
-    { icon: faCog, name: 'cog', id: 408 },
-    { icon: faRocket, name: 'rocket', id: 1409 },
-    { icon: faGraduationCap, name: 'graduation-cap', id: 1076 },
+    { icon: faGraduationCap, name: 'graduation-cap', id: 1497 },
+    { icon: faCamera, name: 'camera', id: 341 },
+    { icon: faMusic, name: 'music', id: 1665 },
+    { icon: faGamepad, name: 'gamepad', id: 1931 },
+    { icon: faCoffee, name: 'coffee', id: 1503 },
+    { icon: faPizzaSlice, name: 'pizza-slice', id: 1361 },
+    { icon: faBicycle, name: 'bicycle', id: 944 },
+    { icon: faCar, name: 'car', id: 132 },
+    { icon: faPlane, name: 'plane', id: 1309 },
+    { icon: faRocket, name: 'rocket', id: 473 },
+    { icon: faPalette, name: 'palette', id: 303 },
+    { icon: faCode, name: 'code', id: 802 },
+    { icon: faLaptop, name: 'laptop', id: 653 },
+    { icon: faMobileAlt, name: 'mobile-alt', id: 1088 },
+    { icon: faHeadphones, name: 'headphones', id: 1383 },
+    { icon: faBook, name: 'book', id: 452 },
+    { icon: faPencilAlt, name: 'pencil-alt', id: 779 },
+    { icon: faLightbulb, name: 'lightbulb', id: 796 },
+    { icon: faTrophy, name: 'trophy', id: 191 },
+    { icon: faMedal, name: 'medal', id: 136 },
+    { icon: faCrown, name: 'crown', id: 723 },
+    { icon: faGem, name: 'gem', id: 1038 },
+    { icon: faFire, name: 'fire', id: 540 },
+    { icon: faBolt, name: 'bolt', id: 1738 },
+    { icon: faMagic, name: 'magic', id: 1156 },
+    { icon: faTree, name: 'tree', id: 314 },
+    { icon: faDog, name: 'dog', id: 82 },
+    { icon: faCat, name: 'cat', id: 1981 },
+    { icon: faFish, name: 'fish', id: 1370 },
+    { icon: faBug, name: 'bug', id: 1545 },
   ];
 
   // Fetch fresh user data on component mount to ensure we have latest fields
@@ -800,12 +861,12 @@ const MySettings: React.FC = () => {
             Choose an icon to display on your avatar.
           </p>
 
-          {/* Icon Selector */}
+          {/* Icon Selector - 6 column grid like IconPickerMini */}
           <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '16px',
-            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 28px)',
+            gap: '8px',
+            width: 'fit-content',
             marginBottom: '16px'
           }}>
             {popularIcons.map((item) => {
@@ -884,7 +945,7 @@ const MySettings: React.FC = () => {
           <button
             onClick={() => setIsIconPickerOpen(true)}
             style={{
-              width: '20%',
+              width: '200px',
               height: '35px',
               backgroundColor: 'transparent',
               color: theme.text,
