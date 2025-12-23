@@ -73,15 +73,12 @@ const MySettings: React.FC = () => {
     fetchUserData();
   }, [setAuth]);
 
-  // Fetch avatar colors from API
+  // Fetch avatar colors from API (using smarthub-colors endpoint)
   useEffect(() => {
     const fetchAvatarColors = async () => {
       try {
-        const response = await api.get('/avatar-colors');
-        console.log('Avatar colors response:', response.data);
-        console.log('Avatar colors array:', response.data.colors);
-        console.log('First color example:', response.data.colors?.[0]);
-        console.log('First color metadata:', response.data.colors?.[0]?.metadata);
+        const response = await api.get('/smarthub-colors');
+        console.log('Avatar colors fetched from smarthub-colors:', response.data);
         setAvatarColors(response.data.colors || []);
       } catch (error) {
         console.error('Failed to fetch avatar colors:', error);
