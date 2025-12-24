@@ -1,4 +1,6 @@
 import { X } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface MemberMenuProps {
   isOpen: boolean;
@@ -12,7 +14,7 @@ interface MemberMenuProps {
   avatarColor: string;
   avatarDisplayMode?: number;
   profileIconId?: number;
-  getIconDefinition?: () => any;
+  getIconDefinition?: () => IconDefinition | null;
   getInitials: () => string;
 }
 
@@ -162,9 +164,7 @@ export default function MemberMenu({
               }}
             >
               {avatarDisplayMode === 26 && getIconDefinition && getIconDefinition() ? (
-                <span style={{ fontSize: '24px' }}>
-                  {getIconDefinition()}
-                </span>
+                <FontAwesomeIcon icon={getIconDefinition()!} style={{ fontSize: '24px' }} />
               ) : (
                 getInitials()
               )}
