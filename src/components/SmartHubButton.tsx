@@ -411,6 +411,7 @@ export default function SmartHubButton({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      setIsOpen(false);
                       navigate('/smart-hub/settings/upgrade/journey');
                     }}
                     style={{
