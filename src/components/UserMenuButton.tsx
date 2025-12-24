@@ -250,16 +250,15 @@ export default function UserMenuButton({
               minHeight: '100px',
               height: 'fit-content',
               padding: '10px',
-              borderBottom: `1px solid ${borderLineColor}`,
-              cursor: 'pointer'
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMemberMenuOpen(true);
+              borderBottom: `1px solid ${borderLineColor}`
             }}
           >
             <UserProfileButton
               globalButtonHover={globalButtonHover}
+              onClick={() => {
+                console.log('Opening Member Menu');
+                setIsMemberMenuOpen(true);
+              }}
               section1Content={
                 <div
                   ref={avatarButtonRef}
