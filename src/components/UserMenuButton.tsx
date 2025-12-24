@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import UserProfileButton from './UserProfileButton';
 import UserAvatarMenu from './UserAvatarMenu';
 import ThemePicker from './ThemePicker';
+import MemberMenu from './MemberMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
@@ -83,6 +84,7 @@ export default function UserMenuButton({
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
+  const [isMemberMenuOpen, setIsMemberMenuOpen] = useState(false);
   const { logout } = useAuth();
   
   console.log('UserMenuButton - avatarDisplayMode:', avatarDisplayMode, 'profileIconId:', profileIconId, 'profileIconName:', profileIconName);
@@ -248,7 +250,12 @@ export default function UserMenuButton({
               minHeight: '100px',
               height: 'fit-content',
               padding: '10px',
-              borderBottom: `1px solid ${borderLineColor}`
+              borderBottom: `1px solid ${borderLineColor}`,
+              cursor: 'pointer'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMemberMenuOpen(true);
             }}
           >
             <UserProfileButton
@@ -271,11 +278,10 @@ export default function UserMenuButton({
                     fontSize: '14px',
                     fontWeight: 600,
                     color: '#ffffff',
-            userSelect: 'none',
+                    userSelect: 'none',
                     cursor: 'pointer',
-                userSelect: 'none',
-            userSelect: 'none',
-                    userSelect: 'none'
+               
+           
                   }}
                 >
                   {avatarDisplayMode === 26 && getIconDefinition() ? (
@@ -793,6 +799,23 @@ export default function UserMenuButton({
       ithemeButtonBkColor={ithemeButtonBkColor}
       ithemeButtonTextColor={ithemeButtonTextColor}
       ithemeBgOpacity={ithemeBgOpacity}
+    />
+
+    {/* Member Menu Slide-out */}
+    <MemberMenu
+      isOpen={isMemberMenuOpen}
+      onClose={() => setIsMemberMenuOpen(false)}
+      menuColor={menuColor}
+      textColor={textColor}
+      borderLineColor={borderLineColor}
+      globalHoverColor={globalButtonHover}
+      firstName={firstName}
+      surname={surname}
+      avatarColor={avatarColor}
+      avatarDisplayMode={avatarDisplayMode}
+      profileIconId={profileIconId}
+      getIconDefinition={getIconDefinition}
+      getInitials={getInitials}
     />
     </>
   );
