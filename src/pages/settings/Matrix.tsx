@@ -67,37 +67,6 @@ const Matrix: React.FC = () => {
           Matrix
         </button>
 
-        {/* Archived Matrix's Button */}
-        <button
-          onClick={() => navigate('/smart-hub/settings/matrix/archived')}
-          style={{
-            backgroundColor: isArchivedRoute ? (theme.button_bk_color || theme.solid_color || '#7F77F1') : 'transparent',
-            color: isArchivedRoute ? '#ffffff' : theme.text,
-            fontFamily: 'Work Sans, sans-serif',
-            fontSize: '14px',
-            fontWeight: 500,
-            paddingLeft: '16px',
-            paddingRight: '16px',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            height: '30px',
-            userSelect: 'none',
-          }}
-          onMouseEnter={(e) => {
-            if (!isArchivedRoute) {
-              e.currentTarget.style.backgroundColor = theme.global_button_hover;
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isArchivedRoute) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
-        >
-          Archive
-        </button>
-
         {/* Versions Button */}
         <button
           onClick={() => navigate('/smart-hub/settings/matrix/versions')}
@@ -127,6 +96,37 @@ const Matrix: React.FC = () => {
           }}
         >
           Versions
+        </button>
+
+        {/* Archived Matrix's Button */}
+        <button
+          onClick={() => navigate('/smart-hub/settings/matrix/archived')}
+          style={{
+            backgroundColor: isArchivedRoute ? (theme.button_bk_color || theme.solid_color || '#7F77F1') : 'transparent',
+            color: isArchivedRoute ? '#ffffff' : theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            fontSize: '14px',
+            fontWeight: 500,
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            height: '30px',
+            userSelect: 'none',
+          }}
+          onMouseEnter={(e) => {
+            if (!isArchivedRoute) {
+              e.currentTarget.style.backgroundColor = theme.global_button_hover;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isArchivedRoute) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          Archive
         </button>
       </div>
 
