@@ -87,9 +87,41 @@ export default function Settings() {
           backgroundColor: theme.menu_bg_opacity || theme.menu,
           overflowY: 'auto',
           padding: '60px 8px 16px 8px',
-          flexShrink: 0
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
+        {/* Return to Smart Hub Button */}
+        <button
+          className="flex items-center gap-3 w-full transition-colors"
+          style={{
+            backgroundColor: 'transparent',
+            border: `1px solid ${theme.border || 'rgba(0,0,0,0.1)'}`,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            height: '36px',
+            borderRadius: '8px',
+            padding: '0 12px',
+            fontSize: '14px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            userSelect: 'none',
+            marginBottom: '24px',
+            textAlign: 'left'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = theme.global_button_hover || 'rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+          onClick={() => navigate('/smart-hub')}
+        >
+          <FontAwesomeIcon icon={solidIcons.faArrowLeft} style={{ fontSize: '14px' }} />
+          <span>Return to Smart Hub</span>
+        </button>
+
         {/* Smart Hub Title */}
         <h2 style={{
           color: theme.title_menu_color_light,

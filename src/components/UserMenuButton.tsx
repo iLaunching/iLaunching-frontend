@@ -350,7 +350,7 @@ export default function UserMenuButton({
                     e.currentTarget.style.backgroundColor = globalButtonHover;
                   }}
                 >
-                  Profile
+                  Membership
                 </div>
               }
             />
