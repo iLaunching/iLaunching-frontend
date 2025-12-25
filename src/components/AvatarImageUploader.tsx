@@ -336,7 +336,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                 className="text-xl font-semimedium flex items-center gap-2"
                 style={{ 
                   color: textColor,
-                  fontFamily: 'Work Sans, sans-serif'
+                  fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
                 <Upload size={35} style={{ color: textColor, border: '1px solid', borderRadius: '5px', padding: '4px', borderColor: titleColor }} strokeWidth={2} />
@@ -405,7 +406,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     className="text-lg font-regular mb-2"
                     style={{ 
                       color: textColor,
-                      fontFamily: 'Work Sans, sans-serif'
+                      fontFamily: 'Work Sans, sans-serif',
+                      userSelect: 'none'
                     }}
                   >
                     Click to upload or drag and drop
@@ -496,7 +498,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                   className="block text-sm font-medium mb-2 flex items-center justify-center gap-2"
                   style={{ 
                     color: textColor,
-                    fontFamily: 'Work Sans, sans-serif'
+                    fontFamily: 'Work Sans, sans-serif',
+                    userSelect: 'none'
                   }}
                 >
                   <ZoomOut className="w-4 h-4" />
@@ -599,7 +602,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                 style={{ 
                   color: textColor,
                   opacity: 0.6,
-                  fontFamily: 'Work Sans, sans-serif'
+                  fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
                 }}
               >
                 Drag to reposition • Use slider to zoom
@@ -614,7 +618,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     border: `1px solid ${toneButtonBorderColor || toneButtonTextColor || textColor}`,
                     color: toneButtonTextColor || textColor,
                     fontFamily: 'Work Sans, sans-serif',
-                    height: '40px'
+                    height: '40px',
+                    userSelect: 'none'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = `${toneButtonBorderColor || toneButtonTextColor || textColor}10`;
@@ -632,7 +637,8 @@ const AvatarImageUploader: React.FC<AvatarImageUploaderProps> = ({
                     backgroundColor: buttonBkColor || toneButtonBkColor || globalButtonHover,
                     color: buttonTextColor || toneButtonTextColor || textColor,
                     fontFamily: 'Work Sans, sans-serif',
-                    height: '40px'
+                    height: '40px',
+                    userSelect:'none'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = buttonHoverColor || buttonBkColor || toneButtonBkColor || globalButtonHover;

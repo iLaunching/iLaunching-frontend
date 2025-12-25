@@ -385,7 +385,8 @@ const MySettings: React.FC = () => {
         fontWeight: 500, 
         marginBottom: '32px',
         color: theme.text,
-        fontFamily: 'Work Sans, sans-serif'
+        fontFamily: 'Work Sans, sans-serif',
+        userSelect: 'none'
       }}>
         My Settings
       </h1>
@@ -403,6 +404,7 @@ const MySettings: React.FC = () => {
           marginBottom: '5px',
           color: theme.text,
           fontFamily: 'Work Sans, sans-serif',
+          userSelect: 'none'
           
         }}>
           Member profile
@@ -415,7 +417,8 @@ const MySettings: React.FC = () => {
           fontFamily: 'Work Sans, sans-serif',
           opacity: 0.7,
           lineHeight: '1.5',
-          marginBottom: '10px'
+          marginBottom: '10px',
+          userSelect: 'none'
         }}>
           Your personal information and account security settings.
         </p>
@@ -444,6 +447,7 @@ const MySettings: React.FC = () => {
                 fontWeight: 500,
                 color: theme.text,
                 fontFamily: 'Work Sans, sans-serif',
+                userSelect: 'none'
               }}
             >
               Avatar
@@ -543,6 +547,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'
                 }}
               />
             </div>
@@ -579,6 +584,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'  
                 }}
               />
             </div>
@@ -591,7 +597,8 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  
                 }}
               >
                 Email
@@ -615,6 +622,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'
                 }}
               />
             </div>
@@ -642,6 +650,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   opacity: 0.7,
+                  userSelect: 'none'
                 }}
               >
                 {user?.oauth_provider ? 
@@ -668,7 +677,8 @@ const MySettings: React.FC = () => {
                     fontStyle: 'italic',
                     fontFamily: 'Work Sans, sans-serif',
                     opacity: 0.7,
-                    lineHeight: '1.4'
+                    lineHeight: '1.4',
+                    userSelect: 'none'
                   }}
                 
                 >
@@ -706,7 +716,8 @@ const MySettings: React.FC = () => {
                     transition: 'background-color 0.2s ease',
                     marginTop: '4px',
                     height: '33px',
-                    width: 'fit-content'
+                    width: 'fit-content',
+                    userSelect: 'none'
                   }}
                 >
                   <Lock className="w-4 h-4" />
@@ -725,7 +736,8 @@ const MySettings: React.FC = () => {
                     fontWeight: 500,
                     color: theme.text,
                     fontFamily: 'Work Sans, sans-serif',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    msUserSelect: 'none',
                   }}
                 >
                   Password
@@ -748,6 +760,7 @@ const MySettings: React.FC = () => {
                     backgroundColor: theme.background,
                     color: theme.text,
                     outline: 'none',
+                    userSelect: 'none'
                   }}
                 />
               </div>
@@ -767,6 +780,7 @@ const MySettings: React.FC = () => {
             marginBottom: '5px',
             color: theme.text,
             fontFamily: 'Work Sans, sans-serif',
+            userSelect: 'none'
           }}>
             Avatar Color
           </h2>
@@ -777,7 +791,8 @@ const MySettings: React.FC = () => {
             fontFamily: 'Work Sans, sans-serif',
             opacity: 0.7,
             lineHeight: '1.5',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            userSelect: 'none'
           }}>
             Choose a color for your avatar background.
           </p>
@@ -846,6 +861,7 @@ const MySettings: React.FC = () => {
             marginBottom: '5px',
             color: theme.text,
             fontFamily: 'Work Sans, sans-serif',
+            userSelect: 'none'
           }}>
             Avatar Icon
           </h2>
@@ -856,7 +872,8 @@ const MySettings: React.FC = () => {
             fontFamily: 'Work Sans, sans-serif',
             opacity: 0.7,
             lineHeight: '1.5',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            userSelect: 'none'
           }}>
             Choose an icon to display on your avatar.
           </p>
