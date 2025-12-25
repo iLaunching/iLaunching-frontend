@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Trash2, Camera, X } from 'lucide-react';
+import { Lock, Trash2, Camera, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -13,7 +13,6 @@ import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messa
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import {
   faUser,
   faHeart,

@@ -9,6 +9,8 @@ export interface User {
   role: string;
   subscription_tier: string;
   membership?: string; // Individual or Enterprise
+  use_password?: boolean; // True for password auth, False for OAuth-only
+  oauth_provider?: string; // e.g., 'google', 'facebook', 'microsoft'
   created_at: string;
   updated_at?: string;
   onboarding_completed?: boolean;
