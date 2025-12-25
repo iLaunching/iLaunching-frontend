@@ -1,15 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Trash2 } from 'lucide-react';
+import { User, Mail, Lock, Trash2, Camera, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
 import AppearanceSelector from '@/components/AppearanceSelector';
 import IThemeSelector from '@/components/iThemeSelector';
 import LoginPermissionsSelector from '@/components/LoginPermissionsSelector';
+import AvatarImageUploader from '@/components/AvatarImageUploader';
+import IconPicker from '@/components/IconPicker';
 import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faHeart,
+  faStar,
+  faHome,
+  faBriefcase,
+  faGraduationCap,
+  faCamera,
+  faMusic,
+  faGamepad,
+  faCoffee,
+  faPizzaSlice,
+  faBicycle,
+  faCar,
+  faPlane,
+  faRocket,
+  faPalette,
+  faCode,
+  faLaptop,
+  faMobileAlt,
+  faHeadphones,
+  faBook,
+  faPencilAlt,
+  faLightbulb,
+  faTrophy,
+  faMedal,
+  faCrown,
+  faGem,
+  faFire,
+  faBolt,
+  faMagic,
+  faTree,
+  faDog,
+  faCat,
+  faFish,
+  faBug,
+} from '@fortawesome/free-solid-svg-icons';
 
 interface SmartHubContextType {
   theme: {
@@ -47,7 +88,52 @@ const MySettings: React.FC = () => {
   const [isPasswordMenuOpen, setIsPasswordMenuOpen] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
   const [isDeleteAccountMenuOpen, setIsDeleteAccountMenuOpen] = useState(false);
+  const [isAvatarUploaderOpen, setIsAvatarUploaderOpen] = useState(false);
+  const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+  const [avatarColors, setAvatarColors] = useState<Array<{ option_value_id: number; value_name: string; display_name: string; metadata: { color: string } }>>([]);
+  const [loadingColors, setLoadingColors] = useState(true);
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  // Popular icons for profile avatar (same as IconPickerMini)
+  const popularIcons: { icon?: any; name: string; id: number | null; isClear?: boolean }[] = [
+    { name: 'clear', id: null, isClear: true },
+    { icon: faUser, name: 'user', id: 1174 },
+    { icon: faHeart, name: 'heart', id: 484 },
+    { icon: faStar, name: 'star', id: 1491 },
+    { icon: faHome, name: 'home', id: 1111 },
+    { icon: faBriefcase, name: 'briefcase', id: 1843 },
+    { icon: faGraduationCap, name: 'graduation-cap', id: 1497 },
+    { icon: faCamera, name: 'camera', id: 341 },
+    { icon: faMusic, name: 'music', id: 1665 },
+    { icon: faGamepad, name: 'gamepad', id: 1931 },
+    { icon: faCoffee, name: 'coffee', id: 1503 },
+    { icon: faPizzaSlice, name: 'pizza-slice', id: 1361 },
+    { icon: faBicycle, name: 'bicycle', id: 944 },
+    { icon: faCar, name: 'car', id: 132 },
+    { icon: faPlane, name: 'plane', id: 1309 },
+    { icon: faRocket, name: 'rocket', id: 473 },
+    { icon: faPalette, name: 'palette', id: 303 },
+    { icon: faCode, name: 'code', id: 802 },
+    { icon: faLaptop, name: 'laptop', id: 653 },
+    { icon: faMobileAlt, name: 'mobile-alt', id: 1088 },
+    { icon: faHeadphones, name: 'headphones', id: 1383 },
+    { icon: faBook, name: 'book', id: 452 },
+    { icon: faPencilAlt, name: 'pencil-alt', id: 779 },
+    { icon: faLightbulb, name: 'lightbulb', id: 796 },
+    { icon: faTrophy, name: 'trophy', id: 191 },
+    { icon: faMedal, name: 'medal', id: 136 },
+    { icon: faCrown, name: 'crown', id: 723 },
+    { icon: faGem, name: 'gem', id: 1038 },
+    { icon: faFire, name: 'fire', id: 540 },
+    { icon: faBolt, name: 'bolt', id: 1738 },
+    { icon: faMagic, name: 'magic', id: 1156 },
+    { icon: faTree, name: 'tree', id: 314 },
+    { icon: faDog, name: 'dog', id: 82 },
+    { icon: faCat, name: 'cat', id: 1981 },
+    { icon: faFish, name: 'fish', id: 1370 },
+    { icon: faBug, name: 'bug', id: 1545 },
+  ];
 
   // Fetch fresh user data on component mount to ensure we have latest fields
   useEffect(() => {
@@ -67,6 +153,23 @@ const MySettings: React.FC = () => {
     };
     fetchUserData();
   }, [setAuth]);
+
+  // Fetch avatar colors from API (using smarthub-colors endpoint)
+  useEffect(() => {
+    const fetchAvatarColors = async () => {
+      try {
+        const response = await api.get('/smarthub-colors');
+        console.log('Avatar colors fetched from smarthub-colors:', response.data);
+        setAvatarColors(response.data.colors || []);
+      } catch (error) {
+        console.error('Failed to fetch avatar colors:', error);
+      } finally {
+        setLoadingColors(false);
+      }
+    };
+
+    fetchAvatarColors();
+  }, []);
 
   console.log('MySettings - user object:', user);
   console.log('MySettings - use_password value:', user?.use_password);
@@ -195,6 +298,78 @@ const MySettings: React.FC = () => {
     updateLoginPermissionsMutation.mutate(permissionId);
   };
 
+  // Mutation to update avatar color
+  const updateAvatarColorMutation = useMutation({
+    mutationFn: async (colorId: number) => {
+      console.log('Calling API to update avatar color:', colorId);
+      const response = await api.patch(`/profile/avatar-color?avatar_color_id=${colorId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Avatar color updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Avatar color updated and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to update avatar color:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleAvatarColorSelect = (colorId: number) => {
+    console.log('Avatar color selected:', colorId);
+    updateAvatarColorMutation.mutate(colorId);
+  };
+
+  // Mutation to update profile icon
+  const updateProfileIconMutation = useMutation({
+    mutationFn: async (iconId: number) => {
+      console.log('Calling API to update profile icon:', iconId);
+      const response = await api.patch(`/profile/icon?profile_icon_id=${iconId}`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Profile icon updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Profile icon updated and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to update profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleIconSelect = (iconId: number) => {
+    console.log('Icon selected:', iconId);
+    updateProfileIconMutation.mutate(iconId);
+  };
+
+  // Mutation to clear profile icon
+  const clearProfileIconMutation = useMutation({
+    mutationFn: async () => {
+      console.log('Calling API to clear profile icon');
+      const response = await api.delete(`/profile/icon`);
+      console.log('API response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log('Profile icon cleared successfully');
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      console.log('✅ Profile icon cleared and refetching');
+    },
+    onError: (error: any) => {
+      console.error('Failed to clear profile icon:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const handleClearIcon = () => {
+    console.log('Clear profile icon clicked');
+    clearProfileIconMutation.mutate();
+  };
+
   return (
     <div className="flex flex-col" style={{ 
         width: '80%',
@@ -210,7 +385,8 @@ const MySettings: React.FC = () => {
         fontWeight: 500, 
         marginBottom: '32px',
         color: theme.text,
-        fontFamily: 'Work Sans, sans-serif'
+        fontFamily: 'Work Sans, sans-serif',
+        userSelect: 'none'
       }}>
         My Settings
       </h1>
@@ -228,6 +404,7 @@ const MySettings: React.FC = () => {
           marginBottom: '5px',
           color: theme.text,
           fontFamily: 'Work Sans, sans-serif',
+          userSelect: 'none'
           
         }}>
           Member profile
@@ -240,7 +417,8 @@ const MySettings: React.FC = () => {
           fontFamily: 'Work Sans, sans-serif',
           opacity: 0.7,
           lineHeight: '1.5',
-          marginBottom: '10px'
+          marginBottom: '10px',
+          userSelect: 'none'
         }}>
           Your personal information and account security settings.
         </p>
@@ -269,29 +447,63 @@ const MySettings: React.FC = () => {
                 fontWeight: 500,
                 color: theme.text,
                 fontFamily: 'Work Sans, sans-serif',
+                userSelect: 'none'
               }}
             >
               Avatar
             </label>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              backgroundColor: avatarColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <span style={{
-                fontSize: '28px',
-                fontWeight: 600,
-                color: '#ffffff',
-                fontFamily: 'Work Sans, sans-serif',
-                userSelect: 'none'
+            <div 
+              style={{
+                position: 'relative',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={() => setIsAvatarHovered(true)}
+              onMouseLeave={() => setIsAvatarHovered(false)}
+              onClick={() => setIsAvatarUploaderOpen(true)}
+            >
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: avatarColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'opacity 0.2s ease'
               }}>
-                {avatarText}
-              </span>
+                <span style={{
+                  fontSize: '28px',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  fontFamily: 'Work Sans, sans-serif',
+                  userSelect: 'none'
+                }}>
+                  {avatarText}
+                </span>
+              </div>
+              {/* Camera Icon Overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: isAvatarHovered ? 1 : 0,
+                transition: 'opacity 0.2s ease',
+                pointerEvents: 'none'
+              }}>
+                <Camera style={{
+                  width: '28px',
+                  height: '28px',
+                  color: '#ffffff'
+                }} />
+              </div>
             </div>
           </div>
 
@@ -335,6 +547,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'
                 }}
               />
             </div>
@@ -371,6 +584,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'  
                 }}
               />
             </div>
@@ -383,7 +597,8 @@ const MySettings: React.FC = () => {
                   fontWeight: 500,
                   color: theme.text,
                   fontFamily: 'Work Sans, sans-serif',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  
                 }}
               >
                 Email
@@ -407,6 +622,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   outline: 'none',
+                  userSelect: 'none'
                 }}
               />
             </div>
@@ -434,6 +650,7 @@ const MySettings: React.FC = () => {
                   backgroundColor: theme.background,
                   color: theme.text,
                   opacity: 0.7,
+                  userSelect: 'none'
                 }}
               >
                 {user?.oauth_provider ? 
@@ -460,7 +677,8 @@ const MySettings: React.FC = () => {
                     fontStyle: 'italic',
                     fontFamily: 'Work Sans, sans-serif',
                     opacity: 0.7,
-                    lineHeight: '1.4'
+                    lineHeight: '1.4',
+                    userSelect: 'none'
                   }}
                 
                 >
@@ -498,7 +716,8 @@ const MySettings: React.FC = () => {
                     transition: 'background-color 0.2s ease',
                     marginTop: '4px',
                     height: '33px',
-                    width: 'fit-content'
+                    width: 'fit-content',
+                    userSelect: 'none'
                   }}
                 >
                   <Lock className="w-4 h-4" />
@@ -517,7 +736,8 @@ const MySettings: React.FC = () => {
                     fontWeight: 500,
                     color: theme.text,
                     fontFamily: 'Work Sans, sans-serif',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    msUserSelect: 'none',
                   }}
                 >
                   Password
@@ -540,11 +760,230 @@ const MySettings: React.FC = () => {
                     backgroundColor: theme.background,
                     color: theme.text,
                     outline: 'none',
+                    userSelect: 'none'
                   }}
                 />
               </div>
             )}
           </div>
+        </div>
+
+        {/* Avatar Color Section */}
+        <div style={{
+          marginTop: '32px',
+          paddingTop: '32px',
+          borderTop: `1px solid ${theme.border}`
+        }}>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            userSelect: 'none'
+          }}>
+            Avatar Color
+          </h2>
+          <p style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px',
+            userSelect: 'none'
+          }}>
+            Choose a color for your avatar background.
+          </p>
+
+          {/* Color Picker */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            width: '100%'
+          }}>
+            {loadingColors ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>Loading colors...</div>
+            ) : avatarColors.length === 0 ? (
+              <div style={{ color: theme.text, fontSize: '14px', opacity: 0.7 }}>No colors available</div>
+            ) : (
+              avatarColors.map((color) => {
+                const isSelected = profile?.avatar_color?.color === color.metadata?.color;
+                return (
+                  <button
+                    key={color.option_value_id}
+                    onClick={() => handleAvatarColorSelect(color.option_value_id)}
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      borderRadius: '50%',
+                      backgroundColor: color.metadata?.color || '#7F77F1',
+                      cursor: 'pointer',
+                      border: isSelected 
+                        ? '2px solid #ffffff' 
+                        : '1px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: isSelected 
+                        ? `0 0 0 2px ${color.metadata?.color || '#7F77F1'}80` 
+                        : 'none',
+                      transition: 'all 0.2s ease',
+                      padding: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = `0 0 0 2px ${color.metadata?.color || '#7F77F1'}40`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }
+                    }}
+                    title={color.display_name}
+                    aria-label={`Select ${color.display_name} color`}
+                  />
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Avatar Icon Section */}
+        <div style={{
+          marginTop: '32px',
+          paddingTop: '32px',
+          borderTop: `1px solid ${theme.border}`
+        }}>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            userSelect: 'none'
+          }}>
+            Avatar Icon
+          </h2>
+          <p style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px',
+            userSelect: 'none'
+          }}>
+            Choose an icon to display on your avatar.
+          </p>
+
+          {/* Icon Selector */}
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: '16px',
+            width: '100%'
+          }}>
+            {popularIcons.map((item) => {
+              const isSelected = profile?.profile_icon?.id === item.id;
+
+              // Special handling for clear button
+              if (item.isClear) {
+                return (
+                  <button
+                    key="clear"
+                    onClick={handleClearIcon}
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      color: theme.text,
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'background-color 0.2s ease',
+                    }}
+                    title="Clear Icon"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
+                );
+              }
+
+              // Regular icon button
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => item.id && handleIconSelect(item.id)}
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
+                    cursor: 'pointer',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease',
+                  }}
+                  title={item.name}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  {item.icon && <FontAwesomeIcon icon={item.icon} size="sm" />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* More Icons Button */}
+          <button
+            onClick={() => setIsIconPickerOpen(true)}
+            style={{
+              width: '20%',
+              height: '35px',
+              backgroundColor: 'transparent',
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              border: `1px solid ${theme.text}40`,
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              marginTop: '15px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = theme.global_button_hover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            More Icons
+          </button>
         </div>
       </div>
 
@@ -1045,6 +1484,43 @@ const MySettings: React.FC = () => {
         customMessage={DELETE_ACCOUNT_MESSAGE}
         confirmButtonText="Delete Account"
         cancelButtonText="Cancel"
+      />
+
+      {/* AvatarImageUploader for User Profile */}
+      <AvatarImageUploader
+        isOpen={isAvatarUploaderOpen}
+        onClose={() => setIsAvatarUploaderOpen(false)}
+        context="user-profile"
+        smart_hub_id={null}
+        textColor={theme.text}
+        menuColor={theme.background}
+        titleColor={theme.text}
+        globalButtonHover={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        toneButtonBkColor={theme.background}
+        toneButtonTextColor={theme.text}
+        toneButtonBorderColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+        backgroundColor={theme.background}
+        solidColor={theme.header_background}
+        feedbackIndicatorBk={theme.feedback_indicator_bk || theme.background}
+        appearanceTextColor={theme.text}
+        buttonBkColor={theme.button_bk_color || theme.header_background}
+        buttonTextColor={theme.button_text_color || theme.text}
+        buttonHoverColor={theme.button_hover_color || theme.global_button_hover}
+      />
+
+      {/* IconPicker for User Profile */}
+      <IconPicker
+        isOpen={isIconPickerOpen}
+        onClose={() => setIsIconPickerOpen(false)}
+        currentIconId={profile?.profile_icon?.id}
+        onIconSelect={handleIconSelect}
+        textColor={theme.text}
+        menuColor={theme.background}
+        titleColor={theme.text}
+        globalButtonHover={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        context="user-profile"
+        toneButtonBkColor={theme.tone_button_bk_color}
+        toneButtonTextColor={theme.tone_button_text_color}
       />
     </div>
   );

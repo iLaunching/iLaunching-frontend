@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FileText, Shield, Lock, Scale, Info, ChevronRight } from 'lucide-react';
+import { FileText, Shield, Lock, Scale, Info, ChevronRight, AlertTriangle } from 'lucide-react';
 
 const EssentialInformation = () => {
   const legalSections = [
@@ -148,6 +148,51 @@ const EssentialInformation = () => {
                 >
                   Get Support
                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete Membership Section */}
+        <div id="delete-membership" className="mt-8 p-6 bg-red-50 rounded-2xl border-2 border-red-200">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Account Deletion Notice
+              </h3>
+              <p className="text-sm text-gray-700 mb-4">
+                Your account has been scheduled for deletion and access has been revoked. 
+                Your data will be permanently removed after the 30-day grace period.
+              </p>
+              <div className="p-4 bg-white rounded-lg border border-red-200">
+                <h4 className="font-semibold text-gray-900 mb-2">What happens next:</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>Your account access has been immediately revoked</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>All your data will be permanently deleted after 30 days</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>You will receive a confirmation email with the deletion date</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 font-bold">•</span>
+                    <span>This action cannot be reversed</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <strong>Need help?</strong> If you have questions about your account deletion or need assistance, 
+                  please contact our support team at <a href="mailto:support@ilaunching.com" className="underline font-semibold">support@ilaunching.com</a>
+                </p>
               </div>
             </div>
           </div>

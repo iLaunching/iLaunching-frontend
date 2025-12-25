@@ -2,6 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect, useState } from 'react';
 import { authApi } from '@/api/auth';
+import axios from 'axios';
 
 // ========================
 // PROTECTED ROUTE
@@ -16,9 +17,11 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRouteProps) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(false);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -43,6 +46,20 @@ export const ProtectedRoute = ({ children, requireOnboarding = true }: Protected
         }
       } catch (error) {
         console.error('Failed to check onboarding status:', error);
+        
+        // Handle 403 errors (account deleted) by logging out and redirecting to login
+        if (axios.isAxiosError(error) && error.response?.status === 403) {
+          console.log('Account deleted or forbidden, redirecting to login');
+          
+          // Open Essential Information page in new tab to show deletion notice
+          window.open('/essential-information#delete-membership', '_blank');
+          
+          // Logout and redirect current tab
+          logout();
+          setShouldRedirectToLogin(true);
+          return;
+        }
+        
         // If check fails, don't block access
         setNeedsOnboarding(false);
       } finally {
@@ -57,7 +74,7 @@ export const ProtectedRoute = ({ children, requireOnboarding = true }: Protected
     }
   }, [isAuthenticated, requireOnboarding, location.pathname]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || shouldRedirectToLogin) {
     return <Navigate to="/login" replace />;
   }
 

@@ -19,6 +19,7 @@ const Matrix: React.FC = () => {
 
   const isActiveRoute = location.pathname === '/smart-hub/settings/matrix/active';
   const isArchivedRoute = location.pathname === '/smart-hub/settings/matrix/archived';
+  const isVersionsRoute = location.pathname === '/smart-hub/settings/matrix/versions';
 
   return (
     <div className="flex flex-col w-full h-full" style={{ position: 'relative' }}>
@@ -63,7 +64,38 @@ const Matrix: React.FC = () => {
             }
           }}
         >
-          Matrix's
+          Matrix
+        </button>
+
+        {/* Versions Button */}
+        <button
+          onClick={() => navigate('/smart-hub/settings/matrix/versions')}
+          style={{
+            backgroundColor: isVersionsRoute ? (theme.button_bk_color || theme.solid_color || '#7F77F1') : 'transparent',
+            color: isVersionsRoute ? '#ffffff' : theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            fontSize: '14px',
+            fontWeight: 500,
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            height: '30px',
+            userSelect: 'none',
+          }}
+          onMouseEnter={(e) => {
+            if (!isVersionsRoute) {
+              e.currentTarget.style.backgroundColor = theme.global_button_hover;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isVersionsRoute) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          Versions
         </button>
 
         {/* Archived Matrix's Button */}
@@ -94,7 +126,7 @@ const Matrix: React.FC = () => {
             }
           }}
         >
-          Archived Matrix's
+          Archive
         </button>
       </div>
 
@@ -130,6 +162,21 @@ const Matrix: React.FC = () => {
               fontFamily: 'Work Sans, sans-serif'
             }}>
               Archived Matrix's
+            </h2>
+          </div>
+        )}
+
+        {/* Versions Container - Only visible on /settings/matrix/versions */}
+        {isVersionsRoute && (
+          <div style={{ marginBottom: '40px' }}>
+            <h2 style={{ 
+              fontSize: '20px', 
+              fontWeight: 600, 
+              marginBottom: '16px',
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif'
+            }}>
+              Matrix Versions
             </h2>
           </div>
         )}

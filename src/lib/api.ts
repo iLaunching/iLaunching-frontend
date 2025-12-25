@@ -95,6 +95,23 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    // Handle 403 errors (account deleted/forbidden)
+    if (error.response?.status === 403) {
+      // Open Essential Information page in new tab to show deletion notice
+      window.open('/essential-information#delete-membership', '_blank');
+      
+      // Clear auth state
+      localStorage.removeItem('auth-storage');
+      
+      // Broadcast logout to all tabs
+      authSync.broadcast({ type: 'LOGOUT' });
+      
+      // Redirect current tab to login
+      window.location.href = '/login';
+      
+      return Promise.reject(error);
+    }
+
     // If error is not 401 or request already retried, reject immediately
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);

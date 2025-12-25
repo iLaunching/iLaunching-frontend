@@ -1,6 +1,9 @@
 import { X, Trash2 } from 'lucide-react';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
+import { authSync } from '@/lib/auth-sync';
 import OnboardingAiHeader from './OnboardingAiHeader';
 import SimpleTypewriter from './SimpleTypewriter';
 import { APP_CONFIG } from '@/constants';
@@ -91,6 +94,8 @@ export default function GeneralMenu({
   smartHubId,
   smartHubs = []
 }: GeneralMenuProps) {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [showTypewriter, setShowTypewriter] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -279,12 +284,18 @@ export default function GeneralMenu({
           if (result.verified) {
             setAcknowledgeMessage('Code verified. Deleting account...');
             // Call delete account API endpoint
-            await authApi.deleteAccount();
-            setAcknowledgeMessage('Account queued for deletion');
+            const deleteResult = await authApi.deleteAccount();
+            setAcknowledgeMessage('Account queued for deletion. Logging out...');
+            
+            // Broadcast logout to all tabs
+            authSync.broadcast({ type: 'LOGOUT' });
+            
+            // Logout user
             setTimeout(() => {
-              onConfirm();
+              logout();
+              navigate('/');
               onClose();
-            }, 1500);
+            }, 2000);
           } else {
             setAcknowledgeMessage('Invalid verification code');
             setTimeout(() => {

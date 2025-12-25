@@ -411,8 +411,8 @@ export default function SmartHubButton({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Handle upgrade action
-                      console.log('Upgrade clicked');
+                      setIsOpen(false);
+                      navigate('/smart-hub/settings/upgrade/journey');
                     }}
                     style={{
                       display: 'flex',

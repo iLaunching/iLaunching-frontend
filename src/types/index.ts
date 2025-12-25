@@ -8,6 +8,7 @@ export interface User {
   name: string;
   role: string;
   subscription_tier: string;
+  membership?: string; // Individual or Enterprise
   created_at: string;
   updated_at?: string;
   onboarding_completed?: boolean;
