@@ -9,7 +9,11 @@ export interface User {
   role: string;
   subscription_tier: string;
   membership?: string; // Individual or Enterprise
+  use_password?: boolean; // True for password auth, False for OAuth-only
+  oauth_provider?: string | null; // e.g., 'google', 'facebook', 'microsoft'
+  email_verified: boolean;
   created_at: string;
+  last_login?: string;
   updated_at?: string;
   onboarding_completed?: boolean;
 }

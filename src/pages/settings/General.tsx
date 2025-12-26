@@ -327,7 +327,7 @@ export default function General() {
       const cleanName = currentIconName.startsWith('fa-') ? currentIconName.slice(3) : currentIconName;
       const camelCase = cleanName
         .split('-')
-        .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+        .map((word: string, index: number) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
         .join('');
       const iconKey = `fa${camelCase.charAt(0).toUpperCase()}${camelCase.slice(1)}`;
 
@@ -462,7 +462,7 @@ export default function General() {
             onClick={() => setIsAvatarUploaderOpen(true)}
           >
             {smart_hub?.avatar_display_option_value_id === 26 && getIconDefinition() ? (
-              <FontAwesomeIcon icon={getIconDefinition()} style={{ fontSize: '40px' }} />
+              <FontAwesomeIcon icon={getIconDefinition() as import('@fortawesome/fontawesome-svg-core').IconDefinition} style={{ fontSize: '40px' }} />
             ) : (
               smart_hub?.avatar || smart_hub?.name?.charAt(0)?.toUpperCase() || 'S'
             )}
@@ -909,12 +909,12 @@ export default function General() {
               userSelect:'none',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
+              e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color || '#000';
               e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = theme.danger_bk_light_color;
-              e.currentTarget.style.color = theme.danger_bk_solid_color;
+              e.currentTarget.style.backgroundColor = theme.danger_bk_light_color || '#fff';
+              e.currentTarget.style.color = theme.danger_bk_solid_color || '#000';
             }}
           >
             Select new owner
@@ -960,13 +960,13 @@ export default function General() {
                   userSelect:'none',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color;
+                  e.currentTarget.style.backgroundColor = theme.danger_bk_solid_color || '#000';
                   e.currentTarget.style.color = '#ffffff';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = theme.danger_tone_text;
-                  e.currentTarget.style.border = `1px solid ${theme.danger_tone_border}`;
+                  e.currentTarget.style.color = theme.danger_tone_text || '#000';
+                  e.currentTarget.style.border = `1px solid ${theme.danger_tone_border || '#000'}`;
                 }}
                 onClick={() => {
                   // Pick a random message when opening the general menu
@@ -1029,14 +1029,14 @@ export default function General() {
         solidColor={theme.header_background}
         buttonHoverColor={theme.button_hover_color}
         aiAcknowledgeTextColor={theme.text}
-        dangerButtonColor={theme.danger_bk_light_color}
-        dangerButtonTextColor={theme.danger_bk_solid_text_color}
-        dangerButtonHoverColor={theme.button_hover_color}
-        dangerButtonSolidColor={theme.danger_button_solid_color}
-        dangerToneBk={theme.danger_tone_bk}
-        dangerToneBorder={theme.danger_tone_border}
-        dangerToneText={theme.danger_tone_text}
-        dangerBkLightColor={theme.danger_bk_light_color}
+        dangerButtonColor={theme.danger_bk_light_color || '#fff'}
+        dangerButtonTextColor={theme.danger_bk_solid_text_color || '#000'}
+        dangerButtonHoverColor={theme.button_hover_color || '#000'}
+        dangerButtonSolidColor={theme.danger_button_solid_color || '#000'}
+        dangerToneBk={theme.danger_tone_bk || '#fff'}
+        dangerToneBorder={theme.danger_tone_border || '#000'}
+        dangerToneText={theme.danger_tone_text || '#000'}
+        dangerBkLightColor={theme.danger_bk_light_color || '#fff'}
         dangerBkSolidColor={theme.danger_bk_solid_color}
         dangerBkSolidTextColor={theme.danger_bk_solid_text_color}
         context="smart-hub"

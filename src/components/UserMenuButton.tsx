@@ -337,11 +337,8 @@ export default function UserMenuButton({
                     paddingBottom: '2px',
                     borderRadius: '10px',
                     cursor: 'pointer',
-                userSelect: 'none',
-            userSelect: 'none',
-                    marginRight:'5px',
                     userSelect: 'none',
-                    userSelect: 'none'
+                    marginRight:'5px',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -370,8 +367,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none',
-                userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -403,8 +398,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none',
-                userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -449,7 +442,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -480,7 +472,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -511,7 +502,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;
@@ -567,7 +557,6 @@ export default function UserMenuButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                 userSelect: 'none',
-            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalButtonHover;

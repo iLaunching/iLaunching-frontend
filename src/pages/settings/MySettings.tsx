@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Trash2, Camera, X } from 'lucide-react';
+import { Lock, Trash2, Camera, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -13,7 +13,6 @@ import { ADD_PASSWORD_MESSAGES, DELETE_ACCOUNT_MESSAGE } from '@/constants/messa
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import {
   faUser,
   faHeart,
@@ -910,7 +909,7 @@ const MySettings: React.FC = () => {
                     }}
                     title="Clear Icon"
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover || '#000';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent';
@@ -943,7 +942,7 @@ const MySettings: React.FC = () => {
                   title={item.name}
                   onMouseEnter={(e) => {
                     if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = theme.global_button_hover;
+                      e.currentTarget.style.backgroundColor = theme.global_button_hover || '#000';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -976,7 +975,7 @@ const MySettings: React.FC = () => {
               marginTop: '15px',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = theme.global_button_hover;
+              e.currentTarget.style.backgroundColor = theme.global_button_hover || '#000';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';

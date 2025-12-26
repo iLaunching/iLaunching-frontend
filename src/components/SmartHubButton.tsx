@@ -421,8 +421,6 @@ export default function SmartHubButton({
                       border: 'none',
                       cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                      
                       fontFamily: 'Work Sans, sans-serif',
                       fontSize: '14px',
@@ -485,8 +483,6 @@ export default function SmartHubButton({
                   fontSize: '14px',
                   cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
@@ -518,8 +514,6 @@ export default function SmartHubButton({
                   fontSize: '14px',
                   cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
@@ -572,8 +566,6 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -605,8 +597,6 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -638,8 +628,6 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -671,8 +659,6 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                 textAlign: 'left'
               }}
               onMouseEnter={(e) => {
@@ -736,8 +722,6 @@ export default function SmartHubButton({
                       fontSize: '14px',
                       cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none',
                       textAlign: 'left'
                     }}
                     onMouseEnter={(e) => {
@@ -798,8 +782,6 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                userSelect: 'none',
-            userSelect: 'none'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalHoverColor;
