@@ -13,6 +13,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
+import { TestNode } from '../components/Canvas/nodes/TestNode.js';
+import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
 import './SmartMatrix.css';
 
 const SmartMatrixCanvas: React.FC = () => {
@@ -50,6 +52,21 @@ const SmartMatrixCanvas: React.FC = () => {
       // Start render loop
       engineRef.current.start();
       setIsEngineReady(true);
+
+      // Add test nodes to demonstrate Phase 2 & 4
+      const testNode = new TestNode('test-1', -300, 0);
+      engineRef.current.getStateManager().addNode(testNode);
+      
+      // Add SmartMatrixNode (Phase 4)
+      const smartMatrixNode = new SmartMatrixNode('smart-1', 100, 0);
+      smartMatrixNode.setConfig({
+        model: 'gpt-4-turbo',
+        temperature: 0.7,
+        maxTokens: 2000,
+        systemPrompt: 'You are a helpful AI assistant that provides concise and accurate responses.',
+        streaming: true
+      });
+      engineRef.current.getStateManager().addNode(smartMatrixNode);
 
       // Setup FPS monitoring
       const fpsInterval = setInterval(() => {
@@ -171,11 +188,147 @@ const SmartMatrixCanvas: React.FC = () => {
     };
   }, [isEngineReady]);
 
+  // Handle node interactions
+  useEffect(() => {
+    const canvas = containerRef.current;
+    if (!canvas || !engineRef.current) {
+      return;
+    }
+
+    const engine = engineRef.current;
+    const connectionManager = engine.getConnectionManager();
+
+    const handleNodeMouseDown = (e: MouseEvent) => {
+      // Only handle left click for nodes
+      if (e.button === 0) {
+        const rect = canvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const camera = engine.getCamera();
+        const [worldX, worldY] = camera.toWorld(screenX, screenY);
+        
+        // Check if clicking on a port to start connection
+        const nodes = engine.getStateManager().getNodesArray();
+        let clickedPort = false;
+        
+        for (const node of nodes) {
+          const allPorts = [...node.getInputPorts(), ...node.getOutputPorts()];
+          for (const port of allPorts) {
+            const portPos = node.getPortPosition(port.id);
+            if (portPos) {
+              const dx = worldX - portPos.x;
+              const dy = worldY - portPos.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              if (distance <= 15) { // Port click threshold
+                connectionManager.startConnection(node.id, port.id, worldX, worldY);
+                clickedPort = true;
+                break;
+              }
+            }
+          }
+          if (clickedPort) break;
+        }
+        
+        // If not clicking port, handle node selection/drag
+        if (!clickedPort) {
+          // Check if clicking on a link to delete it
+          if (e.altKey) {
+            const deleted = connectionManager.deleteLinkAtPoint(worldX, worldY);
+            if (deleted) return;
+          }
+          
+          engine.handleMouseDown(e);
+        }
+      }
+    };
+
+    const handleNodeMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const screenX = e.clientX - rect.left;
+      const screenY = e.clientY - rect.top;
+      const camera = engine.getCamera();
+      const [worldX, worldY] = camera.toWorld(screenX, screenY);
+      
+      // Update connection preview if dragging
+      if (connectionManager.isDragging()) {
+        connectionManager.updateConnectionPreview(worldX, worldY);
+      } else {
+        // Check for link hover (for deletion feedback)
+        connectionManager.checkLinkHover(worldX, worldY);
+        engine.handleMouseMove(e);
+      }
+    };
+
+    const handleNodeMouseUp = (e: MouseEvent) => {
+      if (connectionManager.isDragging()) {
+        const rect = canvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const camera = engine.getCamera();
+        const [worldX, worldY] = camera.toWorld(screenX, screenY);
+        
+        connectionManager.completeConnection(worldX, worldY);
+      } else {
+        engine.handleMouseUp(e);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      engine.handleKeyDown(e);
+    };
+
+    canvas.addEventListener('mousedown', handleNodeMouseDown);
+    window.addEventListener('mousemove', handleNodeMouseMove);
+    window.addEventListener('mouseup', handleNodeMouseUp);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      canvas.removeEventListener('mousedown', handleNodeMouseDown);
+      window.removeEventListener('mousemove', handleNodeMouseMove);
+      window.removeEventListener('mouseup', handleNodeMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isEngineReady]);
+
   // Toggle debug mode
   const toggleDebug = () => {
     setDebugMode(!debugMode);
     if (engineRef.current) {
       engineRef.current.setDebugMode(!debugMode);
+    }
+  };
+  
+  // Add test node
+  const addTestNode = () => {
+    if (engineRef.current) {
+      const nodeCount = engineRef.current.getStateManager().getNodesArray().length;
+      const testNode = new TestNode(
+        `test-${nodeCount + 1}` as any,
+        (nodeCount % 3) * 300 - 300,
+        Math.floor(nodeCount / 3) * 200 - 100
+      );
+      engineRef.current.getStateManager().addNode(testNode);
+    }
+  };
+  
+  // Add SmartMatrix AI node
+  const addSmartMatrixNode = () => {
+    if (engineRef.current) {
+      const nodeCount = engineRef.current.getStateManager().getNodesArray().length;
+      const smartNode = new SmartMatrixNode(
+        `smart-${nodeCount + 1}` as any,
+        (nodeCount % 3) * 300 + 100,
+        Math.floor(nodeCount / 3) * 250
+      );
+      smartNode.setConfig({
+        model: 'gpt-4-turbo',
+        temperature: 0.7,
+        maxTokens: 2000,
+        systemPrompt: 'You are a helpful AI assistant.',
+        streaming: true
+      });
+      engineRef.current.getStateManager().addNode(smartNode);
     }
   };
 
@@ -194,6 +347,63 @@ const SmartMatrixCanvas: React.FC = () => {
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
+      {/* Test Toolbar */}
+      {isEngineReady && (
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 100,
+          display: 'flex',
+          gap: '10px'
+        }}>
+          <button
+            onClick={addTestNode}
+            style={{
+              padding: '10px 20px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            + Add Test Node
+          </button>
+          <button
+            onClick={addSmartMatrixNode}
+            style={{
+              padding: '10px 20px',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            ✨ Add AI Node
+          </button>
+          <button
+            onClick={toggleDebug}
+            style={{
+              padding: '10px 20px',
+              background: debugMode ? '#10b981' : '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            {debugMode ? '✓' : ''} Debug
+          </button>
+        </div>
+      )}
+      
       {/* Canvas Container */}
       <div 
         ref={containerRef} 
@@ -203,18 +413,24 @@ const SmartMatrixCanvas: React.FC = () => {
         tabIndex={0}
       />
 
-      {/* Instructions Overlay (temporary, remove after Phase 2) */}
+      {/* Instructions Overlay */}
       {isEngineReady && (
         <div className="instructions-overlay" aria-live="polite">
           <div className="instructions-box">
-            <h3>🎨 Canvas Controls</h3>
+            <h3>🎨 Canvas Controls - Phase 4: AI Nodes</h3>
             <ul>
               <li><strong>Scroll Wheel:</strong> Zoom in/out at cursor</li>
-              <li><strong>Middle Mouse Button:</strong> Pan canvas</li>
-              <li><strong>Space + Drag:</strong> Pan canvas (coming soon)</li>
+              <li><strong>Middle Mouse:</strong> Pan canvas</li>
+              <li><strong>Click Node:</strong> Select</li>
+              <li><strong>Shift + Click:</strong> Multi-select</li>
+              <li><strong>Alt + Drag:</strong> Box select</li>
+              <li><strong>Drag Port:</strong> Create connection</li>
+              <li><strong>Alt + Click Link:</strong> Delete connection</li>
+              <li><strong>Delete Key:</strong> Delete selected</li>
+              <li><strong>✨ AI Node:</strong> Smart Matrix with 6 models</li>
             </ul>
             <p className="instructions-note">
-              Node creation and interactions coming in Phase 2!
+              ✨ Drag from output (right) to input (left) ports to connect nodes!
             </p>
           </div>
         </div>

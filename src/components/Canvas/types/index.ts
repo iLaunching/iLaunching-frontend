@@ -55,6 +55,7 @@ export interface NodePort {
   label: string;
   position: Point;
   connected: boolean;
+  required?: boolean;
   value?: any;
 }
 
@@ -73,7 +74,8 @@ export type NodeType =
   | 'output'
   | 'webhook'
   | 'schedule'
-  | 'api-call';
+  | 'api-call'
+  | 'test';
 
 export type NodeStatus = 'idle' | 'running' | 'success' | 'error' | 'warning';
 

@@ -24,6 +24,11 @@
 
 import { Camera } from './core/Camera.js';
 import { GridRenderer } from './renderers/GridRenderer.js';
+import { NodeRenderer } from './renderers/NodeRenderer.js';
+import { LinkRenderer } from './renderers/LinkRenderer.js';
+import { InteractionManager } from './interaction/InteractionManager.js';
+import { StateManager } from './state/StateManager.js';
+import { ConnectionManager } from './connections/ConnectionManager.js';
 import { validateEngineConfig } from './utils/validation.js';
 import { PerformanceTracker } from './utils/performance.js';
 import type { CanvasEngineConfig, CanvasEventType, CanvasEventListener, PerformanceMetrics } from './types/index.js';
@@ -46,6 +51,11 @@ export class CanvasEngine {
   // Core systems
   private camera: Camera;
   private gridRenderer: GridRenderer;
+  private nodeRenderer: NodeRenderer;
+  private linkRenderer: LinkRenderer;
+  private interactionManager: InteractionManager;
+  private stateManager: StateManager;
+  private connectionManager: ConnectionManager;
   
   // Container element
   private container: HTMLElement;
@@ -54,6 +64,7 @@ export class CanvasEngine {
   private animationFrameId: number | null = null;
   private isRunning: boolean = false;
   private lastFrameTime: number = 0;
+  private animationTime: number = 0;
   
   // Performance tracking
   private fps: number = 60;
@@ -103,6 +114,45 @@ export class CanvasEngine {
       this.gridRenderer = new GridRenderer({
         enabled: config.gridEnabled ?? true,
         size: config.gridSize ?? 50
+      });
+      
+      // Initialize node renderer
+      this.nodeRenderer = new NodeRenderer();
+      
+      // Initialize link renderer
+      this.linkRenderer = new LinkRenderer();
+      
+      // Initialize state manager
+      this.stateManager = new StateManager();
+      
+      // Initialize connection manager
+      this.connectionManager = new ConnectionManager(this.stateManager, this.camera);
+      
+      // Initialize interaction manager
+      this.interactionManager = new InteractionManager(this.camera);
+      this.interactionManager.setNodes(this.stateManager.getNodes());
+      
+      // Wire up state manager events
+      this.stateManager.on('nodeAdded', () => {
+        this.interactionManager.setNodes(this.stateManager.getNodes());
+        this.markDirty();
+      });
+      this.stateManager.on('nodeRemoved', () => {
+        this.interactionManager.setNodes(this.stateManager.getNodes());
+        this.markDirty();
+      });
+      this.stateManager.on('nodeUpdated', () => this.markDirty());
+      this.stateManager.on('linkAdded', () => {
+        this.markDirty();
+        this.emit('link-added', { timestamp: Date.now() });
+      });
+      this.stateManager.on('linkRemoved', () => {
+        this.markDirty();
+        this.emit('link-removed', { timestamp: Date.now() });
+      });
+      this.stateManager.on('nodeUpdated', () => {
+        // Invalidate link caches when nodes move
+        this.connectionManager.invalidateAllCaches();
       });
       
       // Create canvas layers
@@ -282,9 +332,7 @@ export class CanvasEngine {
     // Calculate delta time
     const deltaTime = currentTime - this.lastFrameTime;
     this.lastFrameTime = currentTime;
-    
-    // Track frame time for performance metrics
-    this.frameTimes.push(deltaTime);
+      this.animationTime += deltaTime / 1000; // Convert to seconds
     if (this.frameTimes.length > 60) {
       this.frameTimes.shift();
     }
@@ -331,11 +379,19 @@ export class CanvasEngine {
       this.layers.nodes.height
     );
     
+    // Update node renderer animation
+    this.nodeRenderer.updateAnimation(deltaTime);
+    
     // Render connections (will be implemented in Phase 3)
     this.renderConnections(deltaTime);
     
-    // Render nodes (will be implemented in Phase 2)
+    // Render nodes
     this.renderNodes();
+    
+    // Render box selection if active
+    if (this.interactionManager.isBoxSelecting()) {
+      this.renderBoxSelection();
+    }
     
     // Render debug overlay
     if (this.debugMode) {
@@ -351,19 +407,108 @@ export class CanvasEngine {
   }
   
   /**
-   * Render connections (placeholder for Phase 3)
+   * Render connections with animations
    */
   private renderConnections(deltaTime: number): void {
-    // TODO: Implement in Phase 3
-    // This will render animated Bezier curves between nodes
+    const ctx = this.contexts.connections;
+    const links = this.connectionManager.getLinks();
+    const hoveredLink = this.connectionManager.getHoveredLink();
+    
+    // Render each link
+    links.forEach(link => {
+      const isHovered = hoveredLink === link;
+      this.linkRenderer.render(
+        ctx,
+        link,
+        this.camera,
+        this.animationTime,
+        false, // isSelected - TODO: implement link selection
+        isHovered
+      );
+    });
+    
+    // Render connection preview if dragging
+    if (this.connectionManager.isDragging()) {
+      const start = this.connectionManager.getPreviewStart();
+      const end = this.connectionManager.getPreviewEnd();
+      const state = this.connectionManager.getState();
+      
+      if (start && end) {
+        this.linkRenderer.renderPreview(
+          ctx,
+          start,
+          end,
+          this.camera,
+          state.isValid
+        );
+      }
+    }
   }
   
   /**
-   * Render nodes (placeholder for Phase 2)
+   * Render all nodes with viewport culling
    */
   private renderNodes(): void {
-    // TODO: Implement in Phase 2
-    // This will render all nodes with offscreen caching
+    const nodes = this.stateManager.getNodesArray();
+    const canvas = this.layers.nodes;
+    
+    // Calculate visible bounds in world space
+    const [worldMinX, worldMinY] = this.camera.toWorld(0, 0);
+    const [worldMaxX, worldMaxY] = this.camera.toWorld(canvas.width, canvas.height);
+    
+    // Add padding to catch nodes partially outside viewport
+    const padding = 100;
+    
+    // Render only visible nodes (viewport culling)
+    let renderedCount = 0;
+    nodes.forEach(node => {
+      // Quick bounds check
+      if (
+        node.x + node.width < worldMinX - padding ||
+        node.x > worldMaxX + padding ||
+        node.y + node.height < worldMinY - padding ||
+        node.y > worldMaxY + padding
+      ) {
+        return; // Skip nodes outside viewport
+      }
+      
+      this.nodeRenderer.render(this.contexts.nodes, node, this.camera);
+      renderedCount++;
+    });
+  }
+  
+  /**
+   * Render box selection rectangle
+   */
+  private renderBoxSelection(): void {
+    const boxSelection = this.interactionManager.getBoxSelection();
+    if (!boxSelection) return;
+    
+    const [startX, startY] = this.camera.toScreen(boxSelection.startX, boxSelection.startY);
+    const [endX, endY] = this.camera.toScreen(boxSelection.endX, boxSelection.endY);
+    
+    const ctx = this.contexts.nodes;
+    
+    // Draw dashed rectangle
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(
+      startX,
+      startY,
+      endX - startX,
+      endY - startY
+    );
+    ctx.setLineDash([]);
+    
+    // Fill with semi-transparent blue
+    ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+    ctx.fillRect(
+      startX,
+      startY,
+      endX - startX,
+      endY - startY
+    );
   }
   
   /**
@@ -428,11 +573,13 @@ export class CanvasEngine {
       ? this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length
       : 0;
     
+    const stats = this.stateManager.getStats();
+    
     return {
       fps: this.fps,
       frameTime: avgFrameTime,
-      nodeCount: 0, // TODO: Implement in Phase 2
-      linkCount: 0, // TODO: Implement in Phase 3
+      nodeCount: stats.nodeCount,
+      linkCount: stats.linkCount,
       renderTime: avgFrameTime,
       updateTime: 0
     };
@@ -444,6 +591,89 @@ export class CanvasEngine {
   setDebugMode(enabled: boolean): void {
     this.debugMode = enabled;
   }
+  
+  // ============================================================================
+  // NODE & STATE MANAGEMENT API
+  // ============================================================================
+  
+  /**
+   * Get state manager instance
+   */
+  getStateManager(): StateManager {
+    return this.stateManager;
+  }
+  
+  /**
+   * Get interaction manager instance
+   */
+  getInteractionManager(): InteractionManager {
+    return this.interactionManager;
+  }
+  
+  /**
+   * Get connection manager instance
+   */
+  getConnectionManager(): ConnectionManager {
+    return this.connectionManager;
+  }
+  
+  /**
+   * Handle mouse down for interactions
+   */
+  handleMouseDown(e: MouseEvent): void {
+    const rect = this.layers.nodes.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+    
+    this.interactionManager.handleMouseDown(
+      screenX,
+      screenY,
+      e.shiftKey,
+      e.altKey
+    );
+    
+    this.markDirty();
+  }
+  
+  /**
+   * Handle mouse move for interactions
+   */
+  handleMouseMove(e: MouseEvent): void {
+    const rect = this.layers.nodes.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+    
+    this.interactionManager.handleMouseMove(screenX, screenY);
+    
+    if (this.interactionManager.isDragging() || this.interactionManager.isBoxSelecting()) {
+      this.markDirty();
+    }
+  }
+  
+  /**
+   * Handle mouse up for interactions
+   */
+  handleMouseUp(e: MouseEvent): void {
+    const rect = this.layers.nodes.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+    
+    this.interactionManager.handleMouseUp(screenX, screenY);
+    
+    this.markDirty();
+  }
+  
+  /**
+   * Handle keyboard input for interactions
+   */
+  handleKeyDown(e: KeyboardEvent): void {
+    this.interactionManager.handleKeyDown(e.key);
+    this.markDirty();
+  }
+  
+  // ============================================================================
+  // EVENT SYSTEM
+  // ============================================================================
   
   /**
    * Event system: Subscribe to engine events
