@@ -91,6 +91,11 @@ export class CanvasEngine {
   // ResizeObserver for better resize handling
   private resizeObserver: ResizeObserver | null = null;
   
+  // High-DPI (Retina) support
+  private devicePixelRatio: number = 1;
+  private cssWidth: number = 0;
+  private cssHeight: number = 0;
+  
   constructor(config: CanvasEngineConfig) {
     // Validate configuration
     try {
@@ -216,7 +221,7 @@ export class CanvasEngine {
   }
   
   /**
-   * Get 2D contexts for all layers
+   * Get 2D contexts for all layers with Retina-optimized settings
    * @throws {Error} If context creation fails
    */
   private getCanvasContexts(): {
@@ -224,18 +229,29 @@ export class CanvasEngine {
     connections: CanvasRenderingContext2D;
     nodes: CanvasRenderingContext2D;
   } {
-    const background = this.layers.background.getContext('2d', { alpha: true });
-    const connections = this.layers.connections.getContext('2d', { alpha: true });
-    const nodes = this.layers.nodes.getContext('2d', { alpha: true });
+    const background = this.layers.background.getContext('2d', { 
+      alpha: true,
+      desynchronized: true  // Better performance for animations
+    });
+    const connections = this.layers.connections.getContext('2d', { 
+      alpha: true,
+      desynchronized: true
+    });
+    const nodes = this.layers.nodes.getContext('2d', { 
+      alpha: true,
+      desynchronized: true
+    });
     
     if (!background || !connections || !nodes) {
       throw new Error('Failed to get canvas 2D contexts');
     }
     
-    // Enable image smoothing for better quality
-    background.imageSmoothingEnabled = true;
-    connections.imageSmoothingEnabled = true;
-    nodes.imageSmoothingEnabled = true;
+    // Configure image smoothing for Retina displays
+    // High quality smoothing for gradients and images
+    [background, connections, nodes].forEach(ctx => {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+    });
     
     return { background, connections, nodes };
   }
@@ -256,29 +272,47 @@ export class CanvasEngine {
   }
   
   /**
-   * Handle window resize
+   * Handle window resize with Retina-grade DPI support
+   * Implements high-DPI canvas scaling for crisp rendering on all displays
    */
   private handleResize(): void {
     const rect = this.container.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const cssWidth = rect.width;
+    const cssHeight = rect.height;
     
-    // Update all canvas sizes
+    // Get device pixel ratio (2x for Retina, 3x for high-end phones, 1x for standard)
+    const dpr = window.devicePixelRatio || 1;
+    
+    // Store for coordinate transformations
+    this.devicePixelRatio = dpr;
+    this.cssWidth = cssWidth;
+    this.cssHeight = cssHeight;
+    
+    // Update all canvas sizes with DPR scaling
     [this.layers.background, this.layers.connections, this.layers.nodes].forEach(canvas => {
-      canvas.width = width;
-      canvas.height = height;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      // Set physical buffer size (actual pixels)
+      canvas.width = Math.round(cssWidth * dpr);
+      canvas.height = Math.round(cssHeight * dpr);
+      
+      // Set CSS display size (logical pixels)
+      canvas.style.width = `${cssWidth}px`;
+      canvas.style.height = `${cssHeight}px`;
     });
     
-    // Update camera
-    this.camera.setCanvasSize(width, height);
+    // Apply DPR scaling to all contexts so we can draw in logical pixels
+    [this.contexts.background, this.contexts.connections, this.contexts.nodes].forEach(ctx => {
+      ctx.scale(dpr, dpr);
+    });
+    
+    // Update camera with CSS dimensions (camera works in logical pixels)
+    this.camera.setCanvasSize(cssWidth, cssHeight);
+    this.camera.setDevicePixelRatio(dpr);
     
     // Mark for re-render
     this.backgroundDirty = true;
     this.markDirty();
     
-    console.log(`📐 Canvas resized to ${width}x${height}`);
+    console.log(`📐 Canvas resized to ${cssWidth}x${cssHeight} (${Math.round(cssWidth * dpr)}x${Math.round(cssHeight * dpr)} physical pixels, DPR: ${dpr})`);
   }
   
   /**

@@ -30,6 +30,9 @@ export class Camera {
   private canvasWidth: number = 0;
   private canvasHeight: number = 0;
   
+  // Device pixel ratio for Retina/high-DPI displays
+  private devicePixelRatio: number = 1;
+  
   constructor(initialState?: Partial<CameraState>) {
     if (initialState) {
       // Validate initial state
@@ -62,13 +65,17 @@ export class Camera {
   }
   
   /**
-   * Convert world coordinates to screen coordinates
-   * Formula: ScreenX = (WorldX * Zoom) + OffsetX
+   * Convert world coordinates to screen coordinates with pixel-perfect rounding
+   * Prevents sub-pixel rendering that causes blurry lines and text
+   * Formula: ScreenX = round((WorldX * Zoom) + OffsetX)
    */
   toScreen(worldX: number, worldY: number): [number, number] {
     const screenX = (worldX - this.x) * this.zoom + this.canvasWidth / 2;
     const screenY = (worldY - this.y) * this.zoom + this.canvasHeight / 2;
-    return [screenX, screenY];
+    
+    // Round to nearest pixel to prevent sub-pixel blurring
+    // This is CRITICAL for crisp rendering on all displays
+    return [Math.round(screenX), Math.round(screenY)];
   }
   
   /**
@@ -131,6 +138,22 @@ export class Camera {
    */
   setZoom(zoom: number): void {
     this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
+  }
+  
+  /**
+   * Set device pixel ratio for high-DPI rendering calculations
+   * @param dpr - Device pixel ratio (typically 1, 2, or 3)
+   */
+  setDevicePixelRatio(dpr: number): void {
+    this.devicePixelRatio = Math.max(1, dpr);
+  }
+  
+  /**
+   * Get device pixel ratio for DPR-aware rendering
+   * Used by renderers to scale gradients, line widths, etc.
+   */
+  getDevicePixelRatio(): number {
+    return this.devicePixelRatio;
   }
   
   /**

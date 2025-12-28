@@ -11,11 +11,19 @@
  */
 
 import React, { useRef, useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
 import './SmartMatrix.css';
+
+interface SmartHubContext {
+  theme: {
+    background: string;
+    [key: string]: any;
+  } | null;
+}
 
 const SmartMatrixCanvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,6 +31,10 @@ const SmartMatrixCanvas: React.FC = () => {
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [fps, setFps] = useState(60);
   const [debugMode, setDebugMode] = useState(false);
+  
+  // Get theme from SmartHub context
+  const context = useOutletContext<SmartHubContext>();
+  const backgroundColor = context?.theme?.background || '#ffffff';
 
   // Initialize Canvas Engine
   useEffect(() => {
@@ -53,20 +65,13 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.start();
       setIsEngineReady(true);
 
-      // Add test nodes to demonstrate Phase 2 & 4
+      // Add test nodes to demonstrate Phase 3
       const testNode = new TestNode('test-1', -300, 0);
       engineRef.current.getStateManager().addNode(testNode);
       
-      // Add SmartMatrixNode (Phase 4)
-      const smartMatrixNode = new SmartMatrixNode('smart-1', 100, 0);
-      smartMatrixNode.setConfig({
-        model: 'gpt-4-turbo',
-        temperature: 0.7,
-        maxTokens: 2000,
-        systemPrompt: 'You are a helpful AI assistant that provides concise and accurate responses.',
-        streaming: true
-      });
-      engineRef.current.getStateManager().addNode(smartMatrixNode);
+      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance background color
+      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor);
+      engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring
       const fpsInterval = setInterval(() => {
@@ -89,7 +94,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode]);
+  }, [debugMode, backgroundColor]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {
@@ -312,32 +317,17 @@ const SmartMatrixCanvas: React.FC = () => {
     }
   };
   
-  // Add SmartMatrix AI node
+  // Add Smart Matrix node
   const addSmartMatrixNode = () => {
     if (engineRef.current) {
       const nodeCount = engineRef.current.getStateManager().getNodesArray().length;
       const smartNode = new SmartMatrixNode(
         `smart-${nodeCount + 1}` as any,
-        (nodeCount % 3) * 300 + 100,
-        Math.floor(nodeCount / 3) * 250
+        (nodeCount % 3) * 350,
+        Math.floor(nodeCount / 3) * 300,
+        backgroundColor
       );
-      smartNode.setConfig({
-        model: 'gpt-4-turbo',
-        temperature: 0.7,
-        maxTokens: 2000,
-        systemPrompt: 'You are a helpful AI assistant.',
-        streaming: true
-      });
       engineRef.current.getStateManager().addNode(smartNode);
-    }
-  };
-
-  // Reset camera
-  const resetCamera = () => {
-    if (engineRef.current) {
-      const camera = engineRef.current.getCamera();
-      camera.reset();
-      engineRef.current.updateBackground();
     }
   };
 
@@ -385,9 +375,10 @@ const SmartMatrixCanvas: React.FC = () => {
               fontWeight: '600'
             }}
           >
-            ✨ Add AI Node
+            ✨ Add Smart Matrix
           </button>
           <button
+
             onClick={toggleDebug}
             style={{
               padding: '10px 20px',
@@ -417,7 +408,7 @@ const SmartMatrixCanvas: React.FC = () => {
       {isEngineReady && (
         <div className="instructions-overlay" aria-live="polite">
           <div className="instructions-box">
-            <h3>🎨 Canvas Controls - Phase 4: AI Nodes</h3>
+            <h3>🎨 Canvas Controls - Phase 3: Connections</h3>
             <ul>
               <li><strong>Scroll Wheel:</strong> Zoom in/out at cursor</li>
               <li><strong>Middle Mouse:</strong> Pan canvas</li>
@@ -427,7 +418,6 @@ const SmartMatrixCanvas: React.FC = () => {
               <li><strong>Drag Port:</strong> Create connection</li>
               <li><strong>Alt + Click Link:</strong> Delete connection</li>
               <li><strong>Delete Key:</strong> Delete selected</li>
-              <li><strong>✨ AI Node:</strong> Smart Matrix with 6 models</li>
             </ul>
             <p className="instructions-note">
               ✨ Drag from output (right) to input (left) ports to connect nodes!

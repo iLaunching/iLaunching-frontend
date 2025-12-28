@@ -40,7 +40,7 @@ export class NodeRenderer {
     animationsEnabled: true
   };
   
-  // Specialized renderers
+  // Specialized renderer for SmartMatrixNode
   private smartMatrixRenderer: SmartMatrixNodeRenderer;
   
   // Offscreen canvas cache for static node parts
@@ -79,7 +79,7 @@ export class NodeRenderer {
       this.config = { ...this.config, ...config };
     }
     
-    // Initialize specialized renderers
+    // Initialize specialized renderer
     this.smartMatrixRenderer = new SmartMatrixNodeRenderer();
   }
   
