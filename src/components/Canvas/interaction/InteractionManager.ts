@@ -90,8 +90,12 @@ export class InteractionManager {
   private lastClickTime: number = 0;
   private lastClickNode: string | null = null;
   
-  constructor(camera: Camera) {
+  // Callback for marking canvas dirty
+  private markDirtyCallback?: () => void;
+  
+  constructor(camera: Camera, markDirtyCallback?: () => void) {
     this.camera = camera;
+    this.markDirtyCallback = markDirtyCallback;
   }
   
   /**
@@ -433,6 +437,10 @@ export class InteractionManager {
     // Clear previous hover
     if (this.state.hoveredNode && this.state.hoveredNode !== hitNode) {
       this.state.hoveredNode.isHovered = false;
+      // Clear port hover if it's a SmartMatrixNode
+      if ('isPortHovered' in this.state.hoveredNode) {
+        (this.state.hoveredNode as any).isPortHovered = false;
+      }
     }
     
     // Set new hover
@@ -441,6 +449,24 @@ export class InteractionManager {
       this.state.hoveredNode = hitNode;
     } else {
       this.state.hoveredNode = null;
+    }
+    
+    // Check port hover for all SmartMatrixNodes
+    this.nodes.forEach(node => {
+      if (node.type === 'smart-matrix' && 'containsPortPoint' in node) {
+        const smartNode = node as any;
+        const wasHovered = smartNode.isPortHovered;
+        smartNode.isPortHovered = smartNode.containsPortPoint(worldX, worldY);
+        // Mark dirty if hover state changed
+        if (wasHovered !== smartNode.isPortHovered && this.markDirtyCallback) {
+          this.markDirtyCallback();
+        }
+      }
+    });
+    
+    // Mark canvas as dirty to trigger re-render
+    if (this.markDirtyCallback) {
+      this.markDirtyCallback();
     }
   }
   

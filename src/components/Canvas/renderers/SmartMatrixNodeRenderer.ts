@@ -11,11 +11,21 @@ import { NodeTextCache } from '../utils/NodeTextCache.js';
 export class SmartMatrixNodeRenderer {
   private animationTime: number = 0;
   private hoverAnimations: Map<string, { progress: number; isExpanding: boolean }> = new Map();
+  private portHoverAnimations: Map<string, { progress: number; isExpanding: boolean }> = new Map();
   private textCache: NodeTextCache;
+  private needsAnimationFrame: boolean = false;
   
   constructor() {
     // Initialize text cache with 100 entry limit, 2x resolution multiplier
     this.textCache = new NodeTextCache(100, 2);
+  }
+  
+  /**
+   * Check if any animations are currently running
+   * Used by engine to determine if continuous rendering is needed
+   */
+  public hasActiveAnimations(): boolean {
+    return this.needsAnimationFrame;
   }
   
   /**
@@ -67,8 +77,30 @@ export class SmartMatrixNodeRenderer {
       ctx.fillStyle = 'transparent';
       ctx.fill();
       
+      // SHADOW CONTAINER: Positioned directly under the circle with faded effect
+      // Rendered before mask layer so it sits behind it
+      const shadowY = centerY + maskRadius + (3 * zoom); // Just below mask layer
+      const shadowRadiusX = maskRadius * 0.9; // Slightly smaller than mask
+      const shadowRadiusY = maskRadius * 0.15; // Compressed ellipse
+      
+      ctx.save();
+      const shadowGradient = ctx.createRadialGradient(
+        centerX, shadowY, 0,
+        centerX, shadowY, shadowRadiusX
+      );
+      shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.15)');
+      shadowGradient.addColorStop(0.3, 'rgba(0, 0, 0, 0.08)');
+      shadowGradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.03)');
+      shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      
+      ctx.beginPath();
+      ctx.ellipse(centerX, shadowY, shadowRadiusX, shadowRadiusY, 0, 0, Math.PI * 2);
+      ctx.fillStyle = shadowGradient;
+      ctx.fill();
+      ctx.restore();
+      
       // RENDER OUTPUT PORT (before mask layer so it sits under it)
-      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom);
+      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor);
       
       // LAYER 2: White Mask (Creates Ring Effect)
       ctx.beginPath();
@@ -148,10 +180,30 @@ export class SmartMatrixNodeRenderer {
       // AI Indicator (center diamond with animated i)
       this.renderAIIndicator(ctx, centerX, centerY, zoom);
       
-      // RENDER TEXT BELOW CIRCLE (Retina-grade with offscreen caching)
-      this.renderText(ctx, centerX, screenY + (node.height * zoom), zoom, dpr);
+      // RENDER TEXT BELOW CIRCLE (transparent background, Work Sans font, user appearance text color)
+      const textOffsetY = (node.height * zoom) + (15 * zoom);
+      this.renderText(ctx, node, centerX, screenY + textOffsetY, zoom, dpr);
       
       ctx.restore();
+      
+      // Check if we need to keep animating (for hover effects)
+      this.needsAnimationFrame = false;
+      for (const [, animState] of this.hoverAnimations) {
+        // Keep animating while expanding to 1 OR contracting to 0
+        if ((animState.isExpanding && animState.progress < 1) || 
+            (!animState.isExpanding && animState.progress > 0)) {
+          this.needsAnimationFrame = true;
+          break;
+        }
+      }
+      // Also check port animations
+      for (const [, animState] of this.portHoverAnimations) {
+        if ((animState.isExpanding && animState.progress < 1) || 
+            (!animState.isExpanding && animState.progress > 0)) {
+          this.needsAnimationFrame = true;
+          break;
+        }
+      }
     } catch (error) {
       console.error('Error rendering SmartMatrixNode:', error);
       ctx.restore();
@@ -179,15 +231,16 @@ export class SmartMatrixNodeRenderer {
     
     const animState = this.hoverAnimations.get(nodeId)!;
     
-    // Update animation state based on hover
-    if (node.isHovered && !animState.isExpanding) {
+    // Update animation state based on hover (node or port)
+    const shouldExpand = node.isHovered || node.isPortHovered;
+    if (shouldExpand && !animState.isExpanding) {
       animState.isExpanding = true;
-    } else if (!node.isHovered && animState.isExpanding) {
+    } else if (!shouldExpand && animState.isExpanding) {
       animState.isExpanding = false;
     }
     
     // Update progress (0 to 1)
-    const animSpeed = 0.08; // Animation speed per frame
+    const animSpeed = 0.25; // Animation speed per frame
     if (animState.isExpanding) {
       animState.progress = Math.min(1, animState.progress + animSpeed);
     } else {
@@ -204,11 +257,11 @@ export class SmartMatrixNodeRenderer {
       const currentRadius = hoverRadius + (maxRadius - hoverRadius) * easedProgress;
       
       // Interpolate opacity (fade in/out)
-      const opacity = 0.3 * animState.progress;
+      const opacity = 0.502 * animState.progress; // Base opacity from #8b5cf680 (80 hex = 0.502)
       
       ctx.beginPath();
       ctx.arc(centerX, centerY, currentRadius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 235, 205, ${opacity})`; // Antiquewhite with animated transparency
+      ctx.fillStyle = `rgba(139, 92, 246, ${opacity})`; // #8b5cf6 purple with animated transparency
       ctx.fill();
     }
   }
@@ -307,6 +360,7 @@ export class SmartMatrixNodeRenderer {
   
   /**
    * Render output port (half-diamond emerging from ring)
+   * Animates forward on hover and changes to solid purple
    */
   private renderOutputPort(
     ctx: CanvasRenderingContext2D,
@@ -314,25 +368,97 @@ export class SmartMatrixNodeRenderer {
     centerY: number,
     outerRadius: number,
     maskRadius: number,
-    zoom: number
+    zoom: number,
+    nodeId: string,
+    isHovering: boolean,
+    maskColor: string
   ): void {
     // Port position: right center, positioned so it's half behind the mask layer
-    const portX = centerX + maskRadius; // Position at mask edge instead of outer edge
-    const portY = centerY;
-    const size = 40 * zoom; // Diamond size (double the old radius for similar visual size)
+    const basePortX = centerX + maskRadius; // Base position at mask edge (in screen coordinates)
+    const portY = centerY; // Screen coordinates
+    const size = 40 * zoom; // Diamond size
     const radius = 8 * zoom; // Border radius for rounded corners
     
+    // Get or initialize animation state
+    const portKey = `${nodeId}-output`;
+    if (!this.portHoverAnimations.has(portKey)) {
+      this.portHoverAnimations.set(portKey, { progress: 0, isExpanding: false });
+    }
+    
+    const animState = this.portHoverAnimations.get(portKey)!;
+    
+    // Update animation state based on hover
+    if (isHovering && !animState.isExpanding) {
+      animState.isExpanding = true;
+    } else if (!isHovering && animState.isExpanding) {
+      animState.isExpanding = false;
+    }
+    
+    // Update progress (0 to 1)
+    const animSpeed = 0.2; // Animation speed per frame
+    if (animState.isExpanding) {
+      animState.progress = Math.min(1, animState.progress + animSpeed);
+    } else {
+      animState.progress = Math.max(0, animState.progress - animSpeed);
+    }
+    
+    // Smooth easing function (ease-out)
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const easedProgress = easeOut(animState.progress);
+    
+    // Animate position (move forward = move right)
+    const moveDistance = 10 * zoom; // Distance to move
+    const portX = basePortX + (moveDistance * easedProgress);
+    
+    // Interpolate color from semi-transparent to solid
+    const baseOpacity = 0.502; // #8b5cf680
+    const targetOpacity = 1.0;  // #8b5cf6
+    const currentOpacity = baseOpacity + (targetOpacity - baseOpacity) * easedProgress;
+
     // Draw port as rounded diamond
     ctx.save();
     ctx.translate(portX, portY);
     ctx.rotate(Math.PI / 4); // 45 degrees
     
-    // Draw rounded diamond shape
-    this.roundRect(ctx, -size / 2, -size / 2, size, size, radius);
-    ctx.fillStyle = '#3b82f6'; // Blue for output
+    // Draw mask layer (background) - slightly larger
+    const maskSize = size + (4 * zoom); // 4px larger
+    this.roundRect(ctx, -maskSize / 2, -maskSize / 2, maskSize, maskSize, radius);
+    ctx.fillStyle = maskColor; // Node mask color
     ctx.fill();
-    ctx.strokeStyle = '#1e40af';
-    ctx.lineWidth = 2 * zoom;
+    
+    // Draw purple connector on top
+    this.roundRect(ctx, -size / 2, -size / 2, size, size, radius);
+    ctx.fillStyle = `rgba(139, 92, 246, ${currentOpacity})`; // Purple with animated opacity
+    ctx.fill();
+    
+    ctx.restore();
+    
+    // Draw modern "+" icon centered between mask edge and connector outer edge
+    ctx.save();
+    // Calculate icon position: halfway between mask edge and right edge of connector
+    const maskEdgeX = centerX + maskRadius;
+    const connectorRightEdge = portX + (size / 2);
+    const iconX = (maskEdgeX + connectorRightEdge) / 2;
+    const iconY = portY;
+    
+    // Draw modern thin "+" icon with lines
+    const iconSize = 6 * zoom; // Smaller size
+    const lineWidth = 1.5 * zoom; // Thin, modern look
+    
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round'; // Rounded ends for modern look
+    
+    // Draw horizontal line
+    ctx.beginPath();
+    ctx.moveTo(iconX - iconSize, iconY);
+    ctx.lineTo(iconX + iconSize, iconY);
+    ctx.stroke();
+    
+    // Draw vertical line
+    ctx.beginPath();
+    ctx.moveTo(iconX, iconY - iconSize);
+    ctx.lineTo(iconX, iconY + iconSize);
     ctx.stroke();
     
     ctx.restore();
@@ -341,9 +467,11 @@ export class SmartMatrixNodeRenderer {
   /**
    * Render text below circle using high-resolution canvas caching
    * This achieves ultra-crisp text on all displays without DOM overlay jitter
+   * Text container has transparent background
    */
   private renderText(
     ctx: CanvasRenderingContext2D,
+    node: SmartMatrixNode,
     centerX: number,
     bottomY: number,
     zoom: number,
@@ -355,13 +483,17 @@ export class SmartMatrixNodeRenderer {
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
+    // Use user appearance text color
+    const textColor = node.textColor || '#1f2937';
+    const descColor = node.textColor || '#6b7280';
+    
     // Get or create cached text canvases at high resolution
     // The cache handles 2x * DPR rendering automatically
     const titleCanvas = this.textCache.getOrCreateTextCanvas(
       'Smart Matrix',
       `600 ${titleSize}px 'Work Sans', sans-serif`,
       300,
-      '#1f2937',
+      textColor,
       dpr
     );
     
@@ -369,7 +501,7 @@ export class SmartMatrixNodeRenderer {
       'AI Orchestration',
       `400 ${descSize}px 'Work Sans', sans-serif`,
       300,
-      '#6b7280',
+      descColor,
       dpr
     );
     
@@ -420,5 +552,19 @@ export class SmartMatrixNodeRenderer {
       centerY + radius < 0 ||
       centerY - radius > canvas.height
     );
+  }
+  
+  /**
+   * Get mouse position relative to canvas
+   */
+  private getMousePosition(canvas: HTMLCanvasElement): { x: number; y: number } | null {
+    // Store mouse position when mouse moves over canvas
+    if (!canvas.dataset.mouseX || !canvas.dataset.mouseY) {
+      return null;
+    }
+    return {
+      x: parseFloat(canvas.dataset.mouseX),
+      y: parseFloat(canvas.dataset.mouseY)
+    };
   }
 }

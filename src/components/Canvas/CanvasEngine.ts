@@ -133,8 +133,8 @@ export class CanvasEngine {
       // Initialize connection manager
       this.connectionManager = new ConnectionManager(this.stateManager, this.camera);
       
-      // Initialize interaction manager
-      this.interactionManager = new InteractionManager(this.camera);
+      // Initialize interaction manager with markDirty callback
+      this.interactionManager = new InteractionManager(this.camera, () => this.markDirty());
       this.interactionManager.setNodes(this.stateManager.getNodes());
       
       // Wire up state manager events
@@ -383,6 +383,11 @@ export class CanvasEngine {
     if (this.isDirty || this.backgroundDirty) {
       this.render(deltaTime);
       this.isDirty = false;
+      
+      // Check if animations need continuous rendering
+      if (this.nodeRenderer.hasActiveAnimations()) {
+        this.markDirty();
+      }
     }
 
     this.animationFrameId = requestAnimationFrame(this.renderLoop.bind(this));

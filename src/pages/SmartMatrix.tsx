@@ -21,6 +21,7 @@ import './SmartMatrix.css';
 interface SmartHubContext {
   theme: {
     background: string;
+    text: string;
     [key: string]: any;
   } | null;
 }
@@ -35,6 +36,7 @@ const SmartMatrixCanvas: React.FC = () => {
   // Get theme from SmartHub context
   const context = useOutletContext<SmartHubContext>();
   const backgroundColor = context?.theme?.background || '#ffffff';
+  const textColor = context?.theme?.text || '#1f2937';
 
   // Initialize Canvas Engine
   useEffect(() => {
@@ -69,8 +71,8 @@ const SmartMatrixCanvas: React.FC = () => {
       const testNode = new TestNode('test-1', -300, 0);
       engineRef.current.getStateManager().addNode(testNode);
       
-      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance background color
-      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor);
+      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors
+      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor);
       engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring
@@ -94,7 +96,23 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode, backgroundColor]);
+  }, [debugMode]); // Only re-initialize if debugMode changes, not colors
+
+  // Update all SmartMatrixNode colors when theme changes
+  useEffect(() => {
+    if (engineRef.current && isEngineReady) {
+      const nodes = engineRef.current.getStateManager().getNodesArray();
+      nodes.forEach(node => {
+        if (node.type === 'smart-matrix') {
+          const smartNode = node as SmartMatrixNode;
+          smartNode.backgroundColor = backgroundColor;
+          smartNode.textColor = textColor;
+        }
+      });
+      // Mark canvas dirty to trigger re-render
+      engineRef.current.markDirty();
+    }
+  }, [backgroundColor, textColor, isEngineReady]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {
@@ -150,6 +168,11 @@ const SmartMatrixCanvas: React.FC = () => {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Store mouse position on canvas for port hover detection
+      const rect = canvas.getBoundingClientRect();
+      canvas.dataset.mouseX = String(e.clientX - rect.left);
+      canvas.dataset.mouseY = String(e.clientY - rect.top);
+      
       if (isPanning) {
         // Throttle pan updates using requestAnimationFrame
         if (animationFrameId === null) {
@@ -252,6 +275,11 @@ const SmartMatrixCanvas: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const screenX = e.clientX - rect.left;
       const screenY = e.clientY - rect.top;
+      
+      // Store mouse position on canvas for port hover detection
+      canvas.dataset.mouseX = String(screenX);
+      canvas.dataset.mouseY = String(screenY);
+      
       const camera = engine.getCamera();
       const [worldX, worldY] = camera.toWorld(screenX, screenY);
       
@@ -263,6 +291,9 @@ const SmartMatrixCanvas: React.FC = () => {
         connectionManager.checkLinkHover(worldX, worldY);
         engine.handleMouseMove(e);
       }
+      
+      // Mark dirty to trigger re-render for port hover animation
+      engine.markDirty();
     };
 
     const handleNodeMouseUp = (e: MouseEvent) => {
@@ -325,7 +356,8 @@ const SmartMatrixCanvas: React.FC = () => {
         `smart-${nodeCount + 1}` as any,
         (nodeCount % 3) * 350,
         Math.floor(nodeCount / 3) * 300,
-        backgroundColor
+        backgroundColor,
+        textColor
       );
       engineRef.current.getStateManager().addNode(smartNode);
     }

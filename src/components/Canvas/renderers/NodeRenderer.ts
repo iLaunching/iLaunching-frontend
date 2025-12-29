@@ -98,6 +98,13 @@ export class NodeRenderer {
   }
   
   /**
+   * Check if any nodes have active animations
+   */
+  hasActiveAnimations(): boolean {
+    return this.smartMatrixRenderer.hasActiveAnimations();
+  }
+  
+  /**
    * Invalidate cache for a specific node
    */
   invalidateCache(nodeId: string): void {
