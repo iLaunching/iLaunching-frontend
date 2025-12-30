@@ -93,9 +93,15 @@ export class InteractionManager {
   // Callback for marking canvas dirty
   private markDirtyCallback?: () => void;
   
-  constructor(camera: Camera, markDirtyCallback?: () => void) {
+  // Grid snapping configuration
+  private gridSize: number = 50;
+  private snapToGrid: boolean = false;
+  
+  constructor(camera: Camera, markDirtyCallback?: () => void, gridSize?: number, snapToGrid?: boolean) {
     this.camera = camera;
     this.markDirtyCallback = markDirtyCallback;
+    if (gridSize !== undefined) this.gridSize = gridSize;
+    if (snapToGrid !== undefined) this.snapToGrid = snapToGrid;
   }
   
   /**
@@ -330,16 +336,30 @@ export class InteractionManager {
   }
   
   /**
+   * Snap a coordinate to the grid
+   */
+  private snapToGridCoordinate(value: number): number {
+    if (!this.snapToGrid) return value;
+    return Math.round(value / this.gridSize) * this.gridSize;
+  }
+  
+  /**
    * Update dragging positions
    */
   private updateDragging(worldX: number, worldY: number): void {
     this.state.draggedNodes.forEach(node => {
       const offset = this.state.dragOffsets.get(node.id);
       if (offset) {
-        node.setPosition(
-          worldX + offset.x,
-          worldY + offset.y
-        );
+        let newX = worldX + offset.x;
+        let newY = worldY + offset.y;
+        
+        // Apply grid snapping if enabled
+        if (this.snapToGrid) {
+          newX = this.snapToGridCoordinate(newX);
+          newY = this.snapToGridCoordinate(newY);
+        }
+        
+        node.setPosition(newX, newY);
       }
     });
   }

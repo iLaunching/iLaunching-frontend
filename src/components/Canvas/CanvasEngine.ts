@@ -133,8 +133,13 @@ export class CanvasEngine {
       // Initialize connection manager
       this.connectionManager = new ConnectionManager(this.stateManager, this.camera);
       
-      // Initialize interaction manager with markDirty callback
-      this.interactionManager = new InteractionManager(this.camera, () => this.markDirty());
+      // Initialize interaction manager with markDirty callback and grid snapping
+      this.interactionManager = new InteractionManager(
+        this.camera, 
+        () => this.markDirty(),
+        config.gridSize ?? 50,
+        config.snapToGrid ?? false
+      );
       this.interactionManager.setNodes(this.stateManager.getNodes());
       
       // Wire up state manager events
