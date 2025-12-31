@@ -479,6 +479,13 @@ export class SmartMatrixNodeRenderer {
   ): void {
     ctx.save();
     
+    // Calculate shadow position to properly position H2 label
+    const maskRadius = 85 * zoom;
+    const centerY = bottomY - (node.height * zoom) - (15 * zoom); // Reverse calculate centerY from bottomY
+    const shadowY = centerY + maskRadius + (3 * zoom);
+    const shadowRadiusY = maskRadius * 0.15;
+    const shadowBottom = shadowY + shadowRadiusY;
+    
     // Calculate font sizes scaled by zoom
     const h2Size = Math.round(10 * zoom);
     const titleSize = Math.round(16 * zoom);
@@ -509,7 +516,7 @@ export class SmartMatrixNodeRenderer {
     
     // Draw H2 border box (positioned 10px below the shadow)
     const h2BoxX = Math.round(centerX - (h2DisplayWidth + padding * 2) / 2);
-    const h2BoxY = Math.round(bottomY + 10);
+    const h2BoxY = Math.round(shadowBottom + 10);
     const h2BoxWidth = h2DisplayWidth + padding * 2;
     const h2BoxHeight = h2DisplayHeight + padding * 2;
     
