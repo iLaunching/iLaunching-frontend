@@ -118,14 +118,16 @@ export class CanvasEngine {
       // Initialize grid renderer
       this.gridRenderer = new GridRenderer({
         enabled: config.gridEnabled ?? true,
-        size: config.gridSize ?? 50
+        size: config.gridSize ?? 50,
+        type: config.gridType ?? 'lines',
+        color: config.gridColor ?? '#e5e7eb'
       });
-      
-      // Initialize node renderer
-      this.nodeRenderer = new NodeRenderer();
       
       // Initialize link renderer
       this.linkRenderer = new LinkRenderer();
+      
+      // Initialize node renderer
+      this.nodeRenderer = new NodeRenderer();
       
       // Initialize state manager
       this.stateManager = new StateManager();
@@ -591,11 +593,6 @@ export class CanvasEngine {
   }
   
   /**
-   * RequbackgroundDirty = true;
-    this.markDirty();
-  }
-  
-  /**
    * Mark canvas as dirty (needs re-render)
    */
   markDirty(): void {
@@ -659,6 +656,22 @@ export class CanvasEngine {
    */
   getConnectionManager(): ConnectionManager {
     return this.connectionManager;
+  }
+  
+  /**
+   * Set grid type (lines or dots)
+   */
+  setGridType(type: 'lines' | 'dots'): void {
+    this.gridRenderer.setConfig({ type });
+    this.backgroundDirty = true;
+  }
+  
+  /**
+   * Set grid color
+   */
+  setGridColor(color: string): void {
+    this.gridRenderer.setConfig({ color });
+    this.backgroundDirty = true;
   }
   
   /**

@@ -9,6 +9,7 @@ import { Camera } from '../core/Camera.js';
 export interface GridConfig {
   enabled: boolean;
   size: number;
+  type: 'lines' | 'dots'; // Grid type: lines or dots
   color: string;
   opacity: number;
   subGridEnabled: boolean;
@@ -21,6 +22,7 @@ export class GridRenderer {
   private config: GridConfig = {
     enabled: true,
     size: 50, // Base grid cell size in world units
+    type: 'lines', // Default to line grid
     color: '#e5e7eb',
     opacity: 0.3,
     subGridEnabled: true,
@@ -99,7 +101,7 @@ export class GridRenderer {
   }
   
   /**
-   * Draw grid lines
+   * Draw grid lines or dots
    */
   private drawGrid(
     ctx: CanvasRenderingContext2D,
@@ -109,8 +111,57 @@ export class GridRenderer {
     color: string,
     opacity: number
   ): void {
-    ctx.strokeStyle = color;
     ctx.globalAlpha = opacity;
+    
+    if (this.config.type === 'dots') {
+      this.drawDottedGrid(ctx, camera, bounds, gridSize, color);
+    } else {
+      this.drawLineGrid(ctx, camera, bounds, gridSize, color);
+    }
+    
+    ctx.globalAlpha = 1.0;
+  }
+  
+  /**
+   * Draw grid as dots
+   */
+  private drawDottedGrid(
+    ctx: CanvasRenderingContext2D,
+    camera: Camera,
+    bounds: { minX: number; minY: number; maxX: number; maxY: number },
+    gridSize: number,
+    color: string
+  ): void {
+    ctx.fillStyle = color;
+    const dotRadius = Math.max(1, 1.5 * camera.zoom); // Scale dot size with zoom
+    
+    // Calculate grid start positions (snap to grid)
+    const startX = Math.floor(bounds.minX / gridSize) * gridSize;
+    const startY = Math.floor(bounds.minY / gridSize) * gridSize;
+    
+    // Draw dots at grid intersections
+    for (let worldX = startX; worldX <= bounds.maxX; worldX += gridSize) {
+      for (let worldY = startY; worldY <= bounds.maxY; worldY += gridSize) {
+        const [screenX, screenY] = camera.toScreen(worldX, worldY);
+        
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  
+  /**
+   * Draw grid as lines
+   */
+  private drawLineGrid(
+    ctx: CanvasRenderingContext2D,
+    camera: Camera,
+    bounds: { minX: number; minY: number; maxX: number; maxY: number },
+    gridSize: number,
+    color: string
+  ): void {
+    ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.beginPath();
     
@@ -137,7 +188,6 @@ export class GridRenderer {
     }
     
     ctx.stroke();
-    ctx.globalAlpha = 1.0;
   }
   
   /**

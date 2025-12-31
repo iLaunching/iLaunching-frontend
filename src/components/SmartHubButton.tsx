@@ -606,11 +606,11 @@ export default function SmartHubButton({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => {
-                console.log('Place holder 1 clicked');
+                console.log('View clicked');
               }}
             >
               <FontAwesomeIcon icon={solidIcons.faCircle} style={{ fontSize: '14px' }} />
-              <span>Place holder 1</span>
+              <span>View</span>
             </button>
 
             {/* Place holder 2 Button */}

@@ -23,6 +23,9 @@ interface SmartHubData {
       icon_prefix: string;
     } | null;
     journey: string;  // Per-hub journey tier
+    show_grid: boolean;  // Display grid in canvas
+    grid_style: string;  // Grid style: 'line' or 'dotted'
+    snap_to_grid: boolean;  // Enable grid snapping
     owner_id: string;
     your_role: string;
     team_members: any[];

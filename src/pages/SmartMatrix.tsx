@@ -24,6 +24,12 @@ interface SmartHubContext {
     text: string;
     [key: string]: any;
   } | null;
+  smart_hub: {
+    show_grid: boolean;
+    grid_style: string;
+    snap_to_grid: boolean;
+    [key: string]: any;
+  } | null;
 }
 
 const SmartMatrixCanvas: React.FC = () => {
@@ -33,10 +39,35 @@ const SmartMatrixCanvas: React.FC = () => {
   const [fps, setFps] = useState(60);
   const [debugMode, setDebugMode] = useState(false);
   
-  // Get theme from SmartHub context
+  // Get theme and grid settings from SmartHub context
   const context = useOutletContext<SmartHubContext>();
   const backgroundColor = context?.theme?.background || '#ffffff';
   const textColor = context?.theme?.text || '#1f2937';
+  const borderLineColor = context?.theme?.border || '#e5e7eb';
+  
+  // Get grid settings from SmartHub
+  const showGrid = context?.smart_hub?.show_grid ?? false;
+  const gridStyle = context?.smart_hub?.grid_style || 'line';
+  const snapToGrid = context?.smart_hub?.snap_to_grid ?? false;
+  
+  const [gridType, setGridType] = useState<'lines' | 'dots'>(
+    gridStyle === 'dotted' ? 'dots' : 'lines'
+  );
+  
+  // Sync gridType state with context when it changes
+  useEffect(() => {
+    setGridType(gridStyle === 'dotted' ? 'dots' : 'lines');
+  }, [gridStyle]);
+  
+  // Debug: Log context
+  console.log('🎨 Theme context:', context?.theme);
+  console.log('🔍 SmartHub context:', context?.smart_hub);
+  console.log('⚙️ Grid settings:', { showGrid, gridStyle, snapToGrid });
+  console.log('⚙️ Grid settings raw:', { 
+    raw_show_grid: context?.smart_hub?.show_grid,
+    raw_grid_style: context?.smart_hub?.grid_style,
+    raw_snap_to_grid: context?.smart_hub?.snap_to_grid
+  });
 
   // Initialize Canvas Engine
   useEffect(() => {
@@ -50,9 +81,11 @@ const SmartMatrixCanvas: React.FC = () => {
       // Create engine instance
       engineRef.current = new CanvasEngine({
         containerElement: containerRef.current,
-        gridEnabled: true,
+        gridEnabled: showGrid,
         gridSize: 50,
-        snapToGrid: false,
+        gridColor: borderLineColor,
+        gridType: gridStyle === 'dotted' ? 'dots' : 'lines',
+        snapToGrid: snapToGrid,
         enableDebug: debugMode,
         initialCamera: {
           x: 0,
@@ -113,6 +146,42 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.markDirty();
     }
   }, [backgroundColor, textColor, isEngineReady]);
+
+  // Update grid type when changed
+  useEffect(() => {
+    if (engineRef.current && isEngineReady) {
+      engineRef.current.setGridType(gridType);
+    }
+  }, [gridType, isEngineReady]);
+
+  // Update grid settings when smart_hub context changes
+  useEffect(() => {
+    if (engineRef.current && isEngineReady) {
+      const engine = engineRef.current;
+      const gridRenderer = engine.getGridRenderer?.();
+      const interactionManager = engine.getInteractionManager?.();
+      
+      if (gridRenderer) {
+        gridRenderer.setConfig({ 
+          enabled: showGrid,
+          type: gridStyle === 'dotted' ? 'dots' : 'lines'
+        });
+        engine.updateBackground();
+      }
+      
+      // Update snap to grid setting on interaction manager
+      if (interactionManager && typeof (interactionManager as any).setSnapToGrid === 'function') {
+        (interactionManager as any).setSnapToGrid(snapToGrid);
+      }
+    }
+  }, [showGrid, gridStyle, snapToGrid, isEngineReady]);
+
+  // Update grid color when theme changes
+  useEffect(() => {
+    if (engineRef.current && isEngineReady) {
+      engineRef.current.setGridColor(borderLineColor);
+    }
+  }, [borderLineColor, isEngineReady]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {
@@ -362,6 +431,11 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(smartNode);
     }
   };
+  
+  // Toggle grid type
+  const toggleGridType = () => {
+    setGridType(prev => prev === 'lines' ? 'dots' : 'lines');
+  };
 
   return (
     <div 
@@ -408,6 +482,21 @@ const SmartMatrixCanvas: React.FC = () => {
             }}
           >
             ✨ Add Smart Matrix
+          </button>
+          <button
+            onClick={toggleGridType}
+            style={{
+              padding: '10px 20px',
+              background: '#6366f1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            {gridType === 'lines' ? '⊞' : '⋯'} Grid: {gridType === 'lines' ? 'Lines' : 'Dots'}
           </button>
           <button
 

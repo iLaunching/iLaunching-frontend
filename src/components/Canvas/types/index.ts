@@ -159,6 +159,8 @@ export interface CanvasEngineConfig {
   initialCamera?: Partial<CameraState>;
   gridEnabled?: boolean;
   gridSize?: number;
+  gridType?: 'lines' | 'dots'; // Grid display type
+  gridColor?: string; // Grid color
   snapToGrid?: boolean;
   performanceMode?: 'high' | 'balanced' | 'low';
   maxNodes?: number;

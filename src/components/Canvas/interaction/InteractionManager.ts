@@ -112,6 +112,13 @@ export class InteractionManager {
   }
   
   /**
+   * Set snap to grid
+   */
+  setSnapToGrid(enabled: boolean): void {
+    this.snapToGrid = enabled;
+  }
+  
+  /**
    * Handle mouse down event
    */
   handleMouseDown(
