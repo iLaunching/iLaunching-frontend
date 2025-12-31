@@ -182,7 +182,7 @@ export class SmartMatrixNodeRenderer {
       
       // RENDER TEXT BELOW CIRCLE (transparent background, Work Sans font, user appearance text color)
       const textOffsetY = (node.height * zoom) + (15 * zoom);
-      this.renderText(ctx, node, centerX, screenY + textOffsetY, zoom, dpr);
+      this.renderText(ctx, node, centerX, centerY, screenY + textOffsetY, zoom, dpr, maskRadius);
       
       ctx.restore();
       
@@ -473,15 +473,15 @@ export class SmartMatrixNodeRenderer {
     ctx: CanvasRenderingContext2D,
     node: SmartMatrixNode,
     centerX: number,
+    centerY: number,
     bottomY: number,
     zoom: number,
-    dpr: number
+    dpr: number,
+    maskRadius: number
   ): void {
     ctx.save();
     
     // Calculate shadow position to properly position H2 label
-    const maskRadius = 85 * zoom;
-    const centerY = bottomY - (node.height * zoom) - (15 * zoom); // Reverse calculate centerY from bottomY
     const shadowY = centerY + maskRadius + (3 * zoom);
     const shadowRadiusY = maskRadius * 0.15;
     const shadowBottom = shadowY + shadowRadiusY;
