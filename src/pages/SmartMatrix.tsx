@@ -183,52 +183,26 @@ const SmartMatrixCanvas: React.FC = () => {
         const gridRenderer = engine.getGridRenderer?.();
         const interactionManager = engine.getInteractionManager?.();
         
-        console.log('🎨 SmartMatrix - Updating canvas grid (after timeout). gridRenderer exists:', !!gridRenderer);
-        
         if (gridRenderer) {
           const newConfig = { 
             enabled: showGrid,
-            type: gridStyle === 'dotted' ? 'dots' : 'lines',
-            color: gridColor  // Update color based on grid style
+            type: (gridStyle === 'dotted' ? 'dots' : 'lines') as 'lines' | 'dots',
+            color: gridColor
           };
-          console.log('🎨 SmartMatrix - New grid config:', newConfig);
-          console.log('🎨 SmartMatrix - BEFORE setConfig - gridRenderer:', gridRenderer);
           gridRenderer.setConfig(newConfig);
-          console.log('✅ SmartMatrix - Grid config updated');
-          
-          // Log the gridRenderer state after setConfig
-          console.log('🎨 SmartMatrix - AFTER setConfig - checking gridRenderer state...');
-          console.log('🎨 SmartMatrix - GridRenderer config:', (gridRenderer as any).config || 'no config property');
-          console.log('🎨 SmartMatrix - GridRenderer enabled:', (gridRenderer as any).enabled || (gridRenderer as any).config?.enabled);
-          
-          console.log('✅ SmartMatrix - Calling updateBackground()...');
           engine.updateBackground();
-          console.log('✅ SmartMatrix - Calling markDirty()...');
-          engine.markDirty(); // Force a render
-          console.log('✅ SmartMatrix - updateBackground() and markDirty() called');
-        } else {
-          console.log('⚠️ SmartMatrix - No gridRenderer available');
+          engine.markDirty();
         }
         
         // Update snap to grid setting on interaction manager
         if (interactionManager && typeof (interactionManager as any).setSnapToGrid === 'function') {
           (interactionManager as any).setSnapToGrid(snapToGrid);
-          console.log('✅ SmartMatrix - Snap to grid updated:', snapToGrid);
         }
-      } else {
-        console.log('⚠️ SmartMatrix - Cannot update grid: engineRef.current is null');
       }
-    }, 50); // Small delay to ensure engine is ready
+    }, 50);
     
     return () => clearTimeout(timeoutId);
   }, [showGrid, gridStyle, snapToGrid, gridColor]);
-
-  // Update grid color when theme changes
-  useEffect(() => {
-    if (engineRef.current && isEngineReady) {
-      engineRef.current.setGridColor(borderLineColor);
-    }
-  }, [borderLineColor, isEngineReady]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {

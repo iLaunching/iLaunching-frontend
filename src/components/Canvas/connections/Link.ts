@@ -187,6 +187,11 @@ export class Link {
     try {
       const path = this.getBezierPath(LINK_CONFIG.PATH_SEGMENTS_HIT); // Optimized segment count
     
+      // Safety check for empty or insufficient path
+      if (!path || path.length < 2) {
+        return false;
+      }
+    
       // Check distance to each line segment
       for (let i = 0; i < path.length - 1; i++) {
         const p1 = path[i];
@@ -247,6 +252,13 @@ export class Link {
     }
     
     const path = this.getBezierPath(50);
+    
+    // Safety check for empty or single-point path
+    if (!path || path.length < 2) {
+      this.cachedLength = 0;
+      return 0;
+    }
+    
     let length = 0;
     
     for (let i = 1; i < path.length; i++) {
@@ -266,6 +278,17 @@ export class Link {
   public getPointAtDistance(distance: number): Point | null {
     try {
       const path = this.getBezierPath(LINK_CONFIG.PATH_SEGMENTS_ANIMATION);
+      
+      // Safety check for empty path
+      if (!path || path.length === 0) {
+        return null;
+      }
+      
+      // If only one point, return it
+      if (path.length === 1) {
+        return path[0];
+      }
+      
       let accumulated = 0;
       
       for (let i = 1; i < path.length; i++) {

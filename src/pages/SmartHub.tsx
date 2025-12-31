@@ -5,6 +5,28 @@ import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
 import api from '@/lib/api';
 
+// Move theme defaults outside component to prevent recreation
+const THEME_DEFAULTS = {
+  header_overlay: '#00000080',
+  header_background: '#7F77F1',
+  background: '#ffffff',
+  text: '#000000',
+  border_line_color: '#E0E0E0',
+  solid_color: '#7F77F1',
+  gradient_color_start: '#7F77F1',
+  gradient_color_end: '#A89FF5',
+  chat_bk_1: '#F5F5F5',
+  prompt_bk: '#FFFFFF',
+  prompt_text_color: '#000000',
+  ai_acknowledge_text_color: '#7F77F1',
+  button_bk_color: '#7F77F1',
+  button_text_color: '#ffffff',
+  button_hover_color: '#6B69D6',
+  feedback_indicator_bk: '#7F77F1',
+  appearance_text_color: '#000000',
+  bg_opacity: '1'
+} as const;
+
 interface SmartHubData {
   smart_hub: {
     id: string;
@@ -173,7 +195,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Avatar color updated successfully:', data);
       // Refetch the smart hub data to get updated color
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -197,7 +219,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Profile icon updated successfully:', data);
       // Refetch the smart hub data to get updated icon
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -224,7 +246,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Profile icon cleared successfully:', data);
       // Refetch the smart hub data
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -248,7 +270,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Appearance updated successfully:', data);
       // Refetch the smart hub data to get updated theme - this should trigger a re-render with new theme
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -272,7 +294,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('iTheme updated successfully:', data);
       // Refetch the smart hub data to get updated theme
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -296,7 +318,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub color updated successfully:', data);
       // Refetch the smart hub data to get updated color
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -332,7 +354,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub icon updated successfully:', data);
       // Refetch the smart hub data to get updated icon
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -368,7 +390,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub icon cleared successfully:', data);
       // Refetch the smart hub data
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -394,32 +416,14 @@ export default function SmartHub() {
   
   // Memoize the Outlet context to prevent unnecessary remounts
   // Must be before early returns to follow Rules of Hooks
-  const themeDefaults = {
-    header_overlay: '#00000080',
-    header_background: '#7F77F1',
-    background: '#ffffff',
-    text: '#000000',
-    border_line_color: '#E0E0E0',
-    solid_color: '#7F77F1',
-    gradient_color_start: '#7F77F1',
-    gradient_color_end: '#A89FF5',
-    chat_bk_1: '#F5F5F5',
-    prompt_bk: '#FFFFFF',
-    prompt_text_color: '#000000',
-    ai_acknowledge_text_color: '#7F77F1',
-    button_bk_color: '#7F77F1',
-    button_text_color: '#ffffff',
-    button_hover_color: '#6B69D6',
-    feedback_indicator_bk: '#7F77F1',
-    appearance_text_color: '#000000',
-    bg_opacity: '1'
-  };
-  
-  const theme = { ...themeDefaults, ...hubData?.theme };
+  const theme = useMemo(
+    () => ({ ...THEME_DEFAULTS, ...hubData?.theme }),
+    [JSON.stringify(hubData?.theme)]
+  );
   
   const outletContext = useMemo(
     () => hubData ? { theme, profile: hubData.profile, smart_hub: hubData.smart_hub } : null,
-    [theme, hubData?.profile, hubData?.smart_hub]
+    [theme, JSON.stringify(hubData?.profile), JSON.stringify(hubData?.smart_hub)]
   );
   
   // Handle authentication errors
