@@ -44,11 +44,16 @@ const SmartMatrixCanvas: React.FC = () => {
   const backgroundColor = context?.theme?.background || '#ffffff';
   const textColor = context?.theme?.text || '#1f2937';
   const borderLineColor = context?.theme?.border || '#e5e7eb';
+  const lineGridColor = context?.theme?.line_grid_color || '#d6d6d6';
+  const dottedGridColor = context?.theme?.dotted_grid_color || '#a0a0a0';
   
   // Get grid settings from SmartHub
   const showGrid = context?.smart_hub?.show_grid ?? false;
   const gridStyle = context?.smart_hub?.grid_style || 'line';
   const snapToGrid = context?.smart_hub?.snap_to_grid ?? false;
+  
+  // Calculate the appropriate grid color based on grid style
+  const gridColor = gridStyle === 'dotted' ? dottedGridColor : lineGridColor;
   
   const [gridType, setGridType] = useState<'lines' | 'dots'>(
     gridStyle === 'dotted' ? 'dots' : 'lines'
@@ -78,7 +83,7 @@ const SmartMatrixCanvas: React.FC = () => {
         containerElement: containerRef.current,
         gridEnabled: showGrid,
         gridSize: 50,
-        gridColor: borderLineColor,
+        gridColor: gridColor,
         gridType: gridStyle === 'dotted' ? 'dots' : 'lines',
         snapToGrid: snapToGrid,
         enableDebug: debugMode,
@@ -183,7 +188,8 @@ const SmartMatrixCanvas: React.FC = () => {
         if (gridRenderer) {
           const newConfig = { 
             enabled: showGrid,
-            type: gridStyle === 'dotted' ? 'dots' : 'lines'
+            type: gridStyle === 'dotted' ? 'dots' : 'lines',
+            color: gridColor  // Update color based on grid style
           };
           console.log('🎨 SmartMatrix - New grid config:', newConfig);
           console.log('🎨 SmartMatrix - BEFORE setConfig - gridRenderer:', gridRenderer);
@@ -215,7 +221,7 @@ const SmartMatrixCanvas: React.FC = () => {
     }, 50); // Small delay to ensure engine is ready
     
     return () => clearTimeout(timeoutId);
-  }, [showGrid, gridStyle, snapToGrid]);
+  }, [showGrid, gridStyle, snapToGrid, gridColor]);
 
   // Update grid color when theme changes
   useEffect(() => {
