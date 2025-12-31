@@ -188,7 +188,7 @@ const SmartMatrixCanvas: React.FC = () => {
         if (gridRenderer) {
           const newConfig = { 
             enabled: showGrid,
-            type: gridStyle === 'dotted' ? 'dots' : 'lines',
+            type: (gridStyle === 'dotted' ? 'dots' : 'lines') as 'lines' | 'dots',
             color: gridColor  // Update color based on grid style
           };
           console.log('🎨 SmartMatrix - New grid config:', newConfig);

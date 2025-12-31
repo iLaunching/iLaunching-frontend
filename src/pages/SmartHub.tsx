@@ -1,9 +1,31 @@
 import { useEffect, useMemo } from 'react';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tantml:query';
 import { useNavigate, Outlet } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
 import api from '@/lib/api';
+
+// Move theme defaults outside component to prevent recreation
+const THEME_DEFAULTS = {
+  header_overlay: '#00000080',
+  header_background: '#7F77F1',
+  background: '#ffffff',
+  text: '#000000',
+  border_line_color: '#E0E0E0',
+  solid_color: '#7F77F1',
+  gradient_color_start: '#7F77F1',
+  gradient_color_end: '#A89FF5',
+  chat_bk_1: '#F5F5F5',
+  prompt_bk: '#FFFFFF',
+  prompt_text_color: '#000000',
+  ai_acknowledge_text_color: '#7F77F1',
+  button_bk_color: '#7F77F1',
+  button_text_color: '#ffffff',
+  button_hover_color: '#6B69D6',
+  feedback_indicator_bk: '#7F77F1',
+  appearance_text_color: '#000000',
+  bg_opacity: '1'
+} as const;
 
 interface SmartHubData {
   smart_hub: {
@@ -394,29 +416,8 @@ export default function SmartHub() {
   
   // Memoize the Outlet context to prevent unnecessary remounts
   // Must be before early returns to follow Rules of Hooks
-  const themeDefaults = {
-    header_overlay: '#00000080',
-    header_background: '#7F77F1',
-    background: '#ffffff',
-    text: '#000000',
-    border_line_color: '#E0E0E0',
-    solid_color: '#7F77F1',
-    gradient_color_start: '#7F77F1',
-    gradient_color_end: '#A89FF5',
-    chat_bk_1: '#F5F5F5',
-    prompt_bk: '#FFFFFF',
-    prompt_text_color: '#000000',
-    ai_acknowledge_text_color: '#7F77F1',
-    button_bk_color: '#7F77F1',
-    button_text_color: '#ffffff',
-    button_hover_color: '#6B69D6',
-    feedback_indicator_bk: '#7F77F1',
-    appearance_text_color: '#000000',
-    bg_opacity: '1'
-  };
-  
   const theme = useMemo(
-    () => ({ ...themeDefaults, ...hubData?.theme }),
+    () => ({ ...THEME_DEFAULTS, ...hubData?.theme }),
     [hubData?.theme]
   );
   
