@@ -487,7 +487,7 @@ export class SmartMatrixNodeRenderer {
     const shadowBottom = shadowY + shadowRadiusY;
     
     // Calculate font sizes scaled by zoom
-    const h2Size = Math.round(10 * zoom);
+    const h2Size = Math.round(8 * zoom);
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
@@ -501,7 +501,7 @@ export class SmartMatrixNodeRenderer {
       'SMART MATRIX',
       `600 ${h2Size}px 'Work Sans', sans-serif`,
       300,
-      solidColor,
+      '#3b82f6',
       dpr
     );
     
@@ -520,7 +520,7 @@ export class SmartMatrixNodeRenderer {
     const h2BoxWidth = h2DisplayWidth + padding * 2;
     const h2BoxHeight = h2DisplayHeight + padding * 2;
     
-    ctx.strokeStyle = solidColor;
+    ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(h2BoxX, h2BoxY, h2BoxWidth, h2BoxHeight, borderRadius);
