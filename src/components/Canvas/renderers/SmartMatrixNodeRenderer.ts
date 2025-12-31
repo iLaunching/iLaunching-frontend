@@ -498,7 +498,7 @@ export class SmartMatrixNodeRenderer {
     
     // Get or create cached H2 text canvas (first element - below shadow)
     const h2Canvas = this.textCache.getOrCreateTextCanvas(
-      'SMART MATRIX',
+      node.matrixName.toUpperCase(),
       `600 ${h2Size}px 'Work Sans', sans-serif`,
       300,
       '#3b82f6',
@@ -539,7 +539,7 @@ export class SmartMatrixNodeRenderer {
     // Get or create cached text canvases at high resolution
     // The cache handles 2x * DPR rendering automatically
     const titleCanvas = this.textCache.getOrCreateTextCanvas(
-      'Smart Matrix',
+      node.matrixName,
       `600 ${titleSize}px 'Work Sans', sans-serif`,
       300,
       textColor,

@@ -11,9 +11,10 @@ export class SmartMatrixNode extends BaseNode {
   public textColor: string = '#1f2937'; // Default dark gray, will be set from appearance
   public solidColor: string = '#7F77F1'; // Default solid color from itheme
   public isPortHovered: boolean = false; // Track port hover state
+  public matrixName: string = 'Smart Matrix'; // Display name from database
   
-  constructor(id: UUID, x: number, y: number, backgroundColor?: string, textColor?: string, solidColor?: string) {
-    super(id, 'smart-matrix', x, y, 250, 250, 'Smart Matrix');
+  constructor(id: UUID, x: number, y: number, backgroundColor?: string, textColor?: string, solidColor?: string, matrixName?: string) {
+    super(id, 'smart-matrix', x, y, 250, 250, matrixName || 'Smart Matrix');
     
     // Single output port on right center for now
     this.addOutputPort('output', 'any', 'Output');
@@ -34,6 +35,11 @@ export class SmartMatrixNode extends BaseNode {
     // Set solid color from user itheme
     if (solidColor) {
       this.solidColor = solidColor;
+    }
+    
+    // Set matrix name from database
+    if (matrixName) {
+      this.matrixName = matrixName;
     }
   }
   

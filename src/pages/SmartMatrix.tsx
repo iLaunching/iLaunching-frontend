@@ -212,8 +212,9 @@ const SmartMatrixCanvas: React.FC = () => {
       const testNode = new TestNode('test-1', -300, 0);
       engineRef.current.getStateManager().addNode(testNode);
       
-      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors
-      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor);
+      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors and matrix name
+      const matrixName = matrixData?.smart_matrix?.name || 'Smart Matrix';
+      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor, matrixName);
       engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring
@@ -239,21 +240,25 @@ const SmartMatrixCanvas: React.FC = () => {
     }
   }, [debugMode]); // Only re-initialize if debugMode changes
 
-  // Update all SmartMatrixNode colors when theme changes
+  // Update all SmartMatrixNode colors and names when data changes
   useEffect(() => {
-    if (engineRef.current && isEngineReady) {
+    if (engineRef.current && isEngineReady && matrixData) {
       const nodes = engineRef.current.getStateManager().getNodesArray();
+      const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
+      
       nodes.forEach(node => {
         if (node.type === 'smart-matrix') {
           const smartNode = node as SmartMatrixNode;
           smartNode.backgroundColor = backgroundColor;
           smartNode.textColor = textColor;
+          smartNode.solidColor = solidColor;
+          smartNode.matrixName = matrixName;
         }
       });
       // Mark canvas dirty to trigger re-render
       engineRef.current.markDirty();
     }
-  }, [backgroundColor, textColor, isEngineReady]);
+  }, [backgroundColor, textColor, solidColor, matrixData, isEngineReady]);
 
   // Update grid type when changed
   useEffect(() => {
@@ -537,12 +542,15 @@ const SmartMatrixCanvas: React.FC = () => {
   const addSmartMatrixNode = () => {
     if (engineRef.current) {
       const nodeCount = engineRef.current.getStateManager().getNodesArray().length;
+      const matrixName = matrixData?.smart_matrix?.name || 'Smart Matrix';
       const smartNode = new SmartMatrixNode(
         `smart-${nodeCount + 1}` as any,
         (nodeCount % 3) * 350,
         Math.floor(nodeCount / 3) * 300,
         backgroundColor,
-        textColor
+        textColor,
+        solidColor,
+        matrixName
       );
       engineRef.current.getStateManager().addNode(smartNode);
     }
