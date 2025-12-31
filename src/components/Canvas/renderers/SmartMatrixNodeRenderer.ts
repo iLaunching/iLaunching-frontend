@@ -507,9 +507,9 @@ export class SmartMatrixNodeRenderer {
     const padding = 4 * zoom; // Internal padding for the border box
     const borderRadius = 3 * zoom;
     
-    // Draw H2 border box (positioned below the shadow)
+    // Draw H2 border box (positioned 10px below the shadow)
     const h2BoxX = Math.round(centerX - (h2DisplayWidth + padding * 2) / 2);
-    const h2BoxY = Math.round(bottomY + 5 * zoom);
+    const h2BoxY = Math.round(bottomY + 10);
     const h2BoxWidth = h2DisplayWidth + padding * 2;
     const h2BoxHeight = h2DisplayHeight + padding * 2;
     
