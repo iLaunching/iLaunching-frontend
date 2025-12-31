@@ -220,6 +220,11 @@ const SmartMatrixCanvas: React.FC = () => {
     console.log('   isEngineReady:', isEngineReady);
     console.log('   engineRef.current exists:', !!engineRef.current);
     
+    if (!engineRef.current || !isEngineReady) {
+      console.log('⏸️ SmartMatrix - Engine not ready, skipping grid update');
+      return;
+    }
+    
     // Use a small timeout to ensure the engine is fully initialized
     const timeoutId = setTimeout(() => {
       if (engineRef.current) {
@@ -233,6 +238,7 @@ const SmartMatrixCanvas: React.FC = () => {
             type: (gridStyle === 'dotted' ? 'dots' : 'lines') as 'lines' | 'dots',
             color: gridColor
           };
+          console.log('✅ SmartMatrix - Updating grid config:', newConfig);
           gridRenderer.setConfig(newConfig);
           engine.updateBackground();
           engine.markDirty();
@@ -246,7 +252,7 @@ const SmartMatrixCanvas: React.FC = () => {
     }, 50);
     
     return () => clearTimeout(timeoutId);
-  }, [showGrid, gridStyle, snapToGrid, gridColor]);
+  }, [showGrid, gridStyle, snapToGrid, gridColor, isEngineReady]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {
