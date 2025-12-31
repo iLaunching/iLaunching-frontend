@@ -43,6 +43,7 @@ const SmartMatrixCanvas: React.FC = () => {
   const context = useOutletContext<SmartHubContext>();
   const backgroundColor = context?.theme?.background || '#ffffff';
   const textColor = context?.theme?.text || '#1f2937';
+  const solidColor = context?.theme?.solid_color || '#7F77F1';
   const borderLineColor = context?.theme?.border || '#e5e7eb';
   const lineGridColor = context?.theme?.line_grid_color || '#d6d6d6';
   const dottedGridColor = context?.theme?.dotted_grid_color || '#a0a0a0';
@@ -118,7 +119,7 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(testNode);
       
       // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors
-      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor);
+      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor);
       engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring

@@ -480,12 +480,52 @@ export class SmartMatrixNodeRenderer {
     ctx.save();
     
     // Calculate font sizes scaled by zoom
+    const h2Size = Math.round(12 * zoom);
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
-    // Use user appearance text color
+    // Use user appearance text color and solid color
+    const solidColor = node.solidColor || '#7F77F1';
     const textColor = node.textColor || '#1f2937';
     const descColor = node.textColor || '#6b7280';
+    
+    // Get or create cached H2 text canvas (first element)
+    const h2Canvas = this.textCache.getOrCreateTextCanvas(
+      'H2',
+      `600 ${h2Size}px 'Work Sans', sans-serif`,
+      100,
+      solidColor,
+      dpr
+    );
+    
+    // Calculate H2 display dimensions
+    const renderScale = 2 * dpr;
+    const h2DisplayWidth = h2Canvas.width / renderScale;
+    const h2DisplayHeight = h2Canvas.height / renderScale;
+    const padding = 4 * zoom; // Internal padding for the border box
+    const borderRadius = 3 * zoom;
+    
+    // Draw H2 border box
+    const h2BoxX = Math.round(centerX - (h2DisplayWidth + padding * 2) / 2);
+    const h2BoxY = Math.round(bottomY - 60 * zoom);
+    const h2BoxWidth = h2DisplayWidth + padding * 2;
+    const h2BoxHeight = h2DisplayHeight + padding * 2;
+    
+    ctx.strokeStyle = solidColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(h2BoxX, h2BoxY, h2BoxWidth, h2BoxHeight, borderRadius);
+    ctx.stroke();
+    
+    // Stamp H2 text inside the border box
+    ctx.drawImage(
+      h2Canvas,
+      0, 0, h2Canvas.width, h2Canvas.height,
+      Math.round(h2BoxX + padding),
+      Math.round(h2BoxY + padding),
+      h2DisplayWidth,
+      h2DisplayHeight
+    );
     
     // Get or create cached text canvases at high resolution
     // The cache handles 2x * DPR rendering automatically
