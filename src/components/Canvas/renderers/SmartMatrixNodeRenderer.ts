@@ -487,7 +487,6 @@ export class SmartMatrixNodeRenderer {
     const shadowBottom = shadowY + shadowRadiusY;
     
     // Calculate font sizes scaled by zoom
-    const h2Size = Math.round(8 * zoom);
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
@@ -496,45 +495,8 @@ export class SmartMatrixNodeRenderer {
     const textColor = node.textColor || '#1f2937';
     const descColor = node.textColor || '#6b7280';
     
-    // Get or create cached H2 text canvas (first element - below shadow)
-    const h2Canvas = this.textCache.getOrCreateTextCanvas(
-      node.matrixName.toUpperCase(),
-      `600 ${h2Size}px 'Work Sans', sans-serif`,
-      300,
-      '#3b82f6',
-      dpr
-    );
-    
     // Calculate render scale once for all text elements
     const renderScale = 2 * dpr; // textScale * dpr
-    
-    // Calculate H2 display dimensions
-    const h2DisplayWidth = h2Canvas.width / renderScale;
-    const h2DisplayHeight = h2Canvas.height / renderScale;
-    const padding = 4 * zoom; // Internal padding for the border box
-    const borderRadius = 3 * zoom;
-    
-    // Draw H2 border box (positioned 10px below the shadow)
-    const h2BoxX = Math.round(centerX - (h2DisplayWidth + padding * 2) / 2);
-    const h2BoxY = Math.round(shadowBottom + 10);
-    const h2BoxWidth = h2DisplayWidth + padding * 2;
-    const h2BoxHeight = h2DisplayHeight + padding * 2;
-    
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(h2BoxX, h2BoxY, h2BoxWidth, h2BoxHeight, borderRadius);
-    ctx.stroke();
-    
-    // Stamp H2 text inside the border box
-    ctx.drawImage(
-      h2Canvas,
-      0, 0, h2Canvas.width, h2Canvas.height,
-      Math.round(h2BoxX + padding),
-      Math.round(h2BoxY + padding),
-      h2DisplayWidth,
-      h2DisplayHeight
-    );
     
     // Get or create cached text canvases at high resolution
     // The cache handles 2x * DPR rendering automatically
@@ -562,17 +524,17 @@ export class SmartMatrixNodeRenderer {
     const descDisplayHeight = descCanvas.height / renderScale;
     
     // Calculate spacing between elements
-    const h2ToTitle = 5 * zoom;  // Gap between H2 and title
+    const shadowToTitle = 10 * zoom;  // Gap between shadow and title
     const titleToDesc = 5 * zoom; // Gap between title and description
     
     // Stamp high-res text onto main canvas (GPU-accelerated)
     // The canvas is already in logical pixels due to ctx.scale(dpr, dpr)
-    // Title positioned below H2 label
+    // Title positioned below shadow
     ctx.drawImage(
       titleCanvas,
       0, 0, titleCanvas.width, titleCanvas.height,  // Source (physical pixels)
       Math.round(centerX - titleDisplayWidth / 2),   // Dest X (centered)
-      Math.round(h2BoxY + h2BoxHeight + h2ToTitle),  // Dest Y (below H2)
+      Math.round(shadowBottom + shadowToTitle),      // Dest Y (below shadow)
       titleDisplayWidth,                             // Dest width (logical)
       titleDisplayHeight                             // Dest height (logical)
     );
@@ -581,7 +543,7 @@ export class SmartMatrixNodeRenderer {
       descCanvas,
       0, 0, descCanvas.width, descCanvas.height,
       Math.round(centerX - descDisplayWidth / 2),
-      Math.round(h2BoxY + h2BoxHeight + h2ToTitle + titleDisplayHeight + titleToDesc), // Below title
+      Math.round(shadowBottom + shadowToTitle + titleDisplayHeight + titleToDesc), // Below title
       descDisplayWidth,
       descDisplayHeight
     );
