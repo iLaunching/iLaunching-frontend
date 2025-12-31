@@ -509,7 +509,7 @@ export class SmartMatrixNodeRenderer {
     );
     
     const descCanvas = this.textCache.getOrCreateTextCanvas(
-      'AI Orchestration',
+      'Smart Matrix',
       `400 ${descSize}px 'Work Sans', sans-serif`,
       300,
       descColor,
