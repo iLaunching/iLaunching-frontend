@@ -72,6 +72,13 @@ const SmartMatrixCanvas: React.FC = () => {
       // Call API server endpoint - includes JWT token automatically
       const response = await api.get('/users/me/current-smart-matrix');
       console.log('📊 Smart Matrix data loaded:', response.data);
+      console.log('🎨 Smart Matrix - Smart Hub Grid Settings:', {
+        show_grid: response.data?.smart_hub?.show_grid,
+        grid_style: response.data?.smart_hub?.grid_style,
+        snap_to_grid: response.data?.smart_hub?.snap_to_grid,
+        smart_hub_id: response.data?.smart_hub?.id,
+        smart_hub_name: response.data?.smart_hub?.name
+      });
       return response.data;
     },
     retry: false,
@@ -86,10 +93,17 @@ const SmartMatrixCanvas: React.FC = () => {
   const lineGridColor = matrixData?.theme?.line_grid_color || '#d6d6d6';
   const dottedGridColor = matrixData?.theme?.dotted_grid_color || '#a0a0a0';
   
-  // Get grid settings from Smart Hub
+  // Get grid settings from Smart Hub (linked via smart_matrix → smart_hub relationship)
   const showGrid = matrixData?.smart_hub?.show_grid ?? false;
   const gridStyle = matrixData?.smart_hub?.grid_style || 'line';
   const snapToGrid = matrixData?.smart_hub?.snap_to_grid ?? false;
+  
+  console.log('🔧 SmartMatrix - Using Grid Settings from Smart Hub:', {
+    showGrid,
+    gridStyle,
+    snapToGrid,
+    source: 'smart_hub table via current-smart-matrix endpoint'
+  });
   
   // Calculate the appropriate grid color based on grid style
   const gridColor = gridStyle === 'dotted' ? dottedGridColor : lineGridColor;
