@@ -169,8 +169,9 @@ export default function SmartHubButton({
     },
     onSuccess: (data, hubId) => {
       console.log('✅ Hub switched successfully:', data);
-      // Invalidate cache to refetch current hub data
+      // Invalidate cache to refetch current hub data AND smart matrix data
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] });
       setIsOpen(false); // Close the dropdown
     },
     onError: (error: any) => {

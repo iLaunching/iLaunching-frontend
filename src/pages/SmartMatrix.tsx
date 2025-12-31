@@ -60,6 +60,7 @@ interface SmartMatrixData {
 const SmartMatrixCanvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
+  const hasInitialized = useRef(false); // Track if initialization has occurred
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [fps, setFps] = useState(60);
   const [debugMode, setDebugMode] = useState(false);
@@ -124,7 +125,13 @@ const SmartMatrixCanvas: React.FC = () => {
 
   // Initialize Canvas Engine (only once when data is first loaded)
   useEffect(() => {
-    if (!containerRef.current || !matrixData || isEngineReady) {
+    // Don't initialize if already initialized, no container, or no data
+    if (hasInitialized.current || !containerRef.current || !matrixData) {
+      console.log('⏸️ Skipping canvas initialization:', { 
+        hasInitialized: hasInitialized.current,
+        hasContainer: !!containerRef.current, 
+        hasData: !!matrixData 
+      });
       return;
     }
 
@@ -151,9 +158,10 @@ const SmartMatrixCanvas: React.FC = () => {
 
       // Start render loop
       engineRef.current.start();
+      hasInitialized.current = true; // Mark as initialized
       setIsEngineReady(true);
       
-      console.log('✅ Canvas Engine marked as ready - initial grid state:', showGrid);
+      console.log('✅ Canvas Engine initialized and ready - initial grid state:', showGrid);
       
       // Apply initial grid settings immediately after engine is ready
       const gridRenderer = engineRef.current.getGridRenderer?.();
@@ -176,27 +184,40 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring
-      const fpsInterval = setInterval(() => {
+      const fpsIntervalRef = setInterval(() => {
         if (engineRef.current) {
           const metrics = engineRef.current.getPerformanceMetrics();
           setFps(metrics.fps);
         }
       }, 1000);
-
-      // Cleanup
-      return () => {
-        clearInterval(fpsInterval);
-        if (engineRef.current) {
-          engineRef.current.stop();
-          engineRef.current.destroy();
-          engineRef.current = null;
-        }
-        setIsEngineReady(false);
-      };
+      
+      // Store interval ID in a way that persists
+      (engineRef.current as any).__fpsInterval = fpsIntervalRef;
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode]); // Only re-initialize if debugMode changes, NOT when matrixData changes
+  }, [matrixData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+  
+  // Cleanup only on unmount
+  useEffect(() => {
+    return () => {
+      // Clear FPS monitoring
+      if (engineRef.current && (engineRef.current as any).__fpsInterval) {
+        clearInterval((engineRef.current as any).__fpsInterval);
+      }
+      
+      // Destroy engine
+      if (engineRef.current) {
+        engineRef.current.stop();
+        engineRef.current.destroy();
+        engineRef.current = null;
+      }
+      
+      hasInitialized.current = false;
+      setIsEngineReady(false);
+      console.log('🧹 Canvas engine cleaned up on unmount');
+    };
+  }, []); // Empty deps - only runs on mount/unmount
 
   // Update all SmartMatrixNode colors and names when data changes
   useEffect(() => {
