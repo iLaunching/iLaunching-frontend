@@ -182,7 +182,7 @@ export class SmartMatrixNodeRenderer {
       
       // RENDER TEXT BELOW CIRCLE (transparent background, Work Sans font, user appearance text color)
       const textOffsetY = (node.height * zoom) + (15 * zoom);
-      this.renderText(ctx, node, centerX, screenY + textOffsetY, zoom, dpr);
+      this.renderText(ctx, node, centerX, centerY, screenY + textOffsetY, zoom, dpr, maskRadius);
       
       ctx.restore();
       
@@ -473,24 +473,35 @@ export class SmartMatrixNodeRenderer {
     ctx: CanvasRenderingContext2D,
     node: SmartMatrixNode,
     centerX: number,
+    centerY: number,
     bottomY: number,
     zoom: number,
-    dpr: number
+    dpr: number,
+    maskRadius: number
   ): void {
     ctx.save();
+    
+    // Calculate shadow position to properly position H2 label
+    const shadowY = centerY + maskRadius + (3 * zoom);
+    const shadowRadiusY = maskRadius * 0.15;
+    const shadowBottom = shadowY + shadowRadiusY;
     
     // Calculate font sizes scaled by zoom
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
-    // Use user appearance text color
+    // Use user appearance text color and solid color
+    const solidColor = node.solidColor || '#7F77F1';
     const textColor = node.textColor || '#1f2937';
     const descColor = node.textColor || '#6b7280';
+    
+    // Calculate render scale once for all text elements
+    const renderScale = 2 * dpr; // textScale * dpr
     
     // Get or create cached text canvases at high resolution
     // The cache handles 2x * DPR rendering automatically
     const titleCanvas = this.textCache.getOrCreateTextCanvas(
-      'Smart Matrix',
+      node.matrixName,
       `600 ${titleSize}px 'Work Sans', sans-serif`,
       300,
       textColor,
@@ -498,7 +509,7 @@ export class SmartMatrixNodeRenderer {
     );
     
     const descCanvas = this.textCache.getOrCreateTextCanvas(
-      'AI Orchestration',
+      'Smart Matrix',
       `400 ${descSize}px 'Work Sans', sans-serif`,
       300,
       descColor,
@@ -507,19 +518,23 @@ export class SmartMatrixNodeRenderer {
     
     // Calculate the display width (logical pixels, not physical)
     // Canvas is rendered at renderScale, so divide by that to get display size
-    const renderScale = 2 * dpr; // textScale * dpr
     const titleDisplayWidth = titleCanvas.width / renderScale;
     const descDisplayWidth = descCanvas.width / renderScale;
     const titleDisplayHeight = titleCanvas.height / renderScale;
     const descDisplayHeight = descCanvas.height / renderScale;
     
+    // Calculate spacing between elements
+    const shadowToTitle = 10 * zoom;  // Gap between shadow and title
+    const titleToDesc = 5 * zoom; // Gap between title and description
+    
     // Stamp high-res text onto main canvas (GPU-accelerated)
     // The canvas is already in logical pixels due to ctx.scale(dpr, dpr)
+    // Title positioned below shadow
     ctx.drawImage(
       titleCanvas,
       0, 0, titleCanvas.width, titleCanvas.height,  // Source (physical pixels)
       Math.round(centerX - titleDisplayWidth / 2),   // Dest X (centered)
-      Math.round(bottomY - 30 * zoom),               // Dest Y
+      Math.round(shadowBottom + shadowToTitle),      // Dest Y (below shadow)
       titleDisplayWidth,                             // Dest width (logical)
       titleDisplayHeight                             // Dest height (logical)
     );
@@ -528,7 +543,7 @@ export class SmartMatrixNodeRenderer {
       descCanvas,
       0, 0, descCanvas.width, descCanvas.height,
       Math.round(centerX - descDisplayWidth / 2),
-      Math.round(bottomY - 10 * zoom),
+      Math.round(shadowBottom + shadowToTitle + titleDisplayHeight + titleToDesc), // Below title
       descDisplayWidth,
       descDisplayHeight
     );

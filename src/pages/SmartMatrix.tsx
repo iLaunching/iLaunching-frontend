@@ -11,46 +11,100 @@
  */
 
 import React, { useRef, useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
+import api from '../lib/api.js';
 import './SmartMatrix.css';
 
-interface SmartHubContext {
-  theme: {
-    background: string;
-    text: string;
-    [key: string]: any;
+interface SmartMatrixData {
+  smart_matrix: {
+    id: string;
+    name: string;
+    smart_hub_id: string;
+    owner_id: string;
+    color: string | null;
+    order_number: number;
+    created_at: string;
+    modified_at: string;
   } | null;
   smart_hub: {
+    id: string;
+    name: string;
     show_grid: boolean;
     grid_style: string;
     snap_to_grid: boolean;
+  } | null;
+  theme: {
+    background: string;
+    text: string;
+    header_overlay: string;
+    header_background: string;
+    solid_color: string;
+    menu: string;
+    border: string;
+    line_grid_color: string;
+    dotted_grid_color: string;
     [key: string]: any;
   } | null;
+  profile: {
+    id: string;
+    user_id: string;
+    first_name: string;
+    surname: string;
+  };
 }
 
 const SmartMatrixCanvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
+  const hasInitialized = useRef(false); // Track if initialization has occurred
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [fps, setFps] = useState(60);
   const [debugMode, setDebugMode] = useState(false);
+  const queryClient = useQueryClient();
   
-  // Get theme and grid settings from SmartHub context
-  const context = useOutletContext<SmartHubContext>();
-  const backgroundColor = context?.theme?.background || '#ffffff';
-  const textColor = context?.theme?.text || '#1f2937';
-  const borderLineColor = context?.theme?.border || '#e5e7eb';
-  const lineGridColor = context?.theme?.line_grid_color || '#d6d6d6';
-  const dottedGridColor = context?.theme?.dotted_grid_color || '#a0a0a0';
+  // Fetch current smart matrix data from API server
+  const { data: matrixData, isLoading, error } = useQuery<SmartMatrixData>({
+    queryKey: ['current-smart-matrix'],
+    queryFn: async () => {
+      // Call API server endpoint - includes JWT token automatically
+      const response = await api.get('/users/me/current-smart-matrix');
+      console.log('📊 Smart Matrix data loaded:', response.data);
+      console.log('🎨 Smart Matrix - Smart Hub Grid Settings:', {
+        show_grid: response.data?.smart_hub?.show_grid,
+        grid_style: response.data?.smart_hub?.grid_style,
+        snap_to_grid: response.data?.smart_hub?.snap_to_grid,
+        smart_hub_id: response.data?.smart_hub?.id,
+        smart_hub_name: response.data?.smart_hub?.name
+      });
+      return response.data;
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
   
-  // Get grid settings from SmartHub
-  const showGrid = context?.smart_hub?.show_grid ?? false;
-  const gridStyle = context?.smart_hub?.grid_style || 'line';
-  const snapToGrid = context?.smart_hub?.snap_to_grid ?? false;
+  // Extract theme and grid settings from matrixData
+  const backgroundColor = matrixData?.theme?.background || '#ffffff';
+  const textColor = matrixData?.theme?.text || '#1f2937';
+  const solidColor = matrixData?.theme?.solid_color || '#7F77F1';
+  const borderLineColor = matrixData?.theme?.border || '#e5e7eb';
+  const lineGridColor = matrixData?.theme?.line_grid_color || '#d6d6d6';
+  const dottedGridColor = matrixData?.theme?.dotted_grid_color || '#a0a0a0';
+  
+  // Get grid settings from Smart Hub (linked via smart_matrix → smart_hub relationship)
+  const showGrid = matrixData?.smart_hub?.show_grid ?? false;
+  const gridStyle = matrixData?.smart_hub?.grid_style || 'line';
+  const snapToGrid = matrixData?.smart_hub?.snap_to_grid ?? false;
+  
+  console.log('🔧 SmartMatrix - Using Grid Settings from Smart Hub:', {
+    showGrid,
+    gridStyle,
+    snapToGrid,
+    source: 'smart_hub table via current-smart-matrix endpoint'
+  });
   
   // Calculate the appropriate grid color based on grid style
   const gridColor = gridStyle === 'dotted' ? dottedGridColor : lineGridColor;
@@ -69,9 +123,15 @@ const SmartMatrixCanvas: React.FC = () => {
     console.log('🔔 isEngineReady changed to:', isEngineReady);
   }, [isEngineReady]);
 
-  // Initialize Canvas Engine
+  // Initialize Canvas Engine (only once when data is first loaded)
   useEffect(() => {
-    if (!containerRef.current) {
+    // Don't initialize if already initialized, no container, or no data
+    if (hasInitialized.current || !containerRef.current || !matrixData) {
+      console.log('⏸️ Skipping canvas initialization:', { 
+        hasInitialized: hasInitialized.current,
+        hasContainer: !!containerRef.current, 
+        hasData: !!matrixData 
+      });
       return;
     }
 
@@ -98,9 +158,10 @@ const SmartMatrixCanvas: React.FC = () => {
 
       // Start render loop
       engineRef.current.start();
+      hasInitialized.current = true; // Mark as initialized
       setIsEngineReady(true);
       
-      console.log('✅ Canvas Engine marked as ready - initial grid state:', showGrid);
+      console.log('✅ Canvas Engine initialized and ready - initial grid state:', showGrid);
       
       // Apply initial grid settings immediately after engine is ready
       const gridRenderer = engineRef.current.getGridRenderer?.();
@@ -117,48 +178,66 @@ const SmartMatrixCanvas: React.FC = () => {
       const testNode = new TestNode('test-1', -300, 0);
       engineRef.current.getStateManager().addNode(testNode);
       
-      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors
-      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor);
+      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors and matrix name
+      const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
+      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor, matrixName);
       engineRef.current.getStateManager().addNode(smartNode);
 
       // Setup FPS monitoring
-      const fpsInterval = setInterval(() => {
+      const fpsIntervalRef = setInterval(() => {
         if (engineRef.current) {
           const metrics = engineRef.current.getPerformanceMetrics();
           setFps(metrics.fps);
         }
       }, 1000);
-
-      // Cleanup
-      return () => {
-        clearInterval(fpsInterval);
-        if (engineRef.current) {
-          engineRef.current.stop();
-          engineRef.current.destroy();
-          engineRef.current = null;
-        }
-        setIsEngineReady(false);
-      };
+      
+      // Store interval ID in a way that persists
+      (engineRef.current as any).__fpsInterval = fpsIntervalRef;
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode]); // Only re-initialize if debugMode changes
-
-  // Update all SmartMatrixNode colors when theme changes
+  }, [matrixData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+  
+  // Cleanup only on unmount
   useEffect(() => {
-    if (engineRef.current && isEngineReady) {
+    return () => {
+      // Clear FPS monitoring
+      if (engineRef.current && (engineRef.current as any).__fpsInterval) {
+        clearInterval((engineRef.current as any).__fpsInterval);
+      }
+      
+      // Destroy engine
+      if (engineRef.current) {
+        engineRef.current.stop();
+        engineRef.current.destroy();
+        engineRef.current = null;
+      }
+      
+      hasInitialized.current = false;
+      setIsEngineReady(false);
+      console.log('🧹 Canvas engine cleaned up on unmount');
+    };
+  }, []); // Empty deps - only runs on mount/unmount
+
+  // Update all SmartMatrixNode colors and names when data changes
+  useEffect(() => {
+    if (engineRef.current && isEngineReady && matrixData) {
       const nodes = engineRef.current.getStateManager().getNodesArray();
+      const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
+      
       nodes.forEach(node => {
         if (node.type === 'smart-matrix') {
           const smartNode = node as SmartMatrixNode;
           smartNode.backgroundColor = backgroundColor;
           smartNode.textColor = textColor;
+          smartNode.solidColor = solidColor;
+          smartNode.matrixName = matrixName;
         }
       });
       // Mark canvas dirty to trigger re-render
       engineRef.current.markDirty();
     }
-  }, [backgroundColor, textColor, isEngineReady]);
+  }, [backgroundColor, textColor, solidColor, matrixData, isEngineReady]);
 
   // Update grid type when changed
   useEffect(() => {
@@ -176,6 +255,11 @@ const SmartMatrixCanvas: React.FC = () => {
     console.log('   isEngineReady:', isEngineReady);
     console.log('   engineRef.current exists:', !!engineRef.current);
     
+    if (!engineRef.current || !isEngineReady) {
+      console.log('⏸️ SmartMatrix - Engine not ready, skipping grid update');
+      return;
+    }
+    
     // Use a small timeout to ensure the engine is fully initialized
     const timeoutId = setTimeout(() => {
       if (engineRef.current) {
@@ -189,6 +273,7 @@ const SmartMatrixCanvas: React.FC = () => {
             type: (gridStyle === 'dotted' ? 'dots' : 'lines') as 'lines' | 'dots',
             color: gridColor
           };
+          console.log('✅ SmartMatrix - Updating grid config:', newConfig);
           gridRenderer.setConfig(newConfig);
           engine.updateBackground();
           engine.markDirty();
@@ -202,7 +287,7 @@ const SmartMatrixCanvas: React.FC = () => {
     }, 50);
     
     return () => clearTimeout(timeoutId);
-  }, [showGrid, gridStyle, snapToGrid, gridColor]);
+  }, [showGrid, gridStyle, snapToGrid, gridColor, isEngineReady]);
 
   // Handle mouse wheel for zoom
   useEffect(() => {
@@ -442,12 +527,15 @@ const SmartMatrixCanvas: React.FC = () => {
   const addSmartMatrixNode = () => {
     if (engineRef.current) {
       const nodeCount = engineRef.current.getStateManager().getNodesArray().length;
+      const matrixName = matrixData?.smart_matrix?.name || 'Smart Matrix';
       const smartNode = new SmartMatrixNode(
         `smart-${nodeCount + 1}` as any,
         (nodeCount % 3) * 350,
         Math.floor(nodeCount / 3) * 300,
         backgroundColor,
-        textColor
+        textColor,
+        solidColor,
+        matrixName
       );
       engineRef.current.getStateManager().addNode(smartNode);
     }
@@ -457,6 +545,62 @@ const SmartMatrixCanvas: React.FC = () => {
   const toggleGridType = () => {
     setGridType(prev => prev === 'lines' ? 'dots' : 'lines');
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="smart-matrix-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        background: backgroundColor
+      }}>
+        <div style={{ textAlign: 'center', color: textColor }}>
+          <div className="loading-spinner" style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(0,0,0,0.1)',
+            borderTop: `4px solid ${solidColor}`,
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p>Loading Smart Matrix...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error) {
+    return (
+      <div className="smart-matrix-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        background: backgroundColor
+      }}>
+        <div style={{ textAlign: 'center', color: textColor }}>
+          <p style={{ color: '#ef4444', marginBottom: '8px' }}>Failed to load Smart Matrix</p>
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] })}
+            style={{
+              padding: '8px 16px',
+              background: solidColor,
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
