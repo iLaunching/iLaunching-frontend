@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useQuery, useQueryClient, useMutation } from '@tantml:query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useNavigate, Outlet } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
 import { authSync } from '@/lib/auth-sync';
@@ -195,7 +195,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Avatar color updated successfully:', data);
       // Refetch the smart hub data to get updated color
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -219,7 +219,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Profile icon updated successfully:', data);
       // Refetch the smart hub data to get updated icon
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -246,7 +246,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Profile icon cleared successfully:', data);
       // Refetch the smart hub data
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -270,7 +270,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Appearance updated successfully:', data);
       // Refetch the smart hub data to get updated theme - this should trigger a re-render with new theme
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -294,7 +294,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('iTheme updated successfully:', data);
       // Refetch the smart hub data to get updated theme
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -318,7 +318,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub color updated successfully:', data);
       // Refetch the smart hub data to get updated color
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -354,7 +354,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub icon updated successfully:', data);
       // Refetch the smart hub data to get updated icon
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
@@ -390,7 +390,7 @@ export default function SmartHub() {
       console.log('API response:', response.data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log('Smart hub icon cleared successfully:', data);
       // Refetch the smart hub data
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
