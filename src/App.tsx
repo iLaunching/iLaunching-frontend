@@ -14,6 +14,7 @@ import Onboarding from './pages/Onboarding';
 import EssentialInformation from './pages/EssentialInformation';
 import SecurityPolicy from './pages/legal/SecurityPolicy';
 import Settings from './pages/Settings';
+import SmartMatrix from './pages/SmartMatrix';
 import General from './pages/settings/General';
 import Member from './pages/settings/Member';
 import Upgrade from './pages/settings/Upgrade';
@@ -99,6 +100,11 @@ function App() {
               </ProtectedRoute>
             }
           >
+            {/* Smart Matrix as default route */}
+            <Route index element={<SmartMatrix />} />
+            <Route path="smart-matrix" element={<SmartMatrix />} />
+            
+            {/* Settings routes */}
             <Route path="settings" element={<Settings />}>
               <Route path="general" element={<General />} />
               <Route path="upgrade/*" element={<Upgrade />} />

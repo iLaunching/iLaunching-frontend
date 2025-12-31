@@ -64,6 +64,9 @@ interface MainHeaderProps {
   promptBk?: string;
   promptTextColor?: string;
   aiAcknowledgeTextColor?: string;
+  showGrid?: boolean;
+  gridStyle?: string;
+  snapToGrid?: boolean;
 }
 
 export default function MainHeader({ 
@@ -123,7 +126,10 @@ export default function MainHeader({
   chatBk1,
   promptBk,
   promptTextColor,
-  aiAcknowledgeTextColor
+  aiAcknowledgeTextColor,
+  showGrid,
+  gridStyle,
+  snapToGrid
 }: MainHeaderProps) {
   console.log('🔍 MainHeader solidColor:', solidColor);
   
@@ -222,6 +228,9 @@ export default function MainHeader({
           promptBk={promptBk}
           promptTextColor={promptTextColor}
           aiAcknowledgeTextColor={aiAcknowledgeTextColor}
+          showGrid={showGrid}
+          gridStyle={gridStyle}
+          snapToGrid={snapToGrid}
         />
       </div>
     </header>
