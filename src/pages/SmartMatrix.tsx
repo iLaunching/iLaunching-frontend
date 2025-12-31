@@ -122,9 +122,9 @@ const SmartMatrixCanvas: React.FC = () => {
     console.log('🔔 isEngineReady changed to:', isEngineReady);
   }, [isEngineReady]);
 
-  // Initialize Canvas Engine
+  // Initialize Canvas Engine (only once when data is first loaded)
   useEffect(() => {
-    if (!containerRef.current || !matrixData) {
+    if (!containerRef.current || !matrixData || isEngineReady) {
       return;
     }
 
@@ -196,7 +196,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [matrixData, debugMode]); // Re-initialize when matrixData loads or debugMode changes
+  }, [debugMode]); // Only re-initialize if debugMode changes, NOT when matrixData changes
 
   // Update all SmartMatrixNode colors and names when data changes
   useEffect(() => {
