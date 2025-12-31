@@ -110,7 +110,7 @@ const SmartMatrixCanvas: React.FC = () => {
 
   // Initialize Canvas Engine
   useEffect(() => {
-    if (!containerRef.current) {
+    if (!containerRef.current || !matrixData) {
       return;
     }
 
@@ -157,7 +157,7 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(testNode);
       
       // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors and matrix name
-      const matrixName = matrixData?.smart_matrix?.name || 'Smart Matrix';
+      const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
       const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor, matrixName);
       engineRef.current.getStateManager().addNode(smartNode);
 
@@ -182,7 +182,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode]); // Only re-initialize if debugMode changes
+  }, [matrixData, debugMode]); // Re-initialize when matrixData loads or debugMode changes
 
   // Update all SmartMatrixNode colors and names when data changes
   useEffect(() => {
