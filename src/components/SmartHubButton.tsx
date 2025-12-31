@@ -239,7 +239,11 @@ export default function SmartHubButton({
     },
     onSettled: () => {
       // Always refetch after error or success to ensure we're in sync with server
+      // Invalidate both current-smart-hub AND current-smart-matrix queries
+      // since SmartMatrix page reads grid settings from its own query
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] });
+      console.log('🔄 Invalidated both current-smart-hub and current-smart-matrix queries');
     }
   });
 
