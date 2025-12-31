@@ -415,7 +415,10 @@ export default function SmartHub() {
     bg_opacity: '1'
   };
   
-  const theme = { ...themeDefaults, ...hubData?.theme };
+  const theme = useMemo(
+    () => ({ ...themeDefaults, ...hubData?.theme }),
+    [hubData?.theme]
+  );
   
   const outletContext = useMemo(
     () => hubData ? { theme, profile: hubData.profile, smart_hub: hubData.smart_hub } : null,
