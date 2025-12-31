@@ -98,62 +98,6 @@ const SmartMatrixCanvas: React.FC = () => {
     gridStyle === 'dotted' ? 'dots' : 'lines'
   );
   
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="smart-matrix-container" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        background: backgroundColor
-      }}>
-        <div style={{ textAlign: 'center', color: textColor }}>
-          <div className="loading-spinner" style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid rgba(0,0,0,0.1)',
-            borderTop: `4px solid ${solidColor}`,
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 16px'
-          }}></div>
-          <p>Loading Smart Matrix...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Show error state
-  if (error) {
-    return (
-      <div className="smart-matrix-container" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        background: backgroundColor
-      }}>
-        <div style={{ textAlign: 'center', color: textColor }}>
-          <p style={{ color: '#ef4444', marginBottom: '8px' }}>Failed to load Smart Matrix</p>
-          <button
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] })}
-            style={{
-              padding: '8px 16px',
-              background: solidColor,
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer'
-            }}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
   // Sync gridType state with context when it changes
   useEffect(() => {
     setGridType(gridStyle === 'dotted' ? 'dots' : 'lines');
@@ -560,6 +504,62 @@ const SmartMatrixCanvas: React.FC = () => {
   const toggleGridType = () => {
     setGridType(prev => prev === 'lines' ? 'dots' : 'lines');
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="smart-matrix-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        background: backgroundColor
+      }}>
+        <div style={{ textAlign: 'center', color: textColor }}>
+          <div className="loading-spinner" style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(0,0,0,0.1)',
+            borderTop: `4px solid ${solidColor}`,
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p>Loading Smart Matrix...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error) {
+    return (
+      <div className="smart-matrix-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        background: backgroundColor
+      }}>
+        <div style={{ textAlign: 'center', color: textColor }}>
+          <p style={{ color: '#ef4444', marginBottom: '8px' }}>Failed to load Smart Matrix</p>
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] })}
+            style={{
+              padding: '8px 16px',
+              background: solidColor,
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
