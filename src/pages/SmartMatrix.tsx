@@ -59,15 +59,10 @@ const SmartMatrixCanvas: React.FC = () => {
     setGridType(gridStyle === 'dotted' ? 'dots' : 'lines');
   }, [gridStyle]);
   
-  // Debug: Log context
-  console.log('🎨 Theme context:', context?.theme);
-  console.log('🔍 SmartHub context:', context?.smart_hub);
-  console.log('⚙️ Grid settings:', { showGrid, gridStyle, snapToGrid });
-  console.log('⚙️ Grid settings raw:', { 
-    raw_show_grid: context?.smart_hub?.show_grid,
-    raw_grid_style: context?.smart_hub?.grid_style,
-    raw_snap_to_grid: context?.smart_hub?.snap_to_grid
-  });
+  // Track when engine becomes ready
+  useEffect(() => {
+    console.log('🔔 isEngineReady changed to:', isEngineReady);
+  }, [isEngineReady]);
 
   // Initialize Canvas Engine
   useEffect(() => {
@@ -99,6 +94,19 @@ const SmartMatrixCanvas: React.FC = () => {
       // Start render loop
       engineRef.current.start();
       setIsEngineReady(true);
+      
+      console.log('✅ Canvas Engine marked as ready - initial grid state:', showGrid);
+      
+      // Apply initial grid settings immediately after engine is ready
+      const gridRenderer = engineRef.current.getGridRenderer?.();
+      if (gridRenderer) {
+        gridRenderer.setConfig({ 
+          enabled: showGrid,
+          type: gridStyle === 'dotted' ? 'dots' : 'lines'
+        });
+        engineRef.current.updateBackground();
+        console.log('✅ Initial grid settings applied:', { showGrid, gridStyle });
+      }
 
       // Add test nodes to demonstrate Phase 3
       const testNode = new TestNode('test-1', -300, 0);
@@ -129,7 +137,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [debugMode]); // Only re-initialize if debugMode changes, not colors
+  }, [debugMode]); // Only re-initialize if debugMode changes
 
   // Update all SmartMatrixNode colors when theme changes
   useEffect(() => {
@@ -156,25 +164,58 @@ const SmartMatrixCanvas: React.FC = () => {
 
   // Update grid settings when smart_hub context changes
   useEffect(() => {
-    if (engineRef.current && isEngineReady) {
-      const engine = engineRef.current;
-      const gridRenderer = engine.getGridRenderer?.();
-      const interactionManager = engine.getInteractionManager?.();
-      
-      if (gridRenderer) {
-        gridRenderer.setConfig({ 
-          enabled: showGrid,
-          type: gridStyle === 'dotted' ? 'dots' : 'lines'
-        });
-        engine.updateBackground();
+    console.log('🔄 SmartMatrix - Grid settings changed:');
+    console.log('   showGrid:', showGrid);
+    console.log('   gridStyle:', gridStyle);
+    console.log('   snapToGrid:', snapToGrid);
+    console.log('   isEngineReady:', isEngineReady);
+    console.log('   engineRef.current exists:', !!engineRef.current);
+    
+    // Use a small timeout to ensure the engine is fully initialized
+    const timeoutId = setTimeout(() => {
+      if (engineRef.current) {
+        const engine = engineRef.current;
+        const gridRenderer = engine.getGridRenderer?.();
+        const interactionManager = engine.getInteractionManager?.();
+        
+        console.log('🎨 SmartMatrix - Updating canvas grid (after timeout). gridRenderer exists:', !!gridRenderer);
+        
+        if (gridRenderer) {
+          const newConfig = { 
+            enabled: showGrid,
+            type: gridStyle === 'dotted' ? 'dots' : 'lines'
+          };
+          console.log('🎨 SmartMatrix - New grid config:', newConfig);
+          console.log('🎨 SmartMatrix - BEFORE setConfig - gridRenderer:', gridRenderer);
+          gridRenderer.setConfig(newConfig);
+          console.log('✅ SmartMatrix - Grid config updated');
+          
+          // Log the gridRenderer state after setConfig
+          console.log('🎨 SmartMatrix - AFTER setConfig - checking gridRenderer state...');
+          console.log('🎨 SmartMatrix - GridRenderer config:', (gridRenderer as any).config || 'no config property');
+          console.log('🎨 SmartMatrix - GridRenderer enabled:', (gridRenderer as any).enabled || (gridRenderer as any).config?.enabled);
+          
+          console.log('✅ SmartMatrix - Calling updateBackground()...');
+          engine.updateBackground();
+          console.log('✅ SmartMatrix - Calling markDirty()...');
+          engine.markDirty(); // Force a render
+          console.log('✅ SmartMatrix - updateBackground() and markDirty() called');
+        } else {
+          console.log('⚠️ SmartMatrix - No gridRenderer available');
+        }
+        
+        // Update snap to grid setting on interaction manager
+        if (interactionManager && typeof (interactionManager as any).setSnapToGrid === 'function') {
+          (interactionManager as any).setSnapToGrid(snapToGrid);
+          console.log('✅ SmartMatrix - Snap to grid updated:', snapToGrid);
+        }
+      } else {
+        console.log('⚠️ SmartMatrix - Cannot update grid: engineRef.current is null');
       }
-      
-      // Update snap to grid setting on interaction manager
-      if (interactionManager && typeof (interactionManager as any).setSnapToGrid === 'function') {
-        (interactionManager as any).setSnapToGrid(snapToGrid);
-      }
-    }
-  }, [showGrid, gridStyle, snapToGrid, isEngineReady]);
+    }, 50); // Small delay to ensure engine is ready
+    
+    return () => clearTimeout(timeoutId);
+  }, [showGrid, gridStyle, snapToGrid]);
 
   // Update grid color when theme changes
   useEffect(() => {

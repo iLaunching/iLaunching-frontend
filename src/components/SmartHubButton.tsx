@@ -8,6 +8,19 @@ import SmartHubCreator from './SmartHubCreator';
 import SmartHubAvatarMenu from './SmartHubAvatarMenu';
 import api from '@/lib/api';
 
+// Import SmartHubData type for type safety in optimistic updates
+interface SmartHubData {
+  smart_hub: {
+    id: string;
+    name: string;
+    show_grid: boolean;
+    grid_style: string;
+    snap_to_grid: boolean;
+    [key: string]: any;  // Allow other properties
+  };
+  [key: string]: any;  // Allow other top-level properties
+}
+
 interface SmartHub {
   id: string;
   name: string;
@@ -51,6 +64,9 @@ interface SmartHubButtonProps {
   promptBk?: string;
   promptTextColor?: string;
   aiAcknowledgeTextColor?: string;
+  showGrid?: boolean;
+  gridStyle?: string;
+  snapToGrid?: boolean;
 }
 
 export default function SmartHubButton({
@@ -86,7 +102,10 @@ export default function SmartHubButton({
   chatBk1,
   promptBk,
   promptTextColor,
-  aiAcknowledgeTextColor
+  aiAcknowledgeTextColor,
+  showGrid = false,
+  gridStyle = 'line',
+  snapToGrid = false
 }: SmartHubButtonProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -94,19 +113,21 @@ export default function SmartHubButton({
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const [isViewMenuOpen, setIsViewMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+  const viewMenuRef = useRef<HTMLDivElement>(null);
+  const viewButtonRef = useRef<HTMLButtonElement>(null);
 
-  console.log('SmartHubButton props:', JSON.stringify({
-    currentIconId,
-    currentIconName,
-    currentIconPrefix,
-    avatarDisplayMode,
-    smartHubName
-  }, null, 2));
-  console.log('SmartHubButton solidColor:', solidColor);
+  // Log showGrid prop changes
+  console.log('◀️ SmartHubButton RECEIVED PROPS:');
+  console.log('   showGrid:', showGrid, '(type:', typeof showGrid, ')');
+  console.log('   gridStyle:', gridStyle, '(type:', typeof gridStyle, ')');
+  console.log('   snapToGrid:', snapToGrid, '(type:', typeof snapToGrid, ')');
+  console.log('   smartHubName:', smartHubName);
+  console.log('   solidColor:', solidColor);
 
   // Get initials from smart hub name
   const getInitials = () => {
@@ -158,18 +179,86 @@ export default function SmartHubButton({
     }
   });
 
+  // Mutation to update grid settings
+  const updateGridSettingsMutation = useMutation({
+    mutationFn: async (settings: { show_grid?: boolean; grid_style?: string; snap_to_grid?: boolean }) => {
+      console.log('⚙️'.repeat(40));
+      console.log('🔄 MUTATION STARTED - settings:', JSON.stringify(settings, null, 2));
+      const response = await api.patch(`/smart-hubs/${currentSmartHubId}/grid-settings`, settings);
+      console.log('✅ API RESPONSE:', JSON.stringify(response.data, null, 2));
+      console.log('⚙️'.repeat(40));
+      return response.data;
+    },
+    onMutate: async (newSettings) => {
+      console.log('🔸 onMutate STARTED');
+      // Cancel outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['current-smart-hub'] });
+      
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData<SmartHubData>(['current-smart-hub']);
+      console.log('🔸 onMutate - previousData.smart_hub.show_grid:', previousData?.smart_hub?.show_grid, 'type:', typeof previousData?.smart_hub?.show_grid);
+      console.log('🔸 onMutate - newSettings:', JSON.stringify(newSettings, null, 2));
+      
+      if (!previousData) {
+        console.log('⚠️ No previous data found, skipping optimistic update');
+        return { previousData };
+      }
+      
+      // Build the updated data object
+      const updatedData: SmartHubData = {
+        ...previousData,
+        smart_hub: {
+          ...previousData.smart_hub,
+          show_grid: newSettings.show_grid !== undefined ? newSettings.show_grid : previousData.smart_hub.show_grid,
+          grid_style: newSettings.grid_style || previousData.smart_hub.grid_style,
+          snap_to_grid: newSettings.snap_to_grid !== undefined ? newSettings.snap_to_grid : previousData.smart_hub.snap_to_grid,
+        }
+      };
+      
+      console.log('🔸 onMutate - updatedData.smart_hub.show_grid:', updatedData.smart_hub.show_grid, 'type:', typeof updatedData.smart_hub.show_grid);
+      
+      // Optimistically update the cache
+      queryClient.setQueryData(['current-smart-hub'], updatedData);
+      
+      const verified = queryClient.getQueryData<SmartHubData>(['current-smart-hub']);
+      console.log('🔸 onMutate - CACHE VERIFIED show_grid:', verified?.smart_hub?.show_grid, 'type:', typeof verified?.smart_hub?.show_grid);
+      console.log('🔸 onMutate COMPLETE');
+      
+      return { previousData };
+    },
+    onError: (error: any, newSettings, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['current-smart-hub'], context.previousData);
+      }
+      console.error('❌ Failed to update grid settings:', error);
+      console.error('Error response:', error.response?.data);
+    },
+    onSuccess: (data) => {
+      console.log('✅ Grid settings updated successfully:', data);
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we're in sync with server
+      queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    }
+  });
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const clickedInsideButton = buttonRef.current?.contains(event.target as Node);
       const clickedInsideMenu = menuRef.current?.contains(event.target as Node);
       const clickedInsideAvatarMenu = avatarMenuRef.current?.contains(event.target as Node);
+      const clickedInsideViewMenu = viewMenuRef.current?.contains(event.target as Node);
 
       // If clicked outside all menus
-      if (!clickedInsideButton && !clickedInsideMenu && !clickedInsideAvatarMenu) {
+      if (!clickedInsideButton && !clickedInsideMenu && !clickedInsideAvatarMenu && !clickedInsideViewMenu) {
         // If avatar menu is open, close only the avatar menu (keep smart hub menu open)
         if (isAvatarMenuOpen) {
           setIsAvatarMenuOpen(false);
+        }
+        if (isViewMenuOpen) {
+          setIsViewMenuOpen(false);
         } 
         // If avatar menu is not open, close the smart hub menu
         else if (isOpen) {
@@ -180,7 +269,12 @@ export default function SmartHubButton({
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isAvatarMenuOpen, isOpen]);
+  }, [isAvatarMenuOpen, isViewMenuOpen, isOpen]);
+
+  // Track showGrid prop changes
+  useEffect(() => {
+    console.log('� SmartHubButton useEffect - showGrid changed to:', showGrid, 'type:', typeof showGrid);
+  }, [showGrid]);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -242,9 +336,14 @@ export default function SmartHubButton({
             // Close avatar menu when clicking anywhere in the dropdown (except avatar and avatar menu)
             const clickedOnAvatar = avatarRef.current?.contains(e.target as Node);
             const clickedInAvatarMenu = avatarMenuRef.current?.contains(e.target as Node);
+            const clickedOnViewButton = viewButtonRef.current?.contains(e.target as Node);
+            const clickedInViewMenu = viewMenuRef.current?.contains(e.target as Node);
             
             if (!clickedOnAvatar && !clickedInAvatarMenu && isAvatarMenuOpen) {
               setIsAvatarMenuOpen(false);
+            }
+            if (!clickedOnViewButton && !clickedInViewMenu && isViewMenuOpen) {
+              setIsViewMenuOpen(false);
             }
           }}
           style={{
@@ -582,8 +681,9 @@ export default function SmartHubButton({
               <span>Templates</span>
             </button>
 
-            {/* Place holder 1 Button */}
+            {/* View Button */}
             <button
+              ref={viewButtonRef}
               className="flex items-center gap-2 w-full transition-colors"
               style={{
                 backgroundColor: 'transparent',
@@ -597,7 +697,8 @@ export default function SmartHubButton({
                 fontSize: '14px',
                 cursor: 'pointer',
                   userSelect: 'none',
-                textAlign: 'left'
+                textAlign: 'left',
+                position: 'relative'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = globalHoverColor;
@@ -605,12 +706,297 @@ export default function SmartHubButton({
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
-              onClick={() => {
-                console.log('View clicked');
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsViewMenuOpen(!isViewMenuOpen);
               }}
             >
-              <FontAwesomeIcon icon={solidIcons.faCircle} style={{ fontSize: '14px' }} />
-              <span>View</span>
+              <FontAwesomeIcon icon={solidIcons.faEye} style={{ fontSize: '14px' }} />
+              <span style={{ flex: 1 }}>View</span>
+              <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px', opacity: 0.6 }} />
+              
+              {/* View Submenu */}
+              {isViewMenuOpen && (
+                <div
+                  ref={viewMenuRef}
+                  style={{
+                    position: 'absolute',
+                    left: 'calc(100% + 8px)',
+                    top: '0',
+                    width: '200px',
+                    minHeight: '100px',
+                    height: 'fit-content',
+                    backgroundColor: backgroundColor || menuColor,
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    padding: '8px',
+                    zIndex: 10000
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div style={{ color: textColor, fontSize: '14px', fontFamily: 'Work Sans, sans-serif' }}>
+                    
+                {/* grid options container  */}
+                <div
+                style={{
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '6px' 
+                }}
+              >
+                <h2 style={{ 
+                  fontSize: '12px', 
+                  marginBottom: '6px', 
+                  fontWeight: 500,
+                  color: titleMenuColorLight,
+                  fontFamily: 'Work Sans, sans-serif'
+                  }}
+                    >
+                    Grid Options
+                    </h2>
+
+                {/* Show Grid Option */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '8px',
+                    backgroundColor: 'transparent',
+                    borderRadius: '6px',
+                    fontFamily: 'Work Sans, sans-serif',
+                    color: textColor
+                  }}
+                >
+                  <FontAwesomeIcon 
+                    icon={solidIcons.faTableCells} 
+                    style={{ fontSize: '14px', width: '16px' }} 
+                  />
+                  <span style={{ fontSize: '13px' }}>Show Grid</span>
+                  <div style={{ flex: 1 }} />
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      
+                      console.log('👆 TOGGLE CLICKED '.repeat(3));
+                      console.log('👆 BEFORE - showGrid:', showGrid, 'type:', typeof showGrid);
+                      
+                      // Simple toggle logic: if false set to true, if true set to false
+                      let newValue;
+                      if (showGrid === false) {
+                        newValue = true;
+                        console.log('👆 Logic: showGrid === false, so setting to true');
+                      } else {
+                        newValue = false;
+                        console.log('👆 Logic: showGrid !== false (is', showGrid, '), so setting to false');
+                      }
+                      
+                      console.log('👆 AFTER - newValue:', newValue, 'type:', typeof newValue);
+                      console.log('👆 Calling mutation with:', { show_grid: newValue });
+                      updateGridSettingsMutation.mutate({ show_grid: newValue });
+                    }}
+                    style={{
+                      width: '36px',
+                      height: '20px',
+                      backgroundColor: showGrid ? solidColor : 'rgba(128, 128, 128, 0.3)',
+                      borderRadius: '10px',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.3s ease',
+                      flexShrink: 0,
+                      pointerEvents: 'auto',
+                      zIndex: 10001
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '50%',
+                        position: 'absolute',
+                        top: '2px',
+                        left: showGrid ? '18px' : '2px',
+                        transition: 'left 0.3s ease',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                      }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Active Grid Options - Only visible when showGrid is true */}
+                {showGrid && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      marginTop: '12px',
+                      paddingTop: '12px',
+                      borderTop: `1px solid ${borderLineColor}`
+                    }}
+                  >
+                    <h3 style={{ 
+                      fontSize: '12px', 
+                      marginBottom: '4px', 
+                      fontWeight: 500,
+                      color: titleMenuColorLight,
+                      fontFamily: 'Work Sans, sans-serif'
+                    }}>
+                      Grid layout
+                    </h3>
+                    
+                    {/* Grid Style Options in a Row */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        width: '100%'
+                      }}
+                    >
+                      {/* Line Grid Option */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateGridSettingsMutation.mutate({ grid_style: 'line' });
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          borderRadius: '8px',
+                          border: `1px solid ${borderLineColor}`,
+                          backgroundColor: gridStyle === 'line' ? solidColor : 'transparent',
+                          color: gridStyle === 'line' ? '#ffffff' : textColor,
+                          fontFamily: 'Work Sans, sans-serif',
+                          fontSize: '12px',
+                          fontWeight: 400,
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (gridStyle !== 'line') {
+                            e.currentTarget.style.backgroundColor = globalHoverColor;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (gridStyle !== 'line') {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <FontAwesomeIcon icon={solidIcons.faGripLines} style={{ fontSize: '12px' }} />
+                        Line
+                      </button>
+
+                      {/* Dotted Grid Option */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateGridSettingsMutation.mutate({ grid_style: 'dotted' });
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          borderRadius: '8px',
+                          border: `1px solid ${borderLineColor}`,
+                          backgroundColor: gridStyle === 'dotted' ? solidColor : 'transparent',
+                          color: gridStyle === 'dotted' ? '#ffffff' : textColor,
+                          fontFamily: 'Work Sans, sans-serif',
+                          fontSize: '12px',
+                          fontWeight: 400,
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (gridStyle !== 'dotted') {
+                            e.currentTarget.style.backgroundColor = globalHoverColor;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (gridStyle !== 'dotted') {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <FontAwesomeIcon icon={solidIcons.faEllipsis} style={{ fontSize: '12px' }} />
+                        Dotted
+                      </button>
+                    </div>
+                    
+                    {/* Snap to Grid Toggle */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        padding: '8px',
+                        backgroundColor: 'transparent',
+                        borderRadius: '6px',
+                        fontFamily: 'Work Sans, sans-serif',
+                        color: textColor,
+                        marginTop: '4px'
+                      }}
+                    >
+                      <FontAwesomeIcon 
+                        icon={solidIcons.faMagnifyingGlassLocation} 
+                        style={{ fontSize: '14px', width: '16px' }} 
+                      />
+                      <span style={{ fontSize: '13px' }}>Snap to Grid</span>
+                      <div style={{ flex: 1 }} />
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newValue = !snapToGrid;
+                          updateGridSettingsMutation.mutate({ snap_to_grid: newValue });
+                        }}
+                        style={{
+                          width: '36px',
+                          height: '20px',
+                          backgroundColor: snapToGrid ? solidColor : 'rgba(128, 128, 128, 0.3)',
+                          borderRadius: '10px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s ease',
+                          flexShrink: 0,
+                          pointerEvents: 'auto',
+                          zIndex: 10001
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            backgroundColor: '#ffffff',
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '2px',
+                            left: snapToGrid ? '18px' : '2px',
+                            transition: 'left 0.3s ease',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                </div>
+                
+                  </div>
+                </div>
+              )}
             </button>
 
             {/* Place holder 2 Button */}

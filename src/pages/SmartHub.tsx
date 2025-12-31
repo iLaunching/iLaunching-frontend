@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useNavigate, Outlet } from 'react-router-dom';
 import MainHeader from '@/components/layout/MainHeader';
@@ -153,6 +153,17 @@ export default function SmartHub() {
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Add logging to track when hubData changes
+  useEffect(() => {
+    if (hubData?.smart_hub) {
+      console.log('='.repeat(80));
+      console.log('🔍 SmartHub - hubData.smart_hub FULL OBJECT:');
+      console.log(JSON.stringify(hubData.smart_hub, null, 2));
+      console.log('🔍 SmartHub - show_grid VALUE:', hubData.smart_hub.show_grid, 'TYPE:', typeof hubData.smart_hub.show_grid);
+      console.log('='.repeat(80));
+    }
+  }, [hubData?.smart_hub?.show_grid]);
 
   // Mutation to update avatar color
   const updateAvatarColorMutation = useMutation({
@@ -381,6 +392,36 @@ export default function SmartHub() {
     clearSmartHubIconMutation.mutate(hubData.smart_hub.id);
   };
   
+  // Memoize the Outlet context to prevent unnecessary remounts
+  // Must be before early returns to follow Rules of Hooks
+  const themeDefaults = {
+    header_overlay: '#00000080',
+    header_background: '#7F77F1',
+    background: '#ffffff',
+    text: '#000000',
+    border_line_color: '#E0E0E0',
+    solid_color: '#7F77F1',
+    gradient_color_start: '#7F77F1',
+    gradient_color_end: '#A89FF5',
+    chat_bk_1: '#F5F5F5',
+    prompt_bk: '#FFFFFF',
+    prompt_text_color: '#000000',
+    ai_acknowledge_text_color: '#7F77F1',
+    button_bk_color: '#7F77F1',
+    button_text_color: '#ffffff',
+    button_hover_color: '#6B69D6',
+    feedback_indicator_bk: '#7F77F1',
+    appearance_text_color: '#000000',
+    bg_opacity: '1'
+  };
+  
+  const theme = { ...themeDefaults, ...hubData?.theme };
+  
+  const outletContext = useMemo(
+    () => hubData ? { theme, profile: hubData.profile, smart_hub: hubData.smart_hub } : null,
+    [theme, hubData?.profile, hubData?.smart_hub]
+  );
+  
   // Handle authentication errors
   useEffect(() => {
     if (error && (error as any).response?.status === 401) {
@@ -432,31 +473,6 @@ export default function SmartHub() {
     );
   }
 
-  const themeDefaults = {
-    header_overlay: '#00000080',
-    header_background: '#7F77F1',
-    background: '#ffffff',
-    text: '#000000',
-    menu: '#f3f4f6',
-    border: '#e5e7eb',
-    user_button_color: '#ffffff59',
-    user_button_hover: '#ffffff66',
-    user_button_icon: '#000000',
-    title_menu_color_light: '#d6d6d6',
-    border_line_color_light: '#d6d6d680',
-    global_button_hover: '#d6d6d64d',
-    solid_color: '#7F77F1',
-    button_bk_color: '#7F77F1',
-    button_text_color: '#ffffff',
-    button_hover_color: '#6B69D6',
-    feedback_indicator_bk: '#7F77F1',
-    appearance_text_color: '#000000',
-    bg_opacity: '1'
-  };
-  
-  // Merge API theme with defaults to ensure all properties exist
-  const theme = { ...themeDefaults, ...hubData?.theme };
-  
   console.log('🎨 SmartHub theme.solid_color:', theme.solid_color);
   console.log('🎨 SmartHub hubData?.theme:', hubData?.theme);
   
@@ -467,6 +483,12 @@ export default function SmartHub() {
     icon_prefix: hubData?.smart_hub?.smartHub_icon?.icon_prefix,
     avatar_display_mode: hubData?.smart_hub?.avatar_display_option_value_id
   }, null, 2));
+  
+  // Log grid settings being passed to SmartHubButton
+  console.log('▶️ SmartHub ABOUT TO PASS TO SmartHubButton:');
+  console.log('   showGrid:', hubData?.smart_hub?.show_grid, '(type:', typeof hubData?.smart_hub?.show_grid, ')');
+  console.log('   gridStyle:', hubData?.smart_hub?.grid_style, '(type:', typeof hubData?.smart_hub?.grid_style, ')');
+  console.log('   snapToGrid:', hubData?.smart_hub?.snap_to_grid, '(type:', typeof hubData?.smart_hub?.snap_to_grid, ')');
   
   return (
     <div 
@@ -537,8 +559,11 @@ export default function SmartHub() {
         promptBk={theme.prompt_bk}
         promptTextColor={theme.prompt_text_color}
         aiAcknowledgeTextColor={theme.ai_acknowledge_text_color}
+        showGrid={hubData.smart_hub.show_grid}
+        gridStyle={hubData.smart_hub.grid_style}
+        snapToGrid={hubData.smart_hub.snap_to_grid}
       />
-      <Outlet context={{ theme, profile: hubData.profile, smart_hub: hubData.smart_hub }} />
+      <Outlet context={outletContext} />
     </div>
   );
 }

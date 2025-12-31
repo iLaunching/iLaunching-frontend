@@ -49,14 +49,15 @@ export class GridRenderer {
    * Only draws grid lines visible in the current viewport
    */
   render(ctx: CanvasRenderingContext2D, camera: Camera): void {
+    const startTime = performance.now();
+    
+    // Always clear the canvas first
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    // If grid is disabled, just clear and return
     if (!this.config.enabled) {
       return;
     }
-    
-    const startTime = performance.now();
-    
-    // Clear the canvas to transparent
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     
     // Fill with transparent background
     ctx.fillStyle = 'transparent';
