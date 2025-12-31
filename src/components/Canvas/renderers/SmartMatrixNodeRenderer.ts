@@ -554,6 +554,10 @@ export class SmartMatrixNodeRenderer {
     const titleDisplayHeight = titleCanvas.height / renderScale;
     const descDisplayHeight = descCanvas.height / renderScale;
     
+    // Calculate spacing between elements
+    const h2ToTitle = 5 * zoom;  // Gap between H2 and title
+    const titleToDesc = 5 * zoom; // Gap between title and description
+    
     // Stamp high-res text onto main canvas (GPU-accelerated)
     // The canvas is already in logical pixels due to ctx.scale(dpr, dpr)
     // Title positioned below H2 label
@@ -561,7 +565,7 @@ export class SmartMatrixNodeRenderer {
       titleCanvas,
       0, 0, titleCanvas.width, titleCanvas.height,  // Source (physical pixels)
       Math.round(centerX - titleDisplayWidth / 2),   // Dest X (centered)
-      Math.round(bottomY + 25 * zoom),               // Dest Y (below H2)
+      Math.round(h2BoxY + h2BoxHeight + h2ToTitle),  // Dest Y (below H2)
       titleDisplayWidth,                             // Dest width (logical)
       titleDisplayHeight                             // Dest height (logical)
     );
@@ -570,7 +574,7 @@ export class SmartMatrixNodeRenderer {
       descCanvas,
       0, 0, descCanvas.width, descCanvas.height,
       Math.round(centerX - descDisplayWidth / 2),
-      Math.round(bottomY + 45 * zoom),               // Below title
+      Math.round(h2BoxY + h2BoxHeight + h2ToTitle + titleDisplayHeight + titleToDesc), // Below title
       descDisplayWidth,
       descDisplayHeight
     );
