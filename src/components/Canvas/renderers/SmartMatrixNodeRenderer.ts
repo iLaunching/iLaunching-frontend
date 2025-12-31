@@ -491,9 +491,9 @@ export class SmartMatrixNodeRenderer {
     
     // Get or create cached H2 text canvas (first element)
     const h2Canvas = this.textCache.getOrCreateTextCanvas(
-      'H2',
+      'SMART MATRIX',
       `600 ${h2Size}px 'Work Sans', sans-serif`,
-      100,
+      300,
       solidColor,
       dpr
     );
