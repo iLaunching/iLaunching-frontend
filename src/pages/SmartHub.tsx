@@ -418,12 +418,12 @@ export default function SmartHub() {
   // Must be before early returns to follow Rules of Hooks
   const theme = useMemo(
     () => ({ ...THEME_DEFAULTS, ...hubData?.theme }),
-    [hubData?.theme]
+    [JSON.stringify(hubData?.theme)]
   );
   
   const outletContext = useMemo(
     () => hubData ? { theme, profile: hubData.profile, smart_hub: hubData.smart_hub } : null,
-    [theme, hubData?.profile, hubData?.smart_hub]
+    [theme, JSON.stringify(hubData?.profile), JSON.stringify(hubData?.smart_hub)]
   );
   
   // Handle authentication errors
