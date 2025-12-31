@@ -480,7 +480,7 @@ export class SmartMatrixNodeRenderer {
     ctx.save();
     
     // Calculate font sizes scaled by zoom
-    const h2Size = Math.round(12 * zoom);
+    const h2Size = Math.round(10 * zoom);
     const titleSize = Math.round(16 * zoom);
     const descSize = Math.round(12 * zoom);
     
@@ -489,7 +489,7 @@ export class SmartMatrixNodeRenderer {
     const textColor = node.textColor || '#1f2937';
     const descColor = node.textColor || '#6b7280';
     
-    // Get or create cached H2 text canvas (first element)
+    // Get or create cached H2 text canvas (first element - below shadow)
     const h2Canvas = this.textCache.getOrCreateTextCanvas(
       'SMART MATRIX',
       `600 ${h2Size}px 'Work Sans', sans-serif`,
@@ -507,9 +507,9 @@ export class SmartMatrixNodeRenderer {
     const padding = 4 * zoom; // Internal padding for the border box
     const borderRadius = 3 * zoom;
     
-    // Draw H2 border box
+    // Draw H2 border box (positioned below the shadow)
     const h2BoxX = Math.round(centerX - (h2DisplayWidth + padding * 2) / 2);
-    const h2BoxY = Math.round(bottomY - 60 * zoom);
+    const h2BoxY = Math.round(bottomY + 5 * zoom);
     const h2BoxWidth = h2DisplayWidth + padding * 2;
     const h2BoxHeight = h2DisplayHeight + padding * 2;
     
@@ -556,11 +556,12 @@ export class SmartMatrixNodeRenderer {
     
     // Stamp high-res text onto main canvas (GPU-accelerated)
     // The canvas is already in logical pixels due to ctx.scale(dpr, dpr)
+    // Title positioned below H2 label
     ctx.drawImage(
       titleCanvas,
       0, 0, titleCanvas.width, titleCanvas.height,  // Source (physical pixels)
       Math.round(centerX - titleDisplayWidth / 2),   // Dest X (centered)
-      Math.round(bottomY - 30 * zoom),               // Dest Y
+      Math.round(bottomY + 25 * zoom),               // Dest Y (below H2)
       titleDisplayWidth,                             // Dest width (logical)
       titleDisplayHeight                             // Dest height (logical)
     );
@@ -569,7 +570,7 @@ export class SmartMatrixNodeRenderer {
       descCanvas,
       0, 0, descCanvas.width, descCanvas.height,
       Math.round(centerX - descDisplayWidth / 2),
-      Math.round(bottomY - 10 * zoom),
+      Math.round(bottomY + 45 * zoom),               // Below title
       descDisplayWidth,
       descDisplayHeight
     );
