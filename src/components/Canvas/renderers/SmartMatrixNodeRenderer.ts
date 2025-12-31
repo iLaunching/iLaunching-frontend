@@ -498,8 +498,10 @@ export class SmartMatrixNodeRenderer {
       dpr
     );
     
+    // Calculate render scale once for all text elements
+    const renderScale = 2 * dpr; // textScale * dpr
+    
     // Calculate H2 display dimensions
-    const renderScale = 2 * dpr;
     const h2DisplayWidth = h2Canvas.width / renderScale;
     const h2DisplayHeight = h2Canvas.height / renderScale;
     const padding = 4 * zoom; // Internal padding for the border box
@@ -547,7 +549,6 @@ export class SmartMatrixNodeRenderer {
     
     // Calculate the display width (logical pixels, not physical)
     // Canvas is rendered at renderScale, so divide by that to get display size
-    const renderScale = 2 * dpr; // textScale * dpr
     const titleDisplayWidth = titleCanvas.width / renderScale;
     const descDisplayWidth = descCanvas.width / renderScale;
     const titleDisplayHeight = titleCanvas.height / renderScale;
