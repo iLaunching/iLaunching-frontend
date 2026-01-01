@@ -63,12 +63,12 @@ export class SmartMatrixNodeRenderer {
       const centerX = screenX + (node.width * zoom) / 2;
       const centerY = screenY + (node.height * zoom) / 2;
       
-      // Circle dimensions (scaled) - Enlarged to match TestNode size
-      const outerRadius = 125 * zoom; // 250px diameter / 2 (enlarged)
-      const connectionRadius = 91 * zoom; // 182px diameter / 2 (enlarged)
-      const maskRadius = 97 * zoom;   // 194px diameter / 2 (enlarged)
-      const hoverRadius = 85 * zoom;  // 170px diameter / 2 (enlarged)
-      const aiRadius = 85 * zoom;     // 170px diameter / 2 (enlarged to match TestNode)
+      // Circle dimensions (scaled) - Further enlarged proportionally
+      const outerRadius = 150 * zoom; // 300px diameter / 2 (larger)
+      const connectionRadius = 109 * zoom; // 218px diameter / 2 (larger)
+      const maskRadius = 116 * zoom;   // 232px diameter / 2 (larger)
+      const hoverRadius = 102 * zoom;  // 204px diameter / 2 (larger)
+      const aiRadius = 102 * zoom;     // 204px diameter / 2 (larger)
       
       // Viewport culling
       if (!this.isVisible(centerX, centerY, outerRadius * 2, ctx.canvas)) {
