@@ -438,8 +438,8 @@ export class SmartMatrixNodeRenderer {
     // Port position at calculated angle on circle
     const basePortX = centerX + maskRadius * Math.cos(angle); // Dynamic position
     const portY = centerY + maskRadius * Math.sin(angle); // Dynamic position
-    const size = 40 * zoom; // Diamond size
-    const radius = 8 * zoom; // Border radius for rounded corners
+    const size = 50 * zoom; // Diamond size (increased)
+    const radius = 10 * zoom; // Border radius for rounded corners (proportional)
     
     // Get or initialize animation state
     const portKey = `${nodeId}-output`;
