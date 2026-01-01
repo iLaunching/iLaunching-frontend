@@ -97,6 +97,13 @@ export class InteractionManager {
   private gridSize: number = 50;
   private snapToGrid: boolean = false;
   
+  // Panning state (screen space coordinates)
+  private panStartScreenX: number = 0;
+  private panStartScreenY: number = 0;
+  private panAnimationFrame: number | null = null;
+  private pendingPanX: number = 0;
+  private pendingPanY: number = 0;
+  
   constructor(camera: Camera, markDirtyCallback?: () => void, gridSize?: number, snapToGrid?: boolean) {
     this.camera = camera;
     this.markDirtyCallback = markDirtyCallback;
@@ -172,37 +179,51 @@ export class InteractionManager {
         // Start box selection
         this.startBoxSelection(worldX, worldY);
       } else {
-        // Clear selection
-        this.clearSelection();
+        // Start panning
+        this.startPanning(screenX, screenY);
       }
     }
   }
   
   /**
-   * Handle mouse move event with throttled hover detection\n   */
+   * Handle mouse move event with throttled hover detection and optimized panning
+   */
   handleMouseMove(screenX: number, screenY: number): void {
-    const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
     const now = performance.now();
     
-    this.state.currentX = worldX;
-    this.state.currentY = worldY;
-    
     switch (this.state.mode) {
-      case 'dragging-node':
+      case 'dragging-node': {
+        const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
+        this.state.currentX = worldX;
+        this.state.currentY = worldY;
         this.updateDragging(worldX, worldY);
         break;
+      }
         
-      case 'box-selecting':
+      case 'box-selecting': {
+        const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
+        this.state.currentX = worldX;
+        this.state.currentY = worldY;
         this.updateBoxSelection(worldX, worldY);
         break;
+      }
         
-      case 'idle':
+      case 'panning':
+        // Skip world conversion for panning (screen space only)
+        this.updatePanning(screenX, screenY);
+        break;
+        
+      case 'idle': {
         // Throttle hover detection for performance (~60fps)
         if (now - this.lastHoverCheck > this.config.hoverThrottleMs) {
+          const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
+          this.state.currentX = worldX;
+          this.state.currentY = worldY;
           this.updateHover(worldX, worldY);
           this.lastHoverCheck = now;
         }
         break;
+      }
     }
   }
   
@@ -219,6 +240,10 @@ export class InteractionManager {
         
       case 'box-selecting':
         this.endBoxSelection();
+        break;
+        
+      case 'panning':
+        this.endPanning();
         break;
     }
     
@@ -453,6 +478,69 @@ export class InteractionManager {
     });
     
     this.state.boxSelection = null;
+  }
+  
+  /**
+   * Start panning
+   */
+  private startPanning(screenX: number, screenY: number): void {
+    this.state.mode = 'panning';
+    // Store screen coordinates separately for panning
+    this.panStartScreenX = screenX;
+    this.panStartScreenY = screenY;
+  }
+  
+  /**
+   * Update panning with RAF-batched smooth movement (60fps optimized)
+   */
+  private updatePanning(screenX: number, screenY: number): void {
+    // Accumulate delta
+    this.pendingPanX += screenX - this.panStartScreenX;
+    this.pendingPanY += screenY - this.panStartScreenY;
+    
+    // Update for next frame
+    this.panStartScreenX = screenX;
+    this.panStartScreenY = screenY;
+    
+    // Batch updates with RAF for smooth 60fps
+    if (this.panAnimationFrame === null) {
+      this.panAnimationFrame = requestAnimationFrame(() => {
+        // Apply accumulated delta
+        this.camera.pan(this.pendingPanX, this.pendingPanY, 1.0);
+        
+        // Reset accumulator
+        this.pendingPanX = 0;
+        this.pendingPanY = 0;
+        this.panAnimationFrame = null;
+        
+        // Mark canvas dirty once per frame
+        if (this.markDirtyCallback) {
+          this.markDirtyCallback();
+        }
+      });
+    }
+  }
+  
+  /**
+   * End panning and cleanup
+   */
+  private endPanning(): void {
+    // Cancel pending RAF if exists
+    if (this.panAnimationFrame !== null) {
+      cancelAnimationFrame(this.panAnimationFrame);
+      this.panAnimationFrame = null;
+    }
+    
+    // Apply any remaining delta
+    if (this.pendingPanX !== 0 || this.pendingPanY !== 0) {
+      this.camera.pan(this.pendingPanX, this.pendingPanY, 1.0);
+      this.pendingPanX = 0;
+      this.pendingPanY = 0;
+      
+      if (this.markDirtyCallback) {
+        this.markDirtyCallback();
+      }
+    }
   }
   
   /**

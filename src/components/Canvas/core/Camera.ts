@@ -91,14 +91,25 @@ export class Camera {
   /**
    * Zoom towards a specific point on screen (typically cursor position)
    * This creates the "zoom into cursor" effect like Make.com
+   * Uses exponential scaling for smooth, natural feel
+   * 
+   * @param delta - Zoom delta (typically from wheel event, positive = zoom in)
+   * @param screenX - Screen X coordinate of zoom focal point
+   * @param screenY - Screen Y coordinate of zoom focal point
+   * @param sensitivity - Zoom sensitivity multiplier (default: 1.0)
    */
-  zoomToPoint(delta: number, screenX: number, screenY: number): void {
-    // Calculate zoom factor (positive delta = zoom in, negative = zoom out)
-    const zoomFactor = delta > 0 ? 1.1 : 0.9;
+  zoomToPoint(delta: number, screenX: number, screenY: number, sensitivity: number = 1.0): void {
+    // Exponential zoom for natural feel (industry standard)
+    // Small deltas near 0 zoom slowly, larger deltas zoom faster
+    const zoomSpeed = 0.002 * sensitivity;
+    const zoomFactor = Math.exp(-delta * zoomSpeed);
     const newZoom = this.zoom * zoomFactor;
     
-    // Clamp zoom to min/max
-    if (newZoom < this.minZoom || newZoom > this.maxZoom) {
+    // Clamp zoom to min/max with smooth limiting
+    const clampedZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+    
+    // If already at limit, don't zoom
+    if (clampedZoom === this.zoom) {
       return;
     }
     
@@ -106,23 +117,39 @@ export class Camera {
     const [worldX, worldY] = this.toWorld(screenX, screenY);
     
     // Apply zoom
-    this.zoom = newZoom;
+    this.zoom = clampedZoom;
     
     // Get world coordinate under cursor AFTER zoom
     const [newWorldX, newWorldY] = this.toWorld(screenX, screenY);
     
     // Adjust camera position so the point under cursor stays the same
+    // This is the "zoom to cursor" magic
     this.x += (worldX - newWorldX);
     this.y += (worldY - newWorldY);
   }
   
   /**
    * Pan the camera by delta pixels in screen space
+   * Direction: positive deltaX pans right, positive deltaY pans down
+   * 
+   * @param deltaX - Screen space horizontal pan delta
+   * @param deltaY - Screen space vertical pan delta
+   * @param damping - Damping factor for smooth panning (0-1, default: 1.0 = instant)
    */
-  pan(deltaX: number, deltaY: number): void {
+  pan(deltaX: number, deltaY: number, damping: number = 1.0): void {
+    // Validate inputs
+    if (!Number.isFinite(deltaX) || !Number.isFinite(deltaY)) {
+      console.warn('Invalid pan delta:', { deltaX, deltaY });
+      return;
+    }
+    
     // Convert screen space delta to world space delta
-    this.x -= deltaX / this.zoom;
-    this.y -= deltaY / this.zoom;
+    // Subtract because camera position is inverse of world movement
+    const worldDeltaX = (deltaX * damping) / this.zoom;
+    const worldDeltaY = (deltaY * damping) / this.zoom;
+    
+    this.x -= worldDeltaX;
+    this.y -= worldDeltaY;
   }
   
   /**

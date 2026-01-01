@@ -486,6 +486,29 @@ export class ConnectionManager {
   }
   
   /**
+   * Get source node center and radius for dynamic connector positioning
+   */
+  getSourceNodeInfo(): { center: Point; radius: number } | null {
+    if (this.state.mode === 'idle' || !this.state.sourceNodeId) {
+      return null;
+    }
+    
+    const node = this.stateManager.getNode(this.state.sourceNodeId);
+    if (!node) return null;
+    
+    // Calculate node center
+    const center = {
+      x: node.x + node.width / 2,
+      y: node.y + node.height / 2
+    };
+    
+    // Estimate radius from node dimensions (use larger dimension / 2)
+    const radius = Math.max(node.width, node.height) / 2;
+    
+    return { center, radius };
+  }
+  
+  /**
    * Get preview end position (for rendering)
    */
   getPreviewEnd(): Point | null {

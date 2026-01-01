@@ -371,7 +371,9 @@ export class LinkRenderer {
     start: Point,
     end: Point,
     camera: Camera,
-    isValid: boolean
+    isValid: boolean,
+    sourceNodeCenter?: Point,
+    sourceNodeRadius?: number
   ): void {
     const [startX, startY] = camera.toScreen(start.x, start.y);
     const [endX, endY] = camera.toScreen(end.x, end.y);
@@ -383,9 +385,24 @@ export class LinkRenderer {
     const arrowSpacing = 35 * zoom; // Same spacing as main connections
     const connectorGap = 0 * zoom; // No gap - shapes start right at the node
     
-    // Calculate distance and angle
-    const dx = endX - startX;
-    const dy = endY - startY;
+    // Calculate dynamic start position on source node circle
+    let actualStartX = startX;
+    let actualStartY = startY;
+    
+    if (sourceNodeCenter && sourceNodeRadius) {
+      // Calculate angle from node center to cursor
+      const [centerScreenX, centerScreenY] = camera.toScreen(sourceNodeCenter.x, sourceNodeCenter.y);
+      const angleToTarget = Math.atan2(endY - centerScreenY, endX - centerScreenX);
+      
+      // Position on the node circle perimeter
+      const radiusScreen = sourceNodeRadius * zoom;
+      actualStartX = centerScreenX + radiusScreen * Math.cos(angleToTarget);
+      actualStartY = centerScreenY + radiusScreen * Math.sin(angleToTarget);
+    }
+    
+    // Calculate distance and angle from dynamic start position
+    const dx = endX - actualStartX;
+    const dy = endY - actualStartY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx);
     
@@ -406,8 +423,8 @@ export class LinkRenderer {
       
       if (t * distance < connectorGap) continue;
       
-      const arrowX = startX + dx * t;
-      const arrowY = startY + dy * t;
+      const arrowX = actualStartX + dx * t;
+      const arrowY = actualStartY + dy * t;
       
       ctx.save();
       ctx.translate(arrowX, arrowY);
@@ -424,8 +441,8 @@ export class LinkRenderer {
       
       if ((1 - t) * distance < connectorGap) continue;
       
-      const arrowX = startX + dx * t;
-      const arrowY = startY + dy * t;
+      const arrowX = actualStartX + dx * t;
+      const arrowY = actualStartY + dy * t;
       
       ctx.save();
       ctx.translate(arrowX, arrowY);
@@ -435,12 +452,12 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Draw start connector (at source node) - always visible, rotates with line direction
+    // Draw start connector - at the dynamic position
     const startDiamondSize = 50 * zoom;
     const startCornerRadius = 10 * zoom;
     
     ctx.save();
-    ctx.translate(startX, startY);
+    ctx.translate(actualStartX, actualStartY);
     ctx.rotate(angle + Math.PI / 4);
     this.drawRoundedRect(ctx, -startDiamondSize / 2, -startDiamondSize / 2, startDiamondSize, startDiamondSize, startCornerRadius);
     ctx.fill();
