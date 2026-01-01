@@ -209,11 +209,18 @@ export class LinkRenderer {
     // Draw diamond-shaped connectors along the line (matching port connector style)
     ctx.fillStyle = color;
     
-    // LEFT SIDE: Add shapes starting from connector, growing inward (behind previous shapes)
+    // Calculate center position
+    const centerT = 0.5;
+    
+    // LEFT SIDE: Grow from center OUTWARD toward left connector (adding behind)
     for (let i = 0; i < currentArrowsPerSide; i++) {
-      // Position: start at gap, then add spacing for each shape (i * spacing)
-      const distanceFromStart = connectorGap + (i * arrowSpacing);
-      const t = distanceFromStart / distance;
+      // Start at center, move left by (i * spacing)
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT - (distanceFromCenter / distance);
+      
+      // Skip if too close to connector gap
+      if (t * distance < connectorGap) continue;
+      
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
@@ -233,11 +240,15 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // RIGHT SIDE: Add shapes starting from connector, growing inward (behind previous shapes)
+    // RIGHT SIDE: Grow from center OUTWARD toward right connector (adding behind)
     for (let i = 0; i < currentArrowsPerSide; i++) {
-      // Position: start at gap from end, then add spacing for each shape (i * spacing)
-      const distanceFromEnd = connectorGap + (i * arrowSpacing);
-      const t = (distance - distanceFromEnd) / distance;
+      // Start at center, move right by (i * spacing)
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT + (distanceFromCenter / distance);
+      
+      // Skip if too close to connector gap
+      if ((1 - t) * distance < connectorGap) continue;
+      
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
