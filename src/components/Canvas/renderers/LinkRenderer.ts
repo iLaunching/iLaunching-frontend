@@ -195,7 +195,7 @@ export class LinkRenderer {
     
     // Calculate number of arrows based on distance
     const arrowSpacing = 35 * zoom; // Space between arrows
-    const arrowSize = 5 * zoom; // Size of each arrow (smaller)
+    const arrowSize = 6 * zoom; // Size of each arrow
     const connectorGap = 8 * zoom; // Very close to connector ports
     
     // Calculate usable distance (excluding gaps at both ends)
@@ -230,7 +230,7 @@ export class LinkRenderer {
       ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
       // Diamond size matching the connector aesthetic
-      const diamondSize = arrowSize * 3.0; // Smaller diamond size
+      const diamondSize = arrowSize * 3.5; // Diamond size
       const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
       
       // Draw rounded rectangle (becomes diamond when rotated 45°)
@@ -258,7 +258,7 @@ export class LinkRenderer {
       ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
       // Diamond size matching the connector aesthetic
-      const diamondSize = arrowSize * 3.0; // Smaller diamond size
+      const diamondSize = arrowSize * 3.5; // Diamond size
       const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
       
       // Draw rounded rectangle (becomes diamond when rotated 45°)
