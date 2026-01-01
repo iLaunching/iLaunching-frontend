@@ -194,7 +194,7 @@ export class LinkRenderer {
     const angle = Math.atan2(dy, dx); // Direction angle
     
     // Calculate number of arrows based on distance
-    const arrowSpacing = 12 * zoom; // Space between arrows
+    const arrowSpacing = 35 * zoom; // More space between arrows
     const arrowSize = 6 * zoom; // Size of each arrow
     const maxArrows = Math.floor(distance / arrowSpacing);
     
