@@ -341,14 +341,13 @@ export class SmartMatrixNodeRenderer {
     
     ctx.restore();
     
-    // Draw white "i" text - offset slightly to ensure visibility above mask
+    // Draw white "i" text
     ctx.save();
     ctx.fillStyle = '#ffffff';
     ctx.font = `bold ${60 * zoom}px "Fredoka", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    // Offset by 3px up and 2px left to ensure complete visibility
-    ctx.fillText('i', centerX - (2 * zoom), centerY - (3 * zoom));
+    ctx.fillText('i', centerX, centerY);
     ctx.restore();
   }
   
@@ -499,8 +498,9 @@ export class SmartMatrixNodeRenderer {
     
     // Draw modern "+" icon along the angle direction
     ctx.save();
-    // Calculate icon position along the angle - closer to front edge
-    const iconDistance = maskRadius + (moveDistance * easedProgress) * 0.85;
+    // Calculate icon position along the angle - positioned outside mask for full visibility
+    const iconOffset = moveDistance * easedProgress + (8 * zoom); // Extra offset to clear mask
+    const iconDistance = maskRadius + iconOffset;
     const iconX = centerX + Math.cos(angle) * iconDistance;
     const iconY = centerY + Math.sin(angle) * iconDistance;
     
