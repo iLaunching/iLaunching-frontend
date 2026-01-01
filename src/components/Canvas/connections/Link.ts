@@ -35,8 +35,8 @@ const LINK_CONFIG = {
 
 export class Link {
   public readonly data: LinkData;
-  public readonly sourceNode: BaseNode;
-  public readonly targetNode: BaseNode;
+  public sourceNode: BaseNode;
+  public targetNode: BaseNode;
   
   // Cached curve data (invalidated when nodes move)
   private cachedPath: Point[] | null = null;
