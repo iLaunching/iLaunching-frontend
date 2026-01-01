@@ -121,7 +121,7 @@ export class LinkRenderer {
     if (this.config.showArrows) {
       this.renderArrow(
         ctx,
-        { x: startX, y: startY }, // Use start point for straight line angle calculation
+        { x: cp2X, y: cp2Y },
         { x: endX, y: endY },
         link.data.status,
         camera.zoom,
@@ -187,14 +187,32 @@ export class LinkRenderer {
       ctx.shadowBlur = RENDER_CONFIG.SHADOW_BLUR_BASE * zoom;
     }
     
-    // Draw curve (straight line instead of bezier for circular nodes)
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y); // Draw straight line
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
+    // Draw beaded line (circles that extend/retract) instead of solid line
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // Calculate number of beads based on distance
+    const beadSpacing = 12 * zoom; // Space between beads
+    const beadRadius = 3 * zoom; // Radius of each bead
+    const maxBeads = Math.floor(distance / beadSpacing);
+    
+    // Animate bead count (extend/retract effect)
+    // Use time-based or connection state to determine how many beads to show
+    const animProgress = 1.0; // Full extension when connected (can animate this)
+    const currentBeadCount = Math.floor(maxBeads * animProgress);
+    
+    // Draw beads along the line
+    ctx.fillStyle = color;
+    for (let i = 0; i <= currentBeadCount; i++) {
+      const t = i / maxBeads; // Progress along line (0 to 1)
+      const beadX = start.x + dx * t;
+      const beadY = start.y + dy * t;
+      
+      ctx.beginPath();
+      ctx.arc(beadX, beadY, beadRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
     
     // Reset shadow
     ctx.shadowColor = 'transparent';
