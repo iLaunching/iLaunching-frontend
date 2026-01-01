@@ -378,7 +378,8 @@ export class LinkRenderer {
     
     // Calculate control points
     const dx = endX - startX;
-    const distance = Math.abs(dx);
+    const dy = endY - startY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
     const offset = Math.min(Math.max(distance * 0.4, 50), 200) * camera.zoom;
     
     const cp1X = startX + offset;
@@ -386,24 +387,85 @@ export class LinkRenderer {
     const cp2X = endX - offset;
     const cp2Y = endY;
     
+    const zoom = camera.zoom;
+    const lineWidth = 2 * zoom;
+    const arrowSize = 6 * zoom;
+    const diamondSize = arrowSize * 3.5;
+    const cornerRadius = arrowSize * 0.6;
+    const arrowSpacing = 25 * zoom;
+    const connectorGap = 5 * zoom;
+    
     // Draw dashed curve
     ctx.save();
-    ctx.setLineDash([5 * camera.zoom, 5 * camera.zoom]);
+    ctx.setLineDash([5 * zoom, 5 * zoom]);
     ctx.beginPath();
     ctx.moveTo(startX, startY);
     ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
     ctx.strokeStyle = isValid ? this.colors.active : this.colors.error;
-    ctx.lineWidth = 2 * camera.zoom;
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.stroke();
     ctx.setLineDash([]);
+    
+    // Draw diamond shapes along the curve (static version)
+    ctx.fillStyle = isValid ? this.colors.active : this.colors.error;
+    
+    const centerT = 0.5;
+    const currentArrowsPerSide = Math.max(0, Math.floor((distance - 2 * connectorGap) / (2 * arrowSpacing)));
+    
+    // Left side diamonds
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT - (distanceFromCenter / distance);
+      
+      if (t * distance < connectorGap) continue;
+      if (t < 0 || t > 1) continue;
+      
+      const arrowX = this.bezierPoint(startX, cp1X, cp2X, endX, t);
+      const arrowY = this.bezierPoint(startY, cp1Y, cp2Y, endY, t);
+      const angle = Math.atan2(endY - startY, endX - startX);
+      
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // Right side diamonds
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT + (distanceFromCenter / distance);
+      
+      if ((1 - t) * distance < connectorGap) continue;
+      if (t < 0 || t > 1) continue;
+      
+      const arrowX = this.bezierPoint(startX, cp1X, cp2X, endX, t);
+      const arrowY = this.bezierPoint(startY, cp1Y, cp2Y, endY, t);
+      const angle = Math.atan2(endY - startY, endX - startX);
+      
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
+    
     ctx.restore();
     
-    // Draw end circle
-    ctx.beginPath();
-    ctx.arc(endX, endY, 6 * camera.zoom, 0, Math.PI * 2);
+    // Draw end diamond (larger, instead of circle)
+    const angle = Math.atan2(endY - startY, endX - startX);
+    const endDiamondSize = diamondSize * 1.5; // Slightly larger at the end
+    
+    ctx.save();
+    ctx.translate(endX, endY);
+    ctx.rotate(angle + Math.PI / 4);
+    this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, cornerRadius * 1.5);
     ctx.fillStyle = isValid ? this.colors.active : this.colors.error;
     ctx.fill();
+    ctx.restore();
   }
   
   /**
