@@ -498,8 +498,9 @@ export class SmartMatrixNodeRenderer {
     
     // Draw modern "+" icon along the angle direction
     ctx.save();
-    // Calculate icon position along the angle
-    const iconDistance = maskRadius + (moveDistance * easedProgress) / 2;
+    // Calculate icon position along the angle - positioned outside mask for full visibility
+    const iconOffset = moveDistance * easedProgress + (8 * zoom); // Extra offset to clear mask
+    const iconDistance = maskRadius + iconOffset;
     const iconX = centerX + Math.cos(angle) * iconDistance;
     const iconY = centerY + Math.sin(angle) * iconDistance;
     
