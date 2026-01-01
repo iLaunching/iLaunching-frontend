@@ -194,8 +194,8 @@ export class LinkRenderer {
     const angle = Math.atan2(dy, dx); // Direction angle
     
     // Calculate number of arrows based on distance
-    const arrowSpacing = 35 * zoom; // Reduced space between arrows for faster extension
-    const arrowSize = 6 * zoom; // Size of each arrow
+    const arrowSpacing = 35 * zoom; // Space between arrows
+    const arrowSize = 5 * zoom; // Size of each arrow (smaller)
     const connectorGap = 8 * zoom; // Very close to connector ports
     
     // Calculate usable distance (excluding gaps at both ends)
@@ -230,7 +230,7 @@ export class LinkRenderer {
       ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
       // Diamond size matching the connector aesthetic
-      const diamondSize = arrowSize * 3.5; // Slightly smaller diamond size
+      const diamondSize = arrowSize * 3.0; // Smaller diamond size
       const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
       
       // Draw rounded rectangle (becomes diamond when rotated 45°)
@@ -258,7 +258,7 @@ export class LinkRenderer {
       ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
       // Diamond size matching the connector aesthetic
-      const diamondSize = arrowSize * 3.5; // Slightly smaller diamond size
+      const diamondSize = arrowSize * 3.0; // Smaller diamond size
       const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
       
       // Draw rounded rectangle (becomes diamond when rotated 45°)
@@ -377,10 +377,10 @@ export class LinkRenderer {
     const [endX, endY] = camera.toScreen(end.x, end.y);
     
     const zoom = camera.zoom;
-    const arrowSize = 6 * zoom;
-    const diamondSize = arrowSize * 3.5;
+    const arrowSize = 5 * zoom;
+    const diamondSize = arrowSize * 3.0;
     const cornerRadius = arrowSize * 0.6;
-    const arrowSpacing = 25 * zoom; // Same spacing as main connections
+    const arrowSpacing = 35 * zoom; // Same spacing as main connections
     const connectorGap = 5 * zoom; // Same gap as main connections
     
     // Calculate distance and angle
