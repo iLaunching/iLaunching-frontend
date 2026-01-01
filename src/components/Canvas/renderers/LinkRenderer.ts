@@ -121,7 +121,7 @@ export class LinkRenderer {
     if (this.config.showArrows) {
       this.renderArrow(
         ctx,
-        { x: cp2X, y: cp2Y },
+        { x: startX, y: startY }, // Use start point for straight line angle calculation
         { x: endX, y: endY },
         link.data.status,
         camera.zoom,
