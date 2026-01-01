@@ -536,7 +536,7 @@ export class CanvasEngine {
         return; // Skip nodes outside viewport
       }
       
-      this.nodeRenderer.render(this.contexts.nodes, node, this.camera, nodeConnectionMap);
+      this.nodeRenderer.render(this.contexts.nodes, node, this.camera, nodeConnectionMap, this.connectionManager);
       renderedCount++;
     });
   }

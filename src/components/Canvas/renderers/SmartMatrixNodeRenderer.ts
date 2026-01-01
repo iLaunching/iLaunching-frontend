@@ -38,7 +38,8 @@ export class SmartMatrixNodeRenderer {
     ctx: CanvasRenderingContext2D,
     node: SmartMatrixNode,
     camera: Camera,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
     // Cleanup stale animation states every 300 frames (~5 seconds at 60fps)
     this.frameCount++;
@@ -110,7 +111,7 @@ export class SmartMatrixNodeRenderer {
       ctx.restore();
       
       // RENDER OUTPUT PORT (before mask layer so it sits under it)
-      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap);
+      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap, connectionManager);
       
       // LAYER 2: White Mask (Creates Ring Effect)
       ctx.beginPath();
@@ -420,8 +421,18 @@ export class SmartMatrixNodeRenderer {
     isHovering: boolean,
     maskColor: string,
     node: any,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
+    // Check if this node's port is being dragged
+    const isDragging = connectionManager && connectionManager.isDragging && connectionManager.isDragging();
+    const state = connectionManager && connectionManager.getState && connectionManager.getState();
+    const isDraggingFromThisNode = isDragging && state && state.sourceNodeId === nodeId;
+    
+    // Hide connector when dragging from this node (visual effect of removing it)
+    if (isDraggingFromThisNode) {
+      return; // Don't render the connector
+    }
     // Calculate dynamic port position based on connection angle
     let angle = 0; // Default: right
     const connections = nodeConnectionMap.get(nodeId);
