@@ -21,6 +21,8 @@ import type { Camera } from '../core/Camera.js';
 import type { BaseNode } from '../nodes/BaseNode.js';
 import { SmartMatrixNode } from '../nodes/SmartMatrixNode.js';
 import { SmartMatrixNodeRenderer } from './SmartMatrixNodeRenderer.js';
+import { TestNode } from '../nodes/TestNode.js';
+import { TestNodeRenderer } from './TestNodeRenderer.js';
 import type { NodeStatus } from '../types/index.js';
 
 export interface NodeRenderConfig {
@@ -42,6 +44,9 @@ export class NodeRenderer {
   
   // Specialized renderer for SmartMatrixNode
   private smartMatrixRenderer: SmartMatrixNodeRenderer;
+  
+  // Specialized renderer for TestNode
+  private testNodeRenderer: TestNodeRenderer;
   
   // Offscreen canvas cache for static node parts
   private nodeCache: Map<string, HTMLCanvasElement> = new Map();
@@ -79,8 +84,9 @@ export class NodeRenderer {
       this.config = { ...this.config, ...config };
     }
     
-    // Initialize specialized renderer
+    // Initialize specialized renderers
     this.smartMatrixRenderer = new SmartMatrixNodeRenderer();
+    this.testNodeRenderer = new TestNodeRenderer();
   }
   
   /**
@@ -139,11 +145,18 @@ export class NodeRenderer {
   render(
     ctx: CanvasRenderingContext2D,
     node: BaseNode,
-    camera: Camera
+    camera: Camera,
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
   ): void {
     // Use specialized renderer for SmartMatrixNode
     if (node instanceof SmartMatrixNode) {
-      this.smartMatrixRenderer.render(ctx, node, camera);
+      this.smartMatrixRenderer.render(ctx, node, camera, nodeConnectionMap);
+      return;
+    }
+    
+    // Use specialized renderer for TestNode
+    if (node instanceof TestNode) {
+      this.testNodeRenderer.render(ctx, node, camera, nodeConnectionMap);
       return;
     }
     

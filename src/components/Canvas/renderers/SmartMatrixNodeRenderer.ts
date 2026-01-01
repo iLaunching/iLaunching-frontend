@@ -31,11 +31,21 @@ export class SmartMatrixNodeRenderer {
   /**
    * Render circular Smart Matrix node with Retina-grade DPR-aware gradients
    */
+  private lastCleanupFrame = 0;
+  private frameCount = 0;
+  
   public render(
     ctx: CanvasRenderingContext2D,
     node: SmartMatrixNode,
-    camera: Camera
+    camera: Camera,
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
   ): void {
+    // Cleanup stale animation states every 300 frames (~5 seconds at 60fps)
+    this.frameCount++;
+    if (this.frameCount - this.lastCleanupFrame > 300) {
+      this.cleanupStaleAnimations();
+      this.lastCleanupFrame = this.frameCount;
+    }
     try {
       ctx.save();
       
@@ -100,7 +110,7 @@ export class SmartMatrixNodeRenderer {
       ctx.restore();
       
       // RENDER OUTPUT PORT (before mask layer so it sits under it)
-      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor);
+      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap);
       
       // LAYER 2: White Mask (Creates Ring Effect)
       ctx.beginPath();
@@ -207,6 +217,43 @@ export class SmartMatrixNodeRenderer {
     } catch (error) {
       console.error('Error rendering SmartMatrixNode:', error);
       ctx.restore();
+    }
+  }
+  
+  /**
+   * Clean up animation states for deleted nodes (prevent memory leaks)
+   */
+  private cleanupStaleAnimations(): void {
+    // Remove animations with 0 progress that haven't been used
+    for (const [key, state] of this.hoverAnimations) {
+      if (state.progress === 0 && !state.isExpanding) {
+        this.hoverAnimations.delete(key);
+      }
+    }
+    for (const [key, state] of this.portHoverAnimations) {
+      if (state.progress === 0 && !state.isExpanding) {
+        this.portHoverAnimations.delete(key);
+      }
+    }
+    
+    // Hard limit: keep only last 200 animations
+    if (this.hoverAnimations.size > 200) {
+      const toDelete = this.hoverAnimations.size - 200;
+      let deleted = 0;
+      for (const key of this.hoverAnimations.keys()) {
+        if (deleted >= toDelete) break;
+        this.hoverAnimations.delete(key);
+        deleted++;
+      }
+    }
+    if (this.portHoverAnimations.size > 200) {
+      const toDelete = this.portHoverAnimations.size - 200;
+      let deleted = 0;
+      for (const key of this.portHoverAnimations.keys()) {
+        if (deleted >= toDelete) break;
+        this.portHoverAnimations.delete(key);
+        deleted++;
+      }
     }
   }
   
@@ -371,11 +418,26 @@ export class SmartMatrixNodeRenderer {
     zoom: number,
     nodeId: string,
     isHovering: boolean,
-    maskColor: string
+    maskColor: string,
+    node: any,
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
   ): void {
-    // Port position: right center, positioned so it's half behind the mask layer
-    const basePortX = centerX + maskRadius; // Base position at mask edge (in screen coordinates)
-    const portY = centerY; // Screen coordinates
+    // Calculate dynamic port position based on connection angle
+    let angle = 0; // Default: right
+    const connections = nodeConnectionMap.get(nodeId);
+    if (connections && connections.targetNodes.length > 0) {
+      // Use first target node (for multiple connections, could average angles)
+      const targetNode = connections.targetNodes[0];
+      const targetCenterX = targetNode.x + targetNode.width / 2;
+      const targetCenterY = targetNode.y + targetNode.height / 2;
+      const nodeCenterX = node.x + node.width / 2;
+      const nodeCenterY = node.y + node.height / 2;
+      angle = Math.atan2(targetCenterY - nodeCenterY, targetCenterX - nodeCenterX);
+    }
+    
+    // Port position at calculated angle on circle
+    const basePortX = centerX + maskRadius * Math.cos(angle); // Dynamic position
+    const portY = centerY + maskRadius * Math.sin(angle); // Dynamic position
     const size = 40 * zoom; // Diamond size
     const radius = 8 * zoom; // Border radius for rounded corners
     
@@ -406,19 +468,20 @@ export class SmartMatrixNodeRenderer {
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
     const easedProgress = easeOut(animState.progress);
     
-    // Animate position (move forward = move right)
-    const moveDistance = 10 * zoom; // Distance to move
-    const portX = basePortX + (moveDistance * easedProgress);
+    // Animate position along the angle direction
+    const moveDistance = 10 * zoom;
+    const portX = basePortX + Math.cos(angle) * (moveDistance * easedProgress);
+    const portY_adjusted = portY + Math.sin(angle) * (moveDistance * easedProgress);
     
     // Interpolate color from semi-transparent to solid
     const baseOpacity = 0.502; // #8b5cf680
     const targetOpacity = 1.0;  // #8b5cf6
     const currentOpacity = baseOpacity + (targetOpacity - baseOpacity) * easedProgress;
 
-    // Draw port as rounded diamond
+    // Draw port as rounded diamond - rotated to align with connection
     ctx.save();
-    ctx.translate(portX, portY);
-    ctx.rotate(Math.PI / 4); // 45 degrees
+    ctx.translate(portX, portY_adjusted);
+    ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection angle + 45° for diamond
     
     // Draw mask layer (background) - slightly larger
     const maskSize = size + (4 * zoom); // 4px larger
@@ -433,13 +496,12 @@ export class SmartMatrixNodeRenderer {
     
     ctx.restore();
     
-    // Draw modern "+" icon centered between mask edge and connector outer edge
+    // Draw modern "+" icon along the angle direction
     ctx.save();
-    // Calculate icon position: halfway between mask edge and right edge of connector
-    const maskEdgeX = centerX + maskRadius;
-    const connectorRightEdge = portX + (size / 2);
-    const iconX = (maskEdgeX + connectorRightEdge) / 2;
-    const iconY = portY;
+    // Calculate icon position along the angle
+    const iconDistance = maskRadius + (moveDistance * easedProgress) / 2;
+    const iconX = centerX + Math.cos(angle) * iconDistance;
+    const iconY = centerY + Math.sin(angle) * iconDistance;
     
     // Draw modern thin "+" icon with lines
     const iconSize = 6 * zoom; // Smaller size

@@ -1,27 +1,92 @@
 /**
- * Test Node
- * Simple node for testing Phase 2 functionality
- * 
- * This is a basic node that demonstrates:
- * - Input/output ports
- * - Basic execution
- * - Visual representation
+ * Test Node with circular design
+ * Similar to SmartMatrix but with input connector for testing connections
  */
 
 import { BaseNode } from './BaseNode.js';
 import type { ExecutionContext, ExecutionResult, UUID } from '../types/index.js';
 
 export class TestNode extends BaseNode {
+  public isPortHovered: boolean = false;
+  public backgroundColor: string = '#1e293b'; // Dark slate background
+
   constructor(id: UUID, x: number, y: number) {
-    super(id, 'test', x, y, 200, 150, 'Test Node');
+    // Circular node: 220x220 (same as SmartMatrix)
+    super(id, 'test', x, y, 220, 220, 'Test Node');
     
-    // Add ports
-    this.addInputPort('input1', 'string', 'Input 1', false);
-    this.addInputPort('input2', 'number', 'Input 2', false);
-    this.addOutputPort('output', 'string', 'Output');
+    // Add single input port (left side, like SmartHub)
+    this.addInputPort('input', 'any', 'Input');
     
-    // Set color
-    this.color = '#3b82f6'; // Blue
+    // Add output port (right side, for testing connections)
+    this.addOutputPort('output', 'any', 'Output');
+    
+    // Set color for UI elements
+    this.color = '#10b981'; // Green to distinguish from SmartMatrix
+  }
+
+  /**
+   * Override containsPoint for circular hit detection
+   * Allows dragging the circular node
+   */
+  public containsPoint(worldX: number, worldY: number): boolean {
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+    const radius = 85; // Main circle radius (maskRadius)
+    
+    const dx = worldX - centerX;
+    const dy = worldY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    return distance <= radius;
+  }
+
+  /**
+   * Get port position for circular node
+   * Ports rotate around circle to point toward target
+   */
+  public getPortPosition(portId: string, targetNode?: BaseNode): { x: number; y: number } | undefined {
+    const port = this.getPort(portId);
+    if (!port) return undefined;
+    
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+    const maskRadius = 85; // Must match renderer
+    
+    // Calculate angle to target node
+    let angle: number;
+    if (targetNode) {
+      const targetCenterX = targetNode.x + targetNode.width / 2;
+      const targetCenterY = targetNode.y + targetNode.height / 2;
+      angle = Math.atan2(targetCenterY - centerY, targetCenterX - centerX);
+    } else {
+      // Default angles when no target
+      angle = port.type === 'input' ? Math.PI : 0; // Left for input, right for output
+    }
+    
+    // Position port at calculated angle on circle edge
+    return {
+      x: centerX + maskRadius * Math.cos(angle),
+      y: centerY + maskRadius * Math.sin(angle)
+    };
+  }
+  
+  /**
+   * Check if a point is within the port area (circular ring)
+   */
+  public containsPortPoint(worldX: number, worldY: number): boolean {
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+    const maskRadius = 85;
+    
+    const dx = worldX - centerX;
+    const dy = worldY - centerY;
+    const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+    
+    const portSize = 40;
+    const innerRadius = maskRadius - portSize / 2;
+    const outerRadius = maskRadius + portSize / 2;
+    
+    return distanceFromCenter >= innerRadius && distanceFromCenter <= outerRadius;
   }
   
   /**

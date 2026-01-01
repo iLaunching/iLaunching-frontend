@@ -415,22 +415,47 @@ const SmartMatrixCanvas: React.FC = () => {
         let clickedPort = false;
         
         for (const node of nodes) {
-          const allPorts = [...node.getInputPorts(), ...node.getOutputPorts()];
-          for (const port of allPorts) {
-            const portPos = node.getPortPosition(port.id);
-            if (portPos) {
-              const dx = worldX - portPos.x;
-              const dy = worldY - portPos.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              if (distance <= 15) { // Port click threshold
-                connectionManager.startConnection(node.id, port.id, worldX, worldY);
-                clickedPort = true;
-                break;
+          // Use specialized port detection for SmartMatrix and TestNode
+          if ((node.type === 'smart-matrix' || node.type === 'test') && 'containsPortPoint' in node) {
+            const customNode = node as any;
+            if (customNode.containsPortPoint(worldX, worldY)) {
+              // Find which port was clicked (output for SmartMatrix, input/output for TestNode)
+              const allPorts = [...node.getOutputPorts(), ...node.getInputPorts()];
+              for (const port of allPorts) {
+                const portPos = node.getPortPosition(port.id);
+                if (portPos) {
+                  const dx = worldX - portPos.x;
+                  const dy = worldY - portPos.y;
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  
+                  if (distance <= 30) { // Generous threshold for circular ports
+                    connectionManager.startConnection(node.id, port.id, worldX, worldY);
+                    clickedPort = true;
+                    break;
+                  }
+                }
+              }
+              if (clickedPort) break;
+            }
+          } else {
+            // Standard port detection for rectangular nodes
+            const allPorts = [...node.getInputPorts(), ...node.getOutputPorts()];
+            for (const port of allPorts) {
+              const portPos = node.getPortPosition(port.id);
+              if (portPos) {
+                const dx = worldX - portPos.x;
+                const dy = worldY - portPos.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= 15) { // Port click threshold
+                  connectionManager.startConnection(node.id, port.id, worldX, worldY);
+                  clickedPort = true;
+                  break;
+                }
               }
             }
+            if (clickedPort) break;
           }
-          if (clickedPort) break;
         }
         
         // If not clicking port, handle node selection/drag

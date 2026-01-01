@@ -496,7 +496,25 @@ export class CanvasEngine {
    */
   private renderNodes(): void {
     const nodes = this.stateManager.getNodesArray();
+    const linksMap = this.connectionManager.getLinks();
     const canvas = this.layers.nodes;
+    
+    // Build connection map ONCE per frame (O(n) instead of O(n*m))
+    // Maps nodeId -> { sourceNodes: [], targetNodes: [] }
+    const nodeConnectionMap = new Map<string, { sourceNodes: any[], targetNodes: any[] }>();
+    for (const link of linksMap.values()) {
+      // Track source connections (for output ports)
+      if (!nodeConnectionMap.has(link.data.fromNodeId)) {
+        nodeConnectionMap.set(link.data.fromNodeId, { sourceNodes: [], targetNodes: [] });
+      }
+      nodeConnectionMap.get(link.data.fromNodeId)!.targetNodes.push(link.targetNode);
+      
+      // Track target connections (for input ports)
+      if (!nodeConnectionMap.has(link.data.toNodeId)) {
+        nodeConnectionMap.set(link.data.toNodeId, { sourceNodes: [], targetNodes: [] });
+      }
+      nodeConnectionMap.get(link.data.toNodeId)!.sourceNodes.push(link.sourceNode);
+    }
     
     // Calculate visible bounds in world space
     const [worldMinX, worldMinY] = this.camera.toWorld(0, 0);
@@ -518,7 +536,7 @@ export class CanvasEngine {
         return; // Skip nodes outside viewport
       }
       
-      this.nodeRenderer.render(this.contexts.nodes, node, this.camera);
+      this.nodeRenderer.render(this.contexts.nodes, node, this.camera, nodeConnectionMap);
       renderedCount++;
     });
   }
