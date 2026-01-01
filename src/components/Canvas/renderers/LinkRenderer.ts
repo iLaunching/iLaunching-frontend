@@ -187,31 +187,43 @@ export class LinkRenderer {
       ctx.shadowBlur = RENDER_CONFIG.SHADOW_BLUR_BASE * zoom;
     }
     
-    // Draw beaded line (circles that extend/retract) instead of solid line
+    // Draw arrow-beaded line (arrows pointing from output to input)
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx); // Direction angle
     
-    // Calculate number of beads based on distance
-    const beadSpacing = 12 * zoom; // Space between beads
-    const beadRadius = 3 * zoom; // Radius of each bead
-    const maxBeads = Math.floor(distance / beadSpacing);
+    // Calculate number of arrows based on distance
+    const arrowSpacing = 12 * zoom; // Space between arrows
+    const arrowSize = 6 * zoom; // Size of each arrow
+    const maxArrows = Math.floor(distance / arrowSpacing);
     
-    // Animate bead count (extend/retract effect)
-    // Use time-based or connection state to determine how many beads to show
+    // Animate arrow count (extend/retract effect)
+    // Use time-based or connection state to determine how many arrows to show
     const animProgress = 1.0; // Full extension when connected (can animate this)
-    const currentBeadCount = Math.floor(maxBeads * animProgress);
+    const currentArrowCount = Math.floor(maxArrows * animProgress);
     
-    // Draw beads along the line
+    // Draw arrows along the line
     ctx.fillStyle = color;
-    for (let i = 0; i <= currentBeadCount; i++) {
-      const t = i / maxBeads; // Progress along line (0 to 1)
-      const beadX = start.x + dx * t;
-      const beadY = start.y + dy * t;
+    for (let i = 0; i <= currentArrowCount; i++) {
+      const t = i / maxArrows; // Progress along line (0 to 1)
+      const arrowX = start.x + dx * t;
+      const arrowY = start.y + dy * t;
       
+      // Draw arrow pointing in direction of flow
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle);
+      
+      // Draw arrow shape (triangle pointing right)
       ctx.beginPath();
-      ctx.arc(beadX, beadY, beadRadius, 0, Math.PI * 2);
+      ctx.moveTo(arrowSize, 0); // Tip
+      ctx.lineTo(-arrowSize / 2, -arrowSize / 2); // Top left
+      ctx.lineTo(-arrowSize / 2, arrowSize / 2); // Bottom left
+      ctx.closePath();
       ctx.fill();
+      
+      ctx.restore();
     }
     
     // Reset shadow
