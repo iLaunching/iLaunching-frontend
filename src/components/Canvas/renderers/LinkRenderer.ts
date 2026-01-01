@@ -218,40 +218,30 @@ export class LinkRenderer {
       // Bigger fat triangle with rounded edges (like diamond connector)
       const arrowLength = arrowSize * 2.2; // Bigger: Length from tip to back
       const arrowWidth = arrowSize * 1.8; // Bigger: Width at the back (fat)
-      const cornerRadius = arrowSize * 0.4; // Rounded corners like connectors
+      const cornerRadius = arrowSize * 0.3; // Rounded corners like connectors
       
-      // Draw rounded triangle
+      // Draw clean rounded triangle aligned with connection line
       ctx.beginPath();
+      ctx.moveTo(arrowLength, 0); // Sharp tip pointing forward
       
-      // Start at tip (sharp point forward)
-      ctx.moveTo(arrowLength, 0);
+      // Top edge to back corner
+      ctx.lineTo(-arrowLength * 0.3, -arrowWidth);
       
-      // Top edge with rounded corner at back
-      ctx.lineTo(-arrowLength * 0.2, -arrowWidth + cornerRadius);
-      ctx.arcTo(-arrowLength * 0.2, -arrowWidth, 
-                -arrowLength * 0.2 + cornerRadius, -arrowWidth, 
+      // Rounded top-back corner
+      ctx.arcTo(-arrowLength * 0.3 - cornerRadius, -arrowWidth,
+                -arrowLength * 0.3 - cornerRadius, 0,
                 cornerRadius);
       
-      // Back edge (flat back with rounded corners)
-      ctx.lineTo(-arrowLength * 0.2 + cornerRadius, -arrowWidth);
-      ctx.arcTo(-arrowLength * 0.2, -arrowWidth,
-                -arrowLength * 0.2, -arrowWidth + cornerRadius,
-                cornerRadius);
-      ctx.lineTo(-arrowLength * 0.2, 0);
-      ctx.lineTo(-arrowLength * 0.2, arrowWidth - cornerRadius);
+      // Back edge
+      ctx.lineTo(-arrowLength * 0.3 - cornerRadius, 0);
       
-      // Bottom back corner (rounded)
-      ctx.arcTo(-arrowLength * 0.2, arrowWidth,
-                -arrowLength * 0.2 + cornerRadius, arrowWidth,
-                cornerRadius);
-      ctx.lineTo(-arrowLength * 0.2 + cornerRadius, arrowWidth);
-      
-      // Bottom edge with rounded corner
-      ctx.arcTo(-arrowLength * 0.2, arrowWidth,
-                -arrowLength * 0.2, arrowWidth - cornerRadius,
+      // Rounded bottom-back corner  
+      ctx.arcTo(-arrowLength * 0.3 - cornerRadius, arrowWidth,
+                -arrowLength * 0.3, arrowWidth,
                 cornerRadius);
       
-      // Bottom edge to tip
+      // Bottom edge back to tip
+      ctx.lineTo(-arrowLength * 0.3, arrowWidth);
       ctx.lineTo(arrowLength, 0);
       
       ctx.closePath();
