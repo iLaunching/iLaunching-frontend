@@ -165,8 +165,20 @@ export class ConnectionManager {
     const hoveredNode = this.findNodeAtPoint(worldX, worldY);
     this.state.hoveredNodeId = hoveredNode ? hoveredNode.id : null;
     
-    // Check if hovering over a valid target port
-    const targetPort = this.findPortAtPoint(worldX, worldY);
+    // Check if hovering over a valid target port (exact hit)
+    let targetPort = this.findPortAtPoint(worldX, worldY);
+    
+    // If no exact port hit but hovering over a node, check if that node has a compatible port
+    if (!targetPort && hoveredNode) {
+      const needInputPort = this.state.mode === 'dragging-from-output';
+      const ports = needInputPort ? hoveredNode.getInputPorts() : hoveredNode.getOutputPorts();
+      
+      if (ports.length > 0) {
+        // Use first available port for validation
+        targetPort = { nodeId: hoveredNode.id, portId: ports[0].id };
+      }
+    }
+    
     if (targetPort) {
       // Validate connection
       const validation = this.validateConnection(
@@ -191,8 +203,24 @@ export class ConnectionManager {
     if (this.state.mode === 'idle') return false;
     
     try {
-      // Find target port
-      const targetPort = this.findPortAtPoint(worldX, worldY);
+      // Try exact port hit first
+      let targetPort = this.findPortAtPoint(worldX, worldY);
+      
+      // If no exact port hit, check if hovering over a node and auto-position the port
+      if (!targetPort) {
+        const hoveredNode = this.findNodeAtPoint(worldX, worldY);
+        if (hoveredNode) {
+          // Find the appropriate port type we need
+          const needInputPort = this.state.mode === 'dragging-from-output';
+          const ports = needInputPort ? hoveredNode.getInputPorts() : hoveredNode.getOutputPorts();
+          
+          if (ports.length > 0) {
+            // Use the first available port (node will auto-position it)
+            targetPort = { nodeId: hoveredNode.id, portId: ports[0].id };
+          }
+        }
+      }
+      
       if (!targetPort) {
         this.cancelConnection();
         return false;
