@@ -125,8 +125,18 @@ export class ConnectionManager {
     const port = node.getPort(portId);
     if (!port) return;
     
-    // Determine drag mode based on port type
+    // Check if output port already has a connection
     if (port.type === 'output') {
+      const existingLinks = this.stateManager.getLinksArray();
+      const hasConnection = existingLinks.some(link => 
+        link.fromNodeId === nodeId && link.fromPortId === portId
+      );
+      
+      if (hasConnection) {
+        // Output port already connected, don't allow dragging
+        return;
+      }
+      
       this.state.mode = 'dragging-from-output';
     } else {
       this.state.mode = 'dragging-from-input';
