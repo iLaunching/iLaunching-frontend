@@ -35,8 +35,8 @@ const LINK_CONFIG = {
 
 export class Link {
   public readonly data: LinkData;
-  private sourceNode: BaseNode;
-  private targetNode: BaseNode;
+  public readonly sourceNode: BaseNode;
+  public readonly targetNode: BaseNode;
   
   // Cached curve data (invalidated when nodes move)
   private cachedPath: Point[] | null = null;
@@ -63,8 +63,10 @@ export class Link {
         return this.getNodeCenterPoints();
       }
       
-      const startPos = this.sourceNode.getPortPosition(this.data.fromPortId);
-      const endPos = this.targetNode.getPortPosition(this.data.toPortId);
+      // Pass target node to source port position (for dynamic circular positioning)
+      const startPos = this.sourceNode.getPortPosition(this.data.fromPortId, this.targetNode);
+      // Pass source node to target port position (for dynamic circular positioning)
+      const endPos = this.targetNode.getPortPosition(this.data.toPortId, this.sourceNode);
       
       return {
         start: startPos || this.getNodeCenter(this.sourceNode),

@@ -63,6 +63,33 @@ export class SmartMatrixNode extends BaseNode {
   }
   
   /**
+   * Get port position for circular node
+   * Output port rotates around circle to point toward target
+   */
+  public getPortPosition(portId: string, targetNode?: BaseNode): { x: number; y: number } | undefined {
+    const port = this.getPort(portId);
+    if (!port) return undefined;
+    
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+    const maskRadius = 85; // Must match renderer
+    
+    // Calculate angle to target node
+    let angle = 0; // Default: right (0 radians)
+    if (targetNode) {
+      const targetCenterX = targetNode.x + targetNode.width / 2;
+      const targetCenterY = targetNode.y + targetNode.height / 2;
+      angle = Math.atan2(targetCenterY - centerY, targetCenterX - centerX);
+    }
+    
+    // Position port at calculated angle on circle edge
+    return {
+      x: centerX + maskRadius * Math.cos(angle),
+      y: centerY + maskRadius * Math.sin(angle)
+    };
+  }
+  
+  /**
    * Check if a world coordinate point is over the output port
    */
   public containsPortPoint(worldX: number, worldY: number): boolean {

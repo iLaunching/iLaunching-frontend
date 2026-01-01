@@ -224,8 +224,10 @@ export abstract class BaseNode {
   
   /**
    * Get the world position of a port's center
+   * @param portId - The ID of the port
+   * @param targetNode - Optional target node for dynamic positioning (used by circular nodes)
    */
-  public getPortPosition(portId: string): { x: number; y: number } | undefined {
+  public getPortPosition(portId: string, targetNode?: BaseNode): { x: number; y: number } | undefined {
     const port = this.getPort(portId);
     if (!port) return undefined;
     
