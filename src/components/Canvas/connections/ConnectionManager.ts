@@ -49,6 +49,7 @@ export interface ConnectionState {
   isValid: boolean;
   errorMessage: string | null;
   hoveredLink: Link | null;
+  hoveredNodeId: string | null; // Track which node is being hovered during drag
 }
 
 export class ConnectionManager {
@@ -63,7 +64,8 @@ export class ConnectionManager {
     currentY: 0,
     isValid: false,
     errorMessage: null,
-    hoveredLink: null
+    hoveredLink: null,
+    hoveredNodeId: null
   };
   
   // Link instances (for hit detection and rendering)
@@ -158,6 +160,10 @@ export class ConnectionManager {
     
     this.state.currentX = worldX;
     this.state.currentY = worldY;
+    
+    // Find node under cursor (not just port)
+    const hoveredNode = this.findNodeAtPoint(worldX, worldY);
+    this.state.hoveredNodeId = hoveredNode ? hoveredNode.id : null;
     
     // Check if hovering over a valid target port
     const targetPort = this.findPortAtPoint(worldX, worldY);
@@ -257,6 +263,7 @@ export class ConnectionManager {
     this.state.currentY = 0;
     this.state.isValid = false;
     this.state.errorMessage = null;
+    this.state.hoveredNodeId = null;
   }
   
   /**
@@ -292,6 +299,21 @@ export class ConnectionManager {
       }
     }
     return false;
+  }
+  
+  /**
+   * Find node at world coordinates
+   */
+  private findNodeAtPoint(worldX: number, worldY: number): BaseNode | null {
+    const nodes = this.stateManager.getNodesArray();
+    
+    for (const node of nodes) {
+      if (node.containsPoint(worldX, worldY)) {
+        return node;
+      }
+    }
+    
+    return null;
   }
   
   /**

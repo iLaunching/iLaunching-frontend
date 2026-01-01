@@ -14,7 +14,7 @@ export class TestNodeRenderer {
   /**
    * Render the test node with circular design
    */
-  public render(ctx: CanvasRenderingContext2D, node: TestNode, camera: Camera, nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>): void {
+  public render(ctx: CanvasRenderingContext2D, node: TestNode, camera: Camera, nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>, connectionManager?: any): void {
     // Cleanup stale animation states every 300 frames
     this.frameCount++;
     if (this.frameCount - this.lastCleanupFrame > 300) {
@@ -57,7 +57,7 @@ export class TestNodeRenderer {
     ctx.fillText('Connection Test', centerX, centerY + 10 * zoom);
     
     // Render ports
-    this.renderInputPort(ctx, centerX, centerY, maskRadius, node.isPortHovered, zoom, node.id, node.backgroundColor, node, nodeConnectionMap);
+    this.renderInputPort(ctx, centerX, centerY, maskRadius, node.isPortHovered, zoom, node.id, node.backgroundColor, node, nodeConnectionMap, connectionManager);
     this.renderOutputPort(ctx, centerX, centerY, maskRadius, zoom, node, nodeConnectionMap);
     
     ctx.restore();
@@ -120,18 +120,32 @@ export class TestNodeRenderer {
     nodeId: string,
     maskColor: string,
     node: any,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
     // Calculate dynamic port position based on connection angle
     let angle = Math.PI; // Default: left
-    const connections = nodeConnectionMap.get(nodeId);
-    if (connections && connections.sourceNodes.length > 0) {
-      const sourceNode = connections.sourceNodes[0];
-      const sourceCenterX = sourceNode.x + sourceNode.width / 2;
-      const sourceCenterY = sourceNode.y + sourceNode.height / 2;
+    
+    // Check if being dragged over during connection creation
+    const state = connectionManager && connectionManager.getState && connectionManager.getState();
+    const isBeingDraggedOver = state && state.mode === 'dragging-from-output' && state.hoveredNodeId === nodeId;
+    
+    if (isBeingDraggedOver && state) {
+      // Point toward the drag cursor
       const nodeCenterX = node.x + node.width / 2;
       const nodeCenterY = node.y + node.height / 2;
-      angle = Math.atan2(sourceCenterY - nodeCenterY, sourceCenterX - nodeCenterX);
+      angle = Math.atan2(state.currentY - nodeCenterY, state.currentX - nodeCenterX);
+    } else {
+      // Use existing connection angle
+      const connections = nodeConnectionMap.get(nodeId);
+      if (connections && connections.sourceNodes.length > 0) {
+        const sourceNode = connections.sourceNodes[0];
+        const sourceCenterX = sourceNode.x + sourceNode.width / 2;
+        const sourceCenterY = sourceNode.y + sourceNode.height / 2;
+        const nodeCenterX = node.x + node.width / 2;
+        const nodeCenterY = node.y + node.height / 2;
+        angle = Math.atan2(sourceCenterY - nodeCenterY, sourceCenterX - nodeCenterX);
+      }
     }
     
     const basePortX = centerX + maskRadius * Math.cos(angle); // Dynamic position

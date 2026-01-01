@@ -157,7 +157,7 @@ export class NodeRenderer {
     
     // Use specialized renderer for TestNode
     if (node instanceof TestNode) {
-      this.testNodeRenderer.render(ctx, node, camera, nodeConnectionMap);
+      this.testNodeRenderer.render(ctx, node, camera, nodeConnectionMap, connectionManager);
       return;
     }
     
