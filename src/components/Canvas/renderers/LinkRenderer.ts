@@ -381,7 +381,7 @@ export class LinkRenderer {
     const diamondSize = arrowSize * 3.0;
     const cornerRadius = arrowSize * 0.6;
     const arrowSpacing = 35 * zoom; // Same spacing as main connections
-    const connectorGap = 5 * zoom; // Same gap as main connections
+    const connectorGap = 0 * zoom; // No gap - shapes start right at the node
     
     // Calculate distance and angle
     const dx = endX - startX;
