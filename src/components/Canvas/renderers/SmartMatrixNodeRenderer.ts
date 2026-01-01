@@ -341,13 +341,14 @@ export class SmartMatrixNodeRenderer {
     
     ctx.restore();
     
-    // Draw white "i" text
+    // Draw white "i" text - offset slightly to ensure visibility above mask
     ctx.save();
     ctx.fillStyle = '#ffffff';
     ctx.font = `bold ${60 * zoom}px "Fredoka", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('i', centerX, centerY);
+    // Offset by 3px up and 2px left to ensure complete visibility
+    ctx.fillText('i', centerX - (2 * zoom), centerY - (3 * zoom));
     ctx.restore();
   }
   
