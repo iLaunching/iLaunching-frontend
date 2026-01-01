@@ -196,17 +196,53 @@ export class LinkRenderer {
     // Calculate number of arrows based on distance
     const arrowSpacing = 35 * zoom; // More space between arrows
     const arrowSize = 6 * zoom; // Size of each arrow
-    const maxArrows = Math.floor(distance / arrowSpacing);
+    const connectorGap = 50 * zoom; // Gap from connector ports
+    
+    // Calculate usable distance (excluding gaps at both ends)
+    const usableDistance = Math.max(0, distance - (connectorGap * 2));
+    const maxArrows = Math.floor(usableDistance / arrowSpacing);
     
     // Animate arrow count (extend/retract effect)
     // Use time-based or connection state to determine how many arrows to show
     const animProgress = 1.0; // Full extension when connected (can animate this)
-    const currentArrowCount = Math.floor(maxArrows * animProgress);
+    
+    // Calculate how many arrows to show from each end (growing from both ends toward center)
+    const totalArrowsToShow = Math.floor(maxArrows * animProgress);
+    const arrowsPerEnd = Math.ceil(totalArrowsToShow / 2);
     
     // Draw diamond-shaped connectors along the line (matching port connector style)
     ctx.fillStyle = color;
-    for (let i = 0; i <= currentArrowCount; i++) {
-      const t = i / maxArrows; // Progress along line (0 to 1)
+    
+    // Draw from start end (growing inward)
+    for (let i = 0; i < arrowsPerEnd && i < maxArrows; i++) {
+      const t = (connectorGap + i * arrowSpacing) / distance; // Position with gap offset
+      const arrowX = start.x + dx * t;
+      const arrowY = start.y + dy * t;
+      
+      // Draw diamond connector (rounded square rotated 45°)
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
+      
+      // Diamond size matching the connector aesthetic
+      const diamondSize = arrowSize * 3.5; // Slightly smaller diamond size
+      const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
+      
+      // Draw rounded rectangle (becomes diamond when rotated 45°)
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    // Draw from end end (growing inward)
+    for (let i = 0; i < arrowsPerEnd && i < maxArrows; i++) {
+      const t = (distance - connectorGap - i * arrowSpacing) / distance; // Position with gap offset from end
+      
+      // Skip if this overlaps with shapes from start (meet in the middle)
+      const startT = (connectorGap + (arrowsPerEnd - 1) * arrowSpacing) / distance;
+      if (t <= startT) continue;
+      
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
