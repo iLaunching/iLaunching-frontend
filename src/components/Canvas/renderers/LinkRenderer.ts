@@ -187,39 +187,32 @@ export class LinkRenderer {
       ctx.shadowBlur = RENDER_CONFIG.SHADOW_BLUR_BASE * zoom;
     }
     
-    // Draw the connection line (straight line from start to end)
+    // Draw arrow-beaded line (arrows pointing from output to input)
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx); // Direction angle
     
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
-    ctx.stroke();
-    
-    // Calculate parameters for diamond decorations
-    const arrowSpacing = 35 * zoom; // Space between diamonds
-    const arrowSize = 6 * zoom; // Base size
+    // Calculate number of arrows based on distance
+    const arrowSpacing = 35 * zoom; // Space between arrows
+    const arrowSize = 6 * zoom; // Size of each arrow
     const connectorGap = 50 * zoom; // Gap from connector ports
+    
+    // Calculate usable distance (excluding gaps at both ends)
+    const usableDistance = Math.max(0, distance - (connectorGap * 2));
+    const maxArrowsPerSide = Math.floor(usableDistance / (arrowSpacing * 2)); // Half the line per side
     
     // Animate arrow count (extend/retract effect)
     const animProgress = 1.0; // Full extension when connected (can animate this)
+    const currentArrowsPerSide = Math.max(0, Math.floor(maxArrowsPerSide * animProgress));
     
-    // Calculate how many diamonds to show at each end
-    const maxArrowsPerEnd = 3; // Maximum diamonds at each end
-    const arrowsToShow = Math.ceil(maxArrowsPerEnd * animProgress);
-    
-    // Draw diamond-shaped decorations at both ends (NOT in the middle)
+    // Draw diamond-shaped connectors along the line (matching port connector style)
     ctx.fillStyle = color;
     
-    // Draw near start end (output connector side)
-    for (let i = 0; i < arrowsToShow; i++) {
-      const distanceFromStart = connectorGap + i * arrowSpacing;
-      if (distanceFromStart > distance / 2) break; // Don't go past middle
-      
+    // LEFT SIDE: Add shapes starting from connector, growing inward (behind previous shapes)
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      // Position: start at gap, then add spacing for each shape (i * spacing)
+      const distanceFromStart = connectorGap + (i * arrowSpacing);
       const t = distanceFromStart / distance;
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
@@ -240,11 +233,10 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Draw near end end (input connector side)
-    for (let i = 0; i < arrowsToShow; i++) {
-      const distanceFromEnd = connectorGap + i * arrowSpacing;
-      if (distanceFromEnd > distance / 2) break; // Don't go past middle
-      
+    // RIGHT SIDE: Add shapes starting from connector, growing inward (behind previous shapes)
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      // Position: start at gap from end, then add spacing for each shape (i * spacing)
+      const distanceFromEnd = connectorGap + (i * arrowSpacing);
       const t = (distance - distanceFromEnd) / distance;
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
