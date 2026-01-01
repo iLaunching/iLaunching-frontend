@@ -433,11 +433,11 @@ export class SmartMatrixNodeRenderer {
     if (isDraggingFromThisNode) {
       return; // Don't render the connector
     }
+    
     // Calculate dynamic port position based on connection angle
     let angle = 0; // Default: right
     
     // Check if being dragged toward during connection creation (dragging FROM an input toward THIS output)
-    const state = connectionManager && connectionManager.getState && connectionManager.getState();
     const isBeingDraggedToward = state && state.mode === 'dragging-from-input' && state.hoveredNodeId === nodeId;
     
     if (isBeingDraggedToward && state) {
