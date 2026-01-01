@@ -196,7 +196,7 @@ export class LinkRenderer {
     // Calculate number of arrows based on distance
     const arrowSpacing = 35 * zoom; // Space between arrows
     const arrowSize = 6 * zoom; // Size of each arrow
-    const connectorGap = 50 * zoom; // Gap from connector ports
+    const connectorGap = 25 * zoom; // Reduced gap from connector ports
     
     // Calculate usable distance (excluding gaps at both ends)
     const usableDistance = Math.max(0, distance - (connectorGap * 2));
