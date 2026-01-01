@@ -215,14 +215,45 @@ export class LinkRenderer {
       ctx.translate(arrowX, arrowY);
       ctx.rotate(angle);
       
-      // Fat triangle shape (like half of the diamond connector)
-      const arrowLength = arrowSize * 1.5; // Length from tip to back
-      const arrowWidth = arrowSize * 1.2; // Width at the back (fat)
+      // Bigger fat triangle with rounded edges (like diamond connector)
+      const arrowLength = arrowSize * 2.2; // Bigger: Length from tip to back
+      const arrowWidth = arrowSize * 1.8; // Bigger: Width at the back (fat)
+      const cornerRadius = arrowSize * 0.4; // Rounded corners like connectors
       
+      // Draw rounded triangle
       ctx.beginPath();
-      ctx.moveTo(arrowLength, 0); // Sharp tip pointing forward
-      ctx.lineTo(-arrowLength * 0.3, -arrowWidth); // Top back corner (wide)
-      ctx.lineTo(-arrowLength * 0.3, arrowWidth); // Bottom back corner (wide)
+      
+      // Start at tip (sharp point forward)
+      ctx.moveTo(arrowLength, 0);
+      
+      // Top edge with rounded corner at back
+      ctx.lineTo(-arrowLength * 0.2, -arrowWidth + cornerRadius);
+      ctx.arcTo(-arrowLength * 0.2, -arrowWidth, 
+                -arrowLength * 0.2 + cornerRadius, -arrowWidth, 
+                cornerRadius);
+      
+      // Back edge (flat back with rounded corners)
+      ctx.lineTo(-arrowLength * 0.2 + cornerRadius, -arrowWidth);
+      ctx.arcTo(-arrowLength * 0.2, -arrowWidth,
+                -arrowLength * 0.2, -arrowWidth + cornerRadius,
+                cornerRadius);
+      ctx.lineTo(-arrowLength * 0.2, 0);
+      ctx.lineTo(-arrowLength * 0.2, arrowWidth - cornerRadius);
+      
+      // Bottom back corner (rounded)
+      ctx.arcTo(-arrowLength * 0.2, arrowWidth,
+                -arrowLength * 0.2 + cornerRadius, arrowWidth,
+                cornerRadius);
+      ctx.lineTo(-arrowLength * 0.2 + cornerRadius, arrowWidth);
+      
+      // Bottom edge with rounded corner
+      ctx.arcTo(-arrowLength * 0.2, arrowWidth,
+                -arrowLength * 0.2, arrowWidth - cornerRadius,
+                cornerRadius);
+      
+      // Bottom edge to tip
+      ctx.lineTo(arrowLength, 0);
+      
       ctx.closePath();
       ctx.fill();
       
