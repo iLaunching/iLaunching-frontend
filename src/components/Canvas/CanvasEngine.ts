@@ -478,6 +478,7 @@ export class CanvasEngine {
       const start = this.connectionManager.getPreviewStart();
       const end = this.connectionManager.getPreviewEnd();
       const state = this.connectionManager.getState();
+      const sourceNodeInfo = this.connectionManager.getSourceNodeInfo();
       
       if (start && end) {
         this.linkRenderer.renderPreview(
@@ -485,7 +486,9 @@ export class CanvasEngine {
           start,
           end,
           this.camera,
-          state.isValid
+          state.isValid,
+          sourceNodeInfo?.center,
+          sourceNodeInfo?.radius
         );
       }
     }
@@ -536,7 +539,7 @@ export class CanvasEngine {
         return; // Skip nodes outside viewport
       }
       
-      this.nodeRenderer.render(this.contexts.nodes, node, this.camera, nodeConnectionMap);
+      this.nodeRenderer.render(this.contexts.nodes, node, this.camera, nodeConnectionMap, this.connectionManager);
       renderedCount++;
     });
   }

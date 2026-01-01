@@ -49,6 +49,7 @@ export interface ConnectionState {
   isValid: boolean;
   errorMessage: string | null;
   hoveredLink: Link | null;
+  hoveredNodeId: string | null; // Track which node is being hovered during drag
 }
 
 export class ConnectionManager {
@@ -63,7 +64,8 @@ export class ConnectionManager {
     currentY: 0,
     isValid: false,
     errorMessage: null,
-    hoveredLink: null
+    hoveredLink: null,
+    hoveredNodeId: null
   };
   
   // Link instances (for hit detection and rendering)
@@ -125,8 +127,18 @@ export class ConnectionManager {
     const port = node.getPort(portId);
     if (!port) return;
     
-    // Determine drag mode based on port type
+    // Check if output port already has a connection
     if (port.type === 'output') {
+      const existingLinks = this.stateManager.getLinksArray();
+      const hasConnection = existingLinks.some(link => 
+        link.fromNodeId === nodeId && link.fromPortId === portId
+      );
+      
+      if (hasConnection) {
+        // Output port already connected, don't allow dragging
+        return;
+      }
+      
       this.state.mode = 'dragging-from-output';
     } else {
       this.state.mode = 'dragging-from-input';
@@ -149,8 +161,24 @@ export class ConnectionManager {
     this.state.currentX = worldX;
     this.state.currentY = worldY;
     
-    // Check if hovering over a valid target port
-    const targetPort = this.findPortAtPoint(worldX, worldY);
+    // Find node under cursor (not just port)
+    const hoveredNode = this.findNodeAtPoint(worldX, worldY);
+    this.state.hoveredNodeId = hoveredNode ? hoveredNode.id : null;
+    
+    // Check if hovering over a valid target port (exact hit)
+    let targetPort = this.findPortAtPoint(worldX, worldY);
+    
+    // If no exact port hit but hovering over a node, check if that node has a compatible port
+    if (!targetPort && hoveredNode) {
+      const needInputPort = this.state.mode === 'dragging-from-output';
+      const ports = needInputPort ? hoveredNode.getInputPorts() : hoveredNode.getOutputPorts();
+      
+      if (ports.length > 0) {
+        // Use first available port for validation
+        targetPort = { nodeId: hoveredNode.id, portId: ports[0].id };
+      }
+    }
+    
     if (targetPort) {
       // Validate connection
       const validation = this.validateConnection(
@@ -175,8 +203,24 @@ export class ConnectionManager {
     if (this.state.mode === 'idle') return false;
     
     try {
-      // Find target port
-      const targetPort = this.findPortAtPoint(worldX, worldY);
+      // Try exact port hit first
+      let targetPort = this.findPortAtPoint(worldX, worldY);
+      
+      // If no exact port hit, check if hovering over a node and auto-position the port
+      if (!targetPort) {
+        const hoveredNode = this.findNodeAtPoint(worldX, worldY);
+        if (hoveredNode) {
+          // Find the appropriate port type we need
+          const needInputPort = this.state.mode === 'dragging-from-output';
+          const ports = needInputPort ? hoveredNode.getInputPorts() : hoveredNode.getOutputPorts();
+          
+          if (ports.length > 0) {
+            // Use the first available port (node will auto-position it)
+            targetPort = { nodeId: hoveredNode.id, portId: ports[0].id };
+          }
+        }
+      }
+      
       if (!targetPort) {
         this.cancelConnection();
         return false;
@@ -247,6 +291,7 @@ export class ConnectionManager {
     this.state.currentY = 0;
     this.state.isValid = false;
     this.state.errorMessage = null;
+    this.state.hoveredNodeId = null;
   }
   
   /**
@@ -282,6 +327,21 @@ export class ConnectionManager {
       }
     }
     return false;
+  }
+  
+  /**
+   * Find node at world coordinates
+   */
+  private findNodeAtPoint(worldX: number, worldY: number): BaseNode | null {
+    const nodes = this.stateManager.getNodesArray();
+    
+    for (const node of nodes) {
+      if (node.containsPoint(worldX, worldY)) {
+        return node;
+      }
+    }
+    
+    return null;
   }
   
   /**
@@ -423,6 +483,29 @@ export class ConnectionManager {
     
     const portPos = node.getPortPosition(this.state.sourcePortId);
     return portPos || null;
+  }
+  
+  /**
+   * Get source node center and radius for dynamic connector positioning
+   */
+  getSourceNodeInfo(): { center: Point; radius: number } | null {
+    if (this.state.mode === 'idle' || !this.state.sourceNodeId) {
+      return null;
+    }
+    
+    const node = this.stateManager.getNode(this.state.sourceNodeId);
+    if (!node) return null;
+    
+    // Calculate node center
+    const center = {
+      x: node.x + node.width / 2,
+      y: node.y + node.height / 2
+    };
+    
+    // Estimate radius from node dimensions (use larger dimension / 2)
+    const radius = Math.max(node.width, node.height) / 2;
+    
+    return { center, radius };
   }
   
   /**

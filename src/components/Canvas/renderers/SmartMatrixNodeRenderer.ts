@@ -38,7 +38,8 @@ export class SmartMatrixNodeRenderer {
     ctx: CanvasRenderingContext2D,
     node: SmartMatrixNode,
     camera: Camera,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
     // Cleanup stale animation states every 300 frames (~5 seconds at 60fps)
     this.frameCount++;
@@ -63,12 +64,12 @@ export class SmartMatrixNodeRenderer {
       const centerX = screenX + (node.width * zoom) / 2;
       const centerY = screenY + (node.height * zoom) / 2;
       
-      // Circle dimensions (scaled) - no additional rounding needed, camera handles it
-      const outerRadius = 110 * zoom; // 220px diameter / 2
-      const connectionRadius = 80 * zoom; // 160px diameter / 2 (smaller than mask)
-      const maskRadius = 85 * zoom;   // 170px diameter / 2 (reduced to make ring bigger)
-      const hoverRadius = 75 * zoom;  // 150px diameter / 2
-      const aiRadius = 75 * zoom;     // 150px diameter / 2
+      // Circle dimensions (scaled) - Slightly reduced for better balance
+      const outerRadius = 135 * zoom; // 270px diameter / 2
+      const connectionRadius = 98 * zoom; // 196px diameter / 2
+      const maskRadius = 104 * zoom;   // 208px diameter / 2
+      const hoverRadius = 92 * zoom;  // 184px diameter / 2
+      const aiRadius = 92 * zoom;     // 184px diameter / 2
       
       // Viewport culling
       if (!this.isVisible(centerX, centerY, outerRadius * 2, ctx.canvas)) {
@@ -110,7 +111,7 @@ export class SmartMatrixNodeRenderer {
       ctx.restore();
       
       // RENDER OUTPUT PORT (before mask layer so it sits under it)
-      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap);
+      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap, connectionManager);
       
       // LAYER 2: White Mask (Creates Ring Effect)
       ctx.beginPath();
@@ -420,26 +421,49 @@ export class SmartMatrixNodeRenderer {
     isHovering: boolean,
     maskColor: string,
     node: any,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
+    // Check if this node's port is being dragged
+    const isDragging = connectionManager && connectionManager.isDragging && connectionManager.isDragging();
+    const state = connectionManager && connectionManager.getState && connectionManager.getState();
+    const isDraggingFromThisNode = isDragging && state && state.sourceNodeId === nodeId;
+    
+    // Always hide connector when dragging from this node (preview line will handle its own connector)
+    if (isDraggingFromThisNode) {
+      return; // Don't render the connector - preview line handles it
+    }
+    
     // Calculate dynamic port position based on connection angle
     let angle = 0; // Default: right
-    const connections = nodeConnectionMap.get(nodeId);
-    if (connections && connections.targetNodes.length > 0) {
-      // Use first target node (for multiple connections, could average angles)
-      const targetNode = connections.targetNodes[0];
-      const targetCenterX = targetNode.x + targetNode.width / 2;
-      const targetCenterY = targetNode.y + targetNode.height / 2;
+    
+    // Check if being dragged toward during connection creation (dragging FROM an input toward THIS output)
+    const isBeingDraggedToward = state && state.mode === 'dragging-from-input' && state.hoveredNodeId === nodeId;
+    
+    if (isBeingDraggedToward && state) {
+      // Point toward the drag source (inverse of drag direction)
       const nodeCenterX = node.x + node.width / 2;
       const nodeCenterY = node.y + node.height / 2;
-      angle = Math.atan2(targetCenterY - nodeCenterY, targetCenterX - nodeCenterX);
+      angle = Math.atan2(state.currentY - nodeCenterY, state.currentX - nodeCenterX);
+    } else {
+      // Use existing connection angle
+      const connections = nodeConnectionMap.get(nodeId);
+      if (connections && connections.targetNodes.length > 0) {
+        // Use first target node (for multiple connections, could average angles)
+        const targetNode = connections.targetNodes[0];
+        const targetCenterX = targetNode.x + targetNode.width / 2;
+        const targetCenterY = targetNode.y + targetNode.height / 2;
+        const nodeCenterX = node.x + node.width / 2;
+        const nodeCenterY = node.y + node.height / 2;
+        angle = Math.atan2(targetCenterY - nodeCenterY, targetCenterX - nodeCenterX);
+      }
     }
     
     // Port position at calculated angle on circle
     const basePortX = centerX + maskRadius * Math.cos(angle); // Dynamic position
     const portY = centerY + maskRadius * Math.sin(angle); // Dynamic position
-    const size = 40 * zoom; // Diamond size
-    const radius = 8 * zoom; // Border radius for rounded corners
+    const size = 50 * zoom; // Diamond size (increased)
+    const radius = 10 * zoom; // Border radius for rounded corners (proportional)
     
     // Get or initialize animation state
     const portKey = `${nodeId}-output`;
@@ -630,6 +654,35 @@ export class SmartMatrixNodeRenderer {
       centerY + radius < 0 ||
       centerY - radius > canvas.height
     );
+  }
+  
+  /**
+   * Get node by ID from connection map
+   */
+  private getNodeById(nodeId: string, nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>): any | null {
+    // Search through all connections to find the node
+    for (const [id, connections] of nodeConnectionMap.entries()) {
+      if (id === nodeId) {
+        // This is the node we're looking for, but we need to return the actual node object
+        // Check in source nodes
+        for (const sourceNode of connections.sourceNodes) {
+          if (sourceNode.id === nodeId) return sourceNode;
+        }
+        // Check in target nodes
+        for (const targetNode of connections.targetNodes) {
+          if (targetNode.id === nodeId) return targetNode;
+        }
+      }
+      // Check if nodeId appears in sourceNodes
+      for (const sourceNode of connections.sourceNodes) {
+        if (sourceNode.id === nodeId) return sourceNode;
+      }
+      // Check if nodeId appears in targetNodes
+      for (const targetNode of connections.targetNodes) {
+        if (targetNode.id === nodeId) return targetNode;
+      }
+    }
+    return null;
   }
   
   /**

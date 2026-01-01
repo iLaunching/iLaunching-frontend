@@ -305,8 +305,10 @@ const SmartMatrixCanvas: React.FC = () => {
       const screenX = e.clientX - rect.left;
       const screenY = e.clientY - rect.top;
 
-      // Zoom at cursor position
-      camera.zoomToPoint(-e.deltaY * 0.01, screenX, screenY);
+      // Zoom at cursor position with optimized sensitivity
+      // deltaY typically ranges from -100 to 100 per wheel tick
+      // Negative deltaY = scroll up = zoom in
+      camera.zoomToPoint(e.deltaY, screenX, screenY, 1.0);
       
       // Update background (uses dirty flag now)
       engineRef.current?.updateBackground();

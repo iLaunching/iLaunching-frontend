@@ -51,7 +51,7 @@ export class SmartMatrixNode extends BaseNode {
     // Calculate center of the circular node
     const centerX = this.x + this.width / 2;
     const centerY = this.y + this.height / 2;
-    const radius = 75; // Layer 4 radius (aiRadius - 150px diameter / 2)
+    const radius = 92; // Layer 4 radius (aiRadius - 184px diameter / 2)
     
     // Distance from center
     const dx = worldX - centerX;
@@ -72,7 +72,7 @@ export class SmartMatrixNode extends BaseNode {
     
     const centerX = this.x + this.width / 2;
     const centerY = this.y + this.height / 2;
-    const maskRadius = 85; // Must match renderer
+    const maskRadius = 104; // Must match renderer
     
     // Calculate angle to target node
     let angle = 0; // Default: right (0 radians)
@@ -96,7 +96,7 @@ export class SmartMatrixNode extends BaseNode {
     // Calculate center of the circular node
     const centerX = this.x + this.width / 2;
     const centerY = this.y + this.height / 2;
-    const maskRadius = 85; // Must match renderer
+    const maskRadius = 104; // Must match renderer
     
     // Port position (right center, at mask edge)
     const portX = centerX + maskRadius;

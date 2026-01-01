@@ -146,17 +146,18 @@ export class NodeRenderer {
     ctx: CanvasRenderingContext2D,
     node: BaseNode,
     camera: Camera,
-    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>
+    nodeConnectionMap: Map<string, { sourceNodes: any[], targetNodes: any[] }>,
+    connectionManager?: any
   ): void {
     // Use specialized renderer for SmartMatrixNode
     if (node instanceof SmartMatrixNode) {
-      this.smartMatrixRenderer.render(ctx, node, camera, nodeConnectionMap);
+      this.smartMatrixRenderer.render(ctx, node, camera, nodeConnectionMap, connectionManager);
       return;
     }
     
     // Use specialized renderer for TestNode
     if (node instanceof TestNode) {
-      this.testNodeRenderer.render(ctx, node, camera, nodeConnectionMap);
+      this.testNodeRenderer.render(ctx, node, camera, nodeConnectionMap, connectionManager);
       return;
     }
     

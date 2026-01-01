@@ -187,14 +187,86 @@ export class LinkRenderer {
       ctx.shadowBlur = RENDER_CONFIG.SHADOW_BLUR_BASE * zoom;
     }
     
-    // Draw curve (straight line instead of bezier for circular nodes)
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y); // Draw straight line
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
+    // Draw arrow-beaded line (arrows pointing from output to input)
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx); // Direction angle
+    
+    // Calculate number of arrows based on distance
+    const arrowSpacing = 35 * zoom; // Space between arrows
+    const arrowSize = 6 * zoom; // Size of each arrow
+    const connectorGap = 8 * zoom; // Very close to connector ports
+    
+    // Calculate usable distance (excluding gaps at both ends)
+    const usableDistance = Math.max(0, distance - (connectorGap * 2));
+    const maxArrowsPerSide = Math.floor(usableDistance / (arrowSpacing * 2)); // Half the line per side
+    
+    // Animate arrow count (extend/retract effect)
+    const animProgress = 1.0; // Full extension when connected (can animate this)
+    const currentArrowsPerSide = Math.max(0, Math.floor(maxArrowsPerSide * animProgress));
+    
+    // Draw diamond-shaped connectors along the line (matching port connector style)
+    ctx.fillStyle = color;
+    
+    // Calculate center position
+    const centerT = 0.5;
+    
+    // LEFT SIDE: Grow from center OUTWARD toward left connector (adding behind)
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      // Start at center, move left by (i * spacing)
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT - (distanceFromCenter / distance);
+      
+      // Skip if too close to connector gap
+      if (t * distance < connectorGap) continue;
+      
+      const arrowX = start.x + dx * t;
+      const arrowY = start.y + dy * t;
+      
+      // Draw diamond connector (rounded square rotated 45°)
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
+      
+      // Diamond size matching the connector aesthetic
+      const diamondSize = arrowSize * 3.5; // Diamond size
+      const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
+      
+      // Draw rounded rectangle (becomes diamond when rotated 45°)
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    // RIGHT SIDE: Grow from center OUTWARD toward right connector (adding behind)
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      // Start at center, move right by (i * spacing)
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT + (distanceFromCenter / distance);
+      
+      // Skip if too close to connector gap
+      if ((1 - t) * distance < connectorGap) continue;
+      
+      const arrowX = start.x + dx * t;
+      const arrowY = start.y + dy * t;
+      
+      // Draw diamond connector (rounded square rotated 45°)
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
+      
+      // Diamond size matching the connector aesthetic
+      const diamondSize = arrowSize * 3.5; // Diamond size
+      const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
+      
+      // Draw rounded rectangle (becomes diamond when rotated 45°)
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      
+      ctx.restore();
+    }
     
     // Reset shadow
     ctx.shadowColor = 'transparent';
@@ -299,39 +371,112 @@ export class LinkRenderer {
     start: Point,
     end: Point,
     camera: Camera,
-    isValid: boolean
+    isValid: boolean,
+    sourceNodeCenter?: Point,
+    sourceNodeRadius?: number
   ): void {
     const [startX, startY] = camera.toScreen(start.x, start.y);
     const [endX, endY] = camera.toScreen(end.x, end.y);
     
-    // Calculate control points
-    const dx = endX - startX;
-    const distance = Math.abs(dx);
-    const offset = Math.min(Math.max(distance * 0.4, 50), 200) * camera.zoom;
+    const zoom = camera.zoom;
+    const arrowSize = 5 * zoom;
+    const diamondSize = arrowSize * 3.0;
+    const cornerRadius = arrowSize * 0.6;
+    const arrowSpacing = 35 * zoom; // Same spacing as main connections
+    const connectorGap = 0 * zoom; // No gap - shapes start right at the node
     
-    const cp1X = startX + offset;
-    const cp1Y = startY;
-    const cp2X = endX - offset;
-    const cp2Y = endY;
+    // Calculate dynamic start position on source node circle
+    let actualStartX = startX;
+    let actualStartY = startY;
     
-    // Draw dashed curve
+    if (sourceNodeCenter && sourceNodeRadius) {
+      // Calculate angle from node center to cursor
+      const [centerScreenX, centerScreenY] = camera.toScreen(sourceNodeCenter.x, sourceNodeCenter.y);
+      const angleToTarget = Math.atan2(endY - centerScreenY, endX - centerScreenX);
+      
+      // Position on the node circle perimeter
+      const radiusScreen = sourceNodeRadius * zoom;
+      actualStartX = centerScreenX + radiusScreen * Math.cos(angleToTarget);
+      actualStartY = centerScreenY + radiusScreen * Math.sin(angleToTarget);
+    }
+    
+    // Calculate distance and angle from dynamic start position
+    const dx = endX - actualStartX;
+    const dy = endY - actualStartY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    
+    // Light color version
+    const lightColor = isValid ? 'rgba(139, 92, 246, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+    
     ctx.save();
-    ctx.setLineDash([5 * camera.zoom, 5 * camera.zoom]);
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-    ctx.strokeStyle = isValid ? this.colors.active : this.colors.error;
-    ctx.lineWidth = 2 * camera.zoom;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.fillStyle = lightColor;
+    
+    const centerT = 0.5;
+    const usableDistance = Math.max(0, distance - (connectorGap * 2));
+    const currentArrowsPerSide = Math.max(0, Math.floor(usableDistance / (arrowSpacing * 2)));
+    
+    // LEFT SIDE: Grow from center toward left
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT - (distanceFromCenter / distance);
+      
+      if (t * distance < connectorGap) continue;
+      
+      const arrowX = actualStartX + dx * t;
+      const arrowY = actualStartY + dy * t;
+      
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // RIGHT SIDE: Grow from center toward right
+    for (let i = 0; i < currentArrowsPerSide; i++) {
+      const distanceFromCenter = i * arrowSpacing;
+      const t = centerT + (distanceFromCenter / distance);
+      
+      if ((1 - t) * distance < connectorGap) continue;
+      
+      const arrowX = actualStartX + dx * t;
+      const arrowY = actualStartY + dy * t;
+      
+      ctx.save();
+      ctx.translate(arrowX, arrowY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // Draw start connector - at the dynamic position
+    const startDiamondSize = 50 * zoom;
+    const startCornerRadius = 10 * zoom;
+    
+    ctx.save();
+    ctx.translate(actualStartX, actualStartY);
+    ctx.rotate(angle + Math.PI / 4);
+    this.drawRoundedRect(ctx, -startDiamondSize / 2, -startDiamondSize / 2, startDiamondSize, startDiamondSize, startCornerRadius);
+    ctx.fill();
     ctx.restore();
     
-    // Draw end circle
-    ctx.beginPath();
-    ctx.arc(endX, endY, 6 * camera.zoom, 0, Math.PI * 2);
-    ctx.fillStyle = isValid ? this.colors.active : this.colors.error;
-    ctx.fill();
+    // Draw end diamond (at cursor) - hide when over valid target
+    if (!isValid) {
+      const endDiamondSize = 50 * zoom;
+      const endCornerRadius = 10 * zoom;
+      
+      ctx.save();
+      ctx.translate(endX, endY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, endCornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    ctx.restore();
   }
   
   /**
@@ -353,5 +498,29 @@ export class LinkRenderer {
       maxY < 0 ||
       minY > canvas.height
     );
+  }
+
+  /**
+   * Draw rounded rectangle (used for diamond connectors)
+   */
+  private drawRoundedRect(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number
+  ): void {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
   }
 }
