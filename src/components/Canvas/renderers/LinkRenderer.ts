@@ -435,16 +435,18 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Draw end diamond (same size as node connector: 50px)
-    const endDiamondSize = 50 * zoom;
-    const endCornerRadius = 10 * zoom;
-    
-    ctx.save();
-    ctx.translate(endX, endY);
-    ctx.rotate(angle + Math.PI / 4);
-    this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, endCornerRadius);
-    ctx.fill();
-    ctx.restore();
+    // Draw end diamond (same size as node connector: 50px) - but transparent when over valid target
+    if (!isValid) {
+      const endDiamondSize = 50 * zoom;
+      const endCornerRadius = 10 * zoom;
+      
+      ctx.save();
+      ctx.translate(endX, endY);
+      ctx.rotate(angle + Math.PI / 4);
+      this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, endCornerRadius);
+      ctx.fill();
+      ctx.restore();
+    }
     
     ctx.restore();
   }

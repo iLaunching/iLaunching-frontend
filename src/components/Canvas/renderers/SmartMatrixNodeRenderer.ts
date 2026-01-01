@@ -429,9 +429,12 @@ export class SmartMatrixNodeRenderer {
     const state = connectionManager && connectionManager.getState && connectionManager.getState();
     const isDraggingFromThisNode = isDragging && state && state.sourceNodeId === nodeId;
     
-    // Hide connector when dragging from this node (visual effect of removing it)
-    if (isDraggingFromThisNode) {
-      return; // Don't render the connector
+    // Check if the drag is currently over a valid connection target
+    const isOverValidTarget = isDraggingFromThisNode && state && state.isValid;
+    
+    // Hide connector when dragging from this node UNLESS over a valid target
+    if (isDraggingFromThisNode && !isOverValidTarget) {
+      return; // Don't render the connector - it's being "pulled away"
     }
     
     // Calculate dynamic port position based on connection angle
