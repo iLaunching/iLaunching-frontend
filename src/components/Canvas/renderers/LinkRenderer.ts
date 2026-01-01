@@ -216,7 +216,7 @@ export class LinkRenderer {
       ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
       // Diamond size matching the connector aesthetic
-      const diamondSize = arrowSize * 4.0; // Bigger diamond size
+      const diamondSize = arrowSize * 3.5; // Slightly smaller diamond size
       const cornerRadius = arrowSize * 0.6; // Rounded corners like connectors
       
       // Draw rounded rectangle (becomes diamond when rotated 45°)
