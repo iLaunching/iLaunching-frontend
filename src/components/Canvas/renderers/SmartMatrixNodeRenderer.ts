@@ -63,12 +63,12 @@ export class SmartMatrixNodeRenderer {
       const centerX = screenX + (node.width * zoom) / 2;
       const centerY = screenY + (node.height * zoom) / 2;
       
-      // Circle dimensions (scaled) - no additional rounding needed, camera handles it
-      const outerRadius = 110 * zoom; // 220px diameter / 2
-      const connectionRadius = 80 * zoom; // 160px diameter / 2 (smaller than mask)
-      const maskRadius = 85 * zoom;   // 170px diameter / 2 (reduced to make ring bigger)
-      const hoverRadius = 75 * zoom;  // 150px diameter / 2
-      const aiRadius = 75 * zoom;     // 150px diameter / 2
+      // Circle dimensions (scaled) - Enlarged to match TestNode size
+      const outerRadius = 125 * zoom; // 250px diameter / 2 (enlarged)
+      const connectionRadius = 91 * zoom; // 182px diameter / 2 (enlarged)
+      const maskRadius = 97 * zoom;   // 194px diameter / 2 (enlarged)
+      const hoverRadius = 85 * zoom;  // 170px diameter / 2 (enlarged)
+      const aiRadius = 85 * zoom;     // 170px diameter / 2 (enlarged to match TestNode)
       
       // Viewport culling
       if (!this.isVisible(centerX, centerY, outerRadius * 2, ctx.canvas)) {

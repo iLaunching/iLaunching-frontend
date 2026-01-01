@@ -194,9 +194,9 @@ export class LinkRenderer {
     const angle = Math.atan2(dy, dx); // Direction angle
     
     // Calculate number of arrows based on distance
-    const arrowSpacing = 25 * zoom; // Reduced space between arrows for faster extension
+    const arrowSpacing = 35 * zoom; // Reduced space between arrows for faster extension
     const arrowSize = 6 * zoom; // Size of each arrow
-    const connectorGap = 5 * zoom; // Very close to connector ports
+    const connectorGap = 8 * zoom; // Very close to connector ports
     
     // Calculate usable distance (excluding gaps at both ends)
     const usableDistance = Math.max(0, distance - (connectorGap * 2));
