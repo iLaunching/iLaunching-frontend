@@ -152,7 +152,7 @@ const SmartMatrixCanvas: React.FC = () => {
           y: 0,
           zoom: 1.0,
           minZoom: 0.1,
-          maxZoom: 3.0
+          maxZoom: 1.0
         }
       });
 

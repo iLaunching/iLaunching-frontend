@@ -431,7 +431,7 @@ const sourceNode = this.nodes.get(link.fromNodeId);
     return {
       nodes: new Map(this.getNodesArray().map(node => [node.id, node.toJSON()])),
       links: this.links,
-      camera: { x: 0, y: 0, zoom: 1.0, minZoom: 0.1, maxZoom: 5.0 } // TODO: Get from camera
+      camera: { x: 0, y: 0, zoom: 1.0, minZoom: 0.1, maxZoom: 1.0 } // TODO: Get from camera
     };
   }
   
@@ -466,7 +466,7 @@ const sourceNode = this.nodes.get(link.fromNodeId);
       timestamp: Date.now(),
       nodes: this.getNodesArray().map(node => node.toJSON()),
       links: this.getLinksArray(),
-      camera: { x: 0, y: 0, zoom: 1.0, minZoom: 0.1, maxZoom: 5.0 }
+      camera: { x: 0, y: 0, zoom: 1.0, minZoom: 0.1, maxZoom: 1.0 }
     };
   }
   
