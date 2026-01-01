@@ -376,17 +376,6 @@ export class LinkRenderer {
     const [startX, startY] = camera.toScreen(start.x, start.y);
     const [endX, endY] = camera.toScreen(end.x, end.y);
     
-    // Calculate control points
-    const dx = endX - startX;
-    const dy = endY - startY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const offset = Math.min(Math.max(distance * 0.4, 50), 200) * camera.zoom;
-    
-    const cp1X = startX + offset;
-    const cp1Y = startY;
-    const cp2X = endX - offset;
-    const cp2Y = endY;
-    
     const zoom = camera.zoom;
     const lineWidth = 2 * zoom;
     const arrowSize = 6 * zoom;
@@ -395,35 +384,41 @@ export class LinkRenderer {
     const arrowSpacing = 25 * zoom;
     const connectorGap = 5 * zoom;
     
-    // Draw dashed curve
+    // Calculate distance and angle
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    
+    // Light color version
+    const lightColor = isValid ? 'rgba(139, 92, 246, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+    
+    // Draw straight line
     ctx.save();
-    ctx.setLineDash([5 * zoom, 5 * zoom]);
     ctx.beginPath();
     ctx.moveTo(startX, startY);
-    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-    ctx.strokeStyle = isValid ? this.colors.active : this.colors.error;
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = lightColor;
     ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.stroke();
-    ctx.setLineDash([]);
     
-    // Draw diamond shapes along the curve (static version)
-    ctx.fillStyle = isValid ? this.colors.active : this.colors.error;
+    // Draw diamond shapes along the line (same pattern as main connections)
+    ctx.fillStyle = lightColor;
     
     const centerT = 0.5;
-    const currentArrowsPerSide = Math.max(0, Math.floor((distance - 2 * connectorGap) / (2 * arrowSpacing)));
+    const usableDistance = Math.max(0, distance - (connectorGap * 2));
+    const currentArrowsPerSide = Math.max(0, Math.floor(usableDistance / (arrowSpacing * 2)));
     
-    // Left side diamonds
+    // LEFT SIDE: Grow from center toward left
     for (let i = 0; i < currentArrowsPerSide; i++) {
       const distanceFromCenter = i * arrowSpacing;
       const t = centerT - (distanceFromCenter / distance);
       
       if (t * distance < connectorGap) continue;
-      if (t < 0 || t > 1) continue;
       
-      const arrowX = this.bezierPoint(startX, cp1X, cp2X, endX, t);
-      const arrowY = this.bezierPoint(startY, cp1Y, cp2Y, endY, t);
-      const angle = Math.atan2(endY - startY, endX - startX);
+      const arrowX = startX + dx * t;
+      const arrowY = startY + dy * t;
       
       ctx.save();
       ctx.translate(arrowX, arrowY);
@@ -433,17 +428,15 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Right side diamonds
+    // RIGHT SIDE: Grow from center toward right
     for (let i = 0; i < currentArrowsPerSide; i++) {
       const distanceFromCenter = i * arrowSpacing;
       const t = centerT + (distanceFromCenter / distance);
       
       if ((1 - t) * distance < connectorGap) continue;
-      if (t < 0 || t > 1) continue;
       
-      const arrowX = this.bezierPoint(startX, cp1X, cp2X, endX, t);
-      const arrowY = this.bezierPoint(startY, cp1Y, cp2Y, endY, t);
-      const angle = Math.atan2(endY - startY, endX - startX);
+      const arrowX = startX + dx * t;
+      const arrowY = startY + dy * t;
       
       ctx.save();
       ctx.translate(arrowX, arrowY);
@@ -455,15 +448,14 @@ export class LinkRenderer {
     
     ctx.restore();
     
-    // Draw end diamond (larger, instead of circle)
-    const angle = Math.atan2(endY - startY, endX - startX);
-    const endDiamondSize = diamondSize * 1.5; // Slightly larger at the end
+    // Draw end diamond (larger at cursor)
+    const endDiamondSize = diamondSize * 1.5;
     
     ctx.save();
     ctx.translate(endX, endY);
     ctx.rotate(angle + Math.PI / 4);
     this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, cornerRadius * 1.5);
-    ctx.fillStyle = isValid ? this.colors.active : this.colors.error;
+    ctx.fillStyle = lightColor;
     ctx.fill();
     ctx.restore();
   }
