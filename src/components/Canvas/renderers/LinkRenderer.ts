@@ -203,48 +203,24 @@ export class LinkRenderer {
     const animProgress = 1.0; // Full extension when connected (can animate this)
     const currentArrowCount = Math.floor(maxArrows * animProgress);
     
-    // Draw fat triangle arrows (half-diamond shape like the connector)
+    // Draw diamond-shaped connectors along the line (matching port connector style)
     ctx.fillStyle = color;
     for (let i = 0; i <= currentArrowCount; i++) {
       const t = i / maxArrows; // Progress along line (0 to 1)
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
-      // Draw fat triangle arrow pointing in direction of flow
+      // Draw diamond connector (rounded square rotated 45°)
       ctx.save();
       ctx.translate(arrowX, arrowY);
-      ctx.rotate(angle);
+      ctx.rotate(angle + Math.PI / 4); // Rotate to align with connection + 45° for diamond
       
-      // Bigger fat triangle with rounded edges (like diamond connector)
-      const arrowLength = arrowSize * 2.2; // Bigger: Length from tip to back
-      const arrowWidth = arrowSize * 1.8; // Bigger: Width at the back (fat)
-      const cornerRadius = arrowSize * 0.3; // Rounded corners like connectors
+      // Diamond size matching the connector aesthetic
+      const diamondSize = arrowSize * 2.5; // Size of the diamond
+      const cornerRadius = arrowSize * 0.5; // Rounded corners like connectors
       
-      // Draw clean rounded triangle aligned with connection line
-      ctx.beginPath();
-      ctx.moveTo(arrowLength, 0); // Sharp tip pointing forward
-      
-      // Top edge to back corner
-      ctx.lineTo(-arrowLength * 0.3, -arrowWidth);
-      
-      // Rounded top-back corner
-      ctx.arcTo(-arrowLength * 0.3 - cornerRadius, -arrowWidth,
-                -arrowLength * 0.3 - cornerRadius, 0,
-                cornerRadius);
-      
-      // Back edge
-      ctx.lineTo(-arrowLength * 0.3 - cornerRadius, 0);
-      
-      // Rounded bottom-back corner  
-      ctx.arcTo(-arrowLength * 0.3 - cornerRadius, arrowWidth,
-                -arrowLength * 0.3, arrowWidth,
-                cornerRadius);
-      
-      // Bottom edge back to tip
-      ctx.lineTo(-arrowLength * 0.3, arrowWidth);
-      ctx.lineTo(arrowLength, 0);
-      
-      ctx.closePath();
+      // Draw rounded rectangle (becomes diamond when rotated 45°)
+      this.drawRoundedRect(ctx, -diamondSize / 2, -diamondSize / 2, diamondSize, diamondSize, cornerRadius);
       ctx.fill();
       
       ctx.restore();
@@ -407,5 +383,29 @@ export class LinkRenderer {
       maxY < 0 ||
       minY > canvas.height
     );
+  }
+
+  /**
+   * Draw rounded rectangle (used for diamond connectors)
+   */
+  private drawRoundedRect(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number
+  ): void {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
   }
 }
