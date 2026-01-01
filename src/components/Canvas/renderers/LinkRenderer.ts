@@ -187,26 +187,32 @@ export class LinkRenderer {
       ctx.shadowBlur = RENDER_CONFIG.SHADOW_BLUR_BASE * zoom;
     }
     
-    // Draw arrow-beaded line (arrows pointing from output to input)
+    // Draw the connection line (straight line from start to end)
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx); // Direction angle
     
-    // Calculate number of arrows based on distance
-    const arrowSpacing = 35 * zoom; // More space between arrows
-    const arrowSize = 6 * zoom; // Size of each arrow
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    
+    // Calculate parameters for diamond decorations
+    const arrowSpacing = 35 * zoom; // Space between diamonds
+    const arrowSize = 6 * zoom; // Base size
     const connectorGap = 50 * zoom; // Gap from connector ports
     
     // Animate arrow count (extend/retract effect)
-    // Use time-based or connection state to determine how many arrows to show
     const animProgress = 1.0; // Full extension when connected (can animate this)
     
-    // Calculate how many arrows to show at each end (NOT filling the middle)
-    const maxArrowsPerEnd = 3; // Maximum arrows at each end
+    // Calculate how many diamonds to show at each end
+    const maxArrowsPerEnd = 3; // Maximum diamonds at each end
     const arrowsToShow = Math.ceil(maxArrowsPerEnd * animProgress);
     
-    // Draw diamond-shaped connectors along the line (matching port connector style)
+    // Draw diamond-shaped decorations at both ends (NOT in the middle)
     ctx.fillStyle = color;
     
     // Draw near start end (output connector side)
