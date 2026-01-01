@@ -203,26 +203,57 @@ export class LinkRenderer {
     const animProgress = 1.0; // Full extension when connected (can animate this)
     const currentArrowCount = Math.floor(maxArrows * animProgress);
     
-    // Draw arrows along the line
+    // Draw speed arrows along the line
     ctx.fillStyle = color;
     for (let i = 0; i <= currentArrowCount; i++) {
       const t = i / maxArrows; // Progress along line (0 to 1)
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
-      // Draw arrow pointing in direction of flow
+      // Draw speed arrow pointing in direction of flow
       ctx.save();
       ctx.translate(arrowX, arrowY);
       ctx.rotate(angle);
       
-      // Draw arrow shape (triangle pointing right)
+      // Draw speed arrow shape (elongated triangle with trailing lines)
+      const arrowLength = arrowSize * 1.8; // Make arrow longer
+      const arrowWidth = arrowSize * 0.8; // Make arrow narrower
+      const trailLength = arrowSize * 1.2; // Length of speed trails
+      
+      // Main arrow body
       ctx.beginPath();
-      ctx.moveTo(arrowSize, 0); // Tip
-      ctx.lineTo(-arrowSize / 2, -arrowSize / 2); // Top left
-      ctx.lineTo(-arrowSize / 2, arrowSize / 2); // Bottom left
+      ctx.moveTo(arrowLength, 0); // Sharp tip
+      ctx.lineTo(-arrowLength * 0.3, -arrowWidth * 0.5); // Top back
+      ctx.lineTo(-arrowLength * 0.3, arrowWidth * 0.5); // Bottom back
       ctx.closePath();
       ctx.fill();
       
+      // Speed trail lines (motion blur effect)
+      ctx.strokeStyle = color;
+      ctx.lineWidth = zoom * 0.8;
+      ctx.lineCap = 'round';
+      
+      // Top trail
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(-arrowLength * 0.3, -arrowWidth * 0.5);
+      ctx.lineTo(-arrowLength * 0.3 - trailLength, -arrowWidth * 0.7);
+      ctx.stroke();
+      
+      // Bottom trail
+      ctx.beginPath();
+      ctx.moveTo(-arrowLength * 0.3, arrowWidth * 0.5);
+      ctx.lineTo(-arrowLength * 0.3 - trailLength, arrowWidth * 0.7);
+      ctx.stroke();
+      
+      // Center trail (optional, for more speed effect)
+      ctx.globalAlpha = 0.4;
+      ctx.beginPath();
+      ctx.moveTo(-arrowLength * 0.3, 0);
+      ctx.lineTo(-arrowLength * 0.3 - trailLength * 1.3, 0);
+      ctx.stroke();
+      
+      ctx.globalAlpha = 1.0;
       ctx.restore();
     }
     
