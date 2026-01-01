@@ -198,24 +198,23 @@ export class LinkRenderer {
     const arrowSize = 6 * zoom; // Size of each arrow
     const connectorGap = 50 * zoom; // Gap from connector ports
     
-    // Calculate usable distance (excluding gaps at both ends)
-    const usableDistance = Math.max(0, distance - (connectorGap * 2));
-    const maxArrows = Math.floor(usableDistance / arrowSpacing);
-    
     // Animate arrow count (extend/retract effect)
     // Use time-based or connection state to determine how many arrows to show
     const animProgress = 1.0; // Full extension when connected (can animate this)
     
-    // Calculate how many arrows to show from each end (growing from both ends toward center)
-    const totalArrowsToShow = Math.floor(maxArrows * animProgress);
-    const arrowsPerEnd = Math.ceil(totalArrowsToShow / 2);
+    // Calculate how many arrows to show at each end (NOT filling the middle)
+    const maxArrowsPerEnd = 3; // Maximum arrows at each end
+    const arrowsToShow = Math.ceil(maxArrowsPerEnd * animProgress);
     
     // Draw diamond-shaped connectors along the line (matching port connector style)
     ctx.fillStyle = color;
     
-    // Draw from start end (growing inward)
-    for (let i = 0; i < arrowsPerEnd && i < maxArrows; i++) {
-      const t = (connectorGap + i * arrowSpacing) / distance; // Position with gap offset
+    // Draw near start end (output connector side)
+    for (let i = 0; i < arrowsToShow; i++) {
+      const distanceFromStart = connectorGap + i * arrowSpacing;
+      if (distanceFromStart > distance / 2) break; // Don't go past middle
+      
+      const t = distanceFromStart / distance;
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
@@ -235,14 +234,12 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Draw from end end (growing inward)
-    for (let i = 0; i < arrowsPerEnd && i < maxArrows; i++) {
-      const t = (distance - connectorGap - i * arrowSpacing) / distance; // Position with gap offset from end
+    // Draw near end end (input connector side)
+    for (let i = 0; i < arrowsToShow; i++) {
+      const distanceFromEnd = connectorGap + i * arrowSpacing;
+      if (distanceFromEnd > distance / 2) break; // Don't go past middle
       
-      // Skip if this overlaps with shapes from start (meet in the middle)
-      const startT = (connectorGap + (arrowsPerEnd - 1) * arrowSpacing) / distance;
-      if (t <= startT) continue;
-      
+      const t = (distance - distanceFromEnd) / distance;
       const arrowX = start.x + dx * t;
       const arrowY = start.y + dy * t;
       
