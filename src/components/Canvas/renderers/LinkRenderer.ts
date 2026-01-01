@@ -435,7 +435,18 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    // Draw end diamond (same size as node connector: 50px) - but transparent when over valid target
+    // Draw start connector (at source node) - always visible, rotates with line direction
+    const startDiamondSize = 50 * zoom;
+    const startCornerRadius = 10 * zoom;
+    
+    ctx.save();
+    ctx.translate(startX, startY);
+    ctx.rotate(angle + Math.PI / 4);
+    this.drawRoundedRect(ctx, -startDiamondSize / 2, -startDiamondSize / 2, startDiamondSize, startDiamondSize, startCornerRadius);
+    ctx.fill();
+    ctx.restore();
+    
+    // Draw end diamond (at cursor) - hide when over valid target
     if (!isValid) {
       const endDiamondSize = 50 * zoom;
       const endCornerRadius = 10 * zoom;

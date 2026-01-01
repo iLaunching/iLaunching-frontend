@@ -429,48 +429,33 @@ export class SmartMatrixNodeRenderer {
     const state = connectionManager && connectionManager.getState && connectionManager.getState();
     const isDraggingFromThisNode = isDragging && state && state.sourceNodeId === nodeId;
     
-    // Check if the drag is currently over a valid connection target
-    const isOverValidTarget = isDraggingFromThisNode && state && state.isValid;
-    
-    // Hide connector when dragging from this node UNLESS over a valid target
-    if (isDraggingFromThisNode && !isOverValidTarget) {
-      return; // Don't render the connector - it's being "pulled away"
+    // Always hide connector when dragging from this node (preview line will handle its own connector)
+    if (isDraggingFromThisNode) {
+      return; // Don't render the connector - preview line handles it
     }
     
     // Calculate dynamic port position based on connection angle
     let angle = 0; // Default: right
     
-    // If dragging from this node and over a valid target, point toward the target
-    if (isOverValidTarget && state && state.hoveredNodeId) {
-      const targetNode = this.getNodeById(state.hoveredNodeId, nodeConnectionMap);
-      if (targetNode) {
-        const targetCenterX = targetNode.x + (targetNode.width || 0) / 2;
-        const targetCenterY = targetNode.y + (targetNode.height || 0) / 2;
+    // Check if being dragged toward during connection creation (dragging FROM an input toward THIS output)
+    const isBeingDraggedToward = state && state.mode === 'dragging-from-input' && state.hoveredNodeId === nodeId;
+    
+    if (isBeingDraggedToward && state) {
+      // Point toward the drag source (inverse of drag direction)
+      const nodeCenterX = node.x + node.width / 2;
+      const nodeCenterY = node.y + node.height / 2;
+      angle = Math.atan2(state.currentY - nodeCenterY, state.currentX - nodeCenterX);
+    } else {
+      // Use existing connection angle
+      const connections = nodeConnectionMap.get(nodeId);
+      if (connections && connections.targetNodes.length > 0) {
+        // Use first target node (for multiple connections, could average angles)
+        const targetNode = connections.targetNodes[0];
+        const targetCenterX = targetNode.x + targetNode.width / 2;
+        const targetCenterY = targetNode.y + targetNode.height / 2;
         const nodeCenterX = node.x + node.width / 2;
         const nodeCenterY = node.y + node.height / 2;
         angle = Math.atan2(targetCenterY - nodeCenterY, targetCenterX - nodeCenterX);
-      }
-    } else {
-      // Check if being dragged toward during connection creation (dragging FROM an input toward THIS output)
-      const isBeingDraggedToward = state && state.mode === 'dragging-from-input' && state.hoveredNodeId === nodeId;
-      
-      if (isBeingDraggedToward && state) {
-        // Point toward the drag source (inverse of drag direction)
-        const nodeCenterX = node.x + node.width / 2;
-        const nodeCenterY = node.y + node.height / 2;
-        angle = Math.atan2(state.currentY - nodeCenterY, state.currentX - nodeCenterX);
-      } else {
-        // Use existing connection angle
-        const connections = nodeConnectionMap.get(nodeId);
-        if (connections && connections.targetNodes.length > 0) {
-          // Use first target node (for multiple connections, could average angles)
-          const targetNode = connections.targetNodes[0];
-          const targetCenterX = targetNode.x + targetNode.width / 2;
-          const targetCenterY = targetNode.y + targetNode.height / 2;
-          const nodeCenterX = node.x + node.width / 2;
-          const nodeCenterY = node.y + node.height / 2;
-          angle = Math.atan2(targetCenterY - nodeCenterY, targetCenterX - nodeCenterX);
-        }
       }
     }
     
