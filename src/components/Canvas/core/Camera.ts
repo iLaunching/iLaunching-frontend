@@ -24,7 +24,7 @@ export class Camera {
   
   // Zoom constraints
   public minZoom: number = 0.1;
-  public maxZoom: number = 3.0;
+  public maxZoom: number = 1.0;
   
   // Canvas dimensions (screen space)
   private canvasWidth: number = 0;
@@ -42,7 +42,7 @@ export class Camera {
       this.y = initialState.y ?? 0;
       this.zoom = initialState.zoom ?? 1.0;
       this.minZoom = initialState.minZoom ?? 0.1;
-      this.maxZoom = initialState.maxZoom ?? 3.0;
+      this.maxZoom = initialState.maxZoom ?? 1.0;
     }
   }
   
