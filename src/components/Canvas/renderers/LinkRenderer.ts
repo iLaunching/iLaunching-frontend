@@ -377,12 +377,11 @@ export class LinkRenderer {
     const [endX, endY] = camera.toScreen(end.x, end.y);
     
     const zoom = camera.zoom;
-    const lineWidth = 2 * zoom;
     const arrowSize = 6 * zoom;
     const diamondSize = arrowSize * 3.5;
     const cornerRadius = arrowSize * 0.6;
-    const arrowSpacing = 25 * zoom;
-    const connectorGap = 5 * zoom;
+    const arrowSpacing = 25 * zoom; // Same spacing as main connections
+    const connectorGap = 5 * zoom; // Same gap as main connections
     
     // Calculate distance and angle
     const dx = endX - startX;
@@ -393,17 +392,7 @@ export class LinkRenderer {
     // Light color version
     const lightColor = isValid ? 'rgba(139, 92, 246, 0.4)' : 'rgba(239, 68, 68, 0.4)';
     
-    // Draw straight line
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.strokeStyle = lightColor;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    
-    // Draw diamond shapes along the line (same pattern as main connections)
     ctx.fillStyle = lightColor;
     
     const centerT = 0.5;
@@ -446,8 +435,6 @@ export class LinkRenderer {
       ctx.restore();
     }
     
-    ctx.restore();
-    
     // Draw end diamond (larger at cursor)
     const endDiamondSize = diamondSize * 1.5;
     
@@ -455,8 +442,9 @@ export class LinkRenderer {
     ctx.translate(endX, endY);
     ctx.rotate(angle + Math.PI / 4);
     this.drawRoundedRect(ctx, -endDiamondSize / 2, -endDiamondSize / 2, endDiamondSize, endDiamondSize, cornerRadius * 1.5);
-    ctx.fillStyle = lightColor;
     ctx.fill();
+    ctx.restore();
+    
     ctx.restore();
   }
   
