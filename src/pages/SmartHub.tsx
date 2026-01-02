@@ -274,6 +274,9 @@ export default function SmartHub() {
       console.log('Appearance updated successfully:', data);
       // Refetch the smart hub data to get updated theme - this should trigger a re-render with new theme
       queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      // Also invalidate Smart Matrix query to update canvas colors
+      queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] });
+      console.log('🎨 Invalidated both current-smart-hub and current-smart-matrix queries');
     },
     onError: (error: any) => {
       console.error('Failed to update appearance:', error);

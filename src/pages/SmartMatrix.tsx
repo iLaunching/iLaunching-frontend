@@ -225,6 +225,7 @@ const SmartMatrixCanvas: React.FC = () => {
       const nodes = engineRef.current.getStateManager().getNodesArray();
       const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
       
+      let updated = false;
       nodes.forEach(node => {
         if (node.type === 'smart-matrix') {
           const smartNode = node as SmartMatrixNode;
@@ -232,10 +233,16 @@ const SmartMatrixCanvas: React.FC = () => {
           smartNode.textColor = textColor;
           smartNode.solidColor = solidColor;
           smartNode.matrixName = matrixName;
+          updated = true;
         }
       });
-      // Mark canvas dirty to trigger re-render
-      engineRef.current.markDirty();
+      
+      if (updated) {
+        // Mark all layers dirty to trigger re-render
+        engineRef.current.markDirty();
+        engineRef.current.updateBackground(); // Update background grid too
+        console.log('🎨 Updated Smart Matrix node colors:', { backgroundColor, textColor, solidColor });
+      }
     }
   }, [backgroundColor, textColor, solidColor, matrixData, isEngineReady]);
 
@@ -635,79 +642,6 @@ const SmartMatrixCanvas: React.FC = () => {
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
-      {/* Test Toolbar */}
-      {isEngineReady && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          zIndex: 100,
-          display: 'flex',
-          gap: '10px'
-        }}>
-          <button
-            onClick={addTestNode}
-            style={{
-              padding: '10px 20px',
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
-          >
-            + Add Test Node
-          </button>
-          <button
-            onClick={addSmartMatrixNode}
-            style={{
-              padding: '10px 20px',
-              background: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
-          >
-            ✨ Add Smart Matrix
-          </button>
-          <button
-            onClick={toggleGridType}
-            style={{
-              padding: '10px 20px',
-              background: '#6366f1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
-          >
-            {gridType === 'lines' ? '⊞' : '⋯'} Grid: {gridType === 'lines' ? 'Lines' : 'Dots'}
-          </button>
-          <button
-
-            onClick={toggleDebug}
-            style={{
-              padding: '10px 20px',
-              background: debugMode ? '#10b981' : '#6b7280',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            {debugMode ? '✓' : ''} Debug
-          </button>
-        </div>
-      )}
-      
       {/* Canvas Container */}
       <div 
         ref={containerRef} 
@@ -716,28 +650,6 @@ const SmartMatrixCanvas: React.FC = () => {
         aria-label="Interactive canvas for node-based automation"
         tabIndex={0}
       />
-
-      {/* Instructions Overlay */}
-      {isEngineReady && (
-        <div className="instructions-overlay" aria-live="polite">
-          <div className="instructions-box">
-            <h3>🎨 Canvas Controls - Phase 3: Connections</h3>
-            <ul>
-              <li><strong>Scroll Wheel:</strong> Zoom in/out at cursor</li>
-              <li><strong>Middle Mouse:</strong> Pan canvas</li>
-              <li><strong>Click Node:</strong> Select</li>
-              <li><strong>Shift + Click:</strong> Multi-select</li>
-              <li><strong>Alt + Drag:</strong> Box select</li>
-              <li><strong>Drag Port:</strong> Create connection</li>
-              <li><strong>Alt + Click Link:</strong> Delete connection</li>
-              <li><strong>Delete Key:</strong> Delete selected</li>
-            </ul>
-            <p className="instructions-note">
-              ✨ Drag from output (right) to input (left) ports to connect nodes!
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* FPS Counter (debug mode) */}
       {debugMode && (
