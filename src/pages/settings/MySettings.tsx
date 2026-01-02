@@ -208,6 +208,10 @@ const MySettings: React.FC = () => {
       
       // Refetch the smart hub data to get updated theme and full profile
       await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+      
+      // Also invalidate Smart Matrix query to update canvas colors
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-matrix'] });
+      console.log('🎨 Invalidated both current-smart-hub and current-smart-matrix queries');
     },
     onError: (error: any) => {
       console.error('Failed to update appearance:', error);
