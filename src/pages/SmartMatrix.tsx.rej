@@ -1,0 +1,72 @@
+--- SmartMatrix.tsx.orig
++++ SmartMatrix.tsx
+@@ -263,43 +264,20 @@
+   }, []); // Empty deps - only runs on mount/unmount
+ 
+ 
+-  // Debounced manifest position update with optimistic cache updates
+-  const updateManifestPositionRef = useRef<NodeJS.Timeout | null>(null);
+-  const updateManifestPosition = useCallback((x: number, y: number, zoom: number) => {
+-    if (!manifestData?.manifest_id) return;
+-    console.log('🔄 updateManifestPosition called:', { x, y, zoom, hasManifest: !!manifestData?.manifest_id });
+-
+-    const manifestId = manifestData.manifest_id;
+-    const matrixId = matrixData?.smart_matrix?.id;
+-
+-    // Optimistically update cache IMMEDIATELY
+-    queryClient.setQueryData(['manifest', matrixId], (old: any) => ({
+-      ...old,
+-      current_x: x,
+-      current_y: y,
+-      zoom_level: zoom,
+-    }));
+-
+-    // Clear previous timeout
+-    if (updateManifestPositionRef.current) {
+-      clearTimeout(updateManifestPositionRef.current);
+-    }
+-
+-    // Debounce the API call
+-    updateManifestPositionRef.current = setTimeout(async () => {
+-      try {
+-        await api.patch(`/manifest/${manifestId}/position`, {
+-          current_x: x,
+-          current_y: y,
+-          zoom_level: zoom,
+-        });
+-        console.log('📍 Position synced:', { x, y, zoom });
+-      } catch (error) {
+-        queryClient.invalidateQueries(['manifest', matrixId]);
+-        console.error('Position sync failed:', error);
+-      }
+-    }, 1000);
+-  }, [manifestData?.manifest_id, matrixData?.smart_matrix?.id, queryClient]);
++  // Production-ready position sync with smart batching and retry logic
++  const { updatePosition, isDirty, syncStatus } = useManifestSync(
++    manifestData?.manifest_id,
++    matrixData?.smart_matrix?.id
++  );
++
++  // Log sync status changes
++  useEffect(() => {
++    if (syncStatus.status === 'saved') {
++      console.log('✅ Position saved to manifest');
++    } else if (syncStatus.status === 'error') {
++      console.warn('⚠️ Position sync error:', syncStatus.errorMessage);
++    }
++  }, [syncStatus]);
+ 
+   // Update all SmartMatrixNode colors and names when data changes
+   useEffect(() => {
+@@ -402,10 +380,10 @@
+ 
+       // Update background (uses dirty flag now)
+       engineRef.current?.updateBackground();
+       
+       // Update manifest position
+-      updateManifestPosition(camera.x, camera.y, camera.zoom);
++      updatePosition(camera.x, camera.y, camera.zoom);
+     };
+ 
+     canvas.addEventListener('wheel', handleWheel, { passive: false });
+ 

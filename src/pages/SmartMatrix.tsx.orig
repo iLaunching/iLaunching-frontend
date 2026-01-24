@@ -10,13 +10,12 @@
  * - Performance monitoring
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
-import { useManifestSync } from '../hooks/useManifestSync';
 import api from '../lib/api.js';
 import './SmartMatrix.css';
 
@@ -58,18 +57,6 @@ interface SmartMatrixData {
   };
 }
 
-interface ManifestData {
-  manifest_id: string;
-  smart_matrix_id: string;
-  user_id: string;
-  current_x: number;
-  current_y: number;
-  zoom_level: number;
-  business_dna: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-}
-
 const SmartMatrixCanvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
@@ -98,29 +85,6 @@ const SmartMatrixCanvas: React.FC = () => {
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-
-  // Fetch manifest data for spatial state (camera position, zoom)
-  const { data: manifestData, isLoading: isManifestLoading, error: manifestError } = useQuery<ManifestData>({
-    queryKey: ['manifest', matrixData?.smart_matrix?.id],
-    queryFn: async () => {
-      const response = await api.get(`/manifest/smart-matrix/${matrixData!.smart_matrix!.id}`);
-      console.log('📍 Manifest data loaded:', response.data);
-      return response.data;
-    },
-    enabled: !!matrixData?.smart_matrix?.id,
-    staleTime: 30 * 1000,
-    retry: (failureCount, error) => {
-      const status = error?.response?.status;
-      if (status === 404 || status === 401) return false;
-      return failureCount < 2;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-
-  // Warn if manifest fails to load (but don't block canvas)
-  if (manifestError) {
-    console.warn('⚠️ Manifest load failed, using default camera position:', manifestError);
-  }
   
   // Extract theme and grid settings from matrixData
   const backgroundColor = matrixData?.theme?.background || '#ffffff';
@@ -135,6 +99,12 @@ const SmartMatrixCanvas: React.FC = () => {
   const gridStyle = matrixData?.smart_hub?.grid_style || 'line';
   const snapToGrid = matrixData?.smart_hub?.snap_to_grid ?? false;
   
+  console.log('🔧 SmartMatrix - Using Grid Settings from Smart Hub:', {
+    showGrid,
+    gridStyle,
+    snapToGrid,
+    source: 'smart_hub table via current-smart-matrix endpoint'
+  });
   
   // Calculate the appropriate grid color based on grid style
   const gridColor = gridStyle === 'dotted' ? dottedGridColor : lineGridColor;
@@ -145,28 +115,9 @@ const SmartMatrixCanvas: React.FC = () => {
   
   // Sync gridType state with context when it changes
   useEffect(() => {
-    const newGridType = gridStyle === 'dotted' ? 'dots' : 'lines';
-    // Only update if actually changed to prevent infinite loop
-    if (gridType !== newGridType) {
-      setGridType(newGridType);
-    }
-  }, [gridStyle, gridType]);
+    setGridType(gridStyle === 'dotted' ? 'dots' : 'lines');
+  }, [gridStyle]);
   
-
-  // Production-ready position sync with smart batching and retry logic
-  const { updatePosition, isDirty, syncStatus } = useManifestSync(
-    manifestData?.manifest_id,
-    matrixData?.smart_matrix?.id
-  );
-
-  // Log sync status changes
-  useEffect(() => {
-    if (syncStatus.status === 'saved') {
-      console.log('✅ Position saved to manifest');
-    } else if (syncStatus.status === 'error') {
-      console.warn('⚠️ Position sync error:', syncStatus.errorMessage);
-    }
-  }, [syncStatus]);
   // Track when engine becomes ready
   useEffect(() => {
     console.log('🔔 isEngineReady changed to:', isEngineReady);
@@ -197,15 +148,9 @@ const SmartMatrixCanvas: React.FC = () => {
         snapToGrid: snapToGrid,
         enableDebug: debugMode,
         initialCamera: {
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
+          x: 0,
+          y: 0,
+          zoom: 1.0,
           minZoom: 0.1,
           maxZoom: 1.0
         }
@@ -251,7 +196,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [matrixData, manifestData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+  }, [matrixData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
   
   // Cleanup only on unmount
   useEffect(() => {
@@ -374,9 +319,6 @@ const SmartMatrixCanvas: React.FC = () => {
       
       // Update background (uses dirty flag now)
       engineRef.current?.updateBackground();
-      
-      // Update manifest position
-      updatePosition(camera.x, camera.y, camera.zoom);
     };
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
@@ -384,30 +326,7 @@ const SmartMatrixCanvas: React.FC = () => {
     return () => {
       canvas.removeEventListener('wheel', handleWheel);
     };
-  }, [isEngineReady, updatePosition]);
-
-  // Listen for camera changes from ANY source (trackpad, touch, drag, etc)
-  useEffect(() => {
-    if (!engineRef.current || !isEngineReady) return;
-
-    const camera = engineRef.current.getCamera();
-    let lastPosition = { x: camera.x, y: camera.y, zoom: camera.zoom };
-
-    const checkCameraChange = () => {
-      if (!engineRef.current) return;
-      const camera = engineRef.current.getCamera();
-      
-      if (camera.x !== lastPosition.x || camera.y !== lastPosition.y || camera.zoom !== lastPosition.zoom) {
-        updatePosition(camera.x, camera.y, camera.zoom);
-        lastPosition = { x: camera.x, y: camera.y, zoom: camera.zoom };
-      }
-    };
-
-    // Check for camera changes every 100ms
-    const interval = setInterval(checkCameraChange, 100);
-
-    return () => clearInterval(interval);
-  }, [isEngineReady, updatePosition]);
+  }, [isEngineReady]);
 
   // Handle middle mouse button pan with throttling
   useEffect(() => {
@@ -446,10 +365,6 @@ const SmartMatrixCanvas: React.FC = () => {
             const deltaY = e.clientY - lastY;
             
             camera.pan(-deltaX, -deltaY);
-            
-            // Update manifest position
-            updatePosition(camera.x, camera.y, camera.zoom);
-            console.log('🔄 Pan: calling updatePosition with', camera.x, camera.y, camera.zoom);
             engineRef.current?.updateBackground();
             
             lastX = e.clientX;
