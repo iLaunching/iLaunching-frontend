@@ -78,7 +78,7 @@ const SmartMatrixCanvas: React.FC = () => {
   const [fps, setFps] = useState(60);
   const [debugMode, setDebugMode] = useState(false);
   const queryClient = useQueryClient();
-  
+
   // Fetch current smart matrix data from API server
   const { data: matrixData, isLoading, error } = useQuery<SmartMatrixData>({
     queryKey: ['current-smart-matrix'],
@@ -121,7 +121,7 @@ const SmartMatrixCanvas: React.FC = () => {
   if (manifestError) {
     console.warn('⚠️ Manifest load failed, using default camera position:', manifestError);
   }
-  
+
   // Extract theme and grid settings from matrixData
   const backgroundColor = matrixData?.theme?.background || '#ffffff';
   const textColor = matrixData?.theme?.text || '#1f2937';
@@ -129,20 +129,20 @@ const SmartMatrixCanvas: React.FC = () => {
   const borderLineColor = matrixData?.theme?.border || '#e5e7eb';
   const lineGridColor = matrixData?.theme?.line_grid_color || '#d6d6d6';
   const dottedGridColor = matrixData?.theme?.dotted_grid_color || '#a0a0a0';
-  
+
   // Get grid settings from Smart Hub (linked via smart_matrix → smart_hub relationship)
   const showGrid = matrixData?.smart_hub?.show_grid ?? false;
   const gridStyle = matrixData?.smart_hub?.grid_style || 'line';
   const snapToGrid = matrixData?.smart_hub?.snap_to_grid ?? false;
-  
-  
+
+
   // Calculate the appropriate grid color based on grid style
   const gridColor = gridStyle === 'dotted' ? dottedGridColor : lineGridColor;
-  
+
   const [gridType, setGridType] = useState<'lines' | 'dots'>(
     gridStyle === 'dotted' ? 'dots' : 'lines'
   );
-  
+
   // Sync gridType state with context when it changes
   useEffect(() => {
     const newGridType = gridStyle === 'dotted' ? 'dots' : 'lines';
@@ -151,7 +151,7 @@ const SmartMatrixCanvas: React.FC = () => {
       setGridType(newGridType);
     }
   }, [gridStyle, gridType]);
-  
+
 
   // Production-ready position sync with smart batching and retry logic
   const { updatePosition, isDirty, syncStatus } = useManifestSync(
@@ -176,10 +176,10 @@ const SmartMatrixCanvas: React.FC = () => {
   useEffect(() => {
     // Don't initialize if already initialized, no container, or no data
     if (hasInitialized.current || !containerRef.current || !matrixData) {
-      console.log('⏸️ Skipping canvas initialization:', { 
+      console.log('⏸️ Skipping canvas initialization:', {
         hasInitialized: hasInitialized.current,
-        hasContainer: !!containerRef.current, 
-        hasData: !!matrixData 
+        hasContainer: !!containerRef.current,
+        hasData: !!matrixData
       });
       return;
     }
@@ -215,13 +215,13 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.start();
       hasInitialized.current = true; // Mark as initialized
       setIsEngineReady(true);
-      
+
       console.log('✅ Canvas Engine initialized and ready - initial grid state:', showGrid);
-      
+
       // Apply initial grid settings immediately after engine is ready
       const gridRenderer = engineRef.current.getGridRenderer?.();
       if (gridRenderer) {
-        gridRenderer.setConfig({ 
+        gridRenderer.setConfig({
           enabled: showGrid,
           type: gridStyle === 'dotted' ? 'dots' : 'lines'
         });
@@ -229,14 +229,8 @@ const SmartMatrixCanvas: React.FC = () => {
         console.log('✅ Initial grid settings applied:', { showGrid, gridStyle });
       }
 
-      // Add test nodes to demonstrate Phase 3
-      const testNode = new TestNode('test-1', -300, 0);
-      engineRef.current.getStateManager().addNode(testNode);
-      
-      // Add SmartMatrixNode (Stage 1: Visual Design) with user's appearance colors and matrix name
-      const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
-      const smartNode = new SmartMatrixNode('smart-1', 100, 0, backgroundColor, textColor, solidColor, matrixName);
-      engineRef.current.getStateManager().addNode(smartNode);
+      // Phase 3: Nodes will be loaded from API via useCanvasPersistence hook
+      // No hardcoded test nodes - canvas starts empty and loads persisted state
 
       // Setup FPS monitoring
       const fpsIntervalRef = setInterval(() => {
@@ -245,14 +239,14 @@ const SmartMatrixCanvas: React.FC = () => {
           setFps(metrics.fps);
         }
       }, 1000);
-      
+
       // Store interval ID in a way that persists
       (engineRef.current as any).__fpsInterval = fpsIntervalRef;
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
   }, [matrixData, manifestData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
-  
+
   // Cleanup only on unmount
   useEffect(() => {
     return () => {
@@ -260,14 +254,14 @@ const SmartMatrixCanvas: React.FC = () => {
       if (engineRef.current && (engineRef.current as any).__fpsInterval) {
         clearInterval((engineRef.current as any).__fpsInterval);
       }
-      
+
       // Destroy engine
       if (engineRef.current) {
         engineRef.current.stop();
         engineRef.current.destroy();
         engineRef.current = null;
       }
-      
+
       hasInitialized.current = false;
       setIsEngineReady(false);
       console.log('🧹 Canvas engine cleaned up on unmount');
@@ -279,7 +273,7 @@ const SmartMatrixCanvas: React.FC = () => {
     if (engineRef.current && isEngineReady && matrixData) {
       const nodes = engineRef.current.getStateManager().getNodesArray();
       const matrixName = matrixData.smart_matrix?.name || 'Smart Matrix';
-      
+
       let updated = false;
       nodes.forEach(node => {
         if (node.type === 'smart-matrix') {
@@ -291,7 +285,7 @@ const SmartMatrixCanvas: React.FC = () => {
           updated = true;
         }
       });
-      
+
       if (updated) {
         // Mark all layers dirty to trigger re-render
         engineRef.current.markDirty();
@@ -316,21 +310,21 @@ const SmartMatrixCanvas: React.FC = () => {
     console.log('   snapToGrid:', snapToGrid);
     console.log('   isEngineReady:', isEngineReady);
     console.log('   engineRef.current exists:', !!engineRef.current);
-    
+
     if (!engineRef.current || !isEngineReady) {
       console.log('⏸️ SmartMatrix - Engine not ready, skipping grid update');
       return;
     }
-    
+
     // Use a small timeout to ensure the engine is fully initialized
     const timeoutId = setTimeout(() => {
       if (engineRef.current) {
         const engine = engineRef.current;
         const gridRenderer = engine.getGridRenderer?.();
         const interactionManager = engine.getInteractionManager?.();
-        
+
         if (gridRenderer) {
-          const newConfig = { 
+          const newConfig = {
             enabled: showGrid,
             type: (gridStyle === 'dotted' ? 'dots' : 'lines') as 'lines' | 'dots',
             color: gridColor
@@ -340,14 +334,14 @@ const SmartMatrixCanvas: React.FC = () => {
           engine.updateBackground();
           engine.markDirty();
         }
-        
+
         // Update snap to grid setting on interaction manager
         if (interactionManager && typeof (interactionManager as any).setSnapToGrid === 'function') {
           (interactionManager as any).setSnapToGrid(snapToGrid);
         }
       }
     }, 50);
-    
+
     return () => clearTimeout(timeoutId);
   }, [showGrid, gridStyle, snapToGrid, gridColor, isEngineReady]);
 
@@ -362,7 +356,7 @@ const SmartMatrixCanvas: React.FC = () => {
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      
+
       const rect = canvas.getBoundingClientRect();
       const screenX = e.clientX - rect.left;
       const screenY = e.clientY - rect.top;
@@ -371,10 +365,10 @@ const SmartMatrixCanvas: React.FC = () => {
       // deltaY typically ranges from -100 to 100 per wheel tick
       // Negative deltaY = scroll up = zoom in
       camera.zoomToPoint(e.deltaY, screenX, screenY, 1.0);
-      
+
       // Update background (uses dirty flag now)
       engineRef.current?.updateBackground();
-      
+
       // Update manifest position
       updatePosition(camera.x, camera.y, camera.zoom);
     };
@@ -396,7 +390,7 @@ const SmartMatrixCanvas: React.FC = () => {
     const checkCameraChange = () => {
       if (!engineRef.current) return;
       const camera = engineRef.current.getCamera();
-      
+
       if (camera.x !== lastPosition.x || camera.y !== lastPosition.y || camera.zoom !== lastPosition.zoom) {
         updatePosition(camera.x, camera.y, camera.zoom);
         lastPosition = { x: camera.x, y: camera.y, zoom: camera.zoom };
@@ -437,21 +431,21 @@ const SmartMatrixCanvas: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       canvas.dataset.mouseX = String(e.clientX - rect.left);
       canvas.dataset.mouseY = String(e.clientY - rect.top);
-      
+
       if (isPanning) {
         // Throttle pan updates using requestAnimationFrame
         if (animationFrameId === null) {
           animationFrameId = requestAnimationFrame(() => {
             const deltaX = e.clientX - lastX;
             const deltaY = e.clientY - lastY;
-            
+
             camera.pan(-deltaX, -deltaY);
-            
+
             // Update manifest position
             updatePosition(camera.x, camera.y, camera.zoom);
             console.log('🔄 Pan: calling updatePosition with', camera.x, camera.y, camera.zoom);
             engineRef.current?.updateBackground();
-            
+
             lastX = e.clientX;
             lastY = e.clientY;
             animationFrameId = null;
@@ -503,11 +497,11 @@ const SmartMatrixCanvas: React.FC = () => {
         const screenY = e.clientY - rect.top;
         const camera = engine.getCamera();
         const [worldX, worldY] = camera.toWorld(screenX, screenY);
-        
+
         // Check if clicking on a port to start connection
         const nodes = engine.getStateManager().getNodesArray();
         let clickedPort = false;
-        
+
         for (const node of nodes) {
           // Use specialized port detection for SmartMatrix and TestNode
           if ((node.type === 'smart-matrix' || node.type === 'test') && 'containsPortPoint' in node) {
@@ -521,7 +515,7 @@ const SmartMatrixCanvas: React.FC = () => {
                   const dx = worldX - portPos.x;
                   const dy = worldY - portPos.y;
                   const distance = Math.sqrt(dx * dx + dy * dy);
-                  
+
                   if (distance <= 30) { // Generous threshold for circular ports
                     connectionManager.startConnection(node.id, port.id, worldX, worldY);
                     clickedPort = true;
@@ -540,7 +534,7 @@ const SmartMatrixCanvas: React.FC = () => {
                 const dx = worldX - portPos.x;
                 const dy = worldY - portPos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                
+
                 if (distance <= 15) { // Port click threshold
                   connectionManager.startConnection(node.id, port.id, worldX, worldY);
                   clickedPort = true;
@@ -551,7 +545,7 @@ const SmartMatrixCanvas: React.FC = () => {
             if (clickedPort) break;
           }
         }
-        
+
         // If not clicking port, handle node selection/drag
         if (!clickedPort) {
           // Check if clicking on a link to delete it
@@ -559,7 +553,7 @@ const SmartMatrixCanvas: React.FC = () => {
             const deleted = connectionManager.deleteLinkAtPoint(worldX, worldY);
             if (deleted) return;
           }
-          
+
           engine.handleMouseDown(e);
         }
       }
@@ -569,14 +563,14 @@ const SmartMatrixCanvas: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const screenX = e.clientX - rect.left;
       const screenY = e.clientY - rect.top;
-      
+
       // Store mouse position on canvas for port hover detection
       canvas.dataset.mouseX = String(screenX);
       canvas.dataset.mouseY = String(screenY);
-      
+
       const camera = engine.getCamera();
       const [worldX, worldY] = camera.toWorld(screenX, screenY);
-      
+
       // Update connection preview if dragging
       if (connectionManager.isDragging()) {
         connectionManager.updateConnectionPreview(worldX, worldY);
@@ -585,7 +579,7 @@ const SmartMatrixCanvas: React.FC = () => {
         connectionManager.checkLinkHover(worldX, worldY);
         engine.handleMouseMove(e);
       }
-      
+
       // Mark dirty to trigger re-render for port hover animation
       engine.markDirty();
     };
@@ -597,7 +591,7 @@ const SmartMatrixCanvas: React.FC = () => {
         const screenY = e.clientY - rect.top;
         const camera = engine.getCamera();
         const [worldX, worldY] = camera.toWorld(screenX, screenY);
-        
+
         connectionManager.completeConnection(worldX, worldY);
       } else {
         engine.handleMouseUp(e);
@@ -628,7 +622,7 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.setDebugMode(!debugMode);
     }
   };
-  
+
   // Add test node
   const addTestNode = () => {
     if (engineRef.current) {
@@ -641,7 +635,7 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(testNode);
     }
   };
-  
+
   // Add Smart Matrix node
   const addSmartMatrixNode = () => {
     if (engineRef.current) {
@@ -659,7 +653,7 @@ const SmartMatrixCanvas: React.FC = () => {
       engineRef.current.getStateManager().addNode(smartNode);
     }
   };
-  
+
   // Toggle grid type
   const toggleGridType = () => {
     setGridType(prev => prev === 'lines' ? 'dots' : 'lines');
@@ -690,7 +684,7 @@ const SmartMatrixCanvas: React.FC = () => {
       </div>
     );
   }
-  
+
   // Show error state
   if (error) {
     return (
@@ -722,14 +716,14 @@ const SmartMatrixCanvas: React.FC = () => {
   }
 
   return (
-    <div 
+    <div
       className="smart-matrix-container"
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
       {/* Canvas Container */}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className="canvas-container"
         role="img"
         aria-label="Interactive canvas for node-based automation"
