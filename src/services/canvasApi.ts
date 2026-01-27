@@ -57,7 +57,7 @@ export const canvasApi = {
     // ============================================================================
 
     async createNode(data: NodeCreateData) {
-        const response = await fetch(`${API_BASE}/api/${API_VERSION}/node/create`, {
+        const response = await fetch(`${API_BASE}/node/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const canvasApi = {
             params.append('node_type', nodeType);
         }
 
-        const url = `${API_BASE}/api/${API_VERSION}/node/context/${contextId}/nodes${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${API_BASE}/node/context/${contextId}/nodes${params.toString() ? '?' + params.toString() : ''}`;
 
         const response = await fetch(url);
 
@@ -99,7 +99,7 @@ export const canvasApi = {
     },
 
     async updateNodePosition(nodeId: string, x: number, y: number) {
-        const response = await fetch(`${API_BASE}/api/${API_VERSION}/node/${nodeId}/position`, {
+        const response = await fetch(`${API_BASE}/node/${nodeId}/position`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export const canvasApi = {
             is_hovered?: boolean;
         }
     ) {
-        const response = await fetch(`${API_BASE}/api/${API_VERSION}/node/${nodeId}/state`, {
+        const response = await fetch(`${API_BASE}/node/${nodeId}/state`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export const canvasApi = {
     },
 
     async deleteNode(nodeId: string) {
-        const response = await fetch(`${API_BASE}/api/${API_VERSION}/node/${nodeId}`, {
+        const response = await fetch(`${API_BASE}/node/${nodeId}`, {
             method: 'DELETE',
         });
 
@@ -153,7 +153,7 @@ export const canvasApi = {
     // ============================================================================
 
     async createConnection(data: ConnectionCreateData) {
-        const response = await fetch(`${API_BASE}/api/${API_VERSION}/connection/create`, {
+        const response = await fetch(`${API_BASE}/connection/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ export const canvasApi = {
 
     async getNodeConnections(nodeId: string) {
         const response = await fetch(
-            `${API_BASE}/api/${API_VERSION}/connection/node/${nodeId}/connections`
+            `${API_BASE}/connection/node/${nodeId}/connections`
         );
 
         if (!response.ok) {
@@ -183,7 +183,7 @@ export const canvasApi = {
 
     async getContextConnections(contextId: string) {
         const response = await fetch(
-            `${API_BASE}/api/${API_VERSION}/connection/context/${contextId}/connections`
+            `${API_BASE}/connection/context/${contextId}/connections`
         );
 
         if (!response.ok) {
@@ -195,7 +195,7 @@ export const canvasApi = {
 
     async deleteConnection(connectionId: string) {
         const response = await fetch(
-            `${API_BASE}/api/${API_VERSION}/connection/${connectionId}`,
+            `${API_BASE}/connection/${connectionId}`,
             {
                 method: 'DELETE',
             }
@@ -221,7 +221,7 @@ export const canvasApi = {
             params.append('context_type', contextType);
         }
 
-        const url = `${API_BASE}/api/${API_VERSION}/templates${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${API_BASE}/templates${params.toString() ? '?' + params.toString() : ''}`;
 
         const response = await fetch(url);
 
@@ -234,7 +234,7 @@ export const canvasApi = {
 
     async getAvailableNodes(contextId: string) {
         const response = await fetch(
-            `${API_BASE}/api/${API_VERSION}/templates/context/${contextId}/available-nodes`
+            `${API_BASE}/templates/context/${contextId}/available-nodes`
         );
 
         if (!response.ok) {
@@ -246,7 +246,7 @@ export const canvasApi = {
 
     async getTemplate(templateId: string) {
         const response = await fetch(
-            `${API_BASE}/api/${API_VERSION}/templates/${templateId}`
+            `${API_BASE}/templates/${templateId}`
         );
 
         if (!response.ok) {
