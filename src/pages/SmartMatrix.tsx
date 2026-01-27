@@ -17,6 +17,7 @@ import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
 import { useManifestSync } from '../hooks/useManifestSync';
+import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import api from '../lib/api.js';
 import './SmartMatrix.css';
 
@@ -62,20 +63,25 @@ interface ManifestData {
   manifest_id: string;
   smart_matrix_id: string;
   user_id: string;
+  master_context_id?: string; // Direct reference to master context (optimization)
   current_x: number;
   current_y: number;
   zoom_level: number;
   business_dna: Record<string, any>;
   created_at: string;
   updated_at: string;
+  manifest?: { // Added manifest property to ManifestData interface based on the instruction's usage
+    context_id: string;
+  };
 }
 
 const SmartMatrixCanvas: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null); // State for canvas engine
+  const containerRef = useRef<HTMLDivElement>(null); // Container for canvas
   const engineRef = useRef<CanvasEngine | null>(null);
-  const hasInitialized = useRef(false); // Track if initialization has occurred
+  const hasInitialized = useRef(false); // Prevent double initialization
   const [isEngineReady, setIsEngineReady] = useState(false);
-  const [fps, setFps] = useState(60);
+  const [fps, setFps] = useState(0);
   const [debugMode, setDebugMode] = useState(false);
   const queryClient = useQueryClient();
 
@@ -115,6 +121,26 @@ const SmartMatrixCanvas: React.FC = () => {
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  // Phase 3: Canvas Persistence - Automatically load and save nodes
+  const {
+    persistNodeCreation,
+    persistConnectionCreation,
+    updateNodePosition,
+    deleteNode,
+    deleteConnection,
+    isLoaded
+  } = useCanvasPersistence({
+    contextId: manifestData?.master_context_id, // Direct reference - no extra query needed!
+    engine: engineRef.current,
+    enabled: isEngineReady && !!manifestData?.master_context_id
+  });
+
+  console.log('🔄 Canvas persistence status:', {
+    isLoaded,
+    contextId: manifestData?.master_context_id,
+    engineReady: isEngineReady
   });
 
   // Warn if manifest fails to load (but don't block canvas)
