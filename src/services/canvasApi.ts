@@ -3,8 +3,7 @@
  * Handles all API calls for Phase 3 canvas persistence
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const API_VERSION = 'v1';
+import api from '../lib/api';
 
 export interface NodeCreateData {
     context_id: string;
@@ -57,20 +56,8 @@ export const canvasApi = {
     // ============================================================================
 
     async createNode(data: NodeCreateData) {
-        const response = await fetch(`${API_BASE}/node/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to create node');
-        }
-
-        return response.json();
+        const response = await api.post('/node/create', data);
+        return response.data;
     },
 
     async getContextNodes(contextId: string, viewport?: Viewport, nodeType?: string) {
@@ -87,31 +74,14 @@ export const canvasApi = {
             params.append('node_type', nodeType);
         }
 
-        const url = `${API_BASE}/node/context/${contextId}/nodes${params.toString() ? '?' + params.toString() : ''}`;
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch nodes');
-        }
-
-        return response.json();
+        const url = `/node/context/${contextId}/nodes${params.toString() ? '?' + params.toString() : ''}`;
+        const response = await api.get(url);
+        return response.data;
     },
 
     async updateNodePosition(nodeId: string, x: number, y: number) {
-        const response = await fetch(`${API_BASE}/node/${nodeId}/position`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ pos_x: x, pos_y: y }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update node position');
-        }
-
-        return response.json();
+        const response = await api.patch(`/node/${nodeId}/position`, { pos_x: x, pos_y: y });
+        return response.data;
     },
 
     async updateNodeState(
@@ -123,29 +93,12 @@ export const canvasApi = {
             is_hovered?: boolean;
         }
     ) {
-        const response = await fetch(`${API_BASE}/node/${nodeId}/state`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(state),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update node state');
-        }
-
-        return response.json();
+        const response = await api.patch(`/node/${nodeId}/state`, state);
+        return response.data;
     },
 
     async deleteNode(nodeId: string) {
-        const response = await fetch(`${API_BASE}/node/${nodeId}`, {
-            method: 'DELETE',
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete node');
-        }
+        await api.delete(`/node/${nodeId}`);
     },
 
     // ============================================================================
@@ -153,57 +106,22 @@ export const canvasApi = {
     // ============================================================================
 
     async createConnection(data: ConnectionCreateData) {
-        const response = await fetch(`${API_BASE}/connection/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to create connection');
-        }
-
-        return response.json();
+        const response = await api.post('/connection/create', data);
+        return response.data;
     },
 
     async getNodeConnections(nodeId: string) {
-        const response = await fetch(
-            `${API_BASE}/connection/node/${nodeId}/connections`
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch node connections');
-        }
-
-        return response.json();
+        const response = await api.get(`/connection/node/${nodeId}/connections`);
+        return response.data;
     },
 
     async getContextConnections(contextId: string) {
-        const response = await fetch(
-            `${API_BASE}/connection/context/${contextId}/connections`
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch context connections');
-        }
-
-        return response.json();
+        const response = await api.get(`/connection/context/${contextId}/connections`);
+        return response.data;
     },
 
     async deleteConnection(connectionId: string) {
-        const response = await fetch(
-            `${API_BASE}/connection/${connectionId}`,
-            {
-                method: 'DELETE',
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to delete connection');
-        }
+        await api.delete(`/connection/${connectionId}`);
     },
 
     // ============================================================================
@@ -221,38 +139,18 @@ export const canvasApi = {
             params.append('context_type', contextType);
         }
 
-        const url = `${API_BASE}/templates${params.toString() ? '?' + params.toString() : ''}`;
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch templates');
-        }
-
-        return response.json();
+        const url = `/templates${params.toString() ? '?' + params.toString() : ''}`;
+        const response = await api.get(url);
+        return response.data;
     },
 
     async getAvailableNodes(contextId: string) {
-        const response = await fetch(
-            `${API_BASE}/templates/context/${contextId}/available-nodes`
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch available nodes');
-        }
-
-        return response.json();
+        const response = await api.get(`/templates/context/${contextId}/available-nodes`);
+        return response.data;
     },
 
     async getTemplate(templateId: string) {
-        const response = await fetch(
-            `${API_BASE}/templates/${templateId}`
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch template');
-        }
-
-        return response.json();
+        const response = await api.get(`/templates/${templateId}`);
+        return response.data;
     },
 };
