@@ -115,12 +115,12 @@ const SmartMatrixCanvas: React.FC = () => {
     },
     enabled: !!matrixData?.smart_matrix?.id,
     staleTime: 30 * 1000,
-    retry: (failureCount, error) => {
+    retry: (failureCount: number, error: any) => {
       const status = error?.response?.status;
       if (status === 404 || status === 401) return false;
       return failureCount < 2;
     },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Phase 3: Canvas Persistence - Automatically load and save nodes
@@ -223,12 +223,6 @@ const SmartMatrixCanvas: React.FC = () => {
         snapToGrid: snapToGrid,
         enableDebug: debugMode,
         initialCamera: {
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
           x: manifestData?.current_x ?? 0,
           y: manifestData?.current_y ?? 0,
           zoom: manifestData?.zoom_level ?? 1.0,

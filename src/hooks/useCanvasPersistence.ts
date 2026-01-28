@@ -51,8 +51,8 @@ export const useCanvasPersistence = ({
 
             const stateManager = engine.getStateManager();
 
-            // Clear existing nodes (except test nodes)
-            stateManager.clearNodes();
+            // TODO: Clear existing nodes when clearNodes() method is implemented
+            // stateManager.clearNodes();
 
             // Recreate nodes from API data
             nodes.forEach((nodeData: any) => {
