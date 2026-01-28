@@ -1,8 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import type { 
-  AuthResponse, 
-  LoginRequest, 
-  SignupRequest, 
+import type {
+  AuthResponse,
+  LoginRequest,
+  SignupRequest,
   RefreshTokenRequest,
   RefreshTokenResponse,
   LogoutRequest,
@@ -39,18 +39,31 @@ const authApiClient = axios.create({
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Only add auth headers for our API endpoints
+    // Only add auth headers for our API endpoints
     const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const isApiRequest = config.baseURL === apiBaseUrl || config.url?.startsWith('/api/');
-    
+
+    // Helper to remove trailing slash for comparison
+    const cleanUrl = (url?: string) => url?.replace(/\/$/, '');
+
+    const isApiRequest =
+      cleanUrl(config.baseURL) === cleanUrl(apiBaseUrl) ||
+      config.url?.startsWith('/api/') ||
+      // Also include our known service modules
+      config.url?.startsWith('/node/') ||
+      config.url?.startsWith('/connection/') ||
+      config.url?.startsWith('/context/') ||
+      config.url?.startsWith('/manifest/') ||
+      config.url?.startsWith('/templates/');
+
     if (isApiRequest) {
       // Get token from localStorage (Zustand persist middleware stores it there)
       const authState = localStorage.getItem('auth-storage');
-      
+
       if (authState) {
         try {
           const { state } = JSON.parse(authState);
           const token = state?.accessToken;
-          
+
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
           }
@@ -59,7 +72,7 @@ api.interceptors.request.use(
         }
       }
     }
-    
+
     return config;
   },
   (error) => {
@@ -99,16 +112,16 @@ api.interceptors.response.use(
     if (error.response?.status === 403) {
       // Open Essential Information page in new tab to show deletion notice
       window.open('/essential-information#delete-membership', '_blank');
-      
+
       // Clear auth state
       localStorage.removeItem('auth-storage');
-      
+
       // Broadcast logout to all tabs
       authSync.broadcast({ type: 'LOGOUT' });
-      
+
       // Redirect current tab to login
       window.location.href = '/login';
-      
+
       return Promise.reject(error);
     }
 
@@ -139,7 +152,7 @@ api.interceptors.response.use(
     // Try to refresh the token
     try {
       const authState = localStorage.getItem('auth-storage');
-      
+
       if (!authState) {
         throw new Error('No auth state found');
       }
@@ -188,10 +201,10 @@ api.interceptors.response.use(
 
       // Clear auth state and redirect to login
       localStorage.removeItem('auth-storage');
-      
+
       // Broadcast logout to all tabs
       authSync.broadcast({ type: 'LOGOUT' });
-      
+
       window.location.href = '/login';
 
       return Promise.reject(refreshError);
@@ -223,7 +236,7 @@ export const authApi = {
     const response = await authApiClient.post<LogoutResponse>('/auth/logout', data);
     return response.data;
   },
-  
+
   /**
    * Send verification code for account deletion
    */
@@ -231,7 +244,7 @@ export const authApi = {
     const response = await api.post('/account/send-deletion-code');
     return response.data;
   },
-  
+
   /**
    * Verify deletion code
    */
@@ -239,7 +252,7 @@ export const authApi = {
     const response = await api.post('/account/verify-deletion-code', { code });
     return response.data;
   },
-  
+
   /**
    * Delete account
    */
