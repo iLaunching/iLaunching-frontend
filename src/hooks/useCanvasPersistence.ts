@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { canvasApi, type NodeCreateData, type ConnectionCreateData } from '../services/canvasApi';
 import type { CanvasEngine } from '../components/Canvas/CanvasEngine';
-import type { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode';
+import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode';
 import type { LinkData } from '../components/Canvas/types';
 
 interface UseCanvasPersistenceOptions {
@@ -55,10 +55,29 @@ export const useCanvasPersistence = ({
             // stateManager.clearNodes();
 
             // Recreate nodes from API data
+            // Recreate nodes from API data
             nodes.forEach((nodeData: any) => {
-                // TODO: Create node factory based on node_type
-                // For now, we'll skip recreation since we need node factories
-                console.log('📦 Node from API:', nodeData.node_name, nodeData.node_type);
+                if (nodeData.node_type === 'smart-matrix') {
+                    // Extract colors from metadata if available
+                    const bgColor = nodeData.node_metadata?.theme_background;
+                    const textColor = nodeData.node_metadata?.theme_text;
+                    const solidColor = nodeData.node_metadata?.theme_solid;
+
+                    const node = new SmartMatrixNode(
+                        nodeData.node_id,
+                        nodeData.pos_x,
+                        nodeData.pos_y,
+                        bgColor,
+                        textColor,
+                        solidColor,
+                        nodeData.node_name
+                    );
+
+                    stateManager.addNode(node);
+                    console.log('✅ Restored SmartMatrixNode:', nodeData.node_id);
+                } else {
+                    console.log('⚠️ Unknown node type, skipping:', nodeData.node_type);
+                }
             });
 
             // Recreate connections
