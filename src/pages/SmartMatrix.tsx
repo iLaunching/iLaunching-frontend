@@ -16,8 +16,9 @@ import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
-import { useManifestSync } from '../hooks/useManifestSync';
+import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
+import { canvasApi } from '../services/canvasApi';
 import api from '../lib/api.js';
 import './SmartMatrix.css';
 
@@ -105,13 +106,13 @@ const SmartMatrixCanvas: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch manifest data for spatial state (camera position, zoom)
-  const { data: manifestData, isLoading: isManifestLoading, error: manifestError } = useQuery<ManifestData>({
-    queryKey: ['manifest', matrixData?.smart_matrix?.id],
+  // Fetch sovereign Smart Matrix data (DNA, position, master context)
+  const { data: smartMatrix, isLoading: isMatrixLoading, error: matrixError } = useQuery({
+    queryKey: ['smart-matrix', matrixData?.smart_matrix?.id],
     queryFn: async () => {
-      const response = await api.get(`/manifest/smart-matrix/${matrixData!.smart_matrix!.id}`);
-      console.log('📍 Manifest data loaded:', response.data);
-      return response.data;
+      const response = await canvasApi.getSmartMatrix(matrixData!.smart_matrix!.id);
+      console.log('📍 Smart Matrix loaded:', response);
+      return response;
     },
     enabled: !!matrixData?.smart_matrix?.id,
     staleTime: 30 * 1000,
@@ -130,22 +131,23 @@ const SmartMatrixCanvas: React.FC = () => {
     updateNodePosition,
     deleteNode,
     deleteConnection,
+    saveCameraPosition,
     isLoaded
   } = useCanvasPersistence({
-    contextId: manifestData?.master_context_id, // Direct reference - no extra query needed!
+    contextId: smartMatrix?.master_context_id,
     engine: engineRef.current,
-    enabled: isEngineReady && !!manifestData?.master_context_id
+    enabled: isEngineReady && !!smartMatrix?.master_context_id
   });
 
   console.log('🔄 Canvas persistence status:', {
     isLoaded,
-    contextId: manifestData?.master_context_id,
+    contextId: smartMatrix?.master_context_id,
     engineReady: isEngineReady
   });
 
-  // Warn if manifest fails to load (but don't block canvas)
-  if (manifestError) {
-    console.warn('⚠️ Manifest load failed, using default camera position:', manifestError);
+  // Warn if smart matrix fails to load (but don't block canvas)
+  if (matrixError) {
+    console.warn('⚠️ Smart Matrix load failed, using default camera position:', matrixError);
   }
 
   // Extract theme and grid settings from matrixData
@@ -180,8 +182,7 @@ const SmartMatrixCanvas: React.FC = () => {
 
 
   // Production-ready position sync with smart batching and retry logic
-  const { updatePosition, isDirty, syncStatus } = useManifestSync(
-    manifestData?.manifest_id,
+  const { updatePosition, isDirty, syncStatus } = useSmartMatrixCameraSync(
     matrixData?.smart_matrix?.id
   );
 
@@ -223,9 +224,9 @@ const SmartMatrixCanvas: React.FC = () => {
         snapToGrid: snapToGrid,
         enableDebug: debugMode,
         initialCamera: {
-          x: manifestData?.current_x ?? 0,
-          y: manifestData?.current_y ?? 0,
-          zoom: manifestData?.zoom_level ?? 1.0,
+          x: smartMatrix?.current_x ?? 0,
+          y: smartMatrix?.current_y ?? 0,
+          zoom: smartMatrix?.zoom_level ?? 1.0,
           minZoom: 0.1,
           maxZoom: 1.0
         }
@@ -265,7 +266,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [matrixData, manifestData, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+  }, [matrixData, smartMatrix, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
 
   // Cleanup only on unmount
   useEffect(() => {

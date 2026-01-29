@@ -15,7 +15,7 @@ interface Position {
 }
 
 /**
- * Production-ready hook for syncing camera position to manifest
+ * Production-ready hook for syncing camera position to Smart Matrix
  * 
  * Features:
  * - 3-second debouncing (reduces API calls by 95%+)
@@ -25,8 +25,7 @@ interface Position {
  * - Optimistic updates persist on error (smooth UX)
  * - Offline support (syncs when reconnected)
  */
-export function useManifestSync(
-    manifestId: string | undefined,
+export function useSmartMatrixCameraSync(
     matrixId: string | undefined
 ) {
     const queryClient = useQueryClient();
@@ -52,8 +51,8 @@ export function useManifestSync(
      */
     const syncPosition = useCallback(
         async (position: Position, retryCount = 0): Promise<boolean> => {
-            if (!manifestId) {
-                console.warn('⚠️ No manifest ID, skipping sync');
+            if (!matrixId) {
+                console.warn('⚠️ No matrix ID, skipping sync');
                 return false;
             }
 
@@ -69,15 +68,15 @@ export function useManifestSync(
                 setSyncStatus({ status: 'saving', lastSyncTime: null });
 
                 await api.patch(
-                    `/manifest/${manifestId}/position`,
+                    `/smart-matrix/${matrixId}/position`,
                     {
-                        current_x: position.x,
-                        current_y: position.y,
-                        zoom_level: position.zoom,
+                        x: position.x,
+                        y: position.y,
+                        zoom: position.zoom,
                     },
                     {
                         signal: abortControllerRef.current.signal,
-                        timeout: 5000, // 5s timeout (reduced from 10s)
+                        timeout: 5000,
                     }
                 );
 
@@ -123,14 +122,13 @@ export function useManifestSync(
                 });
 
                 // Keep optimistic update - don't invalidate cache
-                // Position stays where user put it, will retry on next change
                 pendingPosition.current = position;
                 setIsDirty(true);
 
                 return false;
             }
         },
-        [manifestId]
+        [matrixId]
     );
 
     /**
@@ -139,12 +137,12 @@ export function useManifestSync(
      */
     const updatePosition = useCallback(
         (x: number, y: number, zoom: number) => {
-            if (!manifestId || !matrixId) return;
+            if (!matrixId) return;
 
             const newPosition = { x, y, zoom };
 
             // Optimistically update cache IMMEDIATELY for instant UI feedback
-            queryClient.setQueryData(['manifest', matrixId], (old: any) => ({
+            queryClient.setQueryData(['smart-matrix', matrixId], (old: any) => ({
                 ...old,
                 current_x: x,
                 current_y: y,
@@ -165,7 +163,7 @@ export function useManifestSync(
                 syncPosition(newPosition);
             }, 3000); // 3 seconds (aggressive debouncing)
         },
-        [manifestId, matrixId, queryClient, syncPosition]
+        [matrixId, queryClient, syncPosition]
     );
 
     /**
@@ -208,18 +206,18 @@ export function useManifestSync(
             }
 
             // Final sync if dirty (best effort)
-            if (isDirty && pendingPosition.current && manifestId) {
+            if (isDirty && pendingPosition.current && matrixId) {
                 // Fire and forget - don't wait
-                api.patch(`/manifest/${manifestId}/position`, {
-                    current_x: pendingPosition.current.x,
-                    current_y: pendingPosition.current.y,
-                    zoom_level: pendingPosition.current.zoom,
+                api.patch(`/smart-matrix/${matrixId}/position`, {
+                    x: pendingPosition.current.x,
+                    y: pendingPosition.current.y,
+                    zoom: pendingPosition.current.zoom,
                 }).catch(() => {
                     // Ignore errors on unmount
                 });
             }
         };
-    }, [isDirty, manifestId]);
+    }, [isDirty, matrixId]);
 
     return {
         updatePosition,

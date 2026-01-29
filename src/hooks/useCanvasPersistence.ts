@@ -220,6 +220,17 @@ export const useCanvasPersistence = ({
         }
     }, [enabled]);
 
+    // Changing strategy: expose the API call wrapper
+    const saveCameraPosition = useCallback(async (matrixId: string, x: number, y: number, zoom: number) => {
+        if (!enabled) return;
+        try {
+            await canvasApi.updateCameraPosition(matrixId, x, y, zoom);
+            console.log('✅ Camera position saved');
+        } catch (error) {
+            console.error('❌ Failed to save camera:', error);
+        }
+    }, [enabled]);
+
     // Load canvas state when context and engine are ready
     useEffect(() => {
         if (contextId && engine && enabled && !hasLoadedRef.current) {
@@ -234,6 +245,7 @@ export const useCanvasPersistence = ({
         updateNodePosition,
         deleteNode,
         deleteConnection,
+        saveCameraPosition,
         isLoaded: hasLoadedRef.current
     };
 };

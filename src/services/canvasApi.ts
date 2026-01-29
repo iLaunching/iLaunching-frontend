@@ -153,4 +153,23 @@ export const canvasApi = {
         const response = await api.get(`/templates/${templateId}`);
         return response.data;
     },
+
+    // ============================================================================
+    // Smart Matrix Management (Sovereign Entity)
+    // ============================================================================
+
+    async getSmartMatrix(matrixId: string) {
+        const response = await api.get(`/smart-matrix/${matrixId}`);
+        return response.data;
+    },
+
+    async updateCameraPosition(matrixId: string, x: number, y: number, zoom?: number) {
+        const response = await api.patch(`/smart-matrix/${matrixId}/position`, { x, y, zoom });
+        return response.data;
+    },
+
+    async updateBusinessDNA(matrixId: string, dna: Record<string, any>) {
+        const response = await api.patch(`/smart-matrix/${matrixId}/business-dna`, dna);
+        return response.data;
+    },
 };
