@@ -257,6 +257,40 @@ export const useCanvasPersistence = ({
         }
     }, [contextId, engine, enabled, loadCanvasState]);
 
+    // Phase 3: Subscribe to engine events for position persistence
+    useEffect(() => {
+        if (!engine || !enabled) return;
+
+        const interactionManager = engine.getInteractionManager();
+
+        const handleNodesMoved = (event: any) => {
+            const { nodes } = event.data;
+            nodes.forEach((node: any) => {
+                // Determine the correct ID to use (backendId takes precedence)
+                const nodeId = node.backendId || node.id;
+
+                // Only persist if we have a valid UUID (backendId) or if we need to sync frontend-only nodes?
+                // Actually, backendId is essential for the API call. 
+                // Since loadCanvasState sets `node.id` to the UUID for restored nodes, we use `node.id`.
+                // But for newly created nodes, `node.id` is FrontendID and `node.backendId` is BackendID.
+                // SmartMatrixNode constructor sets `id` to the one passed (which is UUID on restore).
+
+                // Let's use the node.id unless backendId is explicitly set and different
+                // Actually, Step 4260 lines 66-74 shows `new SmartMatrixNode(nodeData.node_id, ...)`
+                // So for restored nodes, `node.id` IS the backend UUID.
+
+                console.log('📦 Persisting move for node:', nodeId, 'to', node.x, node.y);
+                updateNodePosition(nodeId, node.x, node.y);
+            });
+        };
+
+        interactionManager.on('nodesMoved', handleNodesMoved);
+
+        return () => {
+            interactionManager.off('nodesMoved', handleNodesMoved);
+        };
+    }, [engine, enabled, updateNodePosition]);
+
     return {
         loadCanvasState,
         persistNodeCreation,
