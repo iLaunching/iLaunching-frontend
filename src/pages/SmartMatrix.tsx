@@ -202,11 +202,14 @@ const SmartMatrixCanvas: React.FC = () => {
   // Initialize Canvas Engine (only once when data is first loaded)
   useEffect(() => {
     // Don't initialize if already initialized, no container, or no data
-    if (hasInitialized.current || !containerRef.current || !matrixData) {
+    // Wait for smartMatrix camera data (or error) to avoid defaulting to 0,0
+    if (hasInitialized.current || !containerRef.current || !matrixData || (!smartMatrix && !matrixError)) {
       console.log('⏸️ Skipping canvas initialization:', {
         hasInitialized: hasInitialized.current,
         hasContainer: !!containerRef.current,
-        hasData: !!matrixData
+        hasData: !!matrixData,
+        hasCameraData: !!smartMatrix,
+        hasError: !!matrixError
       });
       return;
     }
@@ -266,7 +269,7 @@ const SmartMatrixCanvas: React.FC = () => {
     } catch (error) {
       console.error('Failed to initialize Canvas Engine:', error);
     }
-  }, [matrixData, smartMatrix, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+  }, [matrixData, smartMatrix, matrixError, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
 
   // Cleanup only on unmount
   useEffect(() => {
