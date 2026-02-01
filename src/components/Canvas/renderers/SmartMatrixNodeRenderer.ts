@@ -111,10 +111,21 @@ export class SmartMatrixNodeRenderer {
       ctx.restore();
 
       // RENDER INPUT PORT (before mask layer so it sits under it)
-      this.renderInputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap, connectionManager);
+      // Pass explicit hover state based on ID
+      this.renderInputPort(
+        ctx, centerX, centerY, outerRadius, maskRadius, zoom,
+        node.id,
+        node.hoveredPortId === 'input', // Specific check 
+        node.backgroundColor, node, nodeConnectionMap, connectionManager
+      );
 
       // RENDER OUTPUT PORT (before mask layer so it sits under it)
-      this.renderOutputPort(ctx, centerX, centerY, outerRadius, maskRadius, zoom, node.id, node.isPortHovered, node.backgroundColor, node, nodeConnectionMap, connectionManager);
+      this.renderOutputPort(
+        ctx, centerX, centerY, outerRadius, maskRadius, zoom,
+        node.id,
+        node.hoveredPortId === 'output', // Specific check
+        node.backgroundColor, node, nodeConnectionMap, connectionManager
+      );
 
       // LAYER 2: White Mask (Creates Ring Effect)
       ctx.beginPath();
@@ -666,6 +677,7 @@ export class SmartMatrixNodeRenderer {
     ctx.stroke();
 
     ctx.restore();
+  }
 
 
   /**
@@ -674,15 +686,15 @@ export class SmartMatrixNodeRenderer {
    * Text container has transparent background
    */
   private renderText(
-      ctx: CanvasRenderingContext2D,
-      node: SmartMatrixNode,
-      centerX: number,
-      centerY: number,
-      bottomY: number,
-      zoom: number,
-      dpr: number,
-      maskRadius: number
-    ): void {
+    ctx: CanvasRenderingContext2D,
+    node: SmartMatrixNode,
+    centerX: number,
+    centerY: number,
+    bottomY: number,
+    zoom: number,
+    dpr: number,
+    maskRadius: number
+  ): void {
     ctx.save();
 
     // Calculate shadow position to properly position H2 label

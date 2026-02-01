@@ -55,7 +55,7 @@ export type InteractionEventListener = (event: InteractionEvent) => void;
 export class InteractionManager {
   private camera: Camera;
   private nodes: Map<string, BaseNode> = new Map();
-  
+
   private state: InteractionState = {
     mode: 'idle',
     startX: 0,
@@ -67,13 +67,13 @@ export class InteractionManager {
     hoveredNode: null,
     boxSelection: null
   };
-  
+
   // Selected nodes
   private selectedNodes: Set<string> = new Set();
-  
+
   // Event system
   private eventListeners: Map<string, InteractionEventListener[]> = new Map();
-  
+
   // Configuration
   private config = {
     multiSelectKey: 'Shift', // Hold shift for multi-select
@@ -82,49 +82,49 @@ export class InteractionManager {
     doubleClickTime: 300, // ms
     hoverThrottleMs: 16 // ~60fps throttle for hover detection
   };
-  
+
   // Throttling for hover detection
   private lastHoverCheck: number = 0;
-  
+
   // Double-click detection
   private lastClickTime: number = 0;
   private lastClickNode: string | null = null;
-  
+
   // Callback for marking canvas dirty
   private markDirtyCallback?: () => void;
-  
+
   // Grid snapping configuration
   private gridSize: number = 50;
   private snapToGrid: boolean = false;
-  
+
   // Panning state (screen space coordinates)
   private panStartScreenX: number = 0;
   private panStartScreenY: number = 0;
   private panAnimationFrame: number | null = null;
   private pendingPanX: number = 0;
   private pendingPanY: number = 0;
-  
+
   constructor(camera: Camera, markDirtyCallback?: () => void, gridSize?: number, snapToGrid?: boolean) {
     this.camera = camera;
     this.markDirtyCallback = markDirtyCallback;
     if (gridSize !== undefined) this.gridSize = gridSize;
     if (snapToGrid !== undefined) this.snapToGrid = snapToGrid;
   }
-  
+
   /**
    * Set the nodes to manage
    */
   setNodes(nodes: Map<string, BaseNode>): void {
     this.nodes = nodes;
   }
-  
+
   /**
    * Set snap to grid
    */
   setSnapToGrid(enabled: boolean): void {
     this.snapToGrid = enabled;
   }
-  
+
   /**
    * Handle mouse down event
    */
@@ -135,30 +135,30 @@ export class InteractionManager {
     isAltKey: boolean
   ): void {
     const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
-    
+
     this.state.startX = worldX;
     this.state.startY = worldY;
     this.state.currentX = worldX;
     this.state.currentY = worldY;
-    
+
     // Check for node hit
     const hitNode = this.getNodeAtPoint(worldX, worldY);
-    
+
     if (hitNode) {
       // Check for double-click
       const now = Date.now();
       const isDoubleClick =
         now - this.lastClickTime < this.config.doubleClickTime &&
         this.lastClickNode === hitNode.id;
-      
+
       this.lastClickTime = now;
       this.lastClickNode = hitNode.id;
-      
+
       if (isDoubleClick) {
         this.handleDoubleClick(hitNode);
         return;
       }
-      
+
       // Handle selection
       if (isShiftKey) {
         // Multi-select: toggle node selection
@@ -170,7 +170,7 @@ export class InteractionManager {
           this.selectNode(hitNode);
         }
       }
-      
+
       // Start dragging
       this.startDragging();
     } else {
@@ -184,13 +184,13 @@ export class InteractionManager {
       }
     }
   }
-  
+
   /**
    * Handle mouse move event with throttled hover detection and optimized panning
    */
   handleMouseMove(screenX: number, screenY: number): void {
     const now = performance.now();
-    
+
     switch (this.state.mode) {
       case 'dragging-node': {
         const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
@@ -199,7 +199,7 @@ export class InteractionManager {
         this.updateDragging(worldX, worldY);
         break;
       }
-        
+
       case 'box-selecting': {
         const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
         this.state.currentX = worldX;
@@ -207,12 +207,12 @@ export class InteractionManager {
         this.updateBoxSelection(worldX, worldY);
         break;
       }
-        
+
       case 'panning':
         // Skip world conversion for panning (screen space only)
         this.updatePanning(screenX, screenY);
         break;
-        
+
       case 'idle': {
         // Throttle hover detection for performance (~60fps)
         if (now - this.lastHoverCheck > this.config.hoverThrottleMs) {
@@ -226,30 +226,30 @@ export class InteractionManager {
       }
     }
   }
-  
+
   /**
    * Handle mouse up event
    */
   handleMouseUp(screenX: number, screenY: number): void {
     const [worldX, worldY] = this.camera.toWorld(screenX, screenY);
-    
+
     switch (this.state.mode) {
       case 'dragging-node':
         this.endDragging();
         break;
-        
+
       case 'box-selecting':
         this.endBoxSelection();
         break;
-        
+
       case 'panning':
         this.endPanning();
         break;
     }
-    
+
     this.state.mode = 'idle';
   }
-  
+
   /**
    * Handle keyboard events
    */
@@ -259,18 +259,18 @@ export class InteractionManager {
       case 'Backspace':
         this.deleteSelectedNodes();
         break;
-        
+
       case 'Escape':
         this.clearSelection();
         break;
-        
+
       case 'a':
       case 'A':
         // Ctrl+A or Cmd+A handled externally
         break;
     }
   }
-  
+
   /**
    * Select all nodes
    */
@@ -280,27 +280,27 @@ export class InteractionManager {
       this.selectNode(node);
     });
   }
-  
+
   // ============================================================================
   // PRIVATE METHODS
   // ============================================================================
-  
+
   /**
    * Get node at world coordinates
    */
   private getNodeAtPoint(worldX: number, worldY: number): BaseNode | null {
     // Check in reverse order (top to bottom)
     const nodeArray = Array.from(this.nodes.values()).reverse();
-    
+
     for (const node of nodeArray) {
       if (node.containsPoint(worldX, worldY)) {
         return node;
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * Select a node
    */
@@ -309,7 +309,7 @@ export class InteractionManager {
     this.selectedNodes.add(node.id);
     this.emit({ type: 'nodeSelected', data: node });
   }
-  
+
   /**
    * Deselect a node
    */
@@ -318,7 +318,7 @@ export class InteractionManager {
     this.selectedNodes.delete(node.id);
     this.emit({ type: 'nodeDeselected', data: node });
   }
-  
+
   /**
    * Toggle node selection
    */
@@ -329,7 +329,7 @@ export class InteractionManager {
       this.selectNode(node);
     }
   }
-  
+
   /**
    * Clear all selections
    */
@@ -343,7 +343,7 @@ export class InteractionManager {
     });
     this.selectedNodes.clear();
   }
-  
+
   /**
    * Start dragging selected nodes
    */
@@ -351,13 +351,13 @@ export class InteractionManager {
     this.state.mode = 'dragging-node';
     this.state.draggedNodes = [];
     this.state.dragOffsets.clear();
-    
+
     // Get all selected nodes
     this.selectedNodes.forEach(nodeId => {
       const node = this.nodes.get(nodeId);
       if (node) {
         this.state.draggedNodes.push(node);
-        
+
         // Store offset from cursor to node position
         this.state.dragOffsets.set(node.id, {
           x: node.x - this.state.startX,
@@ -366,7 +366,7 @@ export class InteractionManager {
       }
     });
   }
-  
+
   /**
    * Snap a coordinate to the grid
    */
@@ -374,7 +374,7 @@ export class InteractionManager {
     if (!this.snapToGrid) return value;
     return Math.round(value / this.gridSize) * this.gridSize;
   }
-  
+
   /**
    * Update dragging positions
    */
@@ -384,18 +384,18 @@ export class InteractionManager {
       if (offset) {
         let newX = worldX + offset.x;
         let newY = worldY + offset.y;
-        
+
         // Apply grid snapping if enabled
         if (this.snapToGrid) {
           newX = this.snapToGridCoordinate(newX);
           newY = this.snapToGridCoordinate(newY);
         }
-        
+
         node.setPosition(newX, newY);
       }
     });
   }
-  
+
   /**
    * End dragging
    */
@@ -412,11 +412,11 @@ export class InteractionManager {
         }
       });
     }
-    
+
     this.state.draggedNodes = [];
     this.state.dragOffsets.clear();
   }
-  
+
   /**
    * Start box selection
    */
@@ -429,7 +429,7 @@ export class InteractionManager {
       endY: worldY
     };
   }
-  
+
   /**
    * Update box selection
    */
@@ -439,21 +439,21 @@ export class InteractionManager {
       this.state.boxSelection.endY = worldY;
     }
   }
-  
+
   /**
    * End box selection and select nodes in box
    */
   private endBoxSelection(): void {
     if (!this.state.boxSelection) return;
-    
+
     const { startX, startY, endX, endY } = this.state.boxSelection;
-    
+
     // Calculate box bounds
     const minX = Math.min(startX, endX);
     const maxX = Math.max(startX, endX);
     const minY = Math.min(startY, endY);
     const maxY = Math.max(startY, endY);
-    
+
     // Select nodes inside box
     const selectedNodes: BaseNode[] = [];
     this.nodes.forEach(node => {
@@ -468,7 +468,7 @@ export class InteractionManager {
         selectedNodes.push(node);
       }
     });
-    
+
     this.emit({
       type: 'boxSelected',
       data: {
@@ -476,10 +476,10 @@ export class InteractionManager {
         bounds: { minX, maxX, minY, maxY }
       }
     });
-    
+
     this.state.boxSelection = null;
   }
-  
+
   /**
    * Start panning
    */
@@ -489,7 +489,7 @@ export class InteractionManager {
     this.panStartScreenX = screenX;
     this.panStartScreenY = screenY;
   }
-  
+
   /**
    * Update panning with RAF-batched smooth movement (60fps optimized)
    */
@@ -497,22 +497,22 @@ export class InteractionManager {
     // Accumulate delta
     this.pendingPanX += screenX - this.panStartScreenX;
     this.pendingPanY += screenY - this.panStartScreenY;
-    
+
     // Update for next frame
     this.panStartScreenX = screenX;
     this.panStartScreenY = screenY;
-    
+
     // Batch updates with RAF for smooth 60fps
     if (this.panAnimationFrame === null) {
       this.panAnimationFrame = requestAnimationFrame(() => {
         // Apply accumulated delta
         this.camera.pan(this.pendingPanX, this.pendingPanY, 1.0);
-        
+
         // Reset accumulator
         this.pendingPanX = 0;
         this.pendingPanY = 0;
         this.panAnimationFrame = null;
-        
+
         // Mark canvas dirty once per frame
         if (this.markDirtyCallback) {
           this.markDirtyCallback();
@@ -520,7 +520,7 @@ export class InteractionManager {
       });
     }
   }
-  
+
   /**
    * End panning and cleanup
    */
@@ -530,25 +530,25 @@ export class InteractionManager {
       cancelAnimationFrame(this.panAnimationFrame);
       this.panAnimationFrame = null;
     }
-    
+
     // Apply any remaining delta
     if (this.pendingPanX !== 0 || this.pendingPanY !== 0) {
       this.camera.pan(this.pendingPanX, this.pendingPanY, 1.0);
       this.pendingPanX = 0;
       this.pendingPanY = 0;
-      
+
       if (this.markDirtyCallback) {
         this.markDirtyCallback();
       }
     }
   }
-  
+
   /**
    * Update hover state
    */
   private updateHover(worldX: number, worldY: number): void {
     const hitNode = this.getNodeAtPoint(worldX, worldY);
-    
+
     // Clear previous hover
     if (this.state.hoveredNode && this.state.hoveredNode !== hitNode) {
       this.state.hoveredNode.isHovered = false;
@@ -557,7 +557,7 @@ export class InteractionManager {
         (this.state.hoveredNode as any).isPortHovered = false;
       }
     }
-    
+
     // Set new hover
     if (hitNode) {
       hitNode.isHovered = true;
@@ -565,26 +565,40 @@ export class InteractionManager {
     } else {
       this.state.hoveredNode = null;
     }
-    
+
     // Check port hover for all SmartMatrixNodes
     this.nodes.forEach(node => {
-      if (node.type === 'smart-matrix' && 'containsPortPoint' in node) {
+      if (node.type === 'smart-matrix' && 'getHoveredPortId' in node) {
+        const smartNode = node as any;
+        const prevPortId = smartNode.hoveredPortId;
+
+        // Update specific port hover
+        smartNode.hoveredPortId = smartNode.getHoveredPortId(worldX, worldY);
+
+        // Sync legacy boolean for other systems if needed
+        smartNode.isPortHovered = smartNode.hoveredPortId !== null;
+
+        // Mark dirty if hover state changed
+        if (prevPortId !== smartNode.hoveredPortId && this.markDirtyCallback) {
+          this.markDirtyCallback();
+        }
+      } else if (node.type === 'smart-matrix' && 'containsPortPoint' in node) {
+        // Fallback for older instances/types
         const smartNode = node as any;
         const wasHovered = smartNode.isPortHovered;
         smartNode.isPortHovered = smartNode.containsPortPoint(worldX, worldY);
-        // Mark dirty if hover state changed
         if (wasHovered !== smartNode.isPortHovered && this.markDirtyCallback) {
           this.markDirtyCallback();
         }
       }
     });
-    
+
     // Mark canvas as dirty to trigger re-render
     if (this.markDirtyCallback) {
       this.markDirtyCallback();
     }
   }
-  
+
   /**
    * Handle double-click on node
    */
@@ -593,13 +607,13 @@ export class InteractionManager {
     console.log('Double-clicked node:', node.id);
     // Could open node configuration dialog, etc.
   }
-  
+
   /**
    * Delete selected nodes
    */
   private deleteSelectedNodes(): void {
     const nodesToDelete: BaseNode[] = [];
-    
+
     this.selectedNodes.forEach(nodeId => {
       const node = this.nodes.get(nodeId);
       if (node) {
@@ -607,9 +621,9 @@ export class InteractionManager {
         this.nodes.delete(nodeId);
       }
     });
-    
+
     this.selectedNodes.clear();
-    
+
     if (nodesToDelete.length > 0) {
       this.emit({
         type: 'nodesDeleted',
@@ -617,11 +631,11 @@ export class InteractionManager {
       });
     }
   }
-  
+
   // ============================================================================
   // EVENT SYSTEM
   // ============================================================================
-  
+
   /**
    * Subscribe to interaction events
    */
@@ -631,7 +645,7 @@ export class InteractionManager {
     }
     this.eventListeners.get(eventType)!.push(listener);
   }
-  
+
   /**
    * Unsubscribe from interaction events
    */
@@ -644,7 +658,7 @@ export class InteractionManager {
       }
     }
   }
-  
+
   /**
    * Emit interaction event
    */
@@ -654,39 +668,39 @@ export class InteractionManager {
       listeners.forEach(listener => listener(event));
     }
   }
-  
+
   // ============================================================================
   // PUBLIC API
   // ============================================================================
-  
+
   /**
    * Get current interaction state
    */
   getState(): InteractionState {
     return { ...this.state };
   }
-  
+
   /**
    * Get box selection bounds (for rendering)
    */
   getBoxSelection(): { startX: number; startY: number; endX: number; endY: number } | null {
     return this.state.boxSelection;
   }
-  
+
   /**
    * Get selected node IDs
    */
   getSelectedNodes(): Set<string> {
     return new Set(this.selectedNodes);
   }
-  
+
   /**
    * Check if currently dragging
    */
   isDragging(): boolean {
     return this.state.mode === 'dragging-node';
   }
-  
+
   /**
    * Check if currently box selecting
    */
