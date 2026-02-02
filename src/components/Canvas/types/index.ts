@@ -63,8 +63,9 @@ export interface NodePort {
 // NODE TYPES
 // ============================================================================
 
-export type NodeType = 
+export type NodeType =
   | 'smart-matrix'
+  | 'smart-router'
   | 'trigger'
   | 'data-source'
   | 'filter'
@@ -127,7 +128,7 @@ export interface BezierControlPoints {
 // INTERACTION TYPES
 // ============================================================================
 
-export type InteractionMode = 
+export type InteractionMode =
   | 'select'
   | 'pan'
   | 'drag-node'
