@@ -611,16 +611,24 @@ const SmartMatrixCanvas: React.FC = () => {
     };
 
     // Listen for node selection events
-    const handleSelectionChange = (event: any) => {
-      // Check if a smart matrix node was selected
-      const selectedNodes = Array.from(engine.getInteractionManager().getSelectedNodes());
-      const smartMatrixNode = selectedNodes.find(node => node.type === 'smart-matrix') as SmartMatrixNode | undefined;
+    const handleSelectionChange = () => {
+      // Get selected node IDs
+      const selectedNodeIds = engine.getInteractionManager().getSelectedNodes();
 
-      if (smartMatrixNode) {
-        setSelectedSmartMatrix(smartMatrixNode);
-      } else {
-        setSelectedSmartMatrix(null);
+      // Get actual node objects from state manager
+      const stateManager = engine.getStateManager();
+      let smartMatrixNode: SmartMatrixNode | null = null;
+
+      for (const nodeId of selectedNodeIds) {
+        const node = stateManager.getNode(nodeId);
+        if (node && node.type === 'smart-matrix') {
+          smartMatrixNode = node as SmartMatrixNode;
+          break;
+        }
       }
+
+      console.log('🔍 Selection changed:', { selectedNodeIds, smartMatrixNode });
+      setSelectedSmartMatrix(smartMatrixNode);
     };
 
     // Subscribe to interaction events (simplified for now, ideally via event bus)
@@ -638,7 +646,7 @@ const SmartMatrixCanvas: React.FC = () => {
       } else {
         engine.handleMouseUp(e);
         // Check selection after click
-        handleSelectionChange(e);
+        handleSelectionChange();
       }
     };
 
