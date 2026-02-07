@@ -27,7 +27,9 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
 
         const updatePosition = () => {
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
-            const panelX = screenX + (node.width * camera.zoom) / 2 + 20; // 20px gap to the right
+            // Node radius is 92px, add that + 20px gap to position panel to the right
+            const nodeRadius = 92 * camera.zoom;
+            const panelX = screenX + nodeRadius + 20;
             const panelY = screenY - 250; // Center vertically relative to node
             setPosition({ x: panelX, y: panelY });
 
@@ -51,8 +53,8 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
             className="smart-matrix-properties-panel"
             style={{
                 position: 'absolute',
-                left: `${position.x}px`,
-                top: `${position.y}px`,
+                transform: `translate(${position.x}px, ${position.y}px)`,
+                willChange: 'transform',
                 width: '600px',
                 height: '500px',
                 backgroundColor: '#ffffff',
