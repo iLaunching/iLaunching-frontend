@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { SmartMatrixNode } from '../Canvas/nodes/SmartMatrixNode';
 import type { Camera } from '../Canvas/core/Camera';
 
@@ -18,23 +18,41 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
     style
 }) => {
     const [activeTab, setActiveTab] = useState('settings');
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const animationFrameRef = useRef<number>();
+
+    // Update position to follow node during pan/zoom
+    useEffect(() => {
+        if (!visible) return;
+
+        const updatePosition = () => {
+            const [screenX, screenY] = camera.toScreen(node.x, node.y);
+            const panelX = screenX + (node.width * camera.zoom) / 2 + 20; // 20px gap to the right
+            const panelY = screenY - 250; // Center vertically relative to node
+            setPosition({ x: panelX, y: panelY });
+
+            // Continue updating on next frame
+            animationFrameRef.current = requestAnimationFrame(updatePosition);
+        };
+
+        updatePosition();
+
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [visible, node.x, node.y, node.width, camera]);
 
     if (!visible) return null;
-
-    // Calculate screen position from world coordinates
-    const [screenX, screenY] = camera.toScreen(node.x, node.y);
-
-    // Position the panel to the right of the node
-    const panelX = screenX + (node.width * camera.zoom) / 2 + 20; // 20px gap
-    const panelY = screenY - 250; // Center vertically relative to node
 
     return (
         <div
             className="smart-matrix-properties-panel"
             style={{
                 position: 'absolute',
-                left: `${panelX}px`,
-                top: `${panelY}px`,
+                left: `${position.x}px`,
+                top: `${position.y}px`,
                 width: '600px',
                 height: '500px',
                 backgroundColor: '#ffffff',
@@ -45,6 +63,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 zIndex: 100,
                 overflow: 'hidden',
                 border: '1px solid #e5e7eb',
+                pointerEvents: 'auto',
                 ...style
             }}
         >
