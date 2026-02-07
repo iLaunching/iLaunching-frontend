@@ -775,11 +775,12 @@ const SmartMatrixCanvas: React.FC = () => {
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
-      {selectedSmartMatrix && (
+      {selectedSmartMatrix && engineRef.current && (
         <SmartMatrixProperties
           node={selectedSmartMatrix}
           visible={!!selectedSmartMatrix}
           onClose={() => setSelectedSmartMatrix(null)}
+          camera={engineRef.current.getCamera()}
         />
       )}
 
