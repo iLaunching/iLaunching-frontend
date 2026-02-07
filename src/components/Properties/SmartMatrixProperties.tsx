@@ -19,6 +19,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
 }) => {
     const [activeTab, setActiveTab] = useState('settings');
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const lastPositionRef = useRef({ x: 0, y: 0 });
     const animationFrameRef = useRef<number>();
 
     // Update position to follow node during pan/zoom
@@ -27,11 +28,14 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
 
         const updatePosition = () => {
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
-            // Node radius is 92px, add that + 20px gap to position panel to the right
-            const nodeRadius = 92 * camera.zoom;
-            const panelX = screenX + nodeRadius + 20;
+            const panelX = screenX + (node.width * camera.zoom) / 2 + 20; // 20px gap to the right
             const panelY = screenY - 250; // Center vertically relative to node
-            setPosition({ x: panelX, y: panelY });
+
+            // Only update if position has changed significantly (avoid micro-jitters and unnecessary renders)
+            if (Math.abs(panelX - lastPositionRef.current.x) > 0.1 || Math.abs(panelY - lastPositionRef.current.y) > 0.1) {
+                lastPositionRef.current = { x: panelX, y: panelY };
+                setPosition({ x: panelX, y: panelY });
+            }
 
             // Continue updating on next frame
             animationFrameRef.current = requestAnimationFrame(updatePosition);
