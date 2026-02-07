@@ -16,6 +16,7 @@ import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
+import { SmartMatrixProperties } from '../components/Properties/SmartMatrixProperties';
 import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import { canvasApi } from '../services/canvasApi';
@@ -84,6 +85,7 @@ const SmartMatrixCanvas: React.FC = () => {
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [fps, setFps] = useState(0);
   const [debugMode, setDebugMode] = useState(false);
+  const [selectedSmartMatrix, setSelectedSmartMatrix] = useState<SmartMatrixNode | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch current smart matrix data from API server
@@ -608,8 +610,24 @@ const SmartMatrixCanvas: React.FC = () => {
       engine.markDirty();
     };
 
+    // Listen for node selection events
+    const handleSelectionChange = (event: any) => {
+      // Check if a smart matrix node was selected
+      const selectedNodes = Array.from(engine.getInteractionManager().getSelectedNodes());
+      const smartMatrixNode = selectedNodes.find(node => node.type === 'smart-matrix') as SmartMatrixNode | undefined;
+
+      if (smartMatrixNode) {
+        setSelectedSmartMatrix(smartMatrixNode);
+      } else {
+        setSelectedSmartMatrix(null);
+      }
+    };
+
+    // Subscribe to interaction events (simplified for now, ideally via event bus)
+    // For now we'll hook into mouse up to check selection state
     const handleNodeMouseUp = (e: MouseEvent) => {
       if (connectionManager.isDragging()) {
+        // ... existing connection logic ...
         const rect = canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
@@ -619,8 +637,12 @@ const SmartMatrixCanvas: React.FC = () => {
         connectionManager.completeConnection(worldX, worldY);
       } else {
         engine.handleMouseUp(e);
+        // Check selection after click
+        handleSelectionChange(e);
       }
     };
+
+
 
     const handleKeyDown = (e: KeyboardEvent) => {
       engine.handleKeyDown(e);
@@ -745,6 +767,14 @@ const SmartMatrixCanvas: React.FC = () => {
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
+      {selectedSmartMatrix && (
+        <SmartMatrixProperties
+          node={selectedSmartMatrix}
+          visible={!!selectedSmartMatrix}
+          onClose={() => setSelectedSmartMatrix(null)}
+        />
+      )}
+
       {/* Canvas Container */}
       <div
         ref={containerRef}
