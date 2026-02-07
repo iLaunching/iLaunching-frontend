@@ -515,12 +515,19 @@ const SmartMatrixCanvas: React.FC = () => {
     const engine = engineRef.current;
     const connectionManager = engine.getConnectionManager();
 
+    // Track mouse down position for click vs drag detection
+    let mouseDownPos: { x: number, y: number } | null = null;
+
     const handleNodeMouseDown = (e: MouseEvent) => {
       // Only handle left click for nodes
       if (e.button === 0) {
         const rect = canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
+
+        // Store start position
+        mouseDownPos = { x: screenX, y: screenY };
+
         const camera = engine.getCamera();
         const [worldX, worldY] = camera.toWorld(screenX, screenY);
 
@@ -631,11 +638,9 @@ const SmartMatrixCanvas: React.FC = () => {
       setSelectedSmartMatrix(smartMatrixNode);
     };
 
-    // Subscribe to interaction events (simplified for now, ideally via event bus)
-    // For now we'll hook into mouse up to check selection state
+    // Subscribe to interaction events
     const handleNodeMouseUp = (e: MouseEvent) => {
       if (connectionManager.isDragging()) {
-        // ... existing connection logic ...
         const rect = canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
@@ -645,12 +650,37 @@ const SmartMatrixCanvas: React.FC = () => {
         connectionManager.completeConnection(worldX, worldY);
       } else {
         engine.handleMouseUp(e);
-        // Check selection after click
-        handleSelectionChange();
+
+        // Check if this was a click or a drag
+        if (mouseDownPos) {
+          const rect = canvas.getBoundingClientRect();
+          const screenX = e.clientX - rect.left;
+          const screenY = e.clientY - rect.top;
+
+          const dx = screenX - mouseDownPos.x;
+          const dy = screenY - mouseDownPos.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          console.log(`🖱️ Mouse Up: dist=${dist.toFixed(2)}px`);
+
+          // Only change selection if moved less than 5 pixels (click)
+          // Also allow if clicking on a node (to select it even after small drag)
+          // But strict 5px limit prevents accidental selection during long drags
+          if (dist < 5) {
+            console.log('✅ Click detected (not drag) -> Checking selection');
+            handleSelectionChange();
+          } else {
+            console.log('🛑 Drag detected -> Ignoring selection change');
+          }
+
+          mouseDownPos = null;
+        } else {
+          // Fallback if mouse down wasn't captured
+          console.warn('⚠️ Mouse down position missing in mouse up handler');
+          // handleSelectionChange(); // Commenting out fallback to see if this is the cause
+        }
       }
     };
-
-
 
     const handleKeyDown = (e: KeyboardEvent) => {
       engine.handleKeyDown(e);
