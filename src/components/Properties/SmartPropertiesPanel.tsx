@@ -59,62 +59,41 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
         if (!visible) return;
 
         const updatePosition = () => {
-            const width = 700;
-            const height = 600;
-            const gap = 20;
+            // Panel dimensions
+            const PANEL_WIDTH = 700;
+            const PANEL_HEIGHT = 600;
+            const GAP = 20;
+            const PADDING = 20;
 
-            const [screenX, screenY] = camera.toScreen(node.x, node.y);
+            // Get node's screen position (canvas-relative coordinates)
+            const [nodeScreenX, nodeScreenY] = camera.toScreen(node.x, node.y);
+            const nodeScreenWidth = node.width * camera.zoom;
+            const nodeScreenHeight = node.height * camera.zoom;
 
-            // Panel is now position:absolute inside canvas, so we use canvas coordinates directly!
-            // No viewport conversion needed - screenX/screenY are already correct
-
-            // Get canvas dimensions for boundary checking
+            // Get canvas dimensions
             const canvasRect = canvasContainerRef?.current?.getBoundingClientRect();
             const canvasWidth = canvasRect?.width ?? window.innerWidth;
             const canvasHeight = canvasRect?.height ?? window.innerHeight;
 
-            // Horizontal positioning: prefer LEFT of node, flip to RIGHT only when node is close to left edge
-            const horizontalPadding = 20;
-            const nodeScreenWidth = node.width * camera.zoom;
+            // HORIZONTAL POSITIONING
+            // Try left side first (preferred)
+            let panelX = nodeScreenX - PANEL_WIDTH - GAP;
 
-            // Position panel to the LEFT of the node
-            let panelX = screenX - width - gap;
-
-            // Only switch to right if the NODE itself is too close to the left edge
-            // (Allow panel to extend off-screen on the left)
-            const nodeMinX = 100; // Node must be at least 100px from left edge to keep panel on left
-            const shouldSwitchToRight = screenX < nodeMinX;
-
-            if (shouldSwitchToRight) {
-                // Position on right side
-                panelX = screenX + nodeScreenWidth + gap;
-
-                // Check if it fits on the right
-                const panelRight = panelX + width;
-                if (panelRight > (canvasWidth - horizontalPadding)) {
-                    // Doesn't fit on right either, clamp to canvas
-                    panelX = Math.max(horizontalPadding,
-                        Math.min(panelX, canvasWidth - width - horizontalPadding));
-                }
-            } else {
-                // Keep on left, but clamp if it goes too far off-screen
-                // Allow some off-screen overlap (up to 50% of panel width)
-                const maxOffscreenOverlap = width * 0.5;
-                panelX = Math.max(-maxOffscreenOverlap, panelX);
+            // If doesn't fit on left, try right side
+            if (panelX < PADDING) {
+                panelX = nodeScreenX + nodeScreenWidth + GAP;
             }
 
-            // Vertical positioning: center panel relative to node's VISUAL center
-            const nodeScreenHeight = node.height * camera.zoom;
-            const nodeVisualCenterY = screenY + (nodeScreenHeight / 2);
+            // Clamp to canvas bounds
+            panelX = Math.max(PADDING, Math.min(panelX, canvasWidth - PANEL_WIDTH - PADDING));
 
-            // Position panel so its center aligns with node's visual center
-            let panelY = nodeVisualCenterY - (height / 2);
+            // VERTICAL POSITIONING
+            // Center panel on node's visual center
+            const nodeCenterY = nodeScreenY + (nodeScreenHeight / 2);
+            let panelY = nodeCenterY - (PANEL_HEIGHT / 2);
 
-            // Clamp vertical position to canvas
-            const verticalPadding = 20;
-            const maxPanelY = canvasHeight - height - verticalPadding;
-            const minPanelY = verticalPadding;
-            panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
+            // Clamp to canvas bounds
+            panelY = Math.max(PADDING, Math.min(panelY, canvasHeight - PANEL_HEIGHT - PADDING));
 
             setPosition({ x: panelX, y: panelY });
 
