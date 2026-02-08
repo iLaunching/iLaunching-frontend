@@ -175,6 +175,12 @@ export class InteractionManager {
       this.startDragging();
     } else {
       // Clicked on empty space
+
+      // Clear selection if not using modifier keys (standard behavior)
+      if (!isShiftKey && !isAltKey) {
+        this.clearSelection();
+      }
+
       if (isAltKey) {
         // Start box selection
         this.startBoxSelection(worldX, worldY);

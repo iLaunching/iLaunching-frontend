@@ -16,7 +16,7 @@ import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
-import SmartPropertiesPanel from '../components/Properties/SmartPropertiesPanel';
+import { SmartMatrixProperties } from '../components/Properties/SmartMatrixProperties';
 import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import { canvasApi } from '../services/canvasApi';
@@ -806,12 +806,11 @@ const SmartMatrixCanvas: React.FC = () => {
       aria-label="Smart Matrix Node Automation Builder"
     >
       {selectedSmartMatrix && engineRef.current && (
-        <SmartPropertiesPanel
-          nodeId={selectedSmartMatrix.id}
-          nodeType={selectedSmartMatrix.type}
-          isOpen={!!selectedSmartMatrix}
+        <SmartMatrixProperties
+          node={selectedSmartMatrix}
+          visible={!!selectedSmartMatrix}
           onClose={() => setSelectedSmartMatrix(null)}
-          anchorNode={selectedSmartMatrix}
+          camera={engineRef.current.getCamera()}
         />
       )}
 
