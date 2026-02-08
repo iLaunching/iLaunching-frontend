@@ -29,7 +29,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
         if (!visible) return;
 
         const updatePosition = () => {
-            const width = 900; // Updated width for split view
+            const width = 700; // Updated width
             const height = 600; // Updated height for split view
             const gap = 20;
 
@@ -91,7 +91,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
             // Better: update width based on delta
             setLeftWidth(prev => {
                 const newWidth = prev + e.movementX;
-                return Math.max(200, Math.min(newWidth, 600)); // Clamp between 200 and 600 (assuming total 800)
+                return Math.max(200, Math.min(newWidth, 500)); // Clamp between 200 and 500
             });
         };
 
@@ -120,7 +120,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 transform: position ? `translate(${position.x}px, ${position.y}px)` : undefined,
                 opacity: position ? 1 : 0,
                 willChange: 'transform',
-                width: '900px', // Increased width for split view
+                width: '700px', // Reduced width
                 height: '600px', // Increased height
                 backgroundColor: '#ffffff',
                 borderRadius: '12px',
