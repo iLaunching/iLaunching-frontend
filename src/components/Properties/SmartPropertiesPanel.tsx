@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef, Suspense, useMemo } from 'react';
-import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
@@ -119,14 +118,15 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
         <AnimatePresence>
             {visible && (
                 <motion.div
-                    ref={refs.setFloating}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                     className="smart-properties-panel"
                     style={{
-                        ...floatingStyles,
+                        position: 'absolute',
+                        transform: position ? `translate(${position.x}px, ${position.y}px)` : undefined,
+                        opacity: position ? 1 : 0,
                         width: '700px',
                         height: '600px',
                         backgroundColor: 'rgba(255, 255, 255, 0.95)',
