@@ -126,7 +126,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 backdropFilter: 'blur(30px)', // Stronger blur
                 WebkitBackdropFilter: 'blur(30px)', // Safari support
                 borderRadius: '16px', // Smoother corners for glass
-                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.05)', // Very soft, premium shadow
+                boxShadow: 'none', // Removed shadow as requested
                 border: '1px solid rgba(255, 255, 255, 0.18)', // Subtle glass highlight border
                 display: 'flex',
                 zIndex: 100,
