@@ -73,39 +73,34 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
             const canvasWidth = canvasRect?.width ?? window.innerWidth;
             const canvasHeight = canvasRect?.height ?? window.innerHeight;
 
-            // Horizontal positioning: prefer LEFT of node, flip to RIGHT if no space
+            // Horizontal positioning: prefer LEFT of node, flip to RIGHT only when node is close to left edge
             const horizontalPadding = 20;
             const nodeScreenWidth = node.width * camera.zoom;
 
-            // Position panel to the LEFT of the node (using node's LEFT edge as reference)
+            // Position panel to the LEFT of the node
             let panelX = screenX - width - gap;
 
-            // Check if panel fits on the left side
-            const fitsOnLeft = panelX >= horizontalPadding;
+            // Only switch to right if the NODE itself is too close to the left edge
+            // (Allow panel to extend off-screen on the left)
+            const nodeMinX = 100; // Node must be at least 100px from left edge to keep panel on left
+            const shouldSwitchToRight = screenX < nodeMinX;
 
-            // DEBUG: Log horizontal positioning
-            console.log('🔍 Horizontal Positioning:', {
-                'Node screenX (left edge)': screenX,
-                'Node width (screen)': nodeScreenWidth,
-                'Panel width': width,
-                'Gap': gap,
-                'Panel X (if left)': panelX,
-                'Horizontal padding': horizontalPadding,
-                'Fits on left?': fitsOnLeft,
-                'Canvas width': canvasWidth
-            });
-
-            // If doesn't fit on left, position on right side
-            if (!fitsOnLeft) {
+            if (shouldSwitchToRight) {
+                // Position on right side
                 panelX = screenX + nodeScreenWidth + gap;
 
-                // Also check if it fits on the right
+                // Check if it fits on the right
                 const panelRight = panelX + width;
                 if (panelRight > (canvasWidth - horizontalPadding)) {
-                    // Doesn't fit on either side, clamp to canvas
+                    // Doesn't fit on right either, clamp to canvas
                     panelX = Math.max(horizontalPadding,
                         Math.min(panelX, canvasWidth - width - horizontalPadding));
                 }
+            } else {
+                // Keep on left, but clamp if it goes too far off-screen
+                // Allow some off-screen overlap (up to 50% of panel width)
+                const maxOffscreenOverlap = width * 0.5;
+                panelX = Math.max(-maxOffscreenOverlap, panelX);
             }
 
             // Vertical positioning: center panel relative to node's VISUAL center
