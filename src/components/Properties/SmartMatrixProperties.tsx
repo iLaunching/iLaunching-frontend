@@ -128,7 +128,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 display: 'flex',
                 zIndex: 100,
                 overflow: 'hidden',
-                border: '1px solid #e5e7eb',
+                // border: '1px solid #e5e7eb', // Removed border as requested
                 pointerEvents: 'auto',
                 ...style
             }}
@@ -141,15 +141,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 flexDirection: 'column',
                 borderRight: '1px solid #e5e7eb'
             }}>
-                <div style={{ padding: '16px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: '#374151' }}>Chat Section</h3>
-                </div>
-                <div style={{ flex: 1, padding: '16px' }}>
-                    {/* Chat content placeholder */}
-                    <div style={{ color: '#9ca3af', fontSize: '14px', textAlign: 'center', marginTop: '40px' }}>
-                        Chat interface coming soon
-                    </div>
-                </div>
+                {/* Content cleared */}
             </div>
 
             {/* Resizer Handle */}
@@ -168,35 +160,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
 
             {/* Right Section: Main Context Options */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
-                <div style={{
-                    padding: '16px',
-                    borderBottom: '1px solid #e5e7eb',
-                    background: '#f9fafb',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: '#374151' }}>Main Context Options</h3>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: '18px',
-                            cursor: 'pointer',
-                            color: '#6b7280',
-                            lineHeight: 1
-                        }}
-                    >
-                        ×
-                    </button>
-                </div>
-                <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
-                    {/* Main Options content can go here */}
-                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                        Context and node settings will appear here.
-                    </p>
-                </div>
+                {/* Content cleared */}
             </div>
         </div>
     );
