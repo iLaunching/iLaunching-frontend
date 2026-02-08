@@ -65,17 +65,20 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
 
-            // Get canvas container bounds for accurate viewport detection
+            // Panel is now position:absolute inside canvas, so we use canvas coordinates directly!
+            // No viewport conversion needed - screenX/screenY are already correct
+
+            // Get canvas dimensions for boundary checking
             const canvasRect = canvasContainerRef?.current?.getBoundingClientRect();
-            const viewportLeft = canvasRect?.left ?? 0;
-            const viewportRight = canvasRect?.right ?? window.innerWidth;
+            const canvasWidth = canvasRect?.width ?? window.innerWidth;
+            const canvasHeight = canvasRect?.height ?? window.innerHeight;
 
             // Horizontal positioning: prefer LEFT of node, flip to RIGHT if no space
             const horizontalPadding = 20;
             let panelX = screenX - width - gap;
 
-            // Check if panel fits on the left side (within canvas viewport)
-            const fitsOnLeft = panelX >= (viewportLeft + horizontalPadding);
+            // Check if panel fits on the left side
+            const fitsOnLeft = panelX >= horizontalPadding;
 
             // If doesn't fit on left, position on right side
             if (!fitsOnLeft) {
@@ -83,25 +86,23 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
                 // Also check if it fits on the right
                 const panelRight = panelX + width;
-                if (panelRight > (viewportRight - horizontalPadding)) {
-                    // Doesn't fit on either side, clamp to viewport
-                    panelX = Math.max(viewportLeft + horizontalPadding,
-                        Math.min(panelX, viewportRight - width - horizontalPadding));
+                if (panelRight > (canvasWidth - horizontalPadding)) {
+                    // Doesn't fit on either side, clamp to canvas
+                    panelX = Math.max(horizontalPadding,
+                        Math.min(panelX, canvasWidth - width - horizontalPadding));
                 }
             }
 
             // Vertical positioning: center panel relative to node's VISUAL center
-            // NOTE: Node is rendered as a circle centered at (node.x + width/2, node.y + height/2)
-            // So screenY is the TOP of the node's bounding box, and we need to find the circle's center
             const nodeScreenHeight = node.height * camera.zoom;
             const nodeVisualCenterY = screenY + (nodeScreenHeight / 2);
 
             // Position panel so its center aligns with node's visual center
             let panelY = nodeVisualCenterY - (height / 2);
 
-            // Clamp vertical position to viewport
+            // Clamp vertical position to canvas
             const verticalPadding = 20;
-            const maxPanelY = window.innerHeight - height - verticalPadding;
+            const maxPanelY = canvasHeight - height - verticalPadding;
             const minPanelY = verticalPadding;
             panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
 
@@ -159,7 +160,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                     className="smart-properties-panel"
                     style={{
-                        position: 'fixed',
+                        position: 'absolute', // Changed from 'fixed' - now relative to canvas container!
                         left: `${position?.x ?? 0}px`,
                         top: `${position?.y ?? 0}px`,
                         opacity: position ? 1 : 0,
