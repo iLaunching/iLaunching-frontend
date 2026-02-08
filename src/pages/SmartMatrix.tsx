@@ -811,6 +811,7 @@ const SmartMatrixCanvas: React.FC = () => {
           visible={!!selectedSmartMatrix}
           onClose={() => setSelectedSmartMatrix(null)}
           camera={engineRef.current.getCamera()}
+          canvasContainerRef={containerRef}
         />
       )}
 

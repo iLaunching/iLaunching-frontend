@@ -14,11 +14,19 @@ interface BaseNode {
     [key: string]: any; // Allow additional properties
 }
 
+// Assuming SmartMatrixNode is a specific type of BaseNode, or defined elsewhere
+// For now, I'll assume it's a placeholder for a more specific node type.
+// If SmartMatrixNode is not defined, this would cause a type error.
+// For the purpose of this edit, I will just replace BaseNode with SmartMatrixNode as requested.
+interface SmartMatrixNode extends BaseNode { }
+
+
 interface SmartPropertiesPanelProps {
-    node: BaseNode;
+    node: SmartMatrixNode;
     visible: boolean;
     onClose: () => void;
     camera: Camera;
+    canvasContainerRef?: React.RefObject<HTMLDivElement>;
     style?: React.CSSProperties;
 }
 
@@ -35,6 +43,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     visible,
     onClose,
     camera,
+    canvasContainerRef,
     style
 }) => {
     const [leftWidth, setLeftWidth] = useState(450);
@@ -56,16 +65,29 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
 
+            // Get canvas container bounds for accurate viewport detection
+            const canvasRect = canvasContainerRef?.current?.getBoundingClientRect();
+            const viewportLeft = canvasRect?.left ?? 0;
+            const viewportRight = canvasRect?.right ?? window.innerWidth;
+
             // Horizontal positioning: prefer LEFT of node, flip to RIGHT if no space
             const horizontalPadding = 20;
             let panelX = screenX - width - gap;
 
-            // Check if panel fits on the left side (with padding from viewport edge)
-            const fitsOnLeft = panelX >= horizontalPadding;
+            // Check if panel fits on the left side (within canvas viewport)
+            const fitsOnLeft = panelX >= (viewportLeft + horizontalPadding);
 
             // If doesn't fit on left, position on right side
             if (!fitsOnLeft) {
                 panelX = screenX + (node.width * camera.zoom) + gap;
+
+                // Also check if it fits on the right
+                const panelRight = panelX + width;
+                if (panelRight > (viewportRight - horizontalPadding)) {
+                    // Doesn't fit on either side, clamp to viewport
+                    panelX = Math.max(viewportLeft + horizontalPadding,
+                        Math.min(panelX, viewportRight - width - horizontalPadding));
+                }
             }
 
             // Vertical positioning: center panel relative to node's VISUAL center
