@@ -76,7 +76,6 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
             panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
 
             setPosition({ x: panelX, y: panelY });
-            console.log('Panel position:', { x: panelX, y: panelY }, 'Screen:', { screenX, screenY }, 'Node:', { x: node.x, y: node.y });
 
             // Continue loop
             rafRef.current = requestAnimationFrame(updatePosition);
