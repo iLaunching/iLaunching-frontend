@@ -20,7 +20,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
     const [activeTab, setActiveTab] = useState('settings');
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const animationFrameRef = useRef<number>();
-    const [leftWidth, setLeftWidth] = useState(300); // Initial width for left section
+    const [leftWidth, setLeftWidth] = useState(450); // Initial width for left section
     const [isResizing, setIsResizing] = useState(false);
 
     // Update position to follow node during pan/zoom
