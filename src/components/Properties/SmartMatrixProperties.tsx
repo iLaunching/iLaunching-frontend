@@ -122,11 +122,12 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 willChange: 'transform',
                 width: '700px', // Reduced width
                 height: '600px', // Increased height
-                backgroundColor: 'rgba(255, 255, 255, 0.2)', // More transparent
-                backdropFilter: 'blur(20px)', // Stronger blur
-                WebkitBackdropFilter: 'blur(20px)', // Safari support
-                borderRadius: '12px',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.1)', // Slightly more shadow for contrast
+                backgroundColor: 'rgba(255, 255, 255, 0.15)', // More transparency for glass look
+                backdropFilter: 'blur(30px)', // Stronger blur
+                WebkitBackdropFilter: 'blur(30px)', // Safari support
+                borderRadius: '16px', // Smoother corners for glass
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.05)', // Very soft, premium shadow
+                border: '1px solid rgba(255, 255, 255, 0.18)', // Subtle glass highlight border
                 display: 'flex',
                 zIndex: 100,
                 overflow: 'hidden',
@@ -141,7 +142,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 minWidth: 200,
                 display: 'flex',
                 flexDirection: 'column',
-                borderRight: '1px solid #e5e7eb'
+                borderRight: '1px solid rgba(255, 255, 255, 0.2)' // Glass divider instead of solid gray
             }}>
                 {/* Content cleared */}
             </div>
