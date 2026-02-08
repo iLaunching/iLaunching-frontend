@@ -77,33 +77,6 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             setPosition({ x: panelX, y: panelY });
 
-            // DEBUG: Log every frame to see values
-            console.log('🎯 Panel Positioning:', {
-                'Node (world)': { x: node.x, y: node.y, width: node.width, height: node.height },
-                'Node top (screen)': screenY,
-                'Node height (screen)': nodeScreenHeight,
-                'Node center Y (screen)': nodeCenterY,
-                'Panel height': height,
-                'Panel Y (calculated)': nodeCenterY - (height / 2),
-                'Panel Y (final)': panelY,
-                'Panel center Y': panelY + (height / 2),
-                'Alignment check': `Node center (${nodeCenterY}) should equal Panel center (${panelY + (height / 2)})`
-            });
-
-            // Debug logging - remove after fixing
-            if (Math.random() < 0.01) { // Log only 1% of frames to avoid spam
-                console.log('🎯 Vertical Centering Debug:', {
-                    'Node height (world)': node.height,
-                    'Camera zoom': camera.zoom,
-                    'Node height (screen)': nodeScreenHeight,
-                    'Node top (screenY)': screenY,
-                    'Node center Y': nodeCenterY,
-                    'Panel height': height,
-                    'Panel Y (calculated)': nodeCenterY - (height / 2),
-                    'Panel Y (final)': panelY,
-                    'Was clamped?': panelY !== (nodeCenterY - (height / 2))
-                });
-            }
 
             // Continue loop
             rafRef.current = requestAnimationFrame(updatePosition);
@@ -170,7 +143,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         display: 'flex',
                         zIndex: 1000,
                         overflow: 'hidden',
-                        border: '3px solid red', // DEBUG: Visual border to see panel position
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
                         pointerEvents: 'auto',
                         ...style
                     }}
