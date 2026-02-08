@@ -23,11 +23,12 @@ interface SmartPropertiesPanelProps {
 }
 
 /**
- * Global Properties Panel with Floating UI positioning and performance optimizations
- * - Uses @floating-ui/react for smart positioning
- * - Wrapped in React.memo to prevent re-renders during canvas panning
+ * Global Properties Panel with canvas-based positioning
+ * - Renders directly in canvas (no Portal)
+ * - Simple absolute positioning with transform
+ * - RAF loop tracks camera movements
+ * - React.memo prevents re-renders during panning
  * - Lazy loads context components
- * - Smooth transitions with Framer Motion
  */
 export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     node,
@@ -38,54 +39,55 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 }) => {
     const [leftWidth, setLeftWidth] = useState(450);
     const [isResizing, setIsResizing] = useState(false);
+    const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
+    const rafRef = useRef<number>();
 
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
 
-    // Floating UI setup - use 'fixed' strategy for portal compatibility
-    const { refs, floatingStyles, update } = useFloating({
-        placement: 'left-start',
-        strategy: 'fixed', // Required for portals - positions relative to viewport
-        middleware: [
-            offset(20), // 20px gap from node
-            flip(), // Flip to right if no space on left
-            shift({ padding: 20 }) // Keep within viewport with 20px padding
-        ]
-    });
-
-    // Continuously update virtual element position as camera moves
+    // Update position to follow node during pan/zoom
     useEffect(() => {
         if (!visible) return;
 
         const updatePosition = () => {
+            const width = 700;
+            const height = 600;
+            const gap = 20;
+
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
 
-            refs.setReference({
-                getBoundingClientRect: () => ({
-                    x: screenX,
-                    y: screenY,
-                    width: node.width * camera.zoom,
-                    height: node.height * camera.zoom,
-                    top: screenY,
-                    left: screenX,
-                    right: screenX + (node.width * camera.zoom),
-                    bottom: screenY + (node.height * camera.zoom)
-                })
-            });
+            // Position to the LEFT of the node
+            let panelX = screenX - width - gap;
 
-            update?.();
+            // If left side doesn't fit, try right side
+            if (panelX < 0) {
+                panelX = screenX + (node.width * camera.zoom) + gap;
+            }
+
+            // Vertical positioning: align with top of node
+            let panelY = screenY;
+
+            // Clamp vertical position to viewport
+            const verticalPadding = 20;
+            const maxPanelY = window.innerHeight - height - verticalPadding;
+            const minPanelY = verticalPadding;
+            panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
+
+            setPosition({ x: panelX, y: panelY });
+
+            // Continue loop
+            rafRef.current = requestAnimationFrame(updatePosition);
         };
 
-        // Update position continuously
-        const animationFrame = requestAnimationFrame(function tick() {
-            updatePosition();
-            requestAnimationFrame(tick);
-        });
+        // Start the loop
+        rafRef.current = requestAnimationFrame(updatePosition);
 
         return () => {
-            cancelAnimationFrame(animationFrame);
+            if (rafRef.current) {
+                cancelAnimationFrame(rafRef.current);
+            }
         };
-    }, [visible, node.x, node.y, node.width, node.height, camera, refs, update]);
+    }, [visible, node.x, node.y, node.width, node.height, camera]);
 
     // Handle resizing
     useEffect(() => {
