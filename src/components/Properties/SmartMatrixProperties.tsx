@@ -122,11 +122,11 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 willChange: 'transform',
                 width: '700px', // Reduced width
                 height: '600px', // Increased height
-                backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent
-                backdropFilter: 'blur(12px)', // Frosted glass effect
-                WebkitBackdropFilter: 'blur(12px)', // Safari support
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', // More transparent
+                backdropFilter: 'blur(20px)', // Stronger blur
+                WebkitBackdropFilter: 'blur(20px)', // Safari support
                 borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)', // Subtle shadow
+                boxShadow: '0 4px 24px rgba(0,0,0,0.1)', // Slightly more shadow for contrast
                 display: 'flex',
                 zIndex: 100,
                 overflow: 'hidden',
