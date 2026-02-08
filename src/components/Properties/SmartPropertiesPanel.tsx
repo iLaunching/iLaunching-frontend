@@ -85,15 +85,6 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             setPosition({ x: panelX, y: panelY });
 
-            // DEBUG: Log positioning details
-            console.log('🔍 Alignment Debug:', {
-                'Node visual center Y': nodeVisualCenterY,
-                'Panel Y (top)': panelY,
-                'Panel center Y': panelY + (height / 2),
-                'Panel height': height,
-                'Should align?': nodeVisualCenterY === (panelY + height / 2)
-            });
-
 
             // Continue loop
             rafRef.current = requestAnimationFrame(updatePosition);
@@ -164,20 +155,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         pointerEvents: 'auto',
                         ...style
                     }}
-                >
-                    {/* DEBUG: Visual centerline - positioned relative to entire panel */}
-                    <div style={{
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        top: '50%',
-                        height: '3px',
-                        backgroundColor: 'lime',
-                        zIndex: 10000,
-                        pointerEvents: 'none'
-                    }} />
-
-                    {/* Left Section: Chat */}
+                > {/* Left Section: Chat */}
                     <div style={{
                         width: leftWidth,
                         minWidth: 200,
