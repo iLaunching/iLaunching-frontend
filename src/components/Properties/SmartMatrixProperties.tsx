@@ -120,13 +120,13 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 transform: position ? `translate(${position.x}px, ${position.y}px)` : undefined,
                 opacity: position ? 1 : 0,
                 willChange: 'transform',
-                width: '700px', // Reduced width
-                height: '600px', // Increased height
-                // backgroundColor: 'transparent', // Removed background as requested
-                // backdropFilter: 'none',
-                // WebkitBackdropFilter: 'none',
+                // Frosted Glass Effect
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                backdropFilter: 'blur(15px)',
+                WebkitBackdropFilter: 'blur(15px)',
                 borderRadius: '12px',
-                boxShadow: 'none', // Also removing shadow to be completely clean
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
                 display: 'flex',
                 zIndex: 100,
                 overflow: 'hidden',
