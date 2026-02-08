@@ -43,9 +43,10 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
 
-    // Floating UI setup
+    // Floating UI setup - use 'fixed' strategy for portal compatibility
     const { refs, floatingStyles, update } = useFloating({
         placement: 'left-start',
+        strategy: 'fixed', // Required for portals - positions relative to viewport
         middleware: [
             offset(20), // 20px gap from node
             flip(), // Flip to right if no space on left
