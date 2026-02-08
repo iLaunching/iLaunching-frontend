@@ -133,34 +133,49 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 ...style
             }}
         >
-            {/* Left Section: Chat */}
+            <style>
+                {`
+                    @keyframes panelPopUp {
+                        0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+                        100% { opacity: 1; transform: translateY(0) scale(1); }
+                    }
+                `}
+            </style>
             <div style={{
-                width: leftWidth,
-                minWidth: 200,
+                width: '100%',
+                height: '100%',
                 display: 'flex',
-                flexDirection: 'column',
-                borderRight: '1px solid #e5e7eb'
+                animation: 'panelPopUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
             }}>
-                {/* Content cleared */}
-            </div>
+                {/* Left Section: Chat */}
+                <div style={{
+                    width: leftWidth,
+                    minWidth: 200,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRight: '1px solid #e5e7eb'
+                }}>
+                    {/* Content cleared */}
+                </div>
 
-            {/* Resizer Handle */}
-            <div
-                onMouseDown={() => setIsResizing(true)}
-                style={{
-                    width: '4px',
-                    cursor: 'col-resize',
-                    backgroundColor: isResizing ? '#7F77F1' : 'transparent',
-                    transition: 'background-color 0.2s',
-                    zIndex: 10
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
-                onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
-            />
+                {/* Resizer Handle */}
+                <div
+                    onMouseDown={() => setIsResizing(true)}
+                    style={{
+                        width: '4px',
+                        cursor: 'col-resize',
+                        backgroundColor: isResizing ? '#7F77F1' : 'transparent',
+                        transition: 'background-color 0.2s',
+                        zIndex: 10
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
+                    onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
+                />
 
-            {/* Right Section: Main Context Options */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
-                {/* Content cleared */}
+                {/* Right Section: Main Context Options */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
+                    {/* Content cleared */}
+                </div>
             </div>
         </div>
     );
