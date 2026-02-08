@@ -64,10 +64,8 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                 panelX = screenX + (node.width * camera.zoom) + gap;
             }
 
-            // Vertical positioning: center panel relative to node
-            const nodeScreenHeight = node.height * camera.zoom;
-            const nodeCenterY = screenY + (nodeScreenHeight / 2);
-            let panelY = nodeCenterY - (height / 2);
+            // Vertical positioning: align panel top with node top
+            let panelY = screenY;
 
             // Clamp vertical position to viewport
             const verticalPadding = 20;
@@ -76,6 +74,21 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
             panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
 
             setPosition({ x: panelX, y: panelY });
+
+            // Debug logging - remove after fixing
+            if (Math.random() < 0.01) { // Log only 1% of frames to avoid spam
+                console.log('🎯 Vertical Centering Debug:', {
+                    'Node height (world)': node.height,
+                    'Camera zoom': camera.zoom,
+                    'Node height (screen)': nodeScreenHeight,
+                    'Node top (screenY)': screenY,
+                    'Node center Y': nodeCenterY,
+                    'Panel height': height,
+                    'Panel Y (calculated)': nodeCenterY - (height / 2),
+                    'Panel Y (final)': panelY,
+                    'Was clamped?': panelY !== (nodeCenterY - (height / 2))
+                });
+            }
 
             // Continue loop
             rafRef.current = requestAnimationFrame(updatePosition);
