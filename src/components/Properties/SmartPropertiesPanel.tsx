@@ -139,20 +139,23 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
     if (!visible) return null;
 
+    // Don't render until position is calculated to prevent flash in top-left
+    if (!position) return null;
+
     return (
-        <AnimatePresence>
-            {visible && (
+        <>
+            {/* Properties Panel */}
+            <AnimatePresence>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                     className="smart-properties-panel"
                     style={{
                         position: 'absolute', // Changed from 'fixed' - now relative to canvas container!
-                        left: `${position?.x ?? 0}px`,
-                        top: `${position?.y ?? 0}px`,
-                        opacity: position ? 1 : 0,
+                        left: `${position.x}px`,
+                        top: `${position.y}px`,
                         width: '700px',
                         height: '600px',
                         backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -217,18 +220,18 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                     </div>
                 </motion.div>
             )}
-        </AnimatePresence>
-    );
+            </AnimatePresence>
+            );
 }, (prevProps, nextProps) => {
     // Custom comparison: only re-render if node ID, visibility, or camera zoom changes significantly
     // This prevents re-renders during canvas panning
     return (
-        prevProps.node.id === nextProps.node.id &&
-        prevProps.visible === nextProps.visible &&
-        Math.abs(prevProps.camera.zoom - nextProps.camera.zoom) < 0.01
-    );
+            prevProps.node.id === nextProps.node.id &&
+            prevProps.visible === nextProps.visible &&
+            Math.abs(prevProps.camera.zoom - nextProps.camera.zoom) < 0.01
+            );
 });
 
-SmartPropertiesPanel.displayName = 'SmartPropertiesPanel';
+            SmartPropertiesPanel.displayName = 'SmartPropertiesPanel';
 
-export default SmartPropertiesPanel;
+            export default SmartPropertiesPanel;
