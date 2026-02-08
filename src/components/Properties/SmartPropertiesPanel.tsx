@@ -219,19 +219,19 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         </Suspense>
                     </div>
                 </motion.div>
-            )}
             </AnimatePresence>
-            );
+        </>
+    );
 }, (prevProps, nextProps) => {
     // Custom comparison: only re-render if node ID, visibility, or camera zoom changes significantly
     // This prevents re-renders during canvas panning
     return (
-            prevProps.node.id === nextProps.node.id &&
-            prevProps.visible === nextProps.visible &&
-            Math.abs(prevProps.camera.zoom - nextProps.camera.zoom) < 0.01
-            );
+        prevProps.node.id === nextProps.node.id &&
+        prevProps.visible === nextProps.visible &&
+        Math.abs(prevProps.camera.zoom - nextProps.camera.zoom) < 0.01
+    );
 });
 
-            SmartPropertiesPanel.displayName = 'SmartPropertiesPanel';
+SmartPropertiesPanel.displayName = 'SmartPropertiesPanel';
 
-            export default SmartPropertiesPanel;
+export default SmartPropertiesPanel;
