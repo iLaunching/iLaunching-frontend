@@ -43,46 +43,49 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
 
-    // Calculate screen position from world coordinates
-    const screenPosition = useMemo(() => {
-        const [screenX, screenY] = camera.toScreen(node.x, node.y);
-        return {
-            x: screenX,
-            y: screenY,
-            width: node.width * camera.zoom,
-            height: node.height * camera.zoom
-        };
-    }, [node.x, node.y, node.width, node.height, camera]);
-
     // Floating UI setup
     const { refs, floatingStyles, update } = useFloating({
-        placement: 'right-start',
+        placement: 'left-start',
         middleware: [
             offset(20), // 20px gap from node
-            flip(), // Flip to left if no space on right
+            flip(), // Flip to right if no space on left
             shift({ padding: 20 }) // Keep within viewport with 20px padding
-        ],
-        whileElementsMounted: autoUpdate
+        ]
     });
 
-    // Set virtual element as reference for Floating UI
+    // Continuously update virtual element position as camera moves
     useEffect(() => {
-        if (visible && screenPosition) {
+        if (!visible) return;
+
+        const updatePosition = () => {
+            const [screenX, screenY] = camera.toScreen(node.x, node.y);
+
             refs.setReference({
                 getBoundingClientRect: () => ({
-                    x: screenPosition.x,
-                    y: screenPosition.y,
-                    width: screenPosition.width,
-                    height: screenPosition.height,
-                    top: screenPosition.y,
-                    left: screenPosition.x,
-                    right: screenPosition.x + screenPosition.width,
-                    bottom: screenPosition.y + screenPosition.height
+                    x: screenX,
+                    y: screenY,
+                    width: node.width * camera.zoom,
+                    height: node.height * camera.zoom,
+                    top: screenY,
+                    left: screenX,
+                    right: screenX + (node.width * camera.zoom),
+                    bottom: screenY + (node.height * camera.zoom)
                 })
             });
+
             update?.();
-        }
-    }, [visible, screenPosition, refs, update]);
+        };
+
+        // Update position continuously
+        const animationFrame = requestAnimationFrame(function tick() {
+            updatePosition();
+            requestAnimationFrame(tick);
+        });
+
+        return () => {
+            cancelAnimationFrame(animationFrame);
+        };
+    }, [visible, node.x, node.y, node.width, node.height, camera, refs, update]);
 
     // Handle resizing
     useEffect(() => {
