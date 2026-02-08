@@ -122,7 +122,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 willChange: 'transform',
                 width: '700px', // Reduced width
                 height: '600px', // Increased height
-                backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 borderRadius: '12px',
@@ -155,7 +155,7 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                     minWidth: 200,
                     display: 'flex',
                     flexDirection: 'column',
-                    borderRight: '1px solid #e5e7eb'
+                    borderRight: '1px solid rgba(0, 0, 0, 0.1)'
                 }}>
                     {/* Content cleared */}
                 </div>
