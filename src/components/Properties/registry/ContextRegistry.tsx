@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import type { ContextType, ContextRegistryMap, ContextComponentProps } from './ContextTypes';
 
-// Import context components
-import SmartMatrixContext from '../contexts/SmartMatrixContext';
-import SmartRouterContext from '../contexts/SmartRouterContext';
-import DefaultContext from '../contexts/DefaultContext';
+// Lazy load context components for better performance
+const SmartMatrixContext = lazy(() => import('../contexts/SmartMatrixContext'));
+const SmartRouterContext = lazy(() => import('../contexts/SmartRouterContext'));
+const DefaultContext = lazy(() => import('../contexts/DefaultContext'));
 
 /**
  * The Context Registry
@@ -31,11 +31,14 @@ export const contextRegistry: ContextRegistryMap = {
 
 /**
  * Hook to get the context component for a given node type
+ * Memoized to prevent unnecessary re-computations
  */
 export const useContextRegistry = (nodeType: string): React.ComponentType<ContextComponentProps> => {
-    const type = (nodeType as ContextType) || 'default';
-    const entry = contextRegistry[type] || contextRegistry['default'];
-    return entry.Component;
+    return React.useMemo(() => {
+        const type = (nodeType as ContextType) || 'default';
+        const entry = contextRegistry[type] || contextRegistry['default'];
+        return entry.Component;
+    }, [nodeType]);
 };
 
 /**
