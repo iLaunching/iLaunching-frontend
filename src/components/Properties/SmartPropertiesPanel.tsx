@@ -127,8 +127,9 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                     className="smart-properties-panel"
                     style={{
-                        position: 'absolute',
-                        transform: position ? `translate(${position.x}px, ${position.y}px)` : undefined,
+                        position: 'fixed',
+                        left: `${position?.x ?? 0}px`,
+                        top: `${position?.y ?? 0}px`,
                         opacity: position ? 1 : 0,
                         width: '700px',
                         height: '600px',
