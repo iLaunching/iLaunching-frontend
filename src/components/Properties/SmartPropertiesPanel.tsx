@@ -64,10 +64,14 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                 panelX = screenX + (node.width * camera.zoom) + gap;
             }
 
-            // Vertical positioning: center panel relative to node
+            // Vertical positioning: center panel relative to node's VISUAL center
+            // NOTE: Node is rendered as a circle centered at (node.x + width/2, node.y + height/2)
+            // So screenY is the TOP of the node's bounding box, and we need to find the circle's center
             const nodeScreenHeight = node.height * camera.zoom;
-            const nodeCenterY = screenY + (nodeScreenHeight / 2);
-            let panelY = nodeCenterY - (height / 2);
+            const nodeVisualCenterY = screenY + (nodeScreenHeight / 2);
+
+            // Position panel so its center aligns with node's visual center
+            let panelY = nodeVisualCenterY - (height / 2);
 
             // Clamp vertical position to viewport
             const verticalPadding = 20;
@@ -76,6 +80,15 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
             panelY = Math.max(minPanelY, Math.min(panelY, maxPanelY));
 
             setPosition({ x: panelX, y: panelY });
+
+            // DEBUG: Log positioning details
+            console.log('🔍 Alignment Debug:', {
+                'Node visual center Y': nodeVisualCenterY,
+                'Panel Y (top)': panelY,
+                'Panel center Y': panelY + (height / 2),
+                'Panel height': height,
+                'Should align?': nodeVisualCenterY === (panelY + height / 2)
+            });
 
 
             // Continue loop
@@ -148,6 +161,18 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         ...style
                     }}
                 >
+                    {/* DEBUG: Visual centerline - positioned relative to entire panel */}
+                    <div style={{
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        top: '50%',
+                        height: '3px',
+                        backgroundColor: 'lime',
+                        zIndex: 10000,
+                        pointerEvents: 'none'
+                    }} />
+
                     {/* Left Section: Chat */}
                     <div style={{
                         width: leftWidth,
@@ -180,7 +205,6 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
                     />
 
-                    {/* Right Section: Dynamic Context */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200, overflow: 'hidden' }}>
                         <Suspense fallback={
                             <div style={{
