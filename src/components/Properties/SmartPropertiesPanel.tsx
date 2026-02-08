@@ -56,11 +56,15 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             const [screenX, screenY] = camera.toScreen(node.x, node.y);
 
-            // Position to the LEFT of the node
+            // Horizontal positioning: prefer LEFT of node, flip to RIGHT if no space
+            const horizontalPadding = 20;
             let panelX = screenX - width - gap;
 
-            // If left side doesn't fit, try right side
-            if (panelX < 0) {
+            // Check if panel fits on the left side (with padding from viewport edge)
+            const fitsOnLeft = panelX >= horizontalPadding;
+
+            // If doesn't fit on left, position on right side
+            if (!fitsOnLeft) {
                 panelX = screenX + (node.width * camera.zoom) + gap;
             }
 
