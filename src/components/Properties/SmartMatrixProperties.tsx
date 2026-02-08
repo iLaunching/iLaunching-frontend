@@ -120,13 +120,11 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 transform: position ? `translate(${position.x}px, ${position.y}px)` : undefined,
                 opacity: position ? 1 : 0,
                 willChange: 'transform',
-                // Frosted Glass Effect
-                backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                backdropFilter: 'blur(15px)',
-                WebkitBackdropFilter: 'blur(15px)',
+                width: '700px', // Reduced width
+                height: '600px', // Increased height
+                backgroundColor: '#ffffff',
                 borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)', // Subtle shadow
                 display: 'flex',
                 zIndex: 100,
                 overflow: 'hidden',
@@ -135,49 +133,34 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 ...style
             }}
         >
-            <style>
-                {`
-                    @keyframes panelPopUp {
-                        0% { opacity: 0; transform: translateY(40px) scale(0.95); }
-                        100% { opacity: 1; transform: translateY(0) scale(1); }
-                    }
-                `}
-            </style>
+            {/* Left Section: Chat */}
             <div style={{
-                width: '100%',
-                height: '100%',
+                width: leftWidth,
+                minWidth: 200,
                 display: 'flex',
-                animation: 'panelPopUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+                flexDirection: 'column',
+                borderRight: '1px solid #e5e7eb'
             }}>
-                {/* Left Section: Chat */}
-                <div style={{
-                    width: leftWidth,
-                    minWidth: 200,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderRight: '1px solid rgba(0, 0, 0, 0.1)'
-                }}>
-                    {/* Content cleared */}
-                </div>
+                {/* Content cleared */}
+            </div>
 
-                {/* Resizer Handle */}
-                <div
-                    onMouseDown={() => setIsResizing(true)}
-                    style={{
-                        width: '4px',
-                        cursor: 'col-resize',
-                        backgroundColor: isResizing ? '#7F77F1' : 'transparent',
-                        transition: 'background-color 0.2s',
-                        zIndex: 10
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
-                    onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
-                />
+            {/* Resizer Handle */}
+            <div
+                onMouseDown={() => setIsResizing(true)}
+                style={{
+                    width: '4px',
+                    cursor: 'col-resize',
+                    backgroundColor: isResizing ? '#7F77F1' : 'transparent',
+                    transition: 'background-color 0.2s',
+                    zIndex: 10
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
+                onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
+            />
 
-                {/* Right Section: Main Context Options */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
-                    {/* Content cleared */}
-                </div>
+            {/* Right Section: Main Context Options */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
+                {/* Content cleared */}
             </div>
         </div>
     );
