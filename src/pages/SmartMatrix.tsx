@@ -16,7 +16,7 @@ import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
-import { SmartMatrixProperties } from '../components/Properties/SmartMatrixProperties';
+import SmartPropertiesPanel from '../components/Properties/SmartPropertiesPanel';
 import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import { canvasApi } from '../services/canvasApi';
@@ -258,20 +258,73 @@ const SmartMatrixCanvas: React.FC = () => {
       // Phase 3: Nodes will be loaded from API via useCanvasPersistence hook
       // No hardcoded test nodes - canvas starts empty and loads persisted state
 
-      // Setup FPS monitoring
-      const fpsIntervalRef = setInterval(() => {
-        if (engineRef.current) {
-          const metrics = engineRef.current.getPerformanceMetrics();
-          setFps(metrics.fps);
-        }
-      }, 1000);
+      import { useCameraStore } from '../store/useCameraStore';
 
-      // Store interval ID in a way that persists
-      (engineRef.current as any).__fpsInterval = fpsIntervalRef;
-    } catch (error) {
-      console.error('Failed to initialize Canvas Engine:', error);
-    }
-  }, [matrixData, smartMatrix, matrixError, debugMode]); // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
+      // ...
+
+      const SmartMatrix = () => {
+        // ... existing hooks ...
+        const { updateCamera: updateGlobalCamera } = useCameraStore();
+
+        // ...
+
+        // Initialize Canvas Engine
+        useEffect(() => {
+          // ... initialization code ...
+
+          // Setup FPS monitoring
+          const fpsIntervalRef = setInterval(() => {
+            if (engineRef.current) {
+              const metrics = engineRef.current.getPerformanceMetrics();
+              setFps(metrics.fps);
+
+              // Sync camera state to global store for UI components (Property Panel)
+              const currentCamera = engineRef.current.camera;
+              updateGlobalCamera({
+                x: currentCamera.x,
+                y: currentCamera.y,
+                zoom: currentCamera.zoom
+              });
+            }
+          }, 1000 / 60); // Sync at 60fps or less? Maybe throttle it. 
+          // Actually, syncing every frame for UI positioning is heavy. 
+          // But panel needs smooth movement. 
+          // CanvasEngine likely has an onCameraChange callback or we can hook into render loop.
+          // If CanvasEngine doesn't expose event, we must poll.
+          // Let's use requestAnimationFrame loop outside or assume `start()` loop handles it.
+
+          // Better: Add a listener if CanvasEngine supports it. 
+          // If not, polling in the FPS interval (which was 1000ms) is too slow.
+          // Let's add a tighter loop for camera sync or check if we can modify CanvasEngine.
+          // For now, let's use a faster interval or a separate RAF for UI sync.
+
+          const uiSyncInterval = setInterval(() => {
+            if (engineRef.current) {
+              const cam = engineRef.current.camera;
+              updateGlobalCamera({ x: cam.x, y: cam.y, zoom: cam.zoom });
+            }
+          }, 16); // ~60fps
+
+          // Store interval ID in a way that persists
+          (engineRef.current as any).__fpsInterval = fpsIntervalRef;
+          (engineRef.current as any).__uiSyncInterval = uiSyncInterval;
+
+        } catch (error) {
+          console.error('Failed to initialize Canvas Engine:', error);
+        }
+      }, [matrixData, smartMatrix, matrixError, debugMode, updateGlobalCamera]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (engineRef.current) {
+        if ((engineRef.current as any).__fpsInterval) clearInterval((engineRef.current as any).__fpsInterval);
+        if ((engineRef.current as any).__uiSyncInterval) clearInterval((engineRef.current as any).__uiSyncInterval);
+        // ... destroy ...
+      }
+    };
+  }, []);
+  // Run when data loads or debugMode changes, but hasInitialized prevents re-initialization
 
   // Cleanup only on unmount
   useEffect(() => {
