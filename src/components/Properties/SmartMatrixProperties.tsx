@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { SmartMatrixNode } from '../Canvas/nodes/SmartMatrixNode';
 import type { Camera } from '../Canvas/core/Camera';
+import { useContextRegistry } from './registry/ContextRegistry';
 
 interface SmartMatrixPropertiesProps {
     node: SmartMatrixNode;
@@ -19,9 +20,12 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
 }) => {
     const [activeTab, setActiveTab] = useState('settings');
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
-    const animationFrameRef = useRef<number>();
+    const animationFrameRef = useRef<number | undefined>(undefined);
     const [leftWidth, setLeftWidth] = useState(450); // Initial width for left section
     const [isResizing, setIsResizing] = useState(false);
+
+    // Get the context component for this node type
+    const ContextComponent = useContextRegistry(node.type);
 
     // Update position to follow node during pan/zoom
     // Use layout effect to calculate initial position before paint
@@ -158,9 +162,9 @@ export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
                 onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
             />
 
-            {/* Right Section: Main Context Options */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200 }}>
-                {/* Content cleared */}
+            {/* Right Section: Dynamic Context */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200, overflow: 'hidden' }}>
+                <ContextComponent nodeData={node} onClose={onClose} />
             </div>
         </div>
     );
