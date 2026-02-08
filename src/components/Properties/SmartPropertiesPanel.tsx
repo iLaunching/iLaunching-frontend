@@ -75,14 +75,29 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
 
             // Horizontal positioning: prefer LEFT of node, flip to RIGHT if no space
             const horizontalPadding = 20;
+            const nodeScreenWidth = node.width * camera.zoom;
+
+            // Position panel to the LEFT of the node (using node's LEFT edge as reference)
             let panelX = screenX - width - gap;
 
             // Check if panel fits on the left side
             const fitsOnLeft = panelX >= horizontalPadding;
 
+            // DEBUG: Log horizontal positioning
+            console.log('🔍 Horizontal Positioning:', {
+                'Node screenX (left edge)': screenX,
+                'Node width (screen)': nodeScreenWidth,
+                'Panel width': width,
+                'Gap': gap,
+                'Panel X (if left)': panelX,
+                'Horizontal padding': horizontalPadding,
+                'Fits on left?': fitsOnLeft,
+                'Canvas width': canvasWidth
+            });
+
             // If doesn't fit on left, position on right side
             if (!fitsOnLeft) {
-                panelX = screenX + (node.width * camera.zoom) + gap;
+                panelX = screenX + nodeScreenWidth + gap;
 
                 // Also check if it fits on the right
                 const panelRight = panelX + width;
