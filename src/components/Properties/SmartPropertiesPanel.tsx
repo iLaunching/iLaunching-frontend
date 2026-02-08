@@ -1,17 +1,27 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { SmartMatrixNode } from '../Canvas/nodes/SmartMatrixNode';
 import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
 
-interface SmartMatrixPropertiesProps {
-    node: SmartMatrixNode;
+// Generic node interface - works with any node type
+interface BaseNode {
+    id: string;
+    type: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    [key: string]: any; // Allow additional properties
+}
+
+interface SmartPropertiesPanelProps {
+    node: BaseNode;
     visible: boolean;
     onClose: () => void;
     camera: Camera;
     style?: React.CSSProperties;
 }
 
-export const SmartMatrixProperties: React.FC<SmartMatrixPropertiesProps> = ({
+export const SmartPropertiesPanel: React.FC<SmartPropertiesPanelProps> = ({
     node,
     visible,
     onClose,
