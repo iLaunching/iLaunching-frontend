@@ -64,8 +64,9 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                 panelX = screenX + (node.width * camera.zoom) + gap;
             }
 
-            // Vertical positioning: align with top of node
-            let panelY = screenY;
+            // Vertical positioning: center panel relative to node
+            const nodeScreenHeight = node.height * camera.zoom;
+            let panelY = screenY + (nodeScreenHeight / 2) - (height / 2);
 
             // Clamp vertical position to viewport
             const verticalPadding = 20;
