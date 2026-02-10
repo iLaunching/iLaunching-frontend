@@ -262,4 +262,46 @@ export const authApi = {
   },
 };
 
+// ========================
+// PROTOCOL API
+// ========================
+
+export const protocolApi = {
+  /**
+   * Get all matrix protocols
+   */
+  getProtocols: async (): Promise<{
+    protocols: Array<{
+      protocol_id: string;
+      protocol_key: string;
+      initial_instructions: string;
+      context_framework: any;
+      success_criteria: any;
+      is_active: boolean;
+      created_at: string;
+      updated_at: string;
+    }>;
+    total: number;
+  }> => {
+    const response = await api.get('/api/protocols');
+    return response.data;
+  },
+
+  /**
+   * Get protocol by ID
+   */
+  getProtocolById: async (protocolId: string) => {
+    const response = await api.get(`/api/protocols/${protocolId}`);
+    return response.data;
+  },
+
+  /**
+   * Get protocol by key (GENESIS, CAMPAIGN, VALIDATION)
+   */
+  getProtocolByKey: async (protocolKey: string) => {
+    const response = await api.get(`/api/protocols/key/${protocolKey}`);
+    return response.data;
+  },
+};
+
 export default api;
