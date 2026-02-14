@@ -31,6 +31,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const [activeTab, setActiveTab] = useState<'options' | 'settings'>('options');
     const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
     const [view, setView] = useState<'list' | 'detail'>('list');
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch current smart hub data to get theme colors (same as SmartHub page)
     const { data: hubData } = useQuery({
@@ -58,6 +59,15 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const borderLineColor = hubData?.theme?.border_line_color_light || 'rgba(255, 255, 255, 0.2)';
 
     const protocols = protocolsData?.protocols || [];
+
+    // Filter protocols based on search query
+    const filteredProtocols = protocols.filter((protocol: MatrixProtocol) => {
+        const query = searchQuery.toLowerCase();
+        const name = (protocol.display_name || protocol.protocol_key).toLowerCase();
+        const description = (protocol.short_description || '').toLowerCase();
+
+        return name.includes(query) || description.includes(query);
+    });
 
     // Get protocol badge color
     const getProtocolColor = (protocolKey: string) => {
@@ -185,6 +195,50 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                     Matrix Protocol
                                 </h4>
 
+                                {/* Search Input */}
+                                <div style={{
+                                    marginBottom: '16px',
+                                    position: 'relative'
+                                }}>
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        color: textColor,
+                                        opacity: 0.5,
+                                        pointerEvents: 'none'
+                                    }}>
+                                        <FontAwesomeIcon icon={solidIcons.faSearch} style={{ fontSize: '12px' }} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Search protocols..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px 12px 8px 32px',
+                                            borderRadius: '6px',
+                                            border: `1px solid ${borderLineColor}`,
+                                            background: 'rgba(255, 255, 255, 0.05)',
+                                            color: textColor,
+                                            fontFamily: 'Work Sans, sans-serif',
+                                            fontSize: '13px',
+                                            outline: 'none',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.target.style.borderColor = solidColor;
+                                            e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.borderColor = borderLineColor;
+                                            e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                                        }}
+                                    />
+                                </div>
+
                                 {protocolsLoading ? (
                                     <div style={{
                                         padding: '12px',
@@ -196,8 +250,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                         Loading protocols...
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                        {protocols.map((protocol: MatrixProtocol) => {
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {filteredProtocols.map((protocol: MatrixProtocol) => {
                                             const colors = getProtocolColor(protocol.protocol_key);
                                             const isSelected = selectedProtocol === protocol.protocol_id;
 
@@ -211,14 +265,14 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                     style={{
                                                         display: 'flex',
                                                         alignItems: 'flex-start',
-                                                        padding: '12px',
+                                                        padding: '10px',
                                                         background: isSelected ? colors.bg : 'transparent',
                                                         border: `1px solid ${isSelected ? colors.border : borderLineColor}`,
                                                         borderRadius: '8px',
                                                         cursor: 'pointer',
                                                         transition: 'all 0.2s ease',
                                                         userSelect: 'none',
-                                                        minHeight: '100px',
+                                                        minHeight: '80px',
                                                         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
                                                     }}
                                                     onMouseEnter={(e) => {
@@ -259,9 +313,9 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                         display: 'flex',
                                                         flexDirection: 'column',
                                                         alignItems: 'flex-start',
-                                                        gap: '8px',
+                                                        gap: '3px',
                                                         width: '100%',
-                                                        border: '1px solid red'
+
                                                     }}>
 
                                                         {/* Title */}
@@ -271,7 +325,9 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                             fontSize: '14px',
                                                             fontWeight: 500,
                                                             color: isSelected ? colors.text : textColor,
-                                                            userSelect: 'none'
+                                                            userSelect: 'none',
+
+
                                                         }}>
                                                             {protocol.display_name || protocol.protocol_key}
                                                         </h4>
@@ -280,21 +336,18 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                         <p style={{
                                                             margin: 0,
                                                             fontFamily: 'Work Sans, sans-serif',
-                                                            fontSize: '13px',
+                                                            fontSize: '11px',
                                                             fontWeight: 400,
                                                             color: textColor,
                                                             opacity: 0.7,
                                                             userSelect: 'none',
-                                                            lineHeight: '1.4'
+                                                            lineHeight: '1.4',
+                                                            textAlign: 'left',
+                                                            width: '100%',
+
                                                         }}>
                                                             {protocol.short_description || ''}
                                                         </p>
-
-
-
-
-
-
 
 
                                                     </div>
