@@ -278,12 +278,16 @@ export const protocolApi = {
       context_framework: any;
       success_criteria: any;
       is_active: boolean;
+      background_color?: string;
+      border_color?: string;
+      display_name?: string;
+      display_description?: string;
       created_at: string;
       updated_at: string;
     }>;
     total: number;
   }> => {
-    const response = await api.get('/api/protocols');
+    const response = await api.get('/protocols');
     return response.data;
   },
 
@@ -291,7 +295,7 @@ export const protocolApi = {
    * Get protocol by ID
    */
   getProtocolById: async (protocolId: string) => {
-    const response = await api.get(`/api/protocols/${protocolId}`);
+    const response = await api.get(`/protocols/${protocolId}`);
     return response.data;
   },
 
@@ -299,7 +303,7 @@ export const protocolApi = {
    * Get protocol by key (GENESIS, CAMPAIGN, VALIDATION)
    */
   getProtocolByKey: async (protocolKey: string) => {
-    const response = await api.get(`/api/protocols/key/${protocolKey}`);
+    const response = await api.get(`/protocols/key/${protocolKey}`);
     return response.data;
   },
 };
