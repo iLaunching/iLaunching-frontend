@@ -309,6 +309,23 @@ export const protocolApi = {
 };
 
 // ========================
+// NODE API
+// ========================
+
+export const nodeApi = {
+  /**
+   * Update a node's protocol (which updates its context)
+   */
+  updateProtocol: async (nodeId: string, protocolId: string, protocolKey: string) => {
+    const response = await api.patch(`/node/${nodeId}/protocol`, {
+      protocol_id: protocolId,
+      context_type: protocolKey
+    });
+    return response.data;
+  },
+};
+
+// ========================
 // CONTEXT API
 // ========================
 

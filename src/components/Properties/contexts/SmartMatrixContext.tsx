@@ -3,7 +3,7 @@ import type { ContextComponentProps } from '../registry/ContextTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api, { protocolApi, contextApi } from '@/lib/api';
+import api, { protocolApi, contextApi, nodeApi } from '@/lib/api';
 import { DataDisplayEditor } from '@/components/DataDisplayEditor';
 
 interface MatrixProtocol {
@@ -38,24 +38,19 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const useProtocolMutation = useMutation({
         mutationFn: async (protocol: MatrixProtocol) => {
             // Determine context ID from nodeData
-            // Assuming nodeData has context_id or is the context
-            const contextId = nodeData?.context_id || nodeData?.id;
+            // Use node_id as per refined plan
+            const nodeId = nodeData?.id;
 
-            if (!contextId) {
-                console.error("No context ID found in nodeData", nodeData);
-                throw new Error("No context ID found");
+            if (!nodeId) {
+                console.error("No node ID found in nodeData", nodeData);
+                throw new Error("No node ID found");
             }
 
-            return contextApi.updateContext(contextId, {
-                context_type: 'cell_protocol',
-                current_protocol_id: protocol.protocol_id
-            });
+            return nodeApi.updateProtocol(nodeId, protocol.protocol_id, protocol.protocol_key);
         },
         onSuccess: () => {
             // Invalidate relevant queries
             queryClient.invalidateQueries({ queryKey: ['matrix-protocols'] });
-            // Close the panel
-            onClose?.();
         }
     });
 

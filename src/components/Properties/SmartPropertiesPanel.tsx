@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
+import { InAppChatInterface } from '../InAppChatInterface';
 
 // Generic node interface - works with any node type
 interface BaseNode {
@@ -49,7 +50,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     const [leftWidth, setLeftWidth] = useState(450);
     const [isResizing, setIsResizing] = useState(false);
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
-    const rafRef = useRef<number>();
+    const rafRef = useRef<number | null>(null);
 
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
@@ -178,13 +179,13 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         flexDirection: 'column',
                         borderRight: '1px solid rgba(0,0,0,0.1)'
                     }}>
-                        <div style={{ padding: '16px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                            <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: '#374151' }}>
-                                Chat
-                            </h3>
-                        </div>
-                        <div style={{ flex: 1, padding: '16px', color: '#6b7280', fontSize: '13px' }}>
-                            Chat interface coming soon...
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                            <InAppChatInterface
+                                maxWidth="full"
+                                placeholder="Ask about this node..."
+                                className="h-full"
+                                style={{ height: '100%' }}
+                            />
                         </div>
                     </div>
 
@@ -219,7 +220,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         </Suspense>
                     </div>
                 </motion.div>
-            </AnimatePresence>
+            </AnimatePresence >
         </>
     );
 }, (prevProps, nextProps) => {
