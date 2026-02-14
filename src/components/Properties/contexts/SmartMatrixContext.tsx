@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { ContextComponentProps } from '../registry/ContextTypes';
-import { protocolApi } from '@/lib/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as solidIcons from '@fortawesome/free-solid-svg-icons';
+import { useQuery } from '@tanstack/react-query';
+import api, { protocolApi } from '@/lib/api';
+import { DataDisplayEditor } from '@/components/DataDisplayEditor';
 
 interface MatrixProtocol {
     protocol_id: string;
@@ -9,45 +13,65 @@ interface MatrixProtocol {
     context_framework: any;
     success_criteria: any;
     is_active: boolean;
+    background_color?: string;
+    border_color?: string;
+    display_name?: string;
+    display_description?: string;
+    short_description?: string;
+    icon?: string;
+    created_at: string;
+    updated_at: string;
 }
 
 /**
  * Smart Matrix Context Component
  * Displays settings and configuration for Smart Matrix nodes
- * Includes protocol selection from tbl_matrix_protocols
  */
 export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, onClose }) => {
-    const [protocols, setProtocols] = useState<MatrixProtocol[]>([]);
-    const [selectedProtocol, setSelectedProtocol] = useState<string>('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'options' | 'settings'>('options');
+    const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
+    const [view, setView] = useState<'list' | 'detail'>('list');
 
-    // Fetch protocols on mount
-    useEffect(() => {
-        const fetchProtocols = async () => {
-            try {
-                setLoading(true);
-                const response = await protocolApi.getProtocols();
-                setProtocols(response.protocols);
+    // Fetch current smart hub data to get theme colors (same as SmartHub page)
+    const { data: hubData } = useQuery({
+        queryKey: ['current-smart-hub'],
+        queryFn: async () => {
+            const response = await api.get('/users/me/current-smart-hub');
+            return response.data;
+        }
+    });
 
-                // Set default to GENESIS if available
-                if (response.protocols.length > 0) {
-                    const genesisProtocol = response.protocols.find(p => p.protocol_key === 'GENESIS');
-                    setSelectedProtocol(genesisProtocol?.protocol_id || response.protocols[0].protocol_id);
-                }
-                setError(null);
-            } catch (err) {
-                console.error('Failed to fetch protocols:', err);
-                setError('Failed to load protocols');
-            } finally {
-                setLoading(false);
-            }
-        };
+    // Fetch matrix protocols
+    const { data: protocolsData, isLoading: protocolsLoading } = useQuery({
+        queryKey: ['matrix-protocols'],
+        queryFn: async () => {
+            const response = await protocolApi.getProtocols();
+            return response;
+        }
+    });
 
-        fetchProtocols();
-    }, []);
+    // Extract theme colors from hub data (same pattern as SmartHub page)
+    const globalHoverColor = hubData?.theme?.global_button_hover || 'rgba(0, 0, 0, 0.05)';
+    const solidColor = hubData?.theme?.solid_color || '#3b82f6';
+    const titleColor = hubData?.theme?.title_menu_color_light || '#374151';
+    const textColor = hubData?.theme?.text || '#374151';
+    const borderLineColor = hubData?.theme?.border_line_color_light || 'rgba(255, 255, 255, 0.2)';
 
-    const currentProtocol = protocols.find(p => p.protocol_id === selectedProtocol);
+    const protocols = protocolsData?.protocols || [];
+
+    // Get protocol badge color
+    const getProtocolColor = (protocolKey: string) => {
+        switch (protocolKey) {
+            case 'GENESIS':
+                return { bg: 'rgba(251, 191, 36, 0.1)', border: '#f59e0b', text: '#d97706' };
+            case 'CAMPAIGN':
+                return { bg: 'rgba(239, 68, 68, 0.1)', border: '#ef4444', text: '#dc2626' };
+            case 'VALIDATION':
+                return { bg: 'rgba(59, 130, 246, 0.1)', border: '#3b82f6', text: '#2563eb' };
+            default:
+                return { bg: 'rgba(107, 114, 128, 0.1)', border: '#6b7280', text: '#4b5563' };
+        }
+    };
 
     return (
         <div style={{
@@ -57,200 +81,291 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             overflow: 'hidden'
         }}>
             {/* Header */}
-            <div style={{
-                padding: '16px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-                background: 'rgba(249, 250, 251, 0.5)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: '#374151' }}>
-                    Smart Matrix Settings
-                </h3>
-                {onClose && (
-                    <button
-                        onClick={onClose}
-                        style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: '18px',
-                            cursor: 'pointer',
-                            color: '#6b7280',
-                            lineHeight: 1
-                        }}
-                    >
-                        ×
-                    </button>
-                )}
-            </div>
+            {view === 'list' && (
+                <div style={{
+                    padding: '16px',
+                    borderBottom: `1px solid ${borderLineColor}`,
+                }}>
+                    <h3 style={{ margin: 0, fontFamily: 'Work Sans, sans-serif', fontSize: '14px', fontWeight: 400, color: titleColor, marginBottom: '12px', userSelect: 'none' }}>
+                        Smart Matrix
+                    </h3>
 
-            {/* Content */}
-            <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
-                {/* Node Info */}
-                <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '4px' }}>
-                        Node ID
-                    </label>
-                    <div style={{ fontSize: '14px', color: '#374151', fontFamily: 'monospace', padding: '8px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}>
-                        {nodeData?.id || 'N/A'}
-                    </div>
-                </div>
-
-                {/* Name Field */}
-                <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '4px' }}>
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        defaultValue={nodeData?.name || 'Smart Matrix'}
-                        style={{
-                            width: '100%',
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: '1px solid rgba(0,0,0,0.1)',
-                            borderRadius: '4px',
-                            background: 'rgba(255,255,255,0.8)'
-                        }}
-                    />
-                </div>
-
-                {/* Protocol Selector */}
-                <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '4px' }}>
-                        Matrix Protocol
-                    </label>
-                    {loading ? (
-                        <div style={{ padding: '8px', fontSize: '14px', color: '#6b7280' }}>
-                            Loading protocols...
-                        </div>
-                    ) : error ? (
-                        <div style={{ padding: '8px', fontSize: '14px', color: '#ef4444' }}>
-                            {error}
-                        </div>
-                    ) : (
-                        <select
-                            value={selectedProtocol}
-                            onChange={(e) => setSelectedProtocol(e.target.value)}
+                    {/* Navigation Bar */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '8px'
+                    }}>
+                        {/* Options Button */}
+                        <button
+                            onClick={() => setActiveTab('options')}
                             style={{
-                                width: '100%',
-                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '0px 8px',
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: activeTab === 'options' ? `2px solid ${solidColor}` : '2px solid transparent',
+                                borderRadius: activeTab === 'options' ? '0px' : '8px',
+                                cursor: 'pointer',
+                                fontFamily: 'Work Sans, sans-serif',
                                 fontSize: '14px',
-                                border: '1px solid rgba(0,0,0,0.1)',
-                                borderRadius: '4px',
-                                background: 'rgba(255,255,255,0.8)'
+                                fontWeight: 400,
+                                height: '30px',
+                                color: activeTab === 'options' ? solidColor : textColor,
+                                transition: 'all 0.2s ease',
+                                userSelect: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (activeTab !== 'options') {
+                                    e.currentTarget.style.backgroundColor = globalHoverColor;
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
                             }}
                         >
-                            {protocols.map(protocol => (
-                                <option key={protocol.protocol_id} value={protocol.protocol_id}>
-                                    {protocol.protocol_key}
-                                </option>
-                            ))}
-                        </select>
-                    )}
+                            <FontAwesomeIcon icon={solidIcons.faSliders} style={{ fontSize: '14px' }} />
+                            <span>Options</span>
+                        </button>
+
+                        {/* Settings Button */}
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '0px 8px',
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: activeTab === 'settings' ? `2px solid ${solidColor}` : '2px solid transparent',
+                                borderRadius: activeTab === 'settings' ? '0px' : '8px',
+                                cursor: 'pointer',
+                                fontFamily: 'Work Sans, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: 400,
+                                height: '30px',
+                                color: activeTab === 'settings' ? solidColor : textColor,
+                                transition: 'all 0.2s ease',
+                                userSelect: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (activeTab !== 'settings') {
+                                    e.currentTarget.style.backgroundColor = globalHoverColor;
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                        >
+                            <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
+                            <span>Settings</span>
+                        </button>
+                    </div>
                 </div>
+            )}
 
-                {/* Protocol Details */}
-                {currentProtocol && (
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '8px' }}>
-                            Protocol Details
-                        </label>
-                        <div style={{
-                            padding: '12px',
-                            background: 'rgba(249, 250, 251, 0.8)',
-                            borderRadius: '8px',
-                            border: '1px solid rgba(0,0,0,0.1)'
-                        }}>
-                            {/* Phase Badge */}
-                            <div style={{ marginBottom: '12px' }}>
-                                <span style={{
-                                    display: 'inline-block',
-                                    padding: '4px 12px',
-                                    fontSize: '11px',
-                                    fontWeight: 600,
-                                    borderRadius: '12px',
-                                    background: currentProtocol.protocol_key === 'GENESIS'
-                                        ? 'rgba(251, 191, 36, 0.2)'
-                                        : currentProtocol.protocol_key === 'CAMPAIGN'
-                                            ? 'rgba(239, 68, 68, 0.2)'
-                                            : 'rgba(59, 130, 246, 0.2)',
-                                    color: currentProtocol.protocol_key === 'GENESIS'
-                                        ? '#d97706'
-                                        : currentProtocol.protocol_key === 'CAMPAIGN'
-                                            ? '#dc2626'
-                                            : '#2563eb'
+            {/* Content Container */}
+            <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
+                {activeTab === 'options' && (
+                    <div>
+                        {view === 'list' ? (
+                            /* Matrix Protocol Section */
+                            <div style={{ marginBottom: '20px' }}>
+                                <h4 style={{
+                                    margin: '0 0 12px 0',
+                                    fontFamily: 'Work Sans, sans-serif',
+                                    fontSize: '13px',
+                                    fontWeight: 500,
+                                    color: titleColor,
+                                    userSelect: 'none'
                                 }}>
-                                    {currentProtocol.protocol_key}
-                                </span>
+                                    Matrix Protocol
+                                </h4>
+
+                                {protocolsLoading ? (
+                                    <div style={{
+                                        padding: '12px',
+                                        fontFamily: 'Work Sans, sans-serif',
+                                        fontSize: '13px',
+                                        color: textColor,
+                                        opacity: 0.7
+                                    }}>
+                                        Loading protocols...
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        {protocols.map((protocol: MatrixProtocol) => {
+                                            const colors = getProtocolColor(protocol.protocol_key);
+                                            const isSelected = selectedProtocol === protocol.protocol_id;
+
+                                            return (
+                                                <button
+                                                    key={protocol.protocol_id}
+                                                    onClick={() => {
+                                                        setSelectedProtocol(protocol.protocol_id);
+                                                        setView('detail');
+                                                    }}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'flex-start',
+                                                        padding: '12px',
+                                                        background: isSelected ? colors.bg : 'transparent',
+                                                        border: `1px solid ${isSelected ? colors.border : borderLineColor}`,
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        userSelect: 'none',
+                                                        minHeight: '100px',
+                                                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.backgroundColor = globalHoverColor;
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        if (!isSelected) {
+                                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                                        }
+                                                    }}
+                                                >
+
+                                                    {/* Protocol Icon */}
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        width: 'fit-content',
+                                                        border: '1px solid blue',
+                                                        marginRight: '10px'
+                                                    }}>
+                                                        <img
+                                                            src={protocol.icon}
+                                                            alt={protocol.display_name}
+                                                            style={{
+                                                                width: '24px',
+                                                                height: '24px',
+                                                                objectFit: 'contain'
+                                                            }}
+                                                        />
+                                                    </div>
+
+
+                                                    {/* Protocol Title and  short description */}
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'flex-start',
+                                                        gap: '8px',
+                                                        width: '100%',
+                                                        border: '1px solid red'
+                                                    }}>
+
+                                                        {/* Title */}
+                                                        <h4 style={{
+                                                            margin: 0,
+                                                            fontFamily: 'Work Sans, sans-serif',
+                                                            fontSize: '14px',
+                                                            fontWeight: 500,
+                                                            color: isSelected ? colors.text : textColor,
+                                                            userSelect: 'none'
+                                                        }}>
+                                                            {protocol.display_name || protocol.protocol_key}
+                                                        </h4>
+
+                                                        {/* short description */}
+                                                        <p style={{
+                                                            margin: 0,
+                                                            fontFamily: 'Work Sans, sans-serif',
+                                                            fontSize: '13px',
+                                                            fontWeight: 400,
+                                                            color: textColor,
+                                                            opacity: 0.7,
+                                                            userSelect: 'none',
+                                                            lineHeight: '1.4'
+                                                        }}>
+                                                            {protocol.short_description || ''}
+                                                        </p>
+
+
+
+
+
+
+
+
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
+                        ) : (
+                            /* Protocol Detail View */
+                            <div>
+                                {/* Back Button */}
+                                <button
+                                    onClick={() => setView('list')}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '8px 8px',
+                                        height: '30px',
+                                        marginBottom: '16px',
+                                        background: 'transparent',
+                                        border: `1px solid ${borderLineColor}`,
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontFamily: 'Work Sans, sans-serif',
+                                        fontSize: '13px',
+                                        color: textColor,
+                                        transition: 'all 0.2s ease',
+                                        userSelect: 'none'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = globalHoverColor;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={solidIcons.faArrowLeft} style={{ fontSize: '12px' }} />
+                                    <span>Back</span>
+                                </button>
 
-                            {/* Focus Areas */}
-                            {currentProtocol.context_framework?.focus_areas && (
-                                <div style={{ marginBottom: '12px' }}>
-                                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '6px' }}>
-                                        Focus Areas:
-                                    </div>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                        {currentProtocol.context_framework.focus_areas.map((area: string, idx: number) => (
-                                            <span key={idx} style={{
-                                                fontSize: '10px',
-                                                padding: '3px 8px',
-                                                background: 'rgba(255,255,255,0.8)',
-                                                borderRadius: '4px',
-                                                color: '#374151'
-                                            }}>
-                                                {area.replace(/_/g, ' ')}
-                                            </span>
-                                        ))}
+                                {/* Dynamic Container */}
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '16px'
+                                }}>
+
+
+                                    {/* Protocol Description Display */}
+                                    <div>
+
+                                        <DataDisplayEditor
+                                            value={protocols.find((p: MatrixProtocol) => p.protocol_id === selectedProtocol)?.display_description || ''}
+                                        />
                                     </div>
                                 </div>
-                            )}
-
-                            {/* Recommended Nodes */}
-                            {currentProtocol.context_framework?.recommended_nodes && (
-                                <div>
-                                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '6px' }}>
-                                        Recommended Nodes:
-                                    </div>
-                                    <div style={{ fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
-                                        {currentProtocol.context_framework.recommended_nodes.join(', ')}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 )}
-
-                {/* Description */}
-                <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '4px' }}>
-                        Description
-                    </label>
-                    <textarea
-                        defaultValue={nodeData?.description || ''}
-                        placeholder="Enter description..."
-                        rows={3}
-                        style={{
-                            width: '100%',
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: '1px solid rgba(0,0,0,0.1)',
-                            borderRadius: '4px',
-                            background: 'rgba(255,255,255,0.8)',
-                            resize: 'vertical'
-                        }}
-                    />
-                </div>
-
-                {/* Status Badge */}
-                <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
-                        <span style={{ fontSize: '12px', color: '#059669', fontWeight: 600 }}>Active</span>
+                {activeTab === 'settings' && (
+                    <div>
+                        {/* Settings content will go here */}
+                        <p style={{ fontFamily: 'Work Sans, sans-serif', fontSize: '13px', color: textColor, opacity: 0.7 }}>
+                            Settings content
+                        </p>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
