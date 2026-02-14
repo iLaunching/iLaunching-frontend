@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import type { ContextComponentProps } from '../registry/ContextTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query';
-import api, { protocolApi } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api, { protocolApi, contextApi } from '@/lib/api';
 import { DataDisplayEditor } from '@/components/DataDisplayEditor';
 
 interface MatrixProtocol {
@@ -32,6 +32,40 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
     const [view, setView] = useState<'list' | 'detail'>('list');
     const [searchQuery, setSearchQuery] = useState('');
+    const queryClient = useQueryClient();
+
+    // Mutation for using a protocol
+    const useProtocolMutation = useMutation({
+        mutationFn: async (protocol: MatrixProtocol) => {
+            // Determine context ID from nodeData
+            // Assuming nodeData has context_id or is the context
+            const contextId = nodeData?.context_id || nodeData?.id;
+
+            if (!contextId) {
+                console.error("No context ID found in nodeData", nodeData);
+                throw new Error("No context ID found");
+            }
+
+            return contextApi.updateContext(contextId, {
+                context_type: 'cell_protocol',
+                current_protocol_id: protocol.protocol_id
+            });
+        },
+        onSuccess: () => {
+            // Invalidate relevant queries
+            queryClient.invalidateQueries({ queryKey: ['matrix-protocols'] });
+            // Close the panel
+            onClose?.();
+        }
+    });
+
+    const handleUseProtocol = () => {
+        if (!selectedProtocol) return;
+        const protocol = protocols.find(p => p.protocol_id === selectedProtocol);
+        if (protocol) {
+            useProtocolMutation.mutate(protocol);
+        }
+    };
 
     // Fetch current smart hub data to get theme colors (same as SmartHub page)
     const { data: hubData } = useQuery({
@@ -418,6 +452,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                         background: '#ffffff',
                     }}>
                         <button
+                            onClick={handleUseProtocol}
+                            disabled={useProtocolMutation.isPending}
                             style={{
                                 width: '100%',
                                 padding: '10px',
@@ -425,7 +461,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                 color: '#ffffff',
                                 border: 'none',
                                 borderRadius: '8px',
-                                cursor: 'pointer',
+                                cursor: useProtocolMutation.isPending ? 'wait' : 'pointer',
+                                opacity: useProtocolMutation.isPending ? 0.7 : 1,
                                 fontFamily: 'Work Sans, sans-serif',
                                 fontSize: '14px',
                                 fontWeight: 400,

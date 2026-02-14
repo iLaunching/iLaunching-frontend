@@ -308,4 +308,26 @@ export const protocolApi = {
   },
 };
 
+// ========================
+// CONTEXT API
+// ========================
+
+export const contextApi = {
+  /**
+   * Update a context by ID
+   */
+  updateContext: async (contextId: string, data: {
+    context_name?: string;
+    context_type?: string;
+    current_protocol_id?: string;
+    local_variables?: any;
+    is_active?: boolean;
+    master_dna_payload?: any;
+  }) => {
+    const response = await api.patch(`/context/${contextId}`, data);
+    return response.data;
+  },
+};
+
+
 export default api;
