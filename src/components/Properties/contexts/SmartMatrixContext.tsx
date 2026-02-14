@@ -93,12 +93,11 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             {/* Header */}
             {view === 'list' && (
                 <div style={{
-                    padding: '16px',
+                    padding: '10px 10px 0px 10px',
                     borderBottom: `1px solid ${borderLineColor}`,
+                    height: 'fit-content'
                 }}>
-                    <h3 style={{ margin: 0, fontFamily: 'Work Sans, sans-serif', fontSize: '14px', fontWeight: 400, color: titleColor, marginBottom: '12px', userSelect: 'none' }}>
-                        Smart Matrix
-                    </h3>
+
 
                     {/* Navigation Bar */}
                     <div style={{
@@ -178,22 +177,13 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             )}
 
             {/* Content Container */}
-            <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
+            <div style={{ flex: 1, padding: '18px 10px 10px 10px', overflowY: 'auto' }}>
                 {activeTab === 'options' && (
                     <div>
                         {view === 'list' ? (
                             /* Matrix Protocol Section */
                             <div style={{ marginBottom: '20px' }}>
-                                <h4 style={{
-                                    margin: '0 0 12px 0',
-                                    fontFamily: 'Work Sans, sans-serif',
-                                    fontSize: '13px',
-                                    fontWeight: 500,
-                                    color: titleColor,
-                                    userSelect: 'none'
-                                }}>
-                                    Matrix Protocol
-                                </h4>
+
 
                                 {/* Search Input */}
                                 <div style={{
@@ -207,7 +197,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                         transform: 'translateY(-50%)',
                                         color: textColor,
                                         opacity: 0.5,
-                                        pointerEvents: 'none'
+                                        pointerEvents: 'none',
+                                        height: '30px'
                                     }}>
                                         <FontAwesomeIcon icon={solidIcons.faSearch} style={{ fontSize: '12px' }} />
                                     </div>
@@ -226,6 +217,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                             fontFamily: 'Work Sans, sans-serif',
                                             fontSize: '13px',
                                             outline: 'none',
+                                            height: '30px',
                                             transition: 'all 0.2s ease'
                                         }}
                                         onFocus={(e) => {
@@ -250,10 +242,9 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                         Loading protocols...
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                                         {filteredProtocols.map((protocol: MatrixProtocol) => {
                                             const colors = getProtocolColor(protocol.protocol_key);
-                                            const isSelected = selectedProtocol === protocol.protocol_id;
 
                                             return (
                                                 <button
@@ -264,26 +255,23 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                     }}
                                                     style={{
                                                         display: 'flex',
-                                                        alignItems: 'flex-start',
-                                                        padding: '10px',
-                                                        background: isSelected ? colors.bg : 'transparent',
-                                                        border: `1px solid ${isSelected ? colors.border : borderLineColor}`,
+                                                        padding: '8px',
+                                                        background: 'transparent',
+                                                        border: `1px solid ${solidColor}50`,
                                                         borderRadius: '8px',
                                                         cursor: 'pointer',
                                                         transition: 'all 0.2s ease',
                                                         userSelect: 'none',
-                                                        minHeight: '80px',
-                                                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                                                        minHeight: '70px',
+                                                        height: 'fit-content',
+                                                        boxShadow: `0px 0 1px ${solidColor}90`,
                                                     }}
                                                     onMouseEnter={(e) => {
-                                                        if (!isSelected) {
-                                                            e.currentTarget.style.backgroundColor = globalHoverColor;
-                                                        }
+                                                        e.currentTarget.style.backgroundColor = `color-mix(in srgb, ${globalHoverColor}, transparent 50%)`;
                                                     }}
                                                     onMouseLeave={(e) => {
-                                                        if (!isSelected) {
-                                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                                        }
+                                                        e.currentTarget.style.backgroundColor = 'transparent';
+
                                                     }}
                                                 >
 
@@ -293,7 +281,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                         alignItems: 'center',
                                                         gap: '8px',
                                                         width: 'fit-content',
-                                                        border: '1px solid blue',
+                                                        height: 'fit-content',
                                                         marginRight: '10px'
                                                     }}>
                                                         <img
@@ -324,7 +312,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                             fontFamily: 'Work Sans, sans-serif',
                                                             fontSize: '14px',
                                                             fontWeight: 500,
-                                                            color: isSelected ? colors.text : textColor,
+                                                            color: textColor,
                                                             userSelect: 'none',
 
 
@@ -420,7 +408,49 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                     </div>
                 )}
             </div>
-        </div>
+
+            {/* Sticky Footer - Detail View */}
+            {
+                view === 'detail' && activeTab === 'options' && (
+                    <div style={{
+                        padding: '16px',
+                        borderTop: `1px solid ${borderLineColor}`,
+                        background: '#ffffff',
+                    }}>
+                        <button
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                backgroundColor: solidColor,
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontFamily: 'Work Sans, sans-serif',
+                                fontSize: '14px',
+                                fontWeight: 400,
+                                transition: 'all 0.2s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                height: '30px',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.opacity = '0.9';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.opacity = '1';
+                            }}
+                        >
+                            <span>Use Protocol</span>
+                            <FontAwesomeIcon icon={solidIcons.faArrowRight} style={{ fontSize: '12px' }} />
+                        </button>
+                    </div>
+                )
+            }
+        </div >
     );
 };
 
