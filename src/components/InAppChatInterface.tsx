@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import api from '../lib/api';
-import { InAppEditor } from './streaming/InAppEditor';
 import { useStreaming } from '../hooks/useStreaming.websocket';
+import { InAppEditor } from './streaming/InAppEditor';
 import InAppChatWindowPrompt from './InAppChatWindowPrompt';
 import SignupPopup from './SignupPopup';
 import { getRandomSubmitAcknowledgeMessage } from '../constants';
@@ -417,71 +415,29 @@ export function InAppChatInterface({
 
           // Small delay to let padding apply and DOM update
           setTimeout(() => {
-            let lastQueryPos = -1;
+            try {
+              let lastQueryPos = -1;
 
-            // Find the LAST Query node (the one we just created)
-            doc.descendants((node: any, pos: any) => {
-              if (node.type.name === 'query') {
-                lastQueryPos = pos;
-              }
-            });
+              // Find the LAST Query node (the one we just created)
+              doc.descendants((node: any, pos: any) => {
+                if (node.type.name === 'query') {
+                  lastQueryPos = pos;
+                }
+              });
 
-            if (lastQueryPos >= 0) {
-              // Get the Query DOM element
-              const queryElement = editor.view.domAtPos(lastQueryPos).node as HTMLElement;
-              const queryParent = (queryElement?.closest('[data-node-type="query"]') || queryElement) as HTMLElement;
+              if (lastQueryPos >= 0) {
+                // Get the Query DOM element
+                const queryElement = editor.view.domAtPos(lastQueryPos).node as HTMLElement;
+                const queryParent = (queryElement?.closest('[data-node-type="query"]') || queryElement) as HTMLElement;
 
-              if (queryParent) {
-                const beforeScrollTop = window.scrollY || document.documentElement.scrollTop;
-                const beforeScrollHeight = document.documentElement.scrollHeight;
-                const beforeClientHeight = window.innerHeight;
+                // Scroll the query into view
+                if (queryParent) {
+                  console.log('📜 Scrolling query into view');
+                  queryParent.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                console.log('📏 Before scroll:');
-                console.log('   window.scrollY:', beforeScrollTop);
-                console.log('   document height:', beforeScrollHeight);
-                console.log('   window height:', beforeClientHeight);
-                console.log('   query position in doc:', lastQueryPos);
-                console.log('   conversation count:', conversationCount);
-
-                // Get the query's absolute position on the page
-                const queryRect = queryParent.getBoundingClientRect();
-                const queryAbsoluteTop = queryRect.top + beforeScrollTop;
-
-                // Calculate target scroll with custom top offset
-                const targetScroll = queryAbsoluteTop - topOffset;
-
-                console.log('   queryRect.top:', queryRect.top);
-                console.log('   query absolute top:', queryAbsoluteTop);
-                console.log('   top offset:', topOffset);
-                console.log('   target scroll position:', targetScroll);
-
-                // Scroll window to position
-                window.scrollTo({
-                  top: targetScroll,
-                  behavior: 'smooth'
-                });
-
-                setTimeout(() => {
-                  const afterScrollTop = window.scrollY || document.documentElement.scrollTop;
-                  const scrollDelta = afterScrollTop - beforeScrollTop;
-
-                  console.log('📏 After scroll:');
-                  console.log('   window.scrollY:', afterScrollTop);
-                  console.log('   scroll delta:', scrollDelta, scrollDelta > 0 ? '(scrolled DOWN)' : scrollDelta < 0 ? '(scrolled UP)' : '(no change)');
-                  console.log('   distance from bottom:', document.documentElement.scrollHeight - (afterScrollTop + beforeClientHeight));
-                }, 500);
-
-                console.log('📜 Scrolling window to align Query');
-
-                // Listen for scroll end instead of using timer
-                let scrollEndTimer: ReturnType<typeof setTimeout>;
-                const handleScrollEnd = () => {
-                  clearTimeout(scrollEndTimer);
-                  scrollEndTimer = setTimeout(() => {
-                    // Scroll has stopped, remove listener and start streaming
-                    window.removeEventListener('scroll', handleScrollEnd);
-
-                    console.log('✅ Scroll completed, starting stream');
+                  // Wait for scroll to likely finish before streaming
+                  setTimeout(() => {
+                    console.log('✅ Scroll triggered, starting stream');
                     streaming.addToQueue(queryText, {
                       content_type: 'markdown',
                       speed: 'normal',
@@ -489,26 +445,30 @@ export function InAppChatInterface({
                       turnId: turnId,
                       timestamp: timestamp
                     });
-                  }, 50); // 50ms debounce to detect scroll stop
-                };
-
-                // Add scroll listener
-                window.addEventListener('scroll', handleScrollEnd);
-                // Trigger once immediately in case scroll is instant
-                handleScrollEnd();
-
-                return;
+                  }, 300);
+                  return;
+                }
               }
+
+              // Fallback: start streaming immediately if query not found
+              streaming.addToQueue(queryText, {
+                content_type: 'markdown',
+                speed: 'normal',
+                responseId: responseId,
+                turnId: turnId,
+                timestamp: timestamp
+              });
+            } catch (innerError) {
+              console.warn('⚠️ Error finding query position:', innerError);
+              streaming.addToQueue(queryText, {
+                content_type: 'markdown',
+                speed: 'normal',
+                responseId: responseId,
+                turnId: turnId,
+                timestamp: timestamp
+              });
             }
 
-            // Fallback: start streaming immediately if scroll fails
-            streaming.addToQueue(queryText, {
-              content_type: 'markdown',
-              speed: 'normal',
-              responseId: responseId,
-              turnId: turnId,
-              timestamp: timestamp
-            });
           }, 50); // Small delay to let padding apply
         } catch (scrollError) {
           console.warn('⚠️ Error scrolling:', scrollError);
@@ -544,9 +504,9 @@ export function InAppChatInterface({
         onClose={() => setShowSignupPopup(false)}
       />
 
-      <div className={`relative ${className} in-app-chat-container`} style={style}>
+      <div className={`relative ${className} in-app-chat-container flex flex-col`} style={style}>
         {/* Editor Container with dynamic padding */}
-        <div className={`container mx-auto px-4 ${getPaddingClass()}`}>
+        <div className={`container mx-auto px-4 flex-grow ${getPaddingClass()}`}>
           <div className={`max-w-${maxWidth} mx-auto py-4`}>
             <InAppEditor
               onEditorReady={setEditor}
@@ -557,7 +517,7 @@ export function InAppChatInterface({
 
         {/* Chat Input - Fixed at Bottom of parent container */}
         {!showSignupPopup && (
-          <div className="absolute bottom-0 z-50 w-full">
+          <div className="sticky bottom-0 z-50 w-full">
             <div className={backgroundType === 'connected' || backgroundType === 'ai' ? 'px-4 py-4' : 'p-4'}>
               <InAppChatWindowPrompt
                 onSubmit={handleQuerySubmit}

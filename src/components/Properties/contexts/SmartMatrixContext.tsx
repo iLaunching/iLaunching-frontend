@@ -18,6 +18,8 @@ interface MatrixProtocol {
     display_name?: string;
     display_description?: string;
     short_description?: string;
+    ui_theme?: any;
+    ui_assets?: any;
     icon?: string;
     created_at: string;
     updated_at: string;
@@ -314,12 +316,18 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                         marginRight: '10px'
                                                     }}>
                                                         <img
-                                                            src={protocol.icon}
+                                                            src={protocol.ui_assets?.slug && protocol.ui_assets?.card
+                                                                ? `/protocols/${protocol.ui_assets.slug}/${protocol.ui_assets.card}.webp`
+                                                                : protocol.icon || '/protocols/default/card.webp'}
                                                             alt={protocol.display_name}
+                                                            onError={(e) => {
+                                                                e.currentTarget.src = '/protocols/default/card.webp';
+                                                            }}
                                                             style={{
-                                                                width: '24px',
-                                                                height: '24px',
-                                                                objectFit: 'contain'
+                                                                width: '40px',
+                                                                height: '40px',
+                                                                objectFit: 'contain',
+                                                                borderRadius: '4px'
                                                             }}
                                                         />
                                                     </div>

@@ -179,12 +179,12 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         flexDirection: 'column',
                         borderRight: '1px solid rgba(0,0,0,0.1)'
                     }}>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
                             <InAppChatInterface
                                 maxWidth="full"
                                 placeholder="Ask about this node..."
                                 className="h-full"
-                                style={{ height: '100%' }}
+                                style={{ minHeight: '100%' }}
                             />
                         </div>
                     </div>
