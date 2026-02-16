@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
 import { InAppChatInterface } from '../InAppChatInterface';
+import { useChatHistory } from '../../hooks/useChatPrefetch';
 
 // Generic node interface - works with any node type
 interface BaseNode {
@@ -51,6 +52,13 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     const [isResizing, setIsResizing] = useState(false);
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const rafRef = useRef<number | null>(null);
+
+    // Fetch chat history for this node (Sovereign Speed)
+    // We can use the hook we just created
+    // But we need to import it first
+    // For now, let's assume we can just use the hook if it's exported
+    // imports will be separate chunk
+    const { data: chatHistory, isLoading: isChatLoading } = useChatHistory(node.id);
 
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
@@ -185,6 +193,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                                 placeholder="Ask about this node..."
                                 className="h-full"
                                 style={{ minHeight: '100%' }}
+                                initialContent={chatHistory?.document_json} // Pass fetched history
                             />
                         </div>
                     </div>

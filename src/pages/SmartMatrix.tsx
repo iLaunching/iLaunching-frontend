@@ -20,6 +20,7 @@ import { SmartPropertiesPanel } from '../components/Properties/SmartPropertiesPa
 import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import { canvasApi } from '../services/canvasApi';
+import { useChatPrefetch } from '../hooks/useChatPrefetch';
 import api from '../lib/api.js';
 import './SmartMatrix.css';
 
@@ -87,6 +88,9 @@ const SmartMatrixCanvas: React.FC = () => {
   const [debugMode, setDebugMode] = useState(false);
   const [selectedSmartMatrix, setSelectedSmartMatrix] = useState<SmartMatrixNode | null>(null);
   const queryClient = useQueryClient();
+
+  // Phase 4: Sovereign Speed - Chat Pre-fetch
+  const { handleNodeHover, handleNodeLeave } = useChatPrefetch();
 
   // Fetch current smart matrix data from API server
   const { data: matrixData, isLoading, error } = useQuery<SmartMatrixData>({
@@ -611,6 +615,15 @@ const SmartMatrixCanvas: React.FC = () => {
         // Check for link hover (for deletion feedback)
         connectionManager.checkLinkHover(worldX, worldY);
         engine.handleMouseMove(e);
+
+        // Check for node hover to trigger chat pre-fetch
+        // This makes the chat feel instant when clicking
+        const interactionState = engine.getInteractionManager().getState();
+        if (interactionState.hoveredNode) {
+          handleNodeHover(interactionState.hoveredNode.id);
+        } else {
+          handleNodeLeave();
+        }
       }
 
       // Mark dirty to trigger re-render for port hover animation
@@ -697,7 +710,13 @@ const SmartMatrixCanvas: React.FC = () => {
       window.removeEventListener('mouseup', handleNodeMouseUp);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isEngineReady]);
+    return () => {
+      canvas.removeEventListener('mousedown', handleNodeMouseDown);
+      window.removeEventListener('mousemove', handleNodeMouseMove);
+      window.removeEventListener('mouseup', handleNodeMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isEngineReady, handleNodeHover, handleNodeLeave]);
 
   // Toggle debug mode
   const toggleDebug = () => {

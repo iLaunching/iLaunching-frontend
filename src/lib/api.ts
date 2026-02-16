@@ -323,6 +323,17 @@ export const nodeApi = {
     });
     return response.data;
   },
+
+  /**
+   * Get chat history for a node (pre-fetch)
+   */
+  getChatHistory: async (nodeId: string) => {
+    // Note: This endpoint needs to be implemented on the backend in the next step
+    // For now, we'll just check if it exists or return empty
+    // The prefetch hook handles errors gracefully
+    const response = await api.get(`/chat/node/${nodeId}`);
+    return response.data;
+  },
 };
 
 // ========================

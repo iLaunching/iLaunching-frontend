@@ -21,6 +21,7 @@ interface InAppChatInterfaceProps {
   showGetStarted?: boolean; // Show Get Started button in sales stage
   onGetStartedClick?: () => void; // Callback for Get Started button
   userName?: string; // User's name for personalization
+  initialContent?: any; // Initial JSON content for the editor
 }
 
 export function InAppChatInterface({
@@ -37,18 +38,27 @@ export function InAppChatInterface({
   backgroundType = 'connected',
   showGetStarted = false,
   onGetStartedClick,
-  userName = ''
+  userName = '',
+  initialContent
 }: InAppChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
   const [isStreamingActive, setIsStreamingActive] = useState(false);
-  const hasShownWelcomeRef = useRef(false);
 
-  // Reset welcome flag when component mounts (entering sales stage)
+
+  // Effect to load initial content
   useEffect(() => {
-    console.log('🎬 StreamingChatInterface mounted - resetting welcome flag');
-    hasShownWelcomeRef.current = false;
-  }, []); // Empty deps - only run on mount
+    if (editor && initialContent) {
+      console.log('📝 Setting initial content for editor', initialContent);
+      // Ensure we don't break the editor by setting invalid content
+      try {
+        editor.commands.setContent(initialContent);
+      } catch (e) {
+        console.error('Failed to set initial content:', e);
+      }
+    }
+  }, [editor, initialContent]);
+
 
   // Function to determine the correct padding class
   const getPaddingClass = () => {
@@ -220,61 +230,7 @@ export function InAppChatInterface({
     }
   }, [streaming, editor, userName]);
 
-  /**
-   * Send welcome message when editor initializes and WebSocket is connected
-   */
-  useEffect(() => {
-    console.log('🔍 Welcome effect triggered:', {
-      hasEditor: !!editor,
-      hasStreaming: !!streaming,
-      hasShownWelcome: hasShownWelcomeRef.current,
-      streamingReady: !!streaming?.addToQueue,
-      isConnected: streaming?.isConnected
-    });
 
-    // Skip if already shown
-    if (hasShownWelcomeRef.current) {
-      console.log('⏭️ Welcome already shown, skipping');
-      return;
-    }
-
-    // Wait for editor, streaming, connection
-    if (!editor || !streaming?.addToQueue || !streaming?.isConnected) {
-      console.log('⏸️ Waiting for conditions:', {
-        needsEditor: !editor,
-        needsStreaming: !streaming,
-        needsConnection: !streaming?.isConnected,
-      });
-      return;
-    }
-
-    // Check if editor is truly empty (no aiTurn or dataTurn nodes)
-    const { doc } = editor.state;
-    let conversationCount = 0;
-
-    doc.descendants((node: any) => {
-      if (node.type.name === 'aiTurn' || node.type.name === 'dataTurn') {
-        conversationCount++;
-      }
-    });
-
-    console.log('📊 Editor state:', { conversationCount });
-
-    // Only send welcome if editor is empty
-    if (conversationCount === 0) {
-      console.log('✅ All conditions met, setting up welcome message timer...');
-      // Set flag immediately to prevent re-runs
-      hasShownWelcomeRef.current = true;
-
-      // Send welcome message after a delay
-      setTimeout(() => {
-        console.log('🎉 Sending welcome message now!');
-        sendSystemMessage(SYSTEM_MESSAGE_TYPES.SALES_WELCOME);
-      }, 1500);
-    } else {
-      console.log('⏭️ Editor not empty, skipping welcome message');
-    }
-  }, [editor, streaming?.isConnected, sendSystemMessage]);
 
   const handleQuerySubmit = (content: any) => {
     if (!editor) return;

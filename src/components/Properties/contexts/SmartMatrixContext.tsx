@@ -229,13 +229,14 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                         color: textColor,
                                         opacity: 0.5,
                                         pointerEvents: 'none',
-                                        height: '30px'
+                                        height: '30px',
+                                        userSelect: 'none'
                                     }}>
                                         <FontAwesomeIcon icon={solidIcons.faSearch} style={{ fontSize: '12px' }} />
                                     </div>
                                     <input
                                         type="text"
-                                        placeholder="Search protocols..."
+                                        placeholder="Search..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         style={{
@@ -311,9 +312,11 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         gap: '8px',
-                                                        width: 'fit-content',
-                                                        height: 'fit-content',
-                                                        marginRight: '10px'
+                                                        width: '55px',
+                                                        height: '55px',
+                                                        marginRight: '10px',
+                                                        borderRadius: '3px',
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.05)'
                                                     }}>
                                                         <img
                                                             src={protocol.ui_assets?.slug && protocol.ui_assets?.card
@@ -327,7 +330,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                                                 width: '40px',
                                                                 height: '40px',
                                                                 objectFit: 'contain',
-                                                                borderRadius: '4px'
+                                                                borderRadius: '3px',
+
                                                             }}
                                                         />
                                                     </div>
