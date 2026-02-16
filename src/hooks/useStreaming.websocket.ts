@@ -33,9 +33,9 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
   // Register callbacks with extension immediately when editor is available
   useEffect(() => {
     if (!editor) return;
-    
+
     const storage = (editor.storage as any)?.streamingWebSocket;
-    
+
     if (storage) {
       console.log('📝 Registering callbacks in StreamingWebSocketExtension storage');
       storage.onStreamStart = options.onStreamStart;
@@ -81,37 +81,37 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
       const sessionId = `session-${Date.now()}`;
       const wsUrl = options.apiUrl || import.meta.env.VITE_SALES_WS_URL || 'wss://sales-api-production-3088.up.railway.app';
       const fullUrl = `${wsUrl}/ws/stream/${sessionId}`;
-      
+
       console.log('🔌 Connecting to Railway WebSocket...');
       console.log('   URL:', fullUrl);
       console.log('   Session:', sessionId);
       console.log('   Attempt:', connectionAttempts + 1, '/', maxRetries);
-      
+
       // Use the extension's connect command
       editor.commands.connectStreamingWebSocket(fullUrl, sessionId);
-      
+
       console.log('✅ WebSocket connection initiated via extension');
-      
+
       // Poll for connection state (WebSocket might take a moment to connect)
       let attempts = 0;
       const maxAttempts = 50; // 5 seconds max
       const checkInterval = setInterval(() => {
         attempts++;
-        
+
         // Check storage via multiple paths for reliability
         const storageViaExt = (editor as any).extensionManager?.extensions?.find(
           (ext: any) => ext.name === 'streamingWebSocket'
         )?.storage;
-        
+
         const storageViaDirect = (editor.storage as any)?.streamingWebSocket;
-        
+
         const storage = storageViaDirect || storageViaExt;
-        
+
         // More detailed connection check
-        const isActuallyConnected = storage?.isConnected && 
-                                   storage?.websocket && 
-                                   storage.websocket.readyState === WebSocket.OPEN;
-        
+        const isActuallyConnected = storage?.isConnected &&
+          storage?.websocket &&
+          storage.websocket.readyState === WebSocket.OPEN;
+
         if (isActuallyConnected) {
           clearInterval(checkInterval);
           setIsConnected(true);
@@ -129,7 +129,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
             hasWebSocket: !!storage?.websocket,
             readyState: storage?.websocket?.readyState
           });
-          
+
           // Retry connection if we haven't exceeded max retries
           if (connectionAttempts < maxRetries) {
             const nextAttempt = connectionAttempts + 1;
@@ -145,14 +145,14 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
           }
         }
       }, 100);
-      
+
       // Note: The extension handles all WebSocket events internally
       // We can listen to extension events via the callbacks we pass to it
-      
+
     } catch (error) {
       console.error('❌ Failed to connect:', error);
       setIsConnecting(false);
-      
+
       // Retry on error
       if (connectionAttempts < maxRetries) {
         const nextAttempt = connectionAttempts + 1;
@@ -186,17 +186,17 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
     // Get extension storage - try multiple access methods
     const extensionManager = (editor as any).extensionManager;
     console.log('🔍 Extension manager found:', !!extensionManager);
-    
+
     const streamingExt = extensionManager?.extensions?.find(
       (ext: any) => ext.name === 'streamingWebSocket'
     );
-    
+
     console.log('🔍 Streaming extension found:', !!streamingExt);
-    
+
     // Try different ways to access storage
     const storage = streamingExt?.storage;
     const storageAlt = (editor.storage as any)?.streamingWebSocket;
-    
+
     // Use the correct storage reference
     const actualStorage = storageAlt || storage;
 
@@ -245,7 +245,7 @@ export const useStreaming = (editor: Editor | null, options: UseStreamingOptions
     };
 
     console.log('📤 Sending stream request via WebSocket:', streamRequest);
-    
+
     try {
       actualStorage.websocket.send(JSON.stringify(streamRequest));
       setIsStreaming(true);

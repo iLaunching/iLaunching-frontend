@@ -22,6 +22,7 @@ interface InAppChatInterfaceProps {
   onGetStartedClick?: () => void; // Callback for Get Started button
   userName?: string; // User's name for personalization
   initialContent?: any; // Initial JSON content for the editor
+  onSaveChat?: (content: any) => void; // Callback to save chat history
 }
 
 export function InAppChatInterface({
@@ -39,7 +40,8 @@ export function InAppChatInterface({
   showGetStarted = false,
   onGetStartedClick,
   userName = '',
-  initialContent
+  initialContent,
+  onSaveChat
 }: InAppChatInterfaceProps) {
   const [editor, setEditor] = useState<any>(null);
   const [needsScrollPadding, setNeedsScrollPadding] = useState(false);
@@ -53,6 +55,27 @@ export function InAppChatInterface({
       // Ensure we don't break the editor by setting invalid content
       try {
         editor.commands.setContent(initialContent);
+
+        // Verify AI Indicator exists, restore if missing
+        // This ensures the chat is always ready for new input even if history lacked the indicator
+        const { doc } = editor.state;
+        let hasIndicator = false;
+        doc.descendants((node: any) => {
+          if (node.type.name === 'aiIndicator') {
+            hasIndicator = true;
+            return false; // Stop early
+          }
+        });
+
+        if (!hasIndicator) {
+          console.log('🔌 Restoring AI Indicator after content load');
+          // Insert at the absolute end of the document
+          editor.commands.insertContentAt(doc.content.size, {
+            type: 'aiIndicator',
+            attrs: { aiAcknowledge: '' }
+          });
+        }
+
       } catch (e) {
         console.error('Failed to set initial content:', e);
       }
@@ -138,6 +161,17 @@ export function InAppChatInterface({
       setIsStreamingActive(false);
       // Reset scroll padding so layout returns to post-stream state (45vh)
       setNeedsScrollPadding(false);
+
+      // Save chat history
+      if (onSaveChat && editor) {
+        console.log('💾 Saving chat history...');
+        try {
+          const content = editor.getJSON();
+          onSaveChat(content);
+        } catch (e) {
+          console.error('❌ Failed to save chat history:', e);
+        }
+      }
 
       // Call custom callback if provided
       onStreamComplete?.(message);

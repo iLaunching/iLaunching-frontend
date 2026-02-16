@@ -334,6 +334,16 @@ export const nodeApi = {
     const response = await api.get(`/chat/node/${nodeId}`);
     return response.data;
   },
+
+  /**
+   * Save chat history for a node (persistence)
+   */
+  saveChatHistory: async (nodeId: string, content: any) => {
+    const response = await api.post(`/chat/node/${nodeId}/save`, {
+      document_json: content
+    });
+    return response.data;
+  },
 };
 
 // ========================

@@ -4,6 +4,7 @@ import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
 import { InAppChatInterface } from '../InAppChatInterface';
 import { useChatHistory } from '../../hooks/useChatPrefetch';
+import { nodeApi } from '../../lib/api';
 
 // Generic node interface - works with any node type
 interface BaseNode {
@@ -194,6 +195,14 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                                 className="h-full"
                                 style={{ minHeight: '100%' }}
                                 initialContent={chatHistory?.document_json} // Pass fetched history
+                                onSaveChat={async (content) => {
+                                    try {
+                                        await nodeApi.saveChatHistory(node.id, content);
+                                        console.log('✅ Chat history saved successfully');
+                                    } catch (error) {
+                                        console.error('❌ Failed to save chat history:', error);
+                                    }
+                                }}
                             />
                         </div>
                     </div>
