@@ -67,6 +67,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
     const ContextComponent = useContextRegistry(node.type);
 
     // Fetch context data for this node to check the setup flag
+    // context_id is stored on the node by useCanvasPersistence at load time
     useEffect(() => {
         if (!visible || !node.id) return;
 
@@ -75,27 +76,27 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
             try {
                 const apiClient = (await import('../../lib/api')).default;
 
-                // Step 1: Get context_id — use node.context_id if present,
-                // otherwise fetch the full node from the API (canvas nodes omit this field)
-                let ctxId = node.context_id as string | undefined;
+                // context_id is set on the node at load time by useCanvasPersistence
+                // Fall back to GET /api/v1/node/{id} if for some reason it's missing
+                let ctxId = (node as any).context_id as string | undefined;
+
                 if (!ctxId) {
+                    console.log(`📡 context_id missing on node ${node.id}, fetching from API...`);
                     const nodeResp = await apiClient.get(`/api/v1/node/${node.id}`);
                     ctxId = nodeResp.data?.context_id;
-                    console.log(`📡 Fetched node context_id from API:`, ctxId);
                 }
 
                 if (!ctxId) {
-                    console.warn(`⚠️ No context_id for node ${node.id} — skipping setup check`);
+                    console.warn(`⚠️ No context_id for node ${node.id}`);
                     setSetupLoading(false);
                     return;
                 }
 
-                // Step 2: Store context_id and check the setup flag
                 setContextId(ctxId);
                 const ctxResp = await apiClient.get(`/api/v1/context/${ctxId}`);
                 const ctx = ctxResp.data;
                 setIsSetupMode(ctx?.setup === true);
-                console.log(`📋 Context ${ctxId} setup flag:`, ctx?.setup);
+                console.log(`📋 Node ${node.id} → context ${ctxId} → setup:`, ctx?.setup);
 
             } catch (err) {
                 console.warn('Could not fetch context for setup flag:', err);
@@ -106,7 +107,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
         };
 
         fetchContextData();
-    }, [visible, node.id, node.context_id]);
+    }, [visible, node.id]);
 
     // When user clicks "Change Protocol" in SetupContext, reset setup mode
     const handleSetupDisabled = useCallback(() => {
