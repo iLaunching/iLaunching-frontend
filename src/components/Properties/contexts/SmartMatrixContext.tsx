@@ -48,7 +48,17 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                 throw new Error("No node ID found");
             }
 
-            return nodeApi.updateProtocol(nodeId, protocol.protocol_id, protocol.protocol_key);
+            // 1. Set the protocol on the node
+            const result = await nodeApi.updateProtocol(nodeId, protocol.protocol_id, protocol.protocol_key);
+
+            // 2. Set setup=true on the context to lock the protocol in the panel
+            const contextId = nodeData?.context_id;
+            if (contextId) {
+                await contextApi.updateContextSetup(contextId, true);
+                console.log('🔒 Setup mode enabled for context:', contextId);
+            }
+
+            return result;
         },
         onSuccess: () => {
             // Invalidate relevant queries

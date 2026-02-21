@@ -361,8 +361,19 @@ export const contextApi = {
     local_variables?: any;
     is_active?: boolean;
     master_dna_payload?: any;
+    setup?: boolean;
   }) => {
     const response = await api.patch(`/context/${contextId}`, data);
+    return response.data;
+  },
+
+  /**
+   * Toggle the setup flag on a context.
+   * When setup=true → panel shows SetupContext (locked/protocol mode).
+   * When setup=false → panel shows normal node-specific context.
+   */
+  updateContextSetup: async (contextId: string, setup: boolean) => {
+    const response = await api.patch(`/context/${contextId}`, { setup });
     return response.data;
   },
 };

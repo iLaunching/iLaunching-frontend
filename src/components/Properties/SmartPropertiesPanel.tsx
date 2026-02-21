@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Camera } from '../Canvas/core/Camera';
 import { useContextRegistry } from './registry/ContextRegistry';
 import { InAppChatInterface } from '../InAppChatInterface';
 import { useChatHistory } from '../../hooks/useChatPrefetch';
 import { nodeApi } from '../../lib/api';
+import { SetupContext } from './contexts/SetupContext';
 
 // Generic node interface - works with any node type
 interface BaseNode {
@@ -41,7 +42,7 @@ interface SmartPropertiesPanelProps {
  * - React.memo prevents re-renders during panning
  * - Lazy loads context components
  */
-export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
+export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
     node,
     visible,
     onClose,
@@ -54,15 +55,50 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
     const [position, setPosition] = useState<{ x: number, y: number } | null>(null);
     const rafRef = useRef<number | null>(null);
 
-    // Fetch chat history for this node (Sovereign Speed)
-    // We can use the hook we just created
-    // But we need to import it first
-    // For now, let's assume we can just use the hook if it's exported
-    // imports will be separate chunk
-    const { data: chatHistory, isLoading: isChatLoading } = useChatHistory(node.id);
+    // --- Setup flag state ---
+    // Fetched from backend: determines if SetupContext or ContextComponent is shown
+    const [isSetupMode, setIsSetupMode] = useState(false);
+    const [contextId, setContextId] = useState<string | undefined>(undefined);
+    const [setupLoading, setSetupLoading] = useState(false);
+
+    const { data: chatHistory } = useChatHistory(node.id);
 
     // Get the context component for this node type (memoized in hook)
     const ContextComponent = useContextRegistry(node.type);
+
+    // Fetch context data for this node to check the setup flag
+    useEffect(() => {
+        if (!visible || !node.id) return;
+
+        const fetchContextData = async () => {
+            setSetupLoading(true);
+            try {
+                const ctxId = node.context_id;
+                if (ctxId) {
+                    setContextId(ctxId);
+                    // Dynamically import to avoid circular reference issues
+                    const { default: apiClient } = await import('../../lib/api');
+                    const response = await apiClient.get(`/api/v1/context/${ctxId}`);
+                    const ctx = response.data;
+                    setIsSetupMode(ctx?.setup === true);
+                    console.log(`📋 Context ${ctxId} setup flag:`, ctx?.setup);
+                }
+            } catch (err) {
+                console.warn('Could not fetch context for setup flag:', err);
+                setIsSetupMode(false);
+            } finally {
+                setSetupLoading(false);
+            }
+        };
+
+        fetchContextData();
+    }, [visible, node.id, node.context_id]);
+
+    // When user clicks "Change Protocol" in SetupContext, reset setup mode
+    const handleSetupDisabled = useCallback(() => {
+        setIsSetupMode(false);
+        console.log('🔓 Setup mode disabled — showing node context');
+    }, []);
 
     // Update position to follow node during pan/zoom
     useEffect(() => {
@@ -221,6 +257,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                         onMouseOut={(e) => !isResizing && (e.currentTarget.style.backgroundColor = 'transparent')}
                     />
 
+                    {/* Right Section: Context or Setup */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 200, overflow: 'hidden' }}>
                         <Suspense fallback={
                             <div style={{
@@ -231,26 +268,30 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>(({
                                 color: '#6b7280',
                                 fontSize: '14px'
                             }}>
-                                Loading context...
+                                {setupLoading ? 'Loading...' : 'Loading context...'}
                             </div>
                         }>
-                            <ContextComponent nodeData={node} onClose={onClose} />
+                            {isSetupMode ? (
+                                /* Setup mode: show the locked protocol view */
+                                <SetupContext
+                                    nodeData={node}
+                                    onClose={onClose}
+                                    contextId={contextId}
+                                    onSetupDisabled={handleSetupDisabled}
+                                />
+                            ) : (
+                                /* Normal mode: show the node-specific context */
+                                <ContextComponent nodeData={node} onClose={onClose} />
+                            )}
                         </Suspense>
                     </div>
                 </motion.div>
             </AnimatePresence >
         </>
     );
-}, (prevProps, nextProps) => {
-    // Custom comparison: only re-render if node ID, visibility, or camera zoom changes significantly
-    // This prevents re-renders during canvas panning
-    return (
-        prevProps.node.id === nextProps.node.id &&
-        prevProps.visible === nextProps.visible &&
-        Math.abs(prevProps.camera.zoom - nextProps.camera.zoom) < 0.01
-    );
-});
+}) as React.NamedExoticComponent<SmartPropertiesPanelProps>);
 
 SmartPropertiesPanel.displayName = 'SmartPropertiesPanel';
 
 export default SmartPropertiesPanel;
+
