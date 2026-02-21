@@ -82,7 +82,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
 
                 if (!ctxId) {
                     console.log(`📡 context_id missing on node ${node.id}, fetching from API...`);
-                    const nodeResp = await apiClient.get(`/api/v1/node/${node.id}`);
+                    const nodeResp = await apiClient.get(`/node/${node.id}`);
                     ctxId = nodeResp.data?.context_id;
                 }
 
@@ -93,7 +93,7 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
                 }
 
                 setContextId(ctxId);
-                const ctxResp = await apiClient.get(`/api/v1/context/${ctxId}`);
+                const ctxResp = await apiClient.get(`/context/${ctxId}`);
                 const ctx = ctxResp.data;
                 setIsSetupMode(ctx?.setup === true);
                 console.log(`📋 Node ${node.id} → context ${ctxId} → setup:`, ctx?.setup);
