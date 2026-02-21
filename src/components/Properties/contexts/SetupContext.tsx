@@ -150,10 +150,10 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         ...maskStyle,
                         display: 'flex',
                         flexDirection: 'row',
-                        gap: '8px',
+                        gap: '2px', // Reduced from 8px to bring buttons closer
                         overflowX: 'auto',
                         width: '100%',
-                        padding: '0 24px', // padding to prevent buttons from overlapping content
+                        padding: '0 10px', // Reduced from 24px to match left alignment better
                         scrollBehavior: 'smooth',
                     }}
                 >
