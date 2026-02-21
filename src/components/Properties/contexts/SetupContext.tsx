@@ -349,14 +349,30 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                 {/* Input Nodes Tab Content */}
                 {activeTab === 'input' && (
                     <div style={{ padding: '18px 10px 10px 10px' }}>
-                        {/* Input Nodes content goes here */}
+                        <h3 style={{
+                            fontSize: '15px',
+                            fontWeight: 500,
+                            fontFamily: 'Work Sans, sans-serif',
+                            color: textColor,
+                            margin: 0
+                        }}>
+                            Input Nodes Configuration
+                        </h3>
                     </div>
                 )}
 
                 {/* Output Nodes Tab Content */}
                 {activeTab === 'output' && (
                     <div style={{ padding: '18px 10px 10px 10px' }}>
-                        {/* Output Nodes content goes here */}
+                        <h3 style={{
+                            fontSize: '15px',
+                            fontWeight: 500,
+                            fontFamily: 'Work Sans, sans-serif',
+                            color: textColor,
+                            margin: 0
+                        }}>
+                            Output Nodes Configuration
+                        </h3>
                     </div>
                 )}
 
