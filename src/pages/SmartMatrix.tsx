@@ -705,13 +705,7 @@ const SmartMatrixCanvas: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      canvas.removeEventListener('mousedown', handleNodeMouseDown);
-      window.removeEventListener('mousemove', handleNodeMouseMove);
-      window.removeEventListener('mouseup', handleNodeMouseUp);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-    return () => {
-      canvas.removeEventListener('mousedown', handleNodeMouseDown);
+      canvas?.removeEventListener('mousedown', handleNodeMouseDown);
       window.removeEventListener('mousemove', handleNodeMouseMove);
       window.removeEventListener('mouseup', handleNodeMouseUp);
       window.removeEventListener('keydown', handleKeyDown);
