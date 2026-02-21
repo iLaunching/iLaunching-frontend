@@ -63,6 +63,12 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
         }
     };
 
+    // Faded edges mask effect
+    const maskStyle = {
+        WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+        maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -73,15 +79,25 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
         }}>
             {/* Navigation Bar — matches SmartMatrixContext style */}
             <div style={{
+                position: 'relative',
                 padding: '10px 10px 0px 10px',
                 borderBottom: `1px solid ${borderLineColor}`,
                 height: 'fit-content',
+                display: 'flex',
+                alignItems: 'center',
             }}>
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '8px',
-                }}>
+                <div
+                    className="no-scrollbar"
+                    style={{
+                        ...maskStyle,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '8px',
+                        overflowX: 'auto',
+                        width: '100%',
+                        padding: '0 4px', // slight padding inside the mask so focus rings don't clip
+                    }}
+                >
                     {/* Setup Tab */}
                     <button
                         onClick={() => setActiveTab('setup')}
@@ -102,6 +118,8 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                             color: activeTab === 'setup' ? solidColor : textColor,
                             transition: 'all 0.2s ease',
                             userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                             if (activeTab !== 'setup') {
@@ -136,6 +154,8 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                             color: activeTab === 'input' ? solidColor : textColor,
                             transition: 'all 0.2s ease',
                             userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                             if (activeTab !== 'input') {
@@ -170,6 +190,8 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                             color: activeTab === 'output' ? solidColor : textColor,
                             transition: 'all 0.2s ease',
                             userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                             if (activeTab !== 'output') {
@@ -204,6 +226,8 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                             color: activeTab === 'settings' ? solidColor : textColor,
                             transition: 'all 0.2s ease',
                             userSelect: 'none',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                             if (activeTab !== 'settings') {
