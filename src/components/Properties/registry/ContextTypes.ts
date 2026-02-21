@@ -11,6 +11,8 @@ export type ContextType = 'smart-matrix' | 'smart-router' | 'genesis' | 'default
 export interface ContextComponentProps {
     nodeData: any; // The full node object
     onClose?: () => void;
+    /** Called when a protocol is applied and setup mode is enabled — panel switches to SetupContext */
+    onSetupEnabled?: () => void;
 }
 
 /**

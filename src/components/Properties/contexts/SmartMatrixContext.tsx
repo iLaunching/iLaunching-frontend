@@ -29,7 +29,7 @@ interface MatrixProtocol {
  * Smart Matrix Context Component
  * Displays settings and configuration for Smart Matrix nodes
  */
-export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, onClose }) => {
+export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, onClose, onSetupEnabled }) => {
     const [activeTab, setActiveTab] = useState<'options' | 'settings'>('options');
     const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
     const [view, setView] = useState<'list' | 'detail'>('list');
@@ -58,6 +58,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             if (contextId) {
                 await contextApi.updateContextSetup(contextId, true);
                 console.log('🔒 Setup mode enabled for context:', contextId);
+                // Notify the parent panel to switch immediately — no need for another fetch
+                onSetupEnabled?.();
             } else {
                 console.warn('⚠️ No context_id found after updateProtocol — setup flag not set', result, nodeData);
             }

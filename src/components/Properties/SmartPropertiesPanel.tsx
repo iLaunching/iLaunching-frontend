@@ -100,6 +100,12 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
         console.log('🔓 Setup mode disabled — showing node context');
     }, []);
 
+    // Called by ContextComponent when a protocol is applied — immediately switches panel
+    const handleSetupEnabled = useCallback(() => {
+        setIsSetupMode(true);
+        console.log('🔒 Setup mode enabled — switching to SetupContext');
+    }, []);
+
     // Update position to follow node during pan/zoom
     useEffect(() => {
         if (!visible) return;
@@ -281,7 +287,11 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
                                 />
                             ) : (
                                 /* Normal mode: show the node-specific context */
-                                <ContextComponent nodeData={node} onClose={onClose} />
+                                <ContextComponent
+                                    nodeData={node}
+                                    onClose={onClose}
+                                    onSetupEnabled={handleSetupEnabled}
+                                />
                             )}
                         </Suspense>
                     </div>
