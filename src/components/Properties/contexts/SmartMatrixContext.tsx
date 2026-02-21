@@ -49,13 +49,17 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             }
 
             // 1. Set the protocol on the node
+            // NodeResponse includes context_id — use it to set the setup flag
             const result = await nodeApi.updateProtocol(nodeId, protocol.protocol_id, protocol.protocol_key);
 
             // 2. Set setup=true on the context to lock the protocol in the panel
-            const contextId = nodeData?.context_id;
+            // Prefer the context_id from the API response; fall back to nodeData
+            const contextId = result?.context_id || nodeData?.context_id;
             if (contextId) {
                 await contextApi.updateContextSetup(contextId, true);
                 console.log('🔒 Setup mode enabled for context:', contextId);
+            } else {
+                console.warn('⚠️ No context_id found after updateProtocol — setup flag not set', result, nodeData);
             }
 
             return result;
