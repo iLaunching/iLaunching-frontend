@@ -188,7 +188,7 @@ export const InAppEditor: React.FC<InAppEditorProps> = ({
         .in-app-editor-wrapper .ProseMirror {
           outline: none;
           color: #1f2937; /* Darker gray for better readability */
-          font-size: 12px !important; /* Smaller default for in-app chat */
+          font-size: 14px !important; /* Smaller default for in-app chat */
           font-family: 'Work Sans', sans-serif !important;
           line-height: 1.4 !important;
           /* Performance optimizations */

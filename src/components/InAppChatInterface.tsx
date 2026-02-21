@@ -72,7 +72,10 @@ export function InAppChatInterface({
           // Insert at the absolute end of the document
           editor.commands.insertContentAt(doc.content.size, {
             type: 'aiIndicator',
-            attrs: { aiAcknowledge: '' }
+            attrs: {
+              aiName: 'iLaunching',
+              aiAcknowledge: ''
+            }
           });
         }
 

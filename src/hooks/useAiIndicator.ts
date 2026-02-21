@@ -16,7 +16,7 @@ export const useAiIndicator = (editor: Editor | null) => {
    * @param {boolean} options.append - Whether to append to existing content or replace
    */
   const insertAiMessage = useCallback(
-    ({ aiName = 'AI Assistant', aiAcknowledge = '', text = '', append = true }) => {
+    ({ aiName = 'iLaunching', aiAcknowledge = '', text = '', append = true }) => {
       if (!editor) return;
 
       const content = {
@@ -47,8 +47,8 @@ export const useAiIndicator = (editor: Editor | null) => {
    * @returns {Function} Update function for streaming
    */
   const insertStreamingAiMessage = useCallback(
-    ({ aiName = 'AI Assistant', aiAcknowledge = '', initialText = '' }) => {
-      if (!editor) return () => {};
+    ({ aiName = 'iLaunching', aiAcknowledge = '', initialText = '' }) => {
+      if (!editor) return () => { };
 
       // Insert initial empty AI indicator
       insertAiMessage({
@@ -97,7 +97,7 @@ export const useAiIndicator = (editor: Editor | null) => {
   const insertSalesMessage = useCallback(
     (text: string, userName: string = '') => {
       const acknowledge = userName ? `Speaking with ${userName}` : 'Sales Consultation';
-      
+
       insertAiMessage({
         aiName: 'iLaunching AI',
         aiAcknowledge: acknowledge,
@@ -121,7 +121,7 @@ export const useAiIndicator = (editor: Editor | null) => {
    */
   const hasAiIndicators = useCallback(() => {
     if (!editor) return false;
-    
+
     let hasAi = false;
     editor.state.doc.descendants((node) => {
       if (node.type.name === 'aiIndicator') {
@@ -129,7 +129,7 @@ export const useAiIndicator = (editor: Editor | null) => {
         return false; // Stop iteration
       }
     });
-    
+
     return hasAi;
   }, [editor]);
 

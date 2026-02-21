@@ -12,17 +12,17 @@ import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) => {
   const { aiName, aiAcknowledge, text } = node.attrs;
   console.log('AiIndicator: Rendering with attrs:', { aiName, aiAcknowledge, text });
-  
+
   // Track if this is first render to prevent animation restart
   const [hasAnimated, setHasAnimated] = React.useState(false);
-  
+
   React.useEffect(() => {
     if (!hasAnimated) {
       const timer = setTimeout(() => setHasAnimated(true), 500); // After animation completes
       return () => clearTimeout(timer);
     }
   }, [hasAnimated]);
-  
+
   // Split acknowledge message into words for animation
   const renderAcknowledgeWords = (message: string) => {
     if (!message) return null;
@@ -37,7 +37,7 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
       </span>
     ));
   };
-  
+
   return (
     <NodeViewWrapper className={`ce-ai ${hasAnimated ? 'no-animate' : ''}`}>
       <div className="tiptap-ai-container">
@@ -47,12 +47,12 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
           <div className="tiptap-ai-icon" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
             <span className="tiptap-ai-letter" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>i</span>
           </div>
-          
+
           {/* AI Name */}
           <div className="tiptap-ai-name">
             {aiName || 'AI Assistant'}
           </div>
-          
+
           {/* AI Acknowledge (only show if not empty) */}
           {aiAcknowledge && (
             <div className="tiptap-ai-acknowledge">
@@ -60,10 +60,10 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
             </div>
           )}
         </div>
-        
+
         {/* Main Text Content */}
         {text && (
-          <div 
+          <div
             className="tiptap-ai-text"
             dangerouslySetInnerHTML={{ __html: text }}
           />
@@ -185,6 +185,7 @@ const AiIndicatorComponent = ({ node }: { node: any; updateAttributes?: any }) =
         }
 
         .tiptap-ai-name {
+          font-family: 'Work Sans', sans-serif;
           font-size: 14px;
           font-weight: 600;
           color: rgba(59, 130, 246, 0.8);
@@ -341,7 +342,7 @@ export const AiIndicator = Node.create({
   addAttributes() {
     return {
       aiName: {
-        default: 'AI Assistant',
+        default: 'iLaunching',
       },
       aiAcknowledge: {
         default: '',

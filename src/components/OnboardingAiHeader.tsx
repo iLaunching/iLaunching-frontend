@@ -4,8 +4,8 @@ interface OnboardingAiHeaderProps {
   aiAcknowledgeTextColor?: string;
 }
 
-export default function OnboardingAiHeader({ 
-  aiName = 'AI Assistant',
+export default function OnboardingAiHeader({
+  aiName = 'iLaunching',
   acknowledgeMessage = '',
   aiAcknowledgeTextColor
 }: OnboardingAiHeaderProps) {
@@ -31,12 +31,12 @@ export default function OnboardingAiHeader({
         <div className="onboarding-ai-icon" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
           <span className="onboarding-ai-letter" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>i</span>
         </div>
-        
+
         {/* AI Name */}
         <div className="onboarding-ai-name">
           {aiName}
         </div>
-        
+
         {/* AI Acknowledge (only show if not empty) */}
         {acknowledgeMessage && (
           <div key={acknowledgeMessage} className="onboarding-ai-acknowledge">

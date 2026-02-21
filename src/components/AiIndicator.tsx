@@ -16,8 +16,8 @@ interface AiIndicatorProps {
   className?: string;
 }
 
-export default function AiIndicator({ 
-  aiName = "AI Assistant",
+export default function AiIndicator({
+  aiName = "iLaunching",
   aiAcknowledge = "",
   show = true,
   className = ""
@@ -31,12 +31,12 @@ export default function AiIndicator({
         <div className="ai-icon" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
           <span className="ai-letter" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>i</span>
         </div>
-        
+
         {/* AI Name */}
         <div className="ai-name" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
           {aiName}
         </div>
-        
+
         {/* AI Acknowledge (only show if not empty) */}
         {aiAcknowledge && (
           <div className="ai-acknowledge" style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'default' }}>
