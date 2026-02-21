@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { ContextComponentProps } from '../registry/ContextTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
@@ -18,9 +18,10 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
 }) => {
     const [activeTab, setActiveTab] = useState<'setup' | 'input' | 'output' | 'settings'>('setup');
     const [isChanging, setIsChanging] = useState(false);
-    const [isNavHovered, setIsNavHovered] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [showLeftScroll, setShowLeftScroll] = useState(false);
+    const [showRightScroll, setShowRightScroll] = useState(true);
 
     const effectiveContextId = contextId || (nodeData as any)?.context_id;
 
@@ -71,6 +72,23 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
         maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
     };
 
+    const checkScrollButtons = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            setShowLeftScroll(scrollLeft > 0);
+            // Add a 1px tolerance for floating point rounding differences
+            setShowRightScroll(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+        }
+    };
+
+    useEffect(() => {
+        // Initial check once container mounts
+        checkScrollButtons();
+        // Also check if window resizes affecting the container
+        window.addEventListener('resize', checkScrollButtons);
+        return () => window.removeEventListener('resize', checkScrollButtons);
+    }, []);
+
     const handleScroll = (direction: 'left' | 'right') => {
         if (scrollContainerRef.current) {
             const scrollAmount = 150; // Amount to scroll per click
@@ -78,6 +96,7 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                 left: direction === 'left' ? -scrollAmount : scrollAmount,
                 behavior: 'smooth'
             });
+            // checkScrollButtons will fire via the onScroll event handler
         }
     };
 
@@ -90,43 +109,42 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
             fontFamily: "'Work Sans', sans-serif",
         }}>
             {/* Navigation Bar — matches SmartMatrixContext style */}
-            <div
-                onMouseEnter={() => setIsNavHovered(true)}
-                onMouseLeave={() => setIsNavHovered(false)}
-                style={{
-                    position: 'relative',
-                    padding: '10px 10px 0px 10px',
-                    borderBottom: `1px solid ${borderLineColor}`,
-                    height: 'fit-content',
-                    display: 'flex',
-                    alignItems: 'center',
-                }}>
-                <button
-                    onClick={() => handleScroll('left')}
-                    style={{
-                        position: 'absolute',
-                        left: '4px',
-                        zIndex: 10,
-                        background: 'transparent',
-                        border: 'none',
-                        color: textColor,
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: isNavHovered ? 0.7 : 0,
-                        pointerEvents: isNavHovered ? 'auto' : 'none',
-                        transition: 'opacity 0.2s',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = isNavHovered ? '0.7' : '0')}
-                >
-                    <FontAwesomeIcon icon={solidIcons.faChevronLeft} style={{ fontSize: '12px' }} />
-                </button>
+            <div style={{
+                position: 'relative',
+                padding: '10px 10px 0px 10px',
+                borderBottom: `1px solid ${borderLineColor}`,
+                height: 'fit-content',
+                display: 'flex',
+                alignItems: 'center',
+            }}>
+                {showLeftScroll && (
+                    <button
+                        onClick={() => handleScroll('left')}
+                        style={{
+                            position: 'absolute',
+                            left: '4px',
+                            zIndex: 10,
+                            background: 'transparent',
+                            border: 'none',
+                            color: textColor,
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0.7,
+                            transition: 'opacity 0.2s',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faChevronLeft} style={{ fontSize: '12px' }} />
+                    </button>
+                )}
 
                 <div
                     ref={scrollContainerRef}
+                    onScroll={checkScrollButtons}
                     className="no-scrollbar"
                     style={{
                         ...maskStyle,
@@ -284,29 +302,30 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                     </button>
                 </div>
 
-                <button
-                    onClick={() => handleScroll('right')}
-                    style={{
-                        position: 'absolute',
-                        right: '4px',
-                        zIndex: 10,
-                        background: 'transparent',
-                        border: 'none',
-                        color: textColor,
-                        cursor: 'pointer',
-                        padding: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: isNavHovered ? 0.7 : 0,
-                        pointerEvents: isNavHovered ? 'auto' : 'none',
-                        transition: 'opacity 0.2s',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = isNavHovered ? '0.7' : '0')}
-                >
-                    <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
-                </button>
+                {showRightScroll && (
+                    <button
+                        onClick={() => handleScroll('right')}
+                        style={{
+                            position: 'absolute',
+                            right: '4px',
+                            zIndex: 10,
+                            background: 'transparent',
+                            border: 'none',
+                            color: textColor,
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0.7,
+                            transition: 'opacity 0.2s',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
+                    </button>
+                )}
             </div>
 
             {/* Content Container */}
