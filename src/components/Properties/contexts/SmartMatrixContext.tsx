@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { ContextComponentProps } from '../registry/ContextTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
@@ -35,6 +35,9 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const [view, setView] = useState<'list' | 'detail'>('list');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const categoryScrollRef = useRef<HTMLDivElement>(null);
+    const [showLeftCatScroll, setShowLeftCatScroll] = useState(false);
+    const [showRightCatScroll, setShowRightCatScroll] = useState(true);
     const queryClient = useQueryClient();
 
     // Mutation for using a protocol
@@ -112,6 +115,21 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const titleColor = hubData?.theme?.title_menu_color_light || '#374151';
     const textColor = hubData?.theme?.text || '#374151';
     const borderLineColor = hubData?.theme?.border_line_color_light || 'rgba(255, 255, 255, 0.2)';
+
+    // Smart scroll button checks for the category chip bar
+    const checkCatScroll = () => {
+        if (categoryScrollRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
+            setShowLeftCatScroll(scrollLeft > 0);
+            setShowRightCatScroll(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+        }
+    };
+
+    useEffect(() => {
+        checkCatScroll();
+        window.addEventListener('resize', checkCatScroll);
+        return () => window.removeEventListener('resize', checkCatScroll);
+    }, [categories]);
 
     const protocols = protocolsData?.protocols || [];
 
@@ -232,91 +250,150 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
 
                     {/* Category Filter Chips — only visible on Options tab */}
                     {activeTab === 'options' && categories.length > 0 && (
-                        <div
-                            className="no-scrollbar"
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                gap: '6px',
-                                overflowX: 'auto',
-                                paddingBottom: '8px',
-                                paddingTop: '8px',
-                                scrollbarWidth: 'none',
-                                msOverflowStyle: 'none',
-                            }}
-                        >
-                            {/* All / reset chip */}
-                            <button
-                                onClick={() => setSelectedCategoryId(null)}
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            {/* Left scroll button */}
+                            {showLeftCatScroll && (
+                                <button
+                                    onClick={() => categoryScrollRef.current?.scrollBy({ left: -150, behavior: 'smooth' })}
+                                    style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        zIndex: 10,
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: textColor,
+                                        cursor: 'pointer',
+                                        padding: '4px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        opacity: 0.7,
+                                        transition: 'opacity 0.2s',
+                                    }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                                >
+                                    <FontAwesomeIcon icon={solidIcons.faChevronLeft} style={{ fontSize: '11px' }} />
+                                </button>
+                            )}
+
+                            <div
+                                ref={categoryScrollRef}
+                                onScroll={checkCatScroll}
+                                className="no-scrollbar"
                                 style={{
                                     display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    padding: '3px 10px',
-                                    borderRadius: '20px',
-                                    border: `1px solid ${selectedCategoryId === null ? solidColor : borderLineColor}`,
-                                    backgroundColor: selectedCategoryId === null ? solidColor : 'transparent',
-                                    color: selectedCategoryId === null ? '#fff' : textColor,
-                                    cursor: 'pointer',
-                                    fontFamily: 'Work Sans, sans-serif',
-                                    fontSize: '12px',
-                                    fontWeight: 400,
-                                    whiteSpace: 'nowrap',
-                                    flexShrink: 0,
-                                    transition: 'all 0.2s ease',
-                                    userSelect: 'none',
+                                    flexDirection: 'row',
+                                    gap: '6px',
+                                    overflowX: 'auto',
+                                    paddingBottom: '8px',
+                                    paddingTop: '8px',
+                                    paddingLeft: showLeftCatScroll ? '20px' : '0px',
+                                    paddingRight: showRightCatScroll ? '20px' : '0px',
+                                    scrollbarWidth: 'none',
+                                    msOverflowStyle: 'none',
+                                    width: '100%',
+                                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+                                    maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
                                 }}
                             >
-                                All
-                            </button>
+                                {/* All / reset chip */}
+                                <button
+                                    onClick={() => setSelectedCategoryId(null)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        padding: '3px 10px',
+                                        borderRadius: '20px',
+                                        border: `1px solid ${selectedCategoryId === null ? solidColor : borderLineColor}`,
+                                        backgroundColor: selectedCategoryId === null ? solidColor : 'transparent',
+                                        color: selectedCategoryId === null ? '#fff' : textColor,
+                                        cursor: 'pointer',
+                                        fontFamily: 'Work Sans, sans-serif',
+                                        fontSize: '12px',
+                                        fontWeight: 400,
+                                        whiteSpace: 'nowrap',
+                                        flexShrink: 0,
+                                        transition: 'all 0.2s ease',
+                                        userSelect: 'none',
+                                    }}
+                                >
+                                    All
+                                </button>
 
-                            {categories.map((cat) => {
-                                const isActive = selectedCategoryId === cat.id;
-                                return (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setSelectedCategoryId(isActive ? null : cat.id)}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '5px',
-                                            padding: '3px 10px',
-                                            borderRadius: '20px',
-                                            border: `1px solid ${isActive ? (cat.color || solidColor) : borderLineColor}`,
-                                            backgroundColor: isActive ? (cat.color || solidColor) : 'transparent',
-                                            color: isActive ? '#fff' : textColor,
-                                            cursor: 'pointer',
-                                            fontFamily: 'Work Sans, sans-serif',
-                                            fontSize: '12px',
-                                            fontWeight: 400,
-                                            whiteSpace: 'nowrap',
-                                            flexShrink: 0,
-                                            transition: 'all 0.2s ease',
-                                            userSelect: 'none',
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!isActive) {
-                                                e.currentTarget.style.backgroundColor = `${cat.color || solidColor}22`;
-                                                e.currentTarget.style.borderColor = cat.color || solidColor;
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!isActive) {
-                                                e.currentTarget.style.backgroundColor = 'transparent';
-                                                e.currentTarget.style.borderColor = borderLineColor;
-                                            }
-                                        }}
-                                    >
-                                        {cat.icon_name && (
-                                            <i
-                                                className={`${cat.icon_prefix || 'fas'} ${cat.icon_name}`}
-                                                style={{ fontSize: '11px' }}
-                                            />
-                                        )}
-                                        {cat.name}
-                                    </button>
-                                );
-                            })}
+                                {categories.map((cat) => {
+                                    const isActive = selectedCategoryId === cat.id;
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => setSelectedCategoryId(isActive ? null : cat.id)}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '5px',
+                                                padding: '3px 10px',
+                                                borderRadius: '20px',
+                                                border: `1px solid ${isActive ? (cat.color || solidColor) : borderLineColor}`,
+                                                backgroundColor: isActive ? (cat.color || solidColor) : 'transparent',
+                                                color: isActive ? '#fff' : textColor,
+                                                cursor: 'pointer',
+                                                fontFamily: 'Work Sans, sans-serif',
+                                                fontSize: '12px',
+                                                fontWeight: 400,
+                                                whiteSpace: 'nowrap',
+                                                flexShrink: 0,
+                                                transition: 'all 0.2s ease',
+                                                userSelect: 'none',
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!isActive) {
+                                                    e.currentTarget.style.backgroundColor = `${cat.color || solidColor}22`;
+                                                    e.currentTarget.style.borderColor = cat.color || solidColor;
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!isActive) {
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                    e.currentTarget.style.borderColor = borderLineColor;
+                                                }
+                                            }}
+                                        >
+                                            {cat.icon_name && (
+                                                <i
+                                                    className={`${cat.icon_prefix || 'fas'} ${cat.icon_name}`}
+                                                    style={{ fontSize: '11px' }}
+                                                />
+                                            )}
+                                            {cat.name}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Right scroll button */}
+                            {showRightCatScroll && (
+                                <button
+                                    onClick={() => categoryScrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' })}
+                                    style={{
+                                        position: 'absolute',
+                                        right: 0,
+                                        zIndex: 10,
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: textColor,
+                                        cursor: 'pointer',
+                                        padding: '4px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        opacity: 0.7,
+                                        transition: 'opacity 0.2s',
+                                    }}
+                                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                                >
+                                    <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '11px' }} />
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
