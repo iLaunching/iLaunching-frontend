@@ -18,6 +18,7 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
 }) => {
     const [activeTab, setActiveTab] = useState<'setup' | 'input' | 'output' | 'settings'>('setup');
     const [isChanging, setIsChanging] = useState(false);
+    const [isNavHovered, setIsNavHovered] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -89,14 +90,17 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
             fontFamily: "'Work Sans', sans-serif",
         }}>
             {/* Navigation Bar — matches SmartMatrixContext style */}
-            <div style={{
-                position: 'relative',
-                padding: '10px 10px 0px 10px',
-                borderBottom: `1px solid ${borderLineColor}`,
-                height: 'fit-content',
-                display: 'flex',
-                alignItems: 'center',
-            }}>
+            <div
+                onMouseEnter={() => setIsNavHovered(true)}
+                onMouseLeave={() => setIsNavHovered(false)}
+                style={{
+                    position: 'relative',
+                    padding: '10px 10px 0px 10px',
+                    borderBottom: `1px solid ${borderLineColor}`,
+                    height: 'fit-content',
+                    display: 'flex',
+                    alignItems: 'center',
+                }}>
                 <button
                     onClick={() => handleScroll('left')}
                     style={{
@@ -111,11 +115,12 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        opacity: 0.7,
+                        opacity: isNavHovered ? 0.7 : 0,
+                        pointerEvents: isNavHovered ? 'auto' : 'none',
                         transition: 'opacity 0.2s',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = isNavHovered ? '0.7' : '0')}
                 >
                     <FontAwesomeIcon icon={solidIcons.faChevronLeft} style={{ fontSize: '12px' }} />
                 </button>
@@ -293,11 +298,12 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        opacity: 0.7,
+                        opacity: isNavHovered ? 0.7 : 0,
+                        pointerEvents: isNavHovered ? 'auto' : 'none',
                         transition: 'opacity 0.2s',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = isNavHovered ? '0.7' : '0')}
                 >
                     <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
                 </button>
