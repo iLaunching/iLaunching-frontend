@@ -26,7 +26,7 @@ interface InAppChatInterfaceProps {
 }
 
 export function InAppChatInterface({
-  apiUrl = import.meta.env.VITE_SALES_WS_URL || 'wss://sales-api-production-3088.up.railway.app',
+  apiUrl = import.meta.env.VITE_MAIN_AI_WS_URL ?? 'wss://ilaunchingmainai-production.up.railway.app',
   testMode = false,
   onStreamStart,
   onStreamComplete,
