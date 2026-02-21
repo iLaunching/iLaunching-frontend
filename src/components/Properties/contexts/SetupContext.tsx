@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { ContextComponentProps } from '../registry/ContextTypes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solidIcons from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +19,7 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
     const [activeTab, setActiveTab] = useState<'setup' | 'input' | 'output' | 'settings'>('setup');
     const [isChanging, setIsChanging] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const effectiveContextId = contextId || (nodeData as any)?.context_id;
 
@@ -69,6 +70,16 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
         maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
     };
 
+    const handleScroll = (direction: 'left' | 'right') => {
+        if (scrollContainerRef.current) {
+            const scrollAmount = 150; // Amount to scroll per click
+            scrollContainerRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -86,7 +97,31 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                 display: 'flex',
                 alignItems: 'center',
             }}>
+                <button
+                    onClick={() => handleScroll('left')}
+                    style={{
+                        position: 'absolute',
+                        left: '4px',
+                        zIndex: 10,
+                        background: 'transparent',
+                        border: 'none',
+                        color: textColor,
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0.7,
+                        transition: 'opacity 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                >
+                    <FontAwesomeIcon icon={solidIcons.faChevronLeft} style={{ fontSize: '12px' }} />
+                </button>
+
                 <div
+                    ref={scrollContainerRef}
                     className="no-scrollbar"
                     style={{
                         ...maskStyle,
@@ -95,7 +130,8 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         gap: '8px',
                         overflowX: 'auto',
                         width: '100%',
-                        padding: '0 4px', // slight padding inside the mask so focus rings don't clip
+                        padding: '0 24px', // padding to prevent buttons from overlapping content
+                        scrollBehavior: 'smooth',
                     }}
                 >
                     {/* Setup Tab */}
@@ -242,6 +278,29 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         <span>Settings</span>
                     </button>
                 </div>
+
+                <button
+                    onClick={() => handleScroll('right')}
+                    style={{
+                        position: 'absolute',
+                        right: '4px',
+                        zIndex: 10,
+                        background: 'transparent',
+                        border: 'none',
+                        color: textColor,
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0.7,
+                        transition: 'opacity 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                >
+                    <FontAwesomeIcon icon={solidIcons.faChevronRight} style={{ fontSize: '12px' }} />
+                </button>
             </div>
 
             {/* Content Container */}
