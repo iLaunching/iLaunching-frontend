@@ -306,6 +306,20 @@ export const protocolApi = {
     const response = await api.get(`/protocols/key/${protocolKey}`);
     return response.data;
   },
+
+  getCategories: async (): Promise<Array<{
+    id: number;
+    name: string;
+    description?: string;
+    color?: string;
+    icon_name?: string;
+    icon_prefix?: string;
+    sort_order: number;
+    is_active: boolean;
+  }>> => {
+    const response = await api.get('/protocols/categories');
+    return response.data;
+  },
 };
 
 // ========================

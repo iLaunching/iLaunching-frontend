@@ -34,6 +34,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
     const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
     const [view, setView] = useState<'list' | 'detail'>('list');
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const queryClient = useQueryClient();
 
     // Mutation for using a protocol
@@ -98,6 +99,13 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
         }
     });
 
+    // Fetch protocol categories
+    const { data: categories = [] } = useQuery({
+        queryKey: ['protocol-categories'],
+        queryFn: () => protocolApi.getCategories(),
+        staleTime: 5 * 60 * 1000, // categories rarely change
+    });
+
     // Extract theme colors from hub data (same pattern as SmartHub page)
     const globalHoverColor = hubData?.theme?.global_button_hover || 'rgba(0, 0, 0, 0.05)';
     const solidColor = hubData?.theme?.solid_color || '#3b82f6';
@@ -107,13 +115,14 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
 
     const protocols = protocolsData?.protocols || [];
 
-    // Filter protocols based on search query
+    // Filter protocols based on search query and selected category
     const filteredProtocols = protocols.filter((protocol: MatrixProtocol) => {
         const query = searchQuery.toLowerCase();
         const name = (protocol.display_name || protocol.protocol_key).toLowerCase();
         const description = (protocol.short_description || '').toLowerCase();
-
-        return name.includes(query) || description.includes(query);
+        const matchesSearch = name.includes(query) || description.includes(query);
+        const matchesCategory = selectedCategoryId === null || (protocol as any).category_id === selectedCategoryId;
+        return matchesSearch && matchesCategory;
     });
 
     // Get protocol badge color
@@ -220,6 +229,96 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                             <span>Settings</span>
                         </button>
                     </div>
+
+                    {/* Category Filter Chips — only visible on Options tab */}
+                    {activeTab === 'options' && categories.length > 0 && (
+                        <div
+                            className="no-scrollbar"
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '6px',
+                                overflowX: 'auto',
+                                paddingBottom: '8px',
+                                paddingTop: '8px',
+                                scrollbarWidth: 'none',
+                                msOverflowStyle: 'none',
+                            }}
+                        >
+                            {/* All / reset chip */}
+                            <button
+                                onClick={() => setSelectedCategoryId(null)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    padding: '3px 10px',
+                                    borderRadius: '20px',
+                                    border: `1px solid ${selectedCategoryId === null ? solidColor : borderLineColor}`,
+                                    backgroundColor: selectedCategoryId === null ? solidColor : 'transparent',
+                                    color: selectedCategoryId === null ? '#fff' : textColor,
+                                    cursor: 'pointer',
+                                    fontFamily: 'Work Sans, sans-serif',
+                                    fontSize: '12px',
+                                    fontWeight: 400,
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0,
+                                    transition: 'all 0.2s ease',
+                                    userSelect: 'none',
+                                }}
+                            >
+                                All
+                            </button>
+
+                            {categories.map((cat) => {
+                                const isActive = selectedCategoryId === cat.id;
+                                return (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => setSelectedCategoryId(isActive ? null : cat.id)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '5px',
+                                            padding: '3px 10px',
+                                            borderRadius: '20px',
+                                            border: `1px solid ${isActive ? (cat.color || solidColor) : borderLineColor}`,
+                                            backgroundColor: isActive ? (cat.color || solidColor) : 'transparent',
+                                            color: isActive ? '#fff' : textColor,
+                                            cursor: 'pointer',
+                                            fontFamily: 'Work Sans, sans-serif',
+                                            fontSize: '12px',
+                                            fontWeight: 400,
+                                            whiteSpace: 'nowrap',
+                                            flexShrink: 0,
+                                            transition: 'all 0.2s ease',
+                                            userSelect: 'none',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = `${cat.color || solidColor}22`;
+                                                e.currentTarget.style.borderColor = cat.color || solidColor;
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = 'transparent';
+                                                e.currentTarget.style.borderColor = borderLineColor;
+                                            }
+                                        }}
+                                    >
+                                        {cat.icon_name && (
+                                            <i
+                                                className={`${cat.icon_prefix || 'fas'} ${cat.icon_name}`}
+                                                style={{ fontSize: '11px' }}
+                                            />
+                                        )}
+                                        {cat.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             )}
 
