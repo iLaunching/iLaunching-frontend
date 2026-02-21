@@ -16,7 +16,7 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
     contextId,
     onSetupDisabled,
 }) => {
-    const [activeTab, setActiveTab] = useState<'setup' | 'settings'>('setup');
+    const [activeTab, setActiveTab] = useState<'setup' | 'input' | 'output' | 'settings'>('setup');
     const [isChanging, setIsChanging] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -116,6 +116,74 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         <span>Setup</span>
                     </button>
 
+                    {/* Input Nodes Tab */}
+                    <button
+                        onClick={() => setActiveTab('input')}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '0px 8px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderBottom: activeTab === 'input' ? `2px solid ${solidColor}` : '2px solid transparent',
+                            borderRadius: activeTab === 'input' ? '0px' : '8px',
+                            cursor: 'pointer',
+                            fontFamily: 'Work Sans, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 400,
+                            height: '30px',
+                            color: activeTab === 'input' ? solidColor : textColor,
+                            transition: 'all 0.2s ease',
+                            userSelect: 'none',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (activeTab !== 'input') {
+                                e.currentTarget.style.backgroundColor = globalHoverColor;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faArrowRightToBracket} style={{ fontSize: '14px' }} />
+                        <span>Input Nodes</span>
+                    </button>
+
+                    {/* Output Nodes Tab */}
+                    <button
+                        onClick={() => setActiveTab('output')}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '0px 8px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderBottom: activeTab === 'output' ? `2px solid ${solidColor}` : '2px solid transparent',
+                            borderRadius: activeTab === 'output' ? '0px' : '8px',
+                            cursor: 'pointer',
+                            fontFamily: 'Work Sans, sans-serif',
+                            fontSize: '14px',
+                            fontWeight: 400,
+                            height: '30px',
+                            color: activeTab === 'output' ? solidColor : textColor,
+                            transition: 'all 0.2s ease',
+                            userSelect: 'none',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (activeTab !== 'output') {
+                                e.currentTarget.style.backgroundColor = globalHoverColor;
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                    >
+                        <FontAwesomeIcon icon={solidIcons.faArrowRightFromBracket} style={{ fontSize: '14px' }} />
+                        <span>Output Nodes</span>
+                    </button>
+
                     {/* Settings Tab */}
                     <button
                         onClick={() => setActiveTab('settings')}
@@ -161,9 +229,67 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                     </div>
                 )}
 
+                {/* Input Nodes Tab Content */}
+                {activeTab === 'input' && (
+                    <div style={{ padding: '18px 10px 10px 10px' }}>
+                        {/* Input Nodes content goes here */}
+                    </div>
+                )}
+
+                {/* Output Nodes Tab Content */}
+                {activeTab === 'output' && (
+                    <div style={{ padding: '18px 10px 10px 10px' }}>
+                        {/* Output Nodes content goes here */}
+                    </div>
+                )}
+
                 {/* Settings Tab Content */}
                 {activeTab === 'settings' && (
                     <div style={{ padding: '18px 10px 10px 10px' }}>
+
+                        {/* Reset Section — matches SmartHub General settings style */}
+                        <div style={{
+                            marginBottom: '16px',
+                            fontFamily: 'Work Sans, sans-serif',
+                            border: `1px solid ${borderLineColor}`,
+                            borderRadius: '10px',
+                        }}>
+
+                            {/* header section  */}
+
+                            <div style={{
+                                fontFamily: 'Work Sans, sans-serif',
+                                borderBottom: `1px solid ${borderLineColor}`,
+                                padding: '10px',
+                                height: 'fit-content',
+                                backgroundColor: globalHoverColor,
+                                borderTopLeftRadius: '9px',
+                                borderTopRightRadius: '9px',
+                            }}>
+                                <h2 style={{
+                                    fontSize: '13px',
+                                    fontWeight: 500,
+                                    fontFamily: 'Work Sans, sans-serif',
+                                    userSelect: 'none',
+                                    color: textColor,
+                                    margin: 0,
+                                }}>
+                                    Reset
+                                </h2>
+                            </div>
+                            <div style={{
+                                padding: '16px',
+                                fontFamily: 'Work Sans, sans-serif',
+                                minHeight: '100px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                justifyContent: 'space-between',
+                                userSelect: "none"
+                            }}>
+                                {/* Custom section content will go here */}
+                            </div>
+                        </div>
 
                         {/* Danger Section — matches SmartHub General settings style */}
                         <div style={{
@@ -181,9 +307,10 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                                 padding: '10px',
                                 borderTopLeftRadius: '9px',
                                 borderTopRightRadius: '9px',
+                                userSelect: "none"
                             }}>
                                 <h2 style={{
-                                    fontSize: '15px',
+                                    fontSize: '14px',
                                     fontWeight: 500,
                                     marginBottom: '0px',
                                     fontFamily: 'Work Sans, sans-serif',
@@ -197,13 +324,16 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                             <div style={{
                                 padding: '10px',
                                 fontFamily: 'Work Sans, sans-serif',
+                                fontWeight: 400,
                                 minHeight: '50px',
                                 display: 'flex',
-                                alignItems: 'center',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
                                 justifyContent: 'space-between',
+                                userSelect: "none"
                             }}>
                                 <span style={{
-                                    fontSize: '14px',
+                                    fontSize: '12px',
                                     fontFamily: 'Work Sans, sans-serif',
                                     color: textColor,
                                 }}>
@@ -214,14 +344,18 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                                     onClick={handleChangeProtocol}
                                     disabled={isChanging}
                                     style={{
-                                        paddingLeft: '16px',
-                                        paddingRight: '16px',
+                                        marginTop: '10px',
+                                        paddingLeft: '5px',
+                                        paddingRight: '5px',
+                                        paddingTop: '3px',
+                                        paddingBottom: '3px',
+                                        alignSelf: 'flex-end',
                                         backgroundColor: 'transparent',
                                         color: dangerToneText,
                                         border: `1px solid ${dangerToneBorder}`,
                                         borderRadius: '6px',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
+                                        fontSize: '12px',
+                                        fontWeight: 400,
                                         fontFamily: 'Work Sans, sans-serif',
                                         cursor: isChanging ? 'not-allowed' : 'pointer',
                                         transition: 'all 0.2s ease',
@@ -242,7 +376,7 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                                         e.currentTarget.style.border = `1px solid ${dangerToneBorder}`;
                                     }}
                                 >
-                                    {isChanging ? 'Updating...' : 'Change Protocol'}
+                                    {isChanging ? 'Updating...' : 'Change protocol'}
                                 </button>
                             </div>
                         </div>
