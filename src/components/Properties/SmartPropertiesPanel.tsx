@@ -73,16 +73,30 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
         const fetchContextData = async () => {
             setSetupLoading(true);
             try {
-                const ctxId = node.context_id;
-                if (ctxId) {
-                    setContextId(ctxId);
-                    // Dynamically import to avoid circular reference issues
-                    const { default: apiClient } = await import('../../lib/api');
-                    const response = await apiClient.get(`/api/v1/context/${ctxId}`);
-                    const ctx = response.data;
-                    setIsSetupMode(ctx?.setup === true);
-                    console.log(`📋 Context ${ctxId} setup flag:`, ctx?.setup);
+                const apiClient = (await import('../../lib/api')).default;
+
+                // Step 1: Get context_id — use node.context_id if present,
+                // otherwise fetch the full node from the API (canvas nodes omit this field)
+                let ctxId = node.context_id as string | undefined;
+                if (!ctxId) {
+                    const nodeResp = await apiClient.get(`/api/v1/node/${node.id}`);
+                    ctxId = nodeResp.data?.context_id;
+                    console.log(`📡 Fetched node context_id from API:`, ctxId);
                 }
+
+                if (!ctxId) {
+                    console.warn(`⚠️ No context_id for node ${node.id} — skipping setup check`);
+                    setSetupLoading(false);
+                    return;
+                }
+
+                // Step 2: Store context_id and check the setup flag
+                setContextId(ctxId);
+                const ctxResp = await apiClient.get(`/api/v1/context/${ctxId}`);
+                const ctx = ctxResp.data;
+                setIsSetupMode(ctx?.setup === true);
+                console.log(`📋 Context ${ctxId} setup flag:`, ctx?.setup);
+
             } catch (err) {
                 console.warn('Could not fetch context for setup flag:', err);
                 setIsSetupMode(false);
