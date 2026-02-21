@@ -59,7 +59,8 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
     // Fetched from backend: determines if SetupContext or ContextComponent is shown
     const [isSetupMode, setIsSetupMode] = useState(false);
     const [contextId, setContextId] = useState<string | undefined>(undefined);
-    const [setupLoading, setSetupLoading] = useState(false);
+    const [setupLoading, setSetupLoading] = useState(true);
+    const [resolvedNodeId, setResolvedNodeId] = useState<string | null>(null);
 
     const { data: chatHistory } = useChatHistory(node.id);
 
@@ -71,13 +72,15 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
     useEffect(() => {
         if (!visible || !node.id) return;
 
+        let isMounted = true;
+        setSetupLoading(true);
+
         const fetchContextData = async () => {
-            setSetupLoading(true);
             try {
                 const apiClient = (await import('../../lib/api')).default;
 
                 // context_id is set on the node at load time by useCanvasPersistence
-                // Fall back to GET /api/v1/node/{id} if for some reason it's missing
+                // Fall back to GET /node/{id} if for some reason it's missing
                 let ctxId = (node as any).context_id as string | undefined;
 
                 if (!ctxId) {
@@ -88,26 +91,37 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
 
                 if (!ctxId) {
                     console.warn(`⚠️ No context_id for node ${node.id}`);
-                    setSetupLoading(false);
+                    if (isMounted) {
+                        setResolvedNodeId(node.id);
+                        setSetupLoading(false);
+                    }
                     return;
                 }
 
-                setContextId(ctxId);
+                if (isMounted) setContextId(ctxId);
                 const ctxResp = await apiClient.get(`/context/${ctxId}`);
                 const ctx = ctxResp.data;
-                setIsSetupMode(ctx?.setup === true);
-                console.log(`📋 Node ${node.id} → context ${ctxId} → setup:`, ctx?.setup);
+
+                if (isMounted) {
+                    setIsSetupMode(ctx?.setup === true);
+                    console.log(`📋 Node ${node.id} → context ${ctxId} → setup:`, ctx?.setup);
+                    setResolvedNodeId(node.id);
+                }
 
             } catch (err) {
                 console.warn('Could not fetch context for setup flag:', err);
-                setIsSetupMode(false);
+                if (isMounted) {
+                    setIsSetupMode(false);
+                    setResolvedNodeId(node.id);
+                }
             } finally {
-                setSetupLoading(false);
+                if (isMounted) setSetupLoading(false);
             }
         };
 
         fetchContextData();
-    }, [visible, node.id]);
+        return () => { isMounted = false; };
+    }, [visible, node.id, node.context_id]);
 
     // When user clicks "Change Protocol" in SetupContext, reset setup mode
     const handleSetupDisabled = useCallback(() => {
@@ -289,10 +303,21 @@ export const SmartPropertiesPanel = React.memo<SmartPropertiesPanelProps>((({
                                 color: '#6b7280',
                                 fontSize: '14px'
                             }}>
-                                {setupLoading ? 'Loading...' : 'Loading context...'}
+                                Loading context...
                             </div>
                         }>
-                            {isSetupMode ? (
+                            {(setupLoading || node.id !== resolvedNodeId) ? (
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    height: '100%',
+                                    color: '#6b7280',
+                                    fontSize: '14px'
+                                }}>
+                                    Checking configuration...
+                                </div>
+                            ) : isSetupMode ? (
                                 /* Setup mode: show the locked protocol view */
                                 <SetupContext
                                     nodeData={node}
