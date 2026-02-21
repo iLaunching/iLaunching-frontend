@@ -168,7 +168,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
             {view === 'list' && (
                 <div style={{
                     padding: '10px 10px 0px 10px',
-                    borderBottom: `1px solid ${borderLineColor}`,
+                    /*  borderBottom: `1px solid ${borderLineColor}`, */
                     height: 'fit-content'
                 }}>
 
@@ -232,7 +232,8 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                 height: '30px',
                                 color: activeTab === 'custom' ? solidColor : textColor,
                                 transition: 'all 0.2s ease',
-                                userSelect: 'none'
+                                userSelect: 'none',
+                                marginBottom: '10px'
                             }}
                             onMouseEnter={(e) => {
                                 if (activeTab !== 'custom') {
@@ -243,7 +244,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                 e.currentTarget.style.backgroundColor = 'transparent';
                             }}
                         >
-                            <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
+                            <FontAwesomeIcon icon={solidIcons.faUser} style={{ fontSize: '14px' }} />
                             <span>Custom</span>
                         </button>
                     </div>
