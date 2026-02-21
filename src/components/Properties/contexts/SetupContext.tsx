@@ -155,8 +155,17 @@ export const SetupContext: React.FC<ContextComponentProps & { contextId?: string
                         width: '100%',
                         padding: '0 10px', // Reduced from 24px to match left alignment better
                         scrollBehavior: 'smooth',
+                        msOverflowStyle: 'none',  // IE and Edge
+                        scrollbarWidth: 'none',  // Firefox
                     }}
                 >
+                    <style>
+                        {`
+                        .no-scrollbar::-webkit-scrollbar {
+                            display: none;
+                        }
+                        `}
+                    </style>
                     {/* Setup Tab */}
                     <button
                         onClick={() => setActiveTab('setup')}
