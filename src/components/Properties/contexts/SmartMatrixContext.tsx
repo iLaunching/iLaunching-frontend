@@ -30,7 +30,7 @@ interface MatrixProtocol {
  * Displays settings and configuration for Smart Matrix nodes
  */
 export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, onClose, onSetupEnabled }) => {
-    const [activeTab, setActiveTab] = useState<'options' | 'settings'>('options');
+    const [activeTab, setActiveTab] = useState<'options' | 'custom'>('options');
     const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
     const [view, setView] = useState<'list' | 'detail'>('list');
     const [searchQuery, setSearchQuery] = useState('');
@@ -213,9 +213,9 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                             <span>Options</span>
                         </button>
 
-                        {/* Settings Button */}
+                        {/* Custom Button */}
                         <button
-                            onClick={() => setActiveTab('settings')}
+                            onClick={() => setActiveTab('custom')}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -223,19 +223,19 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                                 padding: '0px 8px',
                                 background: 'transparent',
                                 border: 'none',
-                                borderBottom: activeTab === 'settings' ? `2px solid ${solidColor}` : '2px solid transparent',
-                                borderRadius: activeTab === 'settings' ? '0px' : '8px',
+                                borderBottom: activeTab === 'custom' ? `2px solid ${solidColor}` : '2px solid transparent',
+                                borderRadius: activeTab === 'custom' ? '0px' : '8px',
                                 cursor: 'pointer',
                                 fontFamily: 'Work Sans, sans-serif',
                                 fontSize: '14px',
                                 fontWeight: 400,
                                 height: '30px',
-                                color: activeTab === 'settings' ? solidColor : textColor,
+                                color: activeTab === 'custom' ? solidColor : textColor,
                                 transition: 'all 0.2s ease',
                                 userSelect: 'none'
                             }}
                             onMouseEnter={(e) => {
-                                if (activeTab !== 'settings') {
+                                if (activeTab !== 'custom') {
                                     e.currentTarget.style.backgroundColor = globalHoverColor;
                                 }
                             }}
@@ -244,7 +244,7 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                             }}
                         >
                             <FontAwesomeIcon icon={solidIcons.faGear} style={{ fontSize: '14px' }} />
-                            <span>Settings</span>
+                            <span>Custom</span>
                         </button>
                     </div>
 
@@ -632,11 +632,11 @@ export const SmartMatrixContext: React.FC<ContextComponentProps> = ({ nodeData, 
                         )}
                     </div>
                 )}
-                {activeTab === 'settings' && (
+                {activeTab === 'custom' && (
                     <div>
-                        {/* Settings content will go here */}
+                        {/* Custom content will go here */}
                         <p style={{ fontFamily: 'Work Sans, sans-serif', fontSize: '13px', color: textColor, opacity: 0.7 }}>
-                            Settings content
+                            Custom content
                         </p>
                     </div>
                 )}
