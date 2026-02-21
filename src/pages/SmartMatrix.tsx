@@ -16,9 +16,11 @@ import { CanvasEngine } from '../components/Canvas/CanvasEngine.js';
 import { CanvasErrorBoundary } from '../components/Canvas/ErrorBoundary.js';
 import { TestNode } from '../components/Canvas/nodes/TestNode.js';
 import { SmartMatrixNode } from '../components/Canvas/nodes/SmartMatrixNode.js';
+import { SmartPropertiesPanel } from '../components/Properties/SmartPropertiesPanel';
 import { useSmartMatrixCameraSync } from '../hooks/useManifestSync';
 import { useCanvasPersistence } from '../hooks/useCanvasPersistence';
 import { canvasApi } from '../services/canvasApi';
+import { useChatPrefetch } from '../hooks/useChatPrefetch';
 import api from '../lib/api.js';
 import './SmartMatrix.css';
 
@@ -84,7 +86,11 @@ const SmartMatrixCanvas: React.FC = () => {
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [fps, setFps] = useState(0);
   const [debugMode, setDebugMode] = useState(false);
+  const [selectedSmartMatrix, setSelectedSmartMatrix] = useState<SmartMatrixNode | null>(null);
   const queryClient = useQueryClient();
+
+  // Phase 4: Sovereign Speed - Chat Pre-fetch
+  const { handleNodeHover, handleNodeLeave } = useChatPrefetch();
 
   // Fetch current smart matrix data from API server
   const { data: matrixData, isLoading, error } = useQuery<SmartMatrixData>({
@@ -513,12 +519,19 @@ const SmartMatrixCanvas: React.FC = () => {
     const engine = engineRef.current;
     const connectionManager = engine.getConnectionManager();
 
+    // Track mouse down position for click vs drag detection
+    let mouseDownPos: { x: number, y: number } | null = null;
+
     const handleNodeMouseDown = (e: MouseEvent) => {
       // Only handle left click for nodes
       if (e.button === 0) {
         const rect = canvas.getBoundingClientRect();
         const screenX = e.clientX - rect.left;
         const screenY = e.clientY - rect.top;
+
+        // Store start position
+        mouseDownPos = { x: screenX, y: screenY };
+
         const camera = engine.getCamera();
         const [worldX, worldY] = camera.toWorld(screenX, screenY);
 
@@ -602,12 +615,43 @@ const SmartMatrixCanvas: React.FC = () => {
         // Check for link hover (for deletion feedback)
         connectionManager.checkLinkHover(worldX, worldY);
         engine.handleMouseMove(e);
+
+        // Check for node hover to trigger chat pre-fetch
+        // This makes the chat feel instant when clicking
+        const interactionState = engine.getInteractionManager().getState();
+        if (interactionState.hoveredNode) {
+          handleNodeHover(interactionState.hoveredNode.id);
+        } else {
+          handleNodeLeave();
+        }
       }
 
       // Mark dirty to trigger re-render for port hover animation
       engine.markDirty();
     };
 
+    // Listen for node selection events
+    const handleSelectionChange = () => {
+      // Get selected node IDs
+      const selectedNodeIds = engine.getInteractionManager().getSelectedNodes();
+
+      // Get actual node objects from state manager
+      const stateManager = engine.getStateManager();
+      let smartMatrixNode: SmartMatrixNode | null = null;
+
+      for (const nodeId of selectedNodeIds) {
+        const node = stateManager.getNode(nodeId);
+        if (node && node.type === 'smart-matrix') {
+          smartMatrixNode = node as SmartMatrixNode;
+          break;
+        }
+      }
+
+      console.log('🔍 Selection changed:', { selectedNodeIds, smartMatrixNode });
+      setSelectedSmartMatrix(smartMatrixNode);
+    };
+
+    // Subscribe to interaction events
     const handleNodeMouseUp = (e: MouseEvent) => {
       if (connectionManager.isDragging()) {
         const rect = canvas.getBoundingClientRect();
@@ -619,6 +663,35 @@ const SmartMatrixCanvas: React.FC = () => {
         connectionManager.completeConnection(worldX, worldY);
       } else {
         engine.handleMouseUp(e);
+
+        // Check if this was a click or a drag
+        if (mouseDownPos) {
+          const rect = canvas.getBoundingClientRect();
+          const screenX = e.clientX - rect.left;
+          const screenY = e.clientY - rect.top;
+
+          const dx = screenX - mouseDownPos.x;
+          const dy = screenY - mouseDownPos.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          console.log(`🖱️ Mouse Up: dist=${dist.toFixed(2)}px`);
+
+          // Only change selection if moved less than 5 pixels (click)
+          // Also allow if clicking on a node (to select it even after small drag)
+          // But strict 5px limit prevents accidental selection during long drags
+          if (dist < 5) {
+            console.log('✅ Click detected (not drag) -> Checking selection');
+            handleSelectionChange();
+          } else {
+            console.log('🛑 Drag detected -> Ignoring selection change');
+          }
+
+          mouseDownPos = null;
+        } else {
+          // Fallback if mouse down wasn't captured
+          console.warn('⚠️ Mouse down position missing in mouse up handler');
+          // handleSelectionChange(); // Commenting out fallback to see if this is the cause
+        }
       }
     };
 
@@ -637,7 +710,13 @@ const SmartMatrixCanvas: React.FC = () => {
       window.removeEventListener('mouseup', handleNodeMouseUp);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isEngineReady]);
+    return () => {
+      canvas.removeEventListener('mousedown', handleNodeMouseDown);
+      window.removeEventListener('mousemove', handleNodeMouseMove);
+      window.removeEventListener('mouseup', handleNodeMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isEngineReady, handleNodeHover, handleNodeLeave]);
 
   // Toggle debug mode
   const toggleDebug = () => {
@@ -745,6 +824,16 @@ const SmartMatrixCanvas: React.FC = () => {
       role="application"
       aria-label="Smart Matrix Node Automation Builder"
     >
+      {selectedSmartMatrix && engineRef.current && (
+        <SmartPropertiesPanel
+          node={selectedSmartMatrix}
+          visible={!!selectedSmartMatrix}
+          onClose={() => setSelectedSmartMatrix(null)}
+          camera={engineRef.current.getCamera()}
+          canvasContainerRef={containerRef}
+        />
+      )}
+
       {/* Canvas Container */}
       <div
         ref={containerRef}

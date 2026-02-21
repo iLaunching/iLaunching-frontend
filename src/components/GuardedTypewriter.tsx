@@ -28,8 +28,8 @@ interface GuardedTypewriterProps {
   onEditorReady?: (editor: any) => void;
 }
 
-export default function GuardedTypewriter({ 
-  text, 
+export default function GuardedTypewriter({
+  text,
   speed = 30,
   className = "",
   style = {},
@@ -84,7 +84,7 @@ export default function GuardedTypewriter({
         {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: ''
           }
@@ -115,19 +115,19 @@ export default function GuardedTypewriter({
 
     const handleClick = (event: Event) => {
       const target = event.target as HTMLElement;
-      
+
       // Check if clicked on checkbox area (label or span)
       if (target.closest('.tiptap-task-item label')) {
         event.preventDefault();
-        
+
         const taskItem = target.closest('.tiptap-task-item');
         if (taskItem) {
           const currentChecked = taskItem.getAttribute('data-checked') === 'true';
           const newChecked = !currentChecked;
-          
+
           // Update the data attribute
           taskItem.setAttribute('data-checked', newChecked.toString());
-          
+
           // Update the actual checkbox input
           const checkbox = taskItem.querySelector('input[type="checkbox"]') as HTMLInputElement;
           if (checkbox) {
@@ -141,47 +141,47 @@ export default function GuardedTypewriter({
     const editorElement = containerRef.current?.querySelector('.ProseMirror');
     if (editorElement) {
       editorElement.addEventListener('click', handleClick);
-      
+
       return () => {
         editorElement.removeEventListener('click', handleClick);
       };
     }
   }, [editor]);
 
-  
+
   // Helper function to update content while preserving AI indicator
   const updateContentWithAI = (newContent: string) => {
     if (aiIndicator && aiIndicator.show) {
       // Create a temporary div to parse HTML and get the current content
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = newContent;
-      
+
       // Get current editor content without the AI indicator
       let currentDoc = editor.getJSON();
-      
+
       // Filter out AI indicator to get clean content
       if (currentDoc.content) {
         currentDoc.content = currentDoc.content.filter((node: any) => node.type !== 'aiIndicator');
       } else {
         currentDoc.content = [];
       }
-      
+
       // Set the HTML content (this will parse the HTML properly)
       editor.commands.setContent(newContent);
-      
+
       // Now add the AI indicator back at the end
       if (!aiIndicatorNodeRef.current) {
         aiIndicatorNodeRef.current = {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: '',
             id: 'main-ai-indicator' // Stable ID
           }
         };
       }
-      
+
       // Insert AI indicator at the end
       editor.commands.insertContentAt(editor.state.doc.content.size, aiIndicatorNodeRef.current);
     } else {
@@ -205,7 +205,7 @@ export default function GuardedTypewriter({
     console.log('GuardedTypewriter: Starting typewriter with text');
     textRef.current = text;
     setIsTyping(true);
-    
+
     // Only initialize with AI indicator if editor is empty
     if (aiIndicator && aiIndicator.show && currentContent.length === 0) {
       // Initialize the stable AI indicator ref
@@ -213,7 +213,7 @@ export default function GuardedTypewriter({
         aiIndicatorNodeRef.current = {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: '',
             id: 'main-ai-indicator'
@@ -227,10 +227,10 @@ export default function GuardedTypewriter({
     }
 
     let currentIndex = 0;
-    
+
     // Check if text contains HTML formatting
     const hasHTML = text.includes('<');
-    
+
     if (hasHTML) {
       // Parse HTML into structured elements for smooth animation with wave effect
       const typeHTMLWithWave = () => {
@@ -238,14 +238,14 @@ export default function GuardedTypewriter({
         const parseHTMLToWords = (htmlText: string) => {
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = htmlText;
-          
+
           const wordElements: Array<{
             type: 'word' | 'tag-open' | 'tag-close' | 'break';
             content: string;
             tagName?: string;
             attributes?: string;
           }> = [];
-          
+
           const processNode = (node: Node) => {
             if (node.nodeType === Node.TEXT_NODE) {
               const text = node.textContent;
@@ -276,7 +276,7 @@ export default function GuardedTypewriter({
               const attributes = Array.from(element.attributes)
                 .map(attr => `${attr.name}="${attr.value}"`)
                 .join(' ');
-              
+
               // Add opening tag
               wordElements.push({
                 type: 'tag-open',
@@ -284,10 +284,10 @@ export default function GuardedTypewriter({
                 tagName,
                 attributes
               });
-              
+
               // Process children
               element.childNodes.forEach(child => processNode(child));
-              
+
               // Add closing tag
               wordElements.push({
                 type: 'tag-close',
@@ -296,27 +296,27 @@ export default function GuardedTypewriter({
               });
             }
           };
-          
+
           tempDiv.childNodes.forEach(node => processNode(node));
           return wordElements;
         };
-        
+
         const elements = parseHTMLToWords(text);
         let currentHTML = '';
         let wordCount = 0;
         let insideTaskList = false;
-        
+
         const typeInterval = setInterval(() => {
           if (currentIndex < elements.length) {
             const element = elements[currentIndex];
-            
+
             // Track if we're inside a task list
             if (element.type === 'tag-open' && element.content.includes('data-type="taskList"')) {
               insideTaskList = true;
             } else if (element.type === 'tag-close' && element.tagName === 'ul' && insideTaskList) {
               insideTaskList = false;
             }
-            
+
             if (element.type === 'word') {
               if (insideTaskList) {
                 // Inside task list - add text directly to preserve Tiptap structure
@@ -343,12 +343,12 @@ export default function GuardedTypewriter({
               // Add HTML tags directly
               currentHTML += element.content;
             }
-            
+
             // Update editor content
             updateContentWithAI(currentHTML);
-            
+
             currentIndex++;
-            
+
             // Auto-scroll to follow content
             if (containerRef.current) {
               if (scrollContainer) {
@@ -365,7 +365,7 @@ export default function GuardedTypewriter({
                 const rect = containerRef.current.getBoundingClientRect();
                 const elementBottom = rect.bottom;
                 const windowHeight = window.innerHeight;
-                
+
                 if (elementBottom > windowHeight - 100) {
                   window.scrollTo({
                     top: window.scrollY + (elementBottom - windowHeight + 150),
@@ -382,24 +382,24 @@ export default function GuardedTypewriter({
             }
           }
         }, speed);
-        
+
         return typeInterval;
       };
-      
+
       const interval = typeHTMLWithWave();
       return () => clearInterval(interval);
-      
+
     } else {
       // Handle plain text - split into words for smoother flow
       const words = text.split(' ');
       let currentText = '';
-      
+
       const typeInterval = setInterval(() => {
         if (currentIndex < words.length) {
           currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
           updateContentWithAI(currentText);
           currentIndex++;
-          
+
           // Auto-scroll to follow text as it appears
           if (containerRef.current) {
             if (scrollContainer) {
@@ -416,7 +416,7 @@ export default function GuardedTypewriter({
               const rect = containerRef.current.getBoundingClientRect();
               const elementBottom = rect.bottom;
               const windowHeight = window.innerHeight;
-              
+
               if (elementBottom > windowHeight - 100) {
                 window.scrollTo({
                   top: window.scrollY + (elementBottom - windowHeight + 150),
@@ -428,7 +428,7 @@ export default function GuardedTypewriter({
         } else {
           // Final text without cursor (AI indicator already present)
           updateContentWithAI(currentText);
-          
+
           clearInterval(typeInterval);
           setIsTyping(false);
           if (onComplete) {
@@ -448,14 +448,14 @@ export default function GuardedTypewriter({
     const handleCheckboxClick = (event: Event) => {
       const target = event.target as HTMLElement;
       const taskItem = target.closest('li[data-type="taskItem"]');
-      
+
       if (taskItem) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         const isChecked = taskItem.getAttribute('data-checked') === 'true';
         taskItem.setAttribute('data-checked', (!isChecked).toString());
-        
+
         // The editor content is automatically updated by Tiptap
       }
     };
@@ -464,7 +464,7 @@ export default function GuardedTypewriter({
     const editorElement = containerRef.current?.querySelector('.ProseMirror');
     if (editorElement) {
       editorElement.addEventListener('click', handleCheckboxClick);
-      
+
       return () => {
         editorElement.removeEventListener('click', handleCheckboxClick);
       };
@@ -472,7 +472,7 @@ export default function GuardedTypewriter({
   }, [editor]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`tiptap-typewriter ${isTyping ? 'typing' : ''} ${className}`}
       style={{
@@ -483,14 +483,14 @@ export default function GuardedTypewriter({
         overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
-       
-        
+
+
       }}
     >
       <div className="relative">
         <EditorContent editor={editor} />
       </div>
-      
+
       <style>{`
         .tiptap-typewriter {
           scrollbar-width: thin;

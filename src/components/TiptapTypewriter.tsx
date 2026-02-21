@@ -28,8 +28,8 @@ interface TiptapTypewriterProps {
   onEditorReady?: (editor: any) => void;
 }
 
-export default function TiptapTypewriter({ 
-  text, 
+export default function TiptapTypewriter({
+  text,
   speed = 30,
   className = "",
   style = {},
@@ -83,7 +83,7 @@ export default function TiptapTypewriter({
         {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: ''
           }
@@ -114,19 +114,19 @@ export default function TiptapTypewriter({
 
     const handleClick = (event: Event) => {
       const target = event.target as HTMLElement;
-      
+
       // Check if clicked on checkbox area (label or span)
       if (target.closest('.tiptap-task-item label')) {
         event.preventDefault();
-        
+
         const taskItem = target.closest('.tiptap-task-item');
         if (taskItem) {
           const currentChecked = taskItem.getAttribute('data-checked') === 'true';
           const newChecked = !currentChecked;
-          
+
           // Update the data attribute
           taskItem.setAttribute('data-checked', newChecked.toString());
-          
+
           // Update the actual checkbox input
           const checkbox = taskItem.querySelector('input[type="checkbox"]') as HTMLInputElement;
           if (checkbox) {
@@ -140,7 +140,7 @@ export default function TiptapTypewriter({
     const editorElement = containerRef.current?.querySelector('.ProseMirror');
     if (editorElement) {
       editorElement.addEventListener('click', handleClick);
-      
+
       return () => {
         editorElement.removeEventListener('click', handleClick);
       };
@@ -148,7 +148,7 @@ export default function TiptapTypewriter({
   }, [editor]);
 
 
-  
+
   // Helper function to update content while preserving AI indicator
   const updateContentWithAI = (newContent: string) => {
     console.log('updateContentWithAI called with:', newContent, 'aiIndicator:', aiIndicator);
@@ -156,33 +156,33 @@ export default function TiptapTypewriter({
       // Create a temporary div to parse HTML and get the current content
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = newContent;
-      
+
       // Get current editor content without the AI indicator
       let currentDoc = editor.getJSON();
-      
+
       // Filter out AI indicator to get clean content
       if (currentDoc.content) {
         currentDoc.content = currentDoc.content.filter((node: any) => node.type !== 'aiIndicator');
       } else {
         currentDoc.content = [];
       }
-      
+
       // Set the HTML content (this will parse the HTML properly)
       editor.commands.setContent(newContent);
-      
+
       // Now add the AI indicator back at the end
       if (!aiIndicatorNodeRef.current) {
         aiIndicatorNodeRef.current = {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: '',
             id: 'main-ai-indicator' // Stable ID
           }
         };
       }
-      
+
       // Insert AI indicator at the end
       editor.commands.insertContentAt(editor.state.doc.content.size, aiIndicatorNodeRef.current);
     } else {
@@ -196,7 +196,7 @@ export default function TiptapTypewriter({
 
     // Clear and restart typing when text changes
     setIsTyping(true);
-    
+
     // Initialize with AI indicator if needed
     console.log('TiptapTypewriter: aiIndicator prop:', aiIndicator);
     if (aiIndicator && aiIndicator.show) {
@@ -206,7 +206,7 @@ export default function TiptapTypewriter({
         aiIndicatorNodeRef.current = {
           type: 'aiIndicator',
           attrs: {
-            aiName: aiIndicator.aiName || 'AI Assistant',
+            aiName: aiIndicator.aiName || 'iLaunching',
             aiAcknowledge: aiIndicator.aiAcknowledge || '',
             text: '',
             id: 'main-ai-indicator'
@@ -225,12 +225,12 @@ export default function TiptapTypewriter({
     }
 
     let currentIndex = 0;
-    
 
-    
+
+
     // Check if text contains HTML formatting
     const hasHTML = text.includes('<');
-    
+
     if (hasHTML) {
       // Parse HTML into structured elements for smooth animation with wave effect
       const typeHTMLWithWave = () => {
@@ -238,14 +238,14 @@ export default function TiptapTypewriter({
         const parseHTMLToWords = (htmlText: string) => {
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = htmlText;
-          
+
           const wordElements: Array<{
             type: 'word' | 'tag-open' | 'tag-close' | 'break';
             content: string;
             tagName?: string;
             attributes?: string;
           }> = [];
-          
+
           const processNode = (node: Node) => {
             if (node.nodeType === Node.TEXT_NODE) {
               const text = node.textContent;
@@ -276,7 +276,7 @@ export default function TiptapTypewriter({
               const attributes = Array.from(element.attributes)
                 .map(attr => `${attr.name}="${attr.value}"`)
                 .join(' ');
-              
+
               // Add opening tag
               wordElements.push({
                 type: 'tag-open',
@@ -284,10 +284,10 @@ export default function TiptapTypewriter({
                 tagName,
                 attributes
               });
-              
+
               // Process children
               element.childNodes.forEach(child => processNode(child));
-              
+
               // Add closing tag
               wordElements.push({
                 type: 'tag-close',
@@ -296,27 +296,27 @@ export default function TiptapTypewriter({
               });
             }
           };
-          
+
           tempDiv.childNodes.forEach(node => processNode(node));
           return wordElements;
         };
-        
+
         const elements = parseHTMLToWords(text);
         let currentHTML = '';
         let wordCount = 0;
         let insideTaskList = false;
-        
+
         const typeInterval = setInterval(() => {
           if (currentIndex < elements.length) {
             const element = elements[currentIndex];
-            
+
             // Track if we're inside a task list
             if (element.type === 'tag-open' && element.content.includes('data-type="taskList"')) {
               insideTaskList = true;
             } else if (element.type === 'tag-close' && element.tagName === 'ul' && insideTaskList) {
               insideTaskList = false;
             }
-            
+
             if (element.type === 'word') {
               if (insideTaskList) {
                 // Inside task list - add text directly to preserve Tiptap structure
@@ -343,22 +343,22 @@ export default function TiptapTypewriter({
               // Add HTML tags directly
               currentHTML += element.content;
             }
-            
+
             // Update editor content
             updateContentWithAI(currentHTML);
-            
+
             // Debug: Log when we encounter task list elements
             if (element.content.includes('taskList') || element.content.includes('taskItem')) {
               console.log('Task element:', element.content);
               console.log('Current HTML:', currentHTML);
               console.log('Editor HTML:', editor.getHTML());
-              
+
               // Check what extensions are loaded
               console.log('Loaded extensions:', editor.extensionManager.extensions.map(ext => ext.name));
             }
-            
+
             currentIndex++;
-            
+
             // Auto-scroll to follow content
             if (containerRef.current) {
               if (scrollContainer) {
@@ -375,7 +375,7 @@ export default function TiptapTypewriter({
                 const rect = containerRef.current.getBoundingClientRect();
                 const elementBottom = rect.bottom;
                 const windowHeight = window.innerHeight;
-                
+
                 if (elementBottom > windowHeight - 100) {
                   window.scrollTo({
                     top: window.scrollY + (elementBottom - windowHeight + 150),
@@ -392,24 +392,24 @@ export default function TiptapTypewriter({
             }
           }
         }, speed);
-        
+
         return typeInterval;
       };
-      
+
       const interval = typeHTMLWithWave();
       return () => clearInterval(interval);
-      
+
     } else {
       // Handle plain text - split into words for smoother flow
       const words = text.split(' ');
       let currentText = '';
-      
+
       const typeInterval = setInterval(() => {
         if (currentIndex < words.length) {
           currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
           updateContentWithAI(currentText);
           currentIndex++;
-          
+
           // Auto-scroll to follow text as it appears
           if (containerRef.current) {
             if (scrollContainer) {
@@ -426,7 +426,7 @@ export default function TiptapTypewriter({
               const rect = containerRef.current.getBoundingClientRect();
               const elementBottom = rect.bottom;
               const windowHeight = window.innerHeight;
-              
+
               if (elementBottom > windowHeight - 100) {
                 window.scrollTo({
                   top: window.scrollY + (elementBottom - windowHeight + 150),
@@ -438,7 +438,7 @@ export default function TiptapTypewriter({
         } else {
           // Final text without cursor (AI indicator already present)
           updateContentWithAI(currentText);
-          
+
           clearInterval(typeInterval);
           setIsTyping(false);
           if (onComplete) {
@@ -458,14 +458,14 @@ export default function TiptapTypewriter({
     const handleCheckboxClick = (event: Event) => {
       const target = event.target as HTMLElement;
       const taskItem = target.closest('li[data-type="taskItem"]');
-      
+
       if (taskItem) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         const isChecked = taskItem.getAttribute('data-checked') === 'true';
         taskItem.setAttribute('data-checked', (!isChecked).toString());
-        
+
         // The editor content is automatically updated by Tiptap
       }
     };
@@ -474,7 +474,7 @@ export default function TiptapTypewriter({
     const editorElement = containerRef.current?.querySelector('.ProseMirror');
     if (editorElement) {
       editorElement.addEventListener('click', handleCheckboxClick);
-      
+
       return () => {
         editorElement.removeEventListener('click', handleCheckboxClick);
       };
@@ -482,7 +482,7 @@ export default function TiptapTypewriter({
   }, [editor]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`tiptap-typewriter ${isTyping ? 'typing' : ''} ${className}`}
       style={{
@@ -493,14 +493,14 @@ export default function TiptapTypewriter({
         overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
-       
-        
+
+
       }}
     >
       <div className="relative">
         <EditorContent editor={editor} />
       </div>
-      
+
       <style>{`
         .tiptap-typewriter {
           scrollbar-width: thin;

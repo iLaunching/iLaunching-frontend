@@ -262,4 +262,135 @@ export const authApi = {
   },
 };
 
+// ========================
+// PROTOCOL API
+// ========================
+
+export const protocolApi = {
+  /**
+   * Get all matrix protocols
+   */
+  getProtocols: async (): Promise<{
+    protocols: Array<{
+      protocol_id: string;
+      protocol_key: string;
+      initial_instructions: string;
+      context_framework: any;
+      success_criteria: any;
+      is_active: boolean;
+      background_color?: string;
+      border_color?: string;
+      display_name?: string;
+      display_description?: string;
+      created_at: string;
+      updated_at: string;
+    }>;
+    total: number;
+  }> => {
+    const response = await api.get('/protocols');
+    return response.data;
+  },
+
+  /**
+   * Get protocol by ID
+   */
+  getProtocolById: async (protocolId: string) => {
+    const response = await api.get(`/protocols/${protocolId}`);
+    return response.data;
+  },
+
+  /**
+   * Get protocol by key (GENESIS, CAMPAIGN, VALIDATION)
+   */
+  getProtocolByKey: async (protocolKey: string) => {
+    const response = await api.get(`/protocols/key/${protocolKey}`);
+    return response.data;
+  },
+
+  getCategories: async (): Promise<Array<{
+    id: number;
+    name: string;
+    description?: string;
+    color?: string;
+    icon_name?: string;
+    icon_prefix?: string;
+    sort_order: number;
+    is_active: boolean;
+  }>> => {
+    const response = await api.get('/protocols/categories');
+    return response.data;
+  },
+};
+
+// ========================
+// NODE API
+// ========================
+
+export const nodeApi = {
+  /**
+   * Update a node's protocol (which updates its context)
+   */
+  updateProtocol: async (nodeId: string, protocolId: string, protocolKey: string) => {
+    const response = await api.patch(`/node/${nodeId}/protocol`, {
+      protocol_id: protocolId,
+      context_type: protocolKey
+    });
+    return response.data;
+  },
+
+  /**
+   * Get chat history for a node (pre-fetch)
+   */
+  getChatHistory: async (nodeId: string) => {
+    // Note: This endpoint needs to be implemented on the backend in the next step
+    // For now, we'll just check if it exists or return empty
+    // The prefetch hook handles errors gracefully
+    const response = await api.get(`/chat/node/${nodeId}`);
+    return response.data;
+  },
+
+  /**
+   * Save chat history for a node (persistence)
+   */
+  saveChatHistory: async (nodeId: string, content: any) => {
+    const response = await api.post(`/chat/node/${nodeId}/save`, {
+      document_json: content
+    });
+    return response.data;
+  },
+};
+
+// ========================
+// CONTEXT API
+// ========================
+
+export const contextApi = {
+  /**
+   * Update a context by ID
+   */
+  updateContext: async (contextId: string, data: {
+    context_name?: string;
+    context_type?: string;
+    current_protocol_id?: string;
+    local_variables?: any;
+    is_active?: boolean;
+    master_dna_payload?: any;
+    setup?: boolean;
+  }) => {
+    const response = await api.patch(`/context/${contextId}`, data);
+    return response.data;
+  },
+
+  /**
+   * Toggle the setup flag on a context.
+   * When setup=true → panel shows SetupContext (locked/protocol mode).
+   * When setup=false → panel shows normal node-specific context.
+   */
+  updateContextSetup: async (contextId: string, setup: boolean) => {
+    const response = await api.patch(`/context/${contextId}`, { setup });
+    return response.data;
+  },
+};
+
+
 export default api;

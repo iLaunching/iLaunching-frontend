@@ -73,8 +73,11 @@ export const useCanvasPersistence = ({
                         nodeData.node_name
                     );
 
+                    // Store context_id on the node so SmartPropertiesPanel can read it directly
+                    (node as any).context_id = nodeData.context_id;
+
                     stateManager.addNode(node);
-                    console.log('✅ Restored SmartMatrixNode:', nodeData.node_id);
+                    console.log('✅ Restored SmartMatrixNode:', nodeData.node_id, 'context:', nodeData.context_id);
                 } else {
                     console.log('⚠️ Unknown node type, skipping:', nodeData.node_type);
                 }
