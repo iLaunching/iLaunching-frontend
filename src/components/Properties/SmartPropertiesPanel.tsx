@@ -30,7 +30,7 @@ interface SmartPropertiesPanelProps {
     visible: boolean;
     onClose: () => void;
     camera: Camera;
-    canvasContainerRef?: React.RefObject<HTMLDivElement>;
+    canvasContainerRef?: React.RefObject<HTMLDivElement | null>;
     style?: React.CSSProperties;
 }
 
