@@ -26,6 +26,7 @@ import Trash from './pages/settings/Trash';
 import MySettings from './pages/settings/MySettings';
 import Membership from './pages/settings/Membership';
 import Notifications from './pages/settings/Notifications';
+import SensoryTest from './pages/SensoryTest';
 
 // ========================
 // REACT QUERY CLIENT
@@ -66,6 +67,7 @@ function App() {
           <Route path="/signup-interface" element={<SignupInterface />} />
           <Route path="/essential-information" element={<EssentialInformation />} />
           <Route path="/legal/security-policy" element={<SecurityPolicy />} />
+          <Route path="/sensory-test" element={<SensoryTest />} />
           <Route
             path="/login"
             element={
