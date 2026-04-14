@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** WebSocket URL for synaptic-mind tele-somatic bridge (default local synaptic-mind). */
+/**
+ * WebSocket URL for the **synaptic-mind** server (not this Vite app).
+ * Never use the same port as the frontend — preview/dev on :8080 must talk to API on another port.
+ */
 const defaultWsUrl = () => {
-  const fromEnv = import.meta.env.VITE_SYNAPTIC_MIND_WS_URL as string | undefined;
-  if (fromEnv) return fromEnv;
-  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${proto}//${window.location.hostname}:8080/peripheral/somatic`;
+  const full = import.meta.env.VITE_SYNAPTIC_MIND_WS_URL as string | undefined;
+  if (full) return full;
+  const port = (import.meta.env.VITE_SYNAPTIC_MIND_PORT as string | undefined) || '8090';
+  return `ws://127.0.0.1:${port}/peripheral/somatic`;
 };
 
 type PerceptionSummary = {
@@ -142,10 +145,19 @@ export default function SensoryTest() {
       <div className="max-w-3xl mx-auto space-y-6">
         <h1 className="text-2xl font-semibold tracking-tight">Somatic → Afferent (Synaptic Mind)</h1>
         <p className="text-slate-400 text-sm">
-          Mic frames (2048 samples, 44.1 kHz) over WebSocket to{' '}
-          <code className="text-cyan-400">/peripheral/somatic</code>. Set{' '}
-          <code className="text-cyan-400">VITE_SYNAPTIC_MIND_WS_URL</code> to your Railway{' '}
-          <code className="text-cyan-400">wss://…/peripheral/somatic</code>.
+          Mic frames (2048 samples, 44.1 kHz) over WebSocket to the{' '}
+          <strong className="text-slate-300">synaptic-mind</strong> process — not this Vite server. Default is{' '}
+          <code className="text-cyan-400">ws://127.0.0.1:8090/peripheral/somatic</code> so you can run the API on
+          port <strong>8090</strong> while this page uses <strong>8080</strong>.
+        </p>
+        <p className="text-amber-200/90 text-sm rounded-md border border-amber-800/60 bg-amber-950/40 px-3 py-2">
+          If this page is on <code className="text-amber-100">localhost:8080</code>, do{' '}
+          <strong>not</strong> point the socket at <code>:8080</code> — nothing handles{' '}
+          <code>/peripheral/somatic</code> there. Run synaptic-mind with{' '}
+          <code className="text-amber-100">PORT=8090</code> (or set the URL field /{' '}
+          <code>VITE_SYNAPTIC_MIND_WS_URL</code> / <code>VITE_SYNAPTIC_MIND_PORT</code>). On Railway, set{' '}
+          <code>VITE_SYNAPTIC_MIND_WS_URL=wss://&lt;your-synaptic-service&gt;/peripheral/somatic</code> at{' '}
+          <strong>build</strong> time.
         </p>
 
         <label className="block space-y-1">
