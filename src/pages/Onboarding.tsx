@@ -262,10 +262,16 @@ export default function Onboarding() {
       }
       
       console.log('Starting onboarding with:', { hubName, selectedColorId, matrixName, selectedMarketingId, selectedUseCaseId });
+
+      const browserTimeZone =
+        typeof Intl !== 'undefined' && Intl.DateTimeFormat
+          ? encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || '')
+          : '';
+      const tzQuery = browserTimeZone ? `&time_zone=${browserTimeZone}` : '';
       
       // Step 1: Create Smart Hub with use case
       setAcknowledgeStepMessage('Creating your Smart Hub...');
-      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}&use_case_id=${selectedUseCaseId}`, {
+      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}&use_case_id=${selectedUseCaseId}${tzQuery}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -288,7 +294,7 @@ export default function Onboarding() {
       
       // Step 2: Create Smart Matrix
       setAcknowledgeStepMessage('Setting up your Smart Matrix...');
-      const matrixResponse = await fetch(`${API_URL}/api/v1/onboarding/create-matrix?hub_id=${hubData.hub_id}&matrix_name=${encodeURIComponent(matrixName)}&marketing_option_id=${selectedMarketingId}`, {
+      const matrixResponse = await fetch(`${API_URL}/api/v1/onboarding/create-matrix?hub_id=${hubData.hub_id}&matrix_name=${encodeURIComponent(matrixName)}&marketing_option_id=${selectedMarketingId}${tzQuery}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
