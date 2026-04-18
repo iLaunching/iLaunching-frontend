@@ -17,7 +17,14 @@ type PerceptionSummary = {
   salience: number;
   db_level: number;
   duration_sec: number;
+  /** Low / mid / high tonotopic energy (Phase 2). */
   ventral_magnitudes: number[];
+  pitch_hz?: number;
+  timbre_centroid_hz?: number;
+  rhythm_onset?: number;
+  linguistic_potential?: boolean;
+  crisis_direct_call?: boolean;
+  voice_signature?: number;
   sensory_deprivation: boolean;
   hypothyx_homeostasis_alert: boolean;
 };
