@@ -117,13 +117,18 @@ export function useLandingAuth() {
       }
 
       // CHECKPOINT 2: Is this an OAuth user (external auth)?
-      // Check for any truthy value in oauth_provider (not null, undefined, or empty string)
-      const hasOAuthProvider = result.oauth_provider && 
-                               typeof result.oauth_provider === 'string' && 
-                               result.oauth_provider.trim() !== '';
-      
+      const trimmedProvider =
+        typeof result.oauth_provider === 'string' ? result.oauth_provider.trim() : '';
+      const hasOAuthProviderLabel =
+        trimmedProvider !== '';
+      const oauthOnlyByFlag = result.use_password === false;
+      const hasOAuthProvider = hasOAuthProviderLabel || oauthOnlyByFlag;
+
       if (hasOAuthProvider) {
-        console.log('🔒 OAuth user detected, showing account picker. Provider:', result.oauth_provider);
+        const pickerProvider =
+          trimmedProvider ||
+          (oauthOnlyByFlag ? 'oauth' : null);
+        console.log('🔒 OAuth user detected, showing account picker. Provider:', pickerProvider);
         // OAuth user - show account picker instead of password input
         setAuthState((prev: AuthState) => ({
           ...prev,
@@ -131,7 +136,7 @@ export function useLandingAuth() {
           message: result.message,  // Backend message explains OAuth requirement
           isProcessing: false,
           error: null,
-          oauth_provider: result.oauth_provider || null,
+          oauth_provider: pickerProvider,
         }));
         return;
       }

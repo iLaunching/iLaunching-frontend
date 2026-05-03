@@ -688,6 +688,27 @@ export default function Landing() {
                     className="scale-110"
                   />
                 )}
+                {(authState.oauth_provider === 'oauth' ||
+                  authState.oauth_provider === 'microsoft') && (
+                  <div className="flex flex-col items-center gap-8 w-full max-w-md">
+                    <GoogleAccountPicker 
+                      onAccountSelect={handleGoogleAccountSelect}
+                      onAddAccount={() => {
+                        setIsSignupPopupOpen(true);
+                        setSignupPopupInitialView('options');
+                      }}
+                      className="scale-110"
+                    />
+                    <FacebookAccountPicker 
+                      onAccountSelect={handleFacebookAccountSelect}
+                      onAddAccount={() => {
+                        setIsSignupPopupOpen(true);
+                        setSignupPopupInitialView('options');
+                      }}
+                      className="scale-110"
+                    />
+                  </div>
+                )}
               </div>
             )}
             

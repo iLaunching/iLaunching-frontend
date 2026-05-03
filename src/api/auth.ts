@@ -93,6 +93,8 @@ export interface CheckEmailResponse {
   exists: boolean;
   message: string;
   oauth_provider?: string | null;  // e.g., 'google', 'microsoft' if user signed up via OAuth
+  /** When exists: mirrors server user.use_password (OAuth-only accounts are false). */
+  use_password?: boolean | null;
 }
 
 export interface CheckEmailSignupResponse {
