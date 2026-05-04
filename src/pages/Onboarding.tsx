@@ -279,11 +279,12 @@ export default function Onboarding() {
         try {
           // Modern browsers: extract region from BCP-47 locale when present (e.g. en-GB -> GB)
           if (typeof Intl !== 'undefined' && 'Locale' in Intl && lang) {
-            // @ts-expect-error: Intl.Locale not in older TS libs
-            const loc = new Intl.Locale(lang);
-            // @ts-expect-error: region is not always typed
-            const region = typeof loc.region === 'string' ? loc.region : '';
-            if (region && region.length === 2) return region.toUpperCase();
+            const LocaleCtor = (Intl as any).Locale;
+            if (typeof LocaleCtor === 'function') {
+              const loc = new LocaleCtor(lang);
+              const region = typeof loc?.region === 'string' ? loc.region : '';
+              if (region && region.length === 2) return region.toUpperCase();
+            }
           }
         } catch {
           // ignore
