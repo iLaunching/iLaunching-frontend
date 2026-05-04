@@ -268,10 +268,36 @@ export default function Onboarding() {
           ? encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || '')
           : '';
       const tzQuery = browserTimeZone ? `&time_zone=${browserTimeZone}` : '';
+
+      const browserRegion = (() => {
+        const lang =
+          (typeof navigator !== 'undefined' &&
+            (navigator.languages && navigator.languages[0])) ||
+          (typeof navigator !== 'undefined' && navigator.language) ||
+          '';
+
+        try {
+          // Modern browsers: extract region from BCP-47 locale when present (e.g. en-GB -> GB)
+          if (typeof Intl !== 'undefined' && 'Locale' in Intl && lang) {
+            // @ts-expect-error: Intl.Locale not in older TS libs
+            const loc = new Intl.Locale(lang);
+            // @ts-expect-error: region is not always typed
+            const region = typeof loc.region === 'string' ? loc.region : '';
+            if (region && region.length === 2) return region.toUpperCase();
+          }
+        } catch {
+          // ignore
+        }
+
+        const m = String(lang).match(/[-_](?<r>[A-Za-z]{2})\b/);
+        const fallback = (m && (m.groups?.r || m[1])) || '';
+        return fallback ? fallback.toUpperCase() : '';
+      })();
+      const countryQuery = browserRegion ? `&country=${encodeURIComponent(browserRegion)}` : '';
       
       // Step 1: Create Smart Hub with use case
       setAcknowledgeStepMessage('Creating your Smart Hub...');
-      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}&use_case_id=${selectedUseCaseId}${tzQuery}`, {
+      const hubResponse = await fetch(`${API_URL}/api/v1/onboarding/create-hub?hub_name=${encodeURIComponent(hubName)}&hub_color_id=${selectedColorId}&use_case_id=${selectedUseCaseId}${tzQuery}${countryQuery}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -294,7 +320,7 @@ export default function Onboarding() {
       
       // Step 2: Create Smart Matrix
       setAcknowledgeStepMessage('Setting up your Smart Matrix...');
-      const matrixResponse = await fetch(`${API_URL}/api/v1/onboarding/create-matrix?hub_id=${hubData.hub_id}&matrix_name=${encodeURIComponent(matrixName)}&marketing_option_id=${selectedMarketingId}${tzQuery}`, {
+      const matrixResponse = await fetch(`${API_URL}/api/v1/onboarding/create-matrix?hub_id=${hubData.hub_id}&matrix_name=${encodeURIComponent(matrixName)}&marketing_option_id=${selectedMarketingId}${tzQuery}${countryQuery}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
