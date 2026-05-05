@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Lock, Trash2, Camera, X } from 'lucide-react';
+import { Lock, Trash2, Camera, X, Clock, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -93,6 +93,116 @@ const MySettings: React.FC = () => {
   const [loadingColors, setLoadingColors] = useState(true);
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  const timeZoneOptions = useMemo<string[]>(() => {
+    const supported = (Intl as any)?.supportedValuesOf?.('timeZone');
+    if (Array.isArray(supported) && supported.length > 0) return supported;
+    return [
+      'UTC',
+      'Europe/London',
+      'Europe/Paris',
+      'Europe/Berlin',
+      'Africa/Cairo',
+      'Africa/Johannesburg',
+      'Asia/Dubai',
+      'Asia/Kolkata',
+      'Asia/Bangkok',
+      'Asia/Singapore',
+      'Asia/Tokyo',
+      'Australia/Sydney',
+      'Pacific/Auckland',
+      'America/Sao_Paulo',
+      'America/New_York',
+      'America/Chicago',
+      'America/Denver',
+      'America/Los_Angeles',
+    ];
+  }, []);
+
+  const [selectedTimeZone, setSelectedTimeZone] = useState<string>(() => {
+    const profileTz = (profile as any)?.timezone;
+    if (typeof profileTz === 'string' && profileTz.trim()) return profileTz;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return tz || 'UTC';
+  });
+
+  const [isTimeZoneOpen, setIsTimeZoneOpen] = useState(false);
+  const [timeZoneQuery, setTimeZoneQuery] = useState('');
+  const timeZoneDropdownRef = useRef<HTMLDivElement | null>(null);
+  const timeZoneSearchRef = useRef<HTMLInputElement | null>(null);
+
+  const getTimeZoneGmtOffsetLabel = (timeZone: string) => {
+    try {
+      const d = new Date();
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        timeZoneName: 'shortOffset' as any,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).formatToParts(d);
+      const tzPart = parts.find((p) => p.type === 'timeZoneName')?.value || 'GMT';
+      // Examples: "GMT-4", "GMT+01:00", "UTC"
+      if (tzPart === 'UTC') return 'GMT+00:00';
+      const m = tzPart.match(/GMT([+-])(\d{1,2})(?::?(\d{2}))?/);
+      if (!m) return tzPart.replace('UTC', 'GMT');
+      const sign = m[1];
+      const hh = String(m[2]).padStart(2, '0');
+      const mm = String(m[3] ?? '00').padStart(2, '0');
+      return `GMT${sign}${hh}:${mm}`;
+    } catch {
+      return 'GMT+00:00';
+    }
+  };
+
+  const timeZoneDisplayOptions = useMemo(() => {
+    return timeZoneOptions.map((tz) => {
+      const offset = getTimeZoneGmtOffsetLabel(tz);
+      return { tz, label: `(${offset}) ${tz}` };
+    });
+  }, [timeZoneOptions]);
+
+  const filteredTimeZoneOptions = useMemo(() => {
+    const q = timeZoneQuery.trim().toLowerCase();
+    if (!q) return timeZoneDisplayOptions;
+    return timeZoneDisplayOptions.filter(({ tz, label }) => {
+      const s = `${tz} ${label}`.toLowerCase();
+      return s.includes(q);
+    });
+  }, [timeZoneDisplayOptions, timeZoneQuery]);
+
+  useEffect(() => {
+    if (!isTimeZoneOpen) return;
+    const t = window.setTimeout(() => timeZoneSearchRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
+  }, [isTimeZoneOpen]);
+
+  useEffect(() => {
+    const onMouseDown = (e: MouseEvent) => {
+      const el = timeZoneDropdownRef.current;
+      if (!el) return;
+      if (e.target instanceof Node && !el.contains(e.target)) setIsTimeZoneOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsTimeZoneOpen(false);
+    };
+
+    if (isTimeZoneOpen) {
+      document.addEventListener('mousedown', onMouseDown);
+      document.addEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isTimeZoneOpen]);
+
+  useEffect(() => {
+    const profileTz = (profile as any)?.timezone;
+    if (typeof profileTz !== 'string' || !profileTz.trim()) return;
+    if (profileTz !== selectedTimeZone) setSelectedTimeZone(profileTz);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [(profile as any)?.timezone]);
 
   // Popular icons for profile avatar (same as IconPickerMini)
   const popularIcons: { icon?: any; name: string; id: number | null; isClear?: boolean }[] = [
@@ -372,6 +482,33 @@ const MySettings: React.FC = () => {
     console.log('Clear profile icon clicked');
     clearProfileIconMutation.mutate();
   };
+
+  const updateTimeZoneMutation = useMutation({
+    mutationFn: async (timezone: string) => {
+      console.log('Calling API to update timezone:', timezone);
+      const response = await api.patch(`/profile/timezone?timezone=${encodeURIComponent(timezone)}`);
+      console.log('API response:', response.data);
+      return { timezone, data: response.data };
+    },
+    onSuccess: async ({ timezone }) => {
+      console.log('Timezone updated successfully:', timezone);
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            timezone,
+          },
+        };
+      });
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update timezone:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
 
   return (
     <div className="flex flex-col" style={{ 
@@ -1108,6 +1245,163 @@ const MySettings: React.FC = () => {
           Customize your language and region.
         </p>
 
+        {/* TimeZone */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '500px' }}>
+          <label
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              userSelect: 'none',
+            }}
+          >
+            TimeZone
+          </label>
+
+          <div
+            ref={timeZoneDropdownRef}
+            style={{
+              position: 'relative',
+              userSelect: 'none'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setIsTimeZoneOpen((v) => !v)}
+              onBlur={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.border}`;
+              }}
+              onFocus={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+              }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 12px',
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                backgroundColor: theme.background,
+                color: theme.text,
+                height: '40px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Work Sans, sans-serif',
+                outline: 'none',
+                userSelect: 'none',
+              }}
+            >
+              <Clock style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.8, flexShrink: 0 }} />
+              <span style={{ flex: 1, textAlign: 'left', color: theme.text, opacity: selectedTimeZone ? 1 : 0.7 }}>
+                {selectedTimeZone ? `(${getTimeZoneGmtOffsetLabel(selectedTimeZone)}) ${selectedTimeZone}` : 'Select a timezone'}
+              </span>
+              <ChevronDown style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.7, flexShrink: 0 }} />
+            </button>
+
+            {isTimeZoneOpen && (
+              <div
+                role="group"
+                aria-label="Timezone options"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 'calc(100% + 8px)',
+                  backgroundColor: theme.background,
+                  border: `1px solid ${theme.border}`,
+                  borderRadius: '10px',
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+                  overflow: 'hidden',
+                  zIndex: 50,
+                }}
+              >
+                <div style={{ padding: '10px', borderBottom: `1px solid ${theme.border}` }}>
+                  <input
+                    ref={timeZoneSearchRef}
+                    value={timeZoneQuery}
+                    onChange={(e) => setTimeZoneQuery(e.target.value)}
+                    placeholder="Search timezone…"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      fontSize: '14px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: theme.background,
+                      color: theme.text,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.border}`;
+                    }}
+                  />
+                </div>
+
+                <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                  {filteredTimeZoneOptions.length === 0 ? (
+                    <div
+                      style={{
+                        padding: '12px',
+                        fontSize: '14px',
+                        fontFamily: 'Work Sans, sans-serif',
+                        color: theme.text,
+                        opacity: 0.7,
+                      }}
+                    >
+                      No results
+                    </div>
+                  ) : (
+                    filteredTimeZoneOptions.map(({ tz, label }) => {
+                      const isSelected = tz === selectedTimeZone;
+                      return (
+                        <button
+                          key={tz}
+                          type="button"
+                          onClick={() => {
+                            setSelectedTimeZone(tz);
+                            setIsTimeZoneOpen(false);
+                            setTimeZoneQuery('');
+                            updateTimeZoneMutation.mutate(tz);
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent';
+                          }}
+                          style={{
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '10px 12px',
+                            border: 'none',
+                            backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
+                            color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontFamily: 'Work Sans, sans-serif',
+                            lineHeight: '1.2',
+                            outline: 'none',
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Future security settings can be added here */}
 
       </div>
@@ -1146,7 +1440,7 @@ const MySettings: React.FC = () => {
           Select the way times & dates are displayed.
         </p>
 
-        {/* time zone content  */}
+        {/* (TimeZone moved to Language & Region) */}
     
       </div>
 
