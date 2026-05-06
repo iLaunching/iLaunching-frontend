@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Lock, Trash2, Camera, X, Clock, ChevronDown } from 'lucide-react';
+import { Lock, Trash2, Camera, X, Clock, ChevronDown, MapPin } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { authApi } from '@/api/auth';
 import GeneralMenu from '@/components/GeneralMenu';
@@ -131,6 +131,287 @@ const MySettings: React.FC = () => {
   const timeZoneDropdownRef = useRef<HTMLDivElement | null>(null);
   const timeZoneSearchRef = useRef<HTMLInputElement | null>(null);
 
+  const countryRegionOptions = useMemo<Array<{ regionCode: string; dialCode: string }>>(
+    () => [
+      { regionCode: 'US', dialCode: '1' },
+      { regionCode: 'CA', dialCode: '1' },
+      { regionCode: 'EG', dialCode: '20' },
+      { regionCode: 'ZA', dialCode: '27' },
+      { regionCode: 'GR', dialCode: '30' },
+      { regionCode: 'NL', dialCode: '31' },
+      { regionCode: 'BE', dialCode: '32' },
+      { regionCode: 'FR', dialCode: '33' },
+      { regionCode: 'ES', dialCode: '34' },
+      { regionCode: 'HU', dialCode: '36' },
+      { regionCode: 'IT', dialCode: '39' },
+      { regionCode: 'RO', dialCode: '40' },
+      { regionCode: 'CH', dialCode: '41' },
+      { regionCode: 'AT', dialCode: '43' },
+      { regionCode: 'GB', dialCode: '44' },
+      { regionCode: 'DK', dialCode: '45' },
+      { regionCode: 'SE', dialCode: '46' },
+      { regionCode: 'NO', dialCode: '47' },
+      { regionCode: 'PL', dialCode: '48' },
+      { regionCode: 'DE', dialCode: '49' },
+      { regionCode: 'PE', dialCode: '51' },
+      { regionCode: 'MX', dialCode: '52' },
+      { regionCode: 'CU', dialCode: '53' },
+      { regionCode: 'AR', dialCode: '54' },
+      { regionCode: 'BR', dialCode: '55' },
+      { regionCode: 'CL', dialCode: '56' },
+      { regionCode: 'CO', dialCode: '57' },
+      { regionCode: 'VE', dialCode: '58' },
+      { regionCode: 'MY', dialCode: '60' },
+      { regionCode: 'AU', dialCode: '61' },
+      { regionCode: 'ID', dialCode: '62' },
+      { regionCode: 'PH', dialCode: '63' },
+      { regionCode: 'NZ', dialCode: '64' },
+      { regionCode: 'SG', dialCode: '65' },
+      { regionCode: 'TH', dialCode: '66' },
+      { regionCode: 'JP', dialCode: '81' },
+      { regionCode: 'KR', dialCode: '82' },
+      { regionCode: 'VN', dialCode: '84' },
+      { regionCode: 'CN', dialCode: '86' },
+      { regionCode: 'IN', dialCode: '91' },
+      { regionCode: 'PK', dialCode: '92' },
+      { regionCode: 'LK', dialCode: '94' },
+      { regionCode: 'MM', dialCode: '95' },
+      { regionCode: 'IR', dialCode: '98' },
+      { regionCode: 'SS', dialCode: '211' },
+      { regionCode: 'MA', dialCode: '212' },
+      { regionCode: 'DZ', dialCode: '213' },
+      { regionCode: 'TN', dialCode: '216' },
+      { regionCode: 'LY', dialCode: '218' },
+      { regionCode: 'GM', dialCode: '220' },
+      { regionCode: 'SN', dialCode: '221' },
+      { regionCode: 'MR', dialCode: '222' },
+      { regionCode: 'ML', dialCode: '223' },
+      { regionCode: 'GN', dialCode: '224' },
+      { regionCode: 'CI', dialCode: '225' },
+      { regionCode: 'BF', dialCode: '226' },
+      { regionCode: 'NE', dialCode: '227' },
+      { regionCode: 'TG', dialCode: '228' },
+      { regionCode: 'BJ', dialCode: '229' },
+      { regionCode: 'MU', dialCode: '230' },
+      { regionCode: 'LR', dialCode: '231' },
+      { regionCode: 'SL', dialCode: '232' },
+      { regionCode: 'GH', dialCode: '233' },
+      { regionCode: 'NG', dialCode: '234' },
+      { regionCode: 'TD', dialCode: '235' },
+      { regionCode: 'CF', dialCode: '236' },
+      { regionCode: 'CM', dialCode: '237' },
+      { regionCode: 'CV', dialCode: '238' },
+      { regionCode: 'ST', dialCode: '239' },
+      { regionCode: 'GQ', dialCode: '240' },
+      { regionCode: 'GA', dialCode: '241' },
+      { regionCode: 'CG', dialCode: '242' },
+      { regionCode: 'CD', dialCode: '243' },
+      { regionCode: 'AO', dialCode: '244' },
+      { regionCode: 'GW', dialCode: '245' },
+      { regionCode: 'IO', dialCode: '246' },
+      { regionCode: 'AC', dialCode: '247' },
+      { regionCode: 'SC', dialCode: '248' },
+      { regionCode: 'SD', dialCode: '249' },
+      { regionCode: 'RW', dialCode: '250' },
+      { regionCode: 'ET', dialCode: '251' },
+      { regionCode: 'SO', dialCode: '252' },
+      { regionCode: 'DJ', dialCode: '253' },
+      { regionCode: 'KE', dialCode: '254' },
+      { regionCode: 'TZ', dialCode: '255' },
+      { regionCode: 'UG', dialCode: '256' },
+      { regionCode: 'BI', dialCode: '257' },
+      { regionCode: 'MZ', dialCode: '258' },
+      { regionCode: 'ZM', dialCode: '260' },
+      { regionCode: 'MG', dialCode: '261' },
+      { regionCode: 'RE', dialCode: '262' },
+      { regionCode: 'ZW', dialCode: '263' },
+      { regionCode: 'NA', dialCode: '264' },
+      { regionCode: 'MW', dialCode: '265' },
+      { regionCode: 'LS', dialCode: '266' },
+      { regionCode: 'BW', dialCode: '267' },
+      { regionCode: 'SZ', dialCode: '268' },
+      { regionCode: 'KM', dialCode: '269' },
+      { regionCode: 'YT', dialCode: '262' },
+      { regionCode: 'SH', dialCode: '290' },
+      { regionCode: 'ER', dialCode: '291' },
+      { regionCode: 'AW', dialCode: '297' },
+      { regionCode: 'FO', dialCode: '298' },
+      { regionCode: 'GL', dialCode: '299' },
+      { regionCode: 'GI', dialCode: '350' },
+      { regionCode: 'PT', dialCode: '351' },
+      { regionCode: 'LU', dialCode: '352' },
+      { regionCode: 'IE', dialCode: '353' },
+      { regionCode: 'IS', dialCode: '354' },
+      { regionCode: 'AL', dialCode: '355' },
+      { regionCode: 'MT', dialCode: '356' },
+      { regionCode: 'CY', dialCode: '357' },
+      { regionCode: 'FI', dialCode: '358' },
+      { regionCode: 'BG', dialCode: '359' },
+      { regionCode: 'LT', dialCode: '370' },
+      { regionCode: 'LV', dialCode: '371' },
+      { regionCode: 'EE', dialCode: '372' },
+      { regionCode: 'MD', dialCode: '373' },
+      { regionCode: 'AM', dialCode: '374' },
+      { regionCode: 'BY', dialCode: '375' },
+      { regionCode: 'AD', dialCode: '376' },
+      { regionCode: 'MC', dialCode: '377' },
+      { regionCode: 'SM', dialCode: '378' },
+      { regionCode: 'VA', dialCode: '379' },
+      { regionCode: 'UA', dialCode: '380' },
+      { regionCode: 'RS', dialCode: '381' },
+      { regionCode: 'ME', dialCode: '382' },
+      { regionCode: 'XK', dialCode: '383' },
+      { regionCode: 'HR', dialCode: '385' },
+      { regionCode: 'SI', dialCode: '386' },
+      { regionCode: 'BA', dialCode: '387' },
+      { regionCode: 'MK', dialCode: '389' },
+      { regionCode: 'CZ', dialCode: '420' },
+      { regionCode: 'SK', dialCode: '421' },
+      { regionCode: 'LI', dialCode: '423' },
+      { regionCode: 'FK', dialCode: '500' },
+      { regionCode: 'BZ', dialCode: '501' },
+      { regionCode: 'GT', dialCode: '502' },
+      { regionCode: 'SV', dialCode: '503' },
+      { regionCode: 'HN', dialCode: '504' },
+      { regionCode: 'NI', dialCode: '505' },
+      { regionCode: 'CR', dialCode: '506' },
+      { regionCode: 'PA', dialCode: '507' },
+      { regionCode: 'PM', dialCode: '508' },
+      { regionCode: 'HT', dialCode: '509' },
+      { regionCode: 'GP', dialCode: '590' },
+      { regionCode: 'BO', dialCode: '591' },
+      { regionCode: 'GY', dialCode: '592' },
+      { regionCode: 'EC', dialCode: '593' },
+      { regionCode: 'GF', dialCode: '594' },
+      { regionCode: 'PY', dialCode: '595' },
+      { regionCode: 'MQ', dialCode: '596' },
+      { regionCode: 'SR', dialCode: '597' },
+      { regionCode: 'UY', dialCode: '598' },
+      { regionCode: 'CW', dialCode: '599' },
+      { regionCode: 'TL', dialCode: '670' },
+      { regionCode: 'AQ', dialCode: '672' },
+      { regionCode: 'BN', dialCode: '673' },
+      { regionCode: 'NR', dialCode: '674' },
+      { regionCode: 'PG', dialCode: '675' },
+      { regionCode: 'TO', dialCode: '676' },
+      { regionCode: 'SB', dialCode: '677' },
+      { regionCode: 'VU', dialCode: '678' },
+      { regionCode: 'FJ', dialCode: '679' },
+      { regionCode: 'PW', dialCode: '680' },
+      { regionCode: 'WF', dialCode: '681' },
+      { regionCode: 'CK', dialCode: '682' },
+      { regionCode: 'NU', dialCode: '683' },
+      { regionCode: 'WS', dialCode: '685' },
+      { regionCode: 'KI', dialCode: '686' },
+      { regionCode: 'NC', dialCode: '687' },
+      { regionCode: 'TV', dialCode: '688' },
+      { regionCode: 'PF', dialCode: '689' },
+      { regionCode: 'TK', dialCode: '690' },
+      { regionCode: 'FM', dialCode: '691' },
+      { regionCode: 'MH', dialCode: '692' },
+      { regionCode: 'RU', dialCode: '7' },
+      { regionCode: 'KZ', dialCode: '7' },
+      { regionCode: 'JO', dialCode: '962' },
+      { regionCode: 'SY', dialCode: '963' },
+      { regionCode: 'IQ', dialCode: '964' },
+      { regionCode: 'KW', dialCode: '965' },
+      { regionCode: 'SA', dialCode: '966' },
+      { regionCode: 'YE', dialCode: '967' },
+      { regionCode: 'OM', dialCode: '968' },
+      { regionCode: 'PS', dialCode: '970' },
+      { regionCode: 'AE', dialCode: '971' },
+      { regionCode: 'IL', dialCode: '972' },
+      { regionCode: 'BH', dialCode: '973' },
+      { regionCode: 'QA', dialCode: '974' },
+      { regionCode: 'BT', dialCode: '975' },
+      { regionCode: 'MN', dialCode: '976' },
+      { regionCode: 'NP', dialCode: '977' },
+      { regionCode: 'TJ', dialCode: '992' },
+      { regionCode: 'TM', dialCode: '993' },
+      { regionCode: 'AZ', dialCode: '994' },
+      { regionCode: 'GE', dialCode: '995' },
+      { regionCode: 'KG', dialCode: '996' },
+      { regionCode: 'UZ', dialCode: '998' },
+      { regionCode: 'HK', dialCode: '852' },
+      { regionCode: 'MO', dialCode: '853' },
+      { regionCode: 'TW', dialCode: '886' },
+      { regionCode: 'MV', dialCode: '960' },
+      { regionCode: 'LB', dialCode: '961' },
+      { regionCode: 'DO', dialCode: '1' },
+      { regionCode: 'PR', dialCode: '1' },
+      { regionCode: 'VI', dialCode: '1' },
+      { regionCode: 'JM', dialCode: '1' },
+      { regionCode: 'TT', dialCode: '1' },
+      { regionCode: 'BS', dialCode: '1' },
+      { regionCode: 'BB', dialCode: '1' },
+      { regionCode: 'AG', dialCode: '1' },
+      { regionCode: 'DM', dialCode: '1' },
+      { regionCode: 'KN', dialCode: '1' },
+      { regionCode: 'LC', dialCode: '1' },
+      { regionCode: 'VC', dialCode: '1' },
+      { regionCode: 'GD', dialCode: '1' },
+      { regionCode: 'KY', dialCode: '1' },
+      { regionCode: 'TC', dialCode: '1' },
+      { regionCode: 'VG', dialCode: '1' },
+      { regionCode: 'MS', dialCode: '1' },
+      { regionCode: 'BM', dialCode: '1' },
+      { regionCode: 'AI', dialCode: '1' },
+      { regionCode: 'SX', dialCode: '1' },
+      { regionCode: 'AF', dialCode: '93' },
+      { regionCode: 'BD', dialCode: '880' },
+    ],
+    []
+  );
+
+  const getRegionDisplayName = (regionCode: string) => {
+    try {
+      const displayNames = typeof Intl !== 'undefined' ? (Intl as any).DisplayNames : undefined;
+      if (displayNames) {
+        const dn = new displayNames([navigator.language || 'en'], { type: 'region' });
+        return dn.of(regionCode.toUpperCase()) || regionCode.toUpperCase();
+      }
+      return regionCode.toUpperCase();
+    } catch {
+      return regionCode.toUpperCase();
+    }
+  };
+
+  const countryRegionDisplayOptions = useMemo(() => {
+    return countryRegionOptions
+      .map(({ regionCode, dialCode }) => {
+        const name = getRegionDisplayName(regionCode);
+        return { regionCode: regionCode.toUpperCase(), dialCode, label: `${name} (+${dialCode})` };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [countryRegionOptions]);
+
+  const [selectedCountryRegion, setSelectedCountryRegion] = useState<string>(() => {
+    const cc = (profile as any)?.country_code || (profile as any)?.countryCode;
+    if (typeof cc === 'string' && cc.trim()) return cc.trim().toUpperCase();
+    try {
+      const localeRegion = (Intl as any)?.Locale ? new (Intl as any).Locale(navigator.language).region : undefined;
+      if (typeof localeRegion === 'string' && localeRegion.trim()) return localeRegion.trim().toUpperCase();
+    } catch {}
+    return 'US';
+  });
+
+  const [isCountryRegionOpen, setIsCountryRegionOpen] = useState(false);
+  const [countryRegionQuery, setCountryRegionQuery] = useState('');
+  const countryRegionDropdownRef = useRef<HTMLDivElement | null>(null);
+  const countryRegionSearchRef = useRef<HTMLInputElement | null>(null);
+
+  const filteredCountryRegionOptions = useMemo(() => {
+    const q = countryRegionQuery.trim().toLowerCase();
+    if (!q) return countryRegionDisplayOptions;
+    const digits = q.replace(/[^0-9]/g, '');
+    return countryRegionDisplayOptions.filter(({ regionCode, dialCode, label }) => {
+      const s = `${label} ${regionCode} +${dialCode}`.toLowerCase();
+      if (s.includes(q)) return true;
+      if (digits && (`${dialCode}`.startsWith(digits) || `+${dialCode}`.includes(digits))) return true;
+      return false;
+    });
+  }, [countryRegionDisplayOptions, countryRegionQuery]);
+
   const getTimeZoneGmtOffsetLabel = (timeZone: string) => {
     try {
       const d = new Date();
@@ -178,6 +459,12 @@ const MySettings: React.FC = () => {
   }, [isTimeZoneOpen]);
 
   useEffect(() => {
+    if (!isCountryRegionOpen) return;
+    const t = window.setTimeout(() => countryRegionSearchRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
+  }, [isCountryRegionOpen]);
+
+  useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
       const el = timeZoneDropdownRef.current;
       if (!el) return;
@@ -198,11 +485,39 @@ const MySettings: React.FC = () => {
   }, [isTimeZoneOpen]);
 
   useEffect(() => {
+    const onMouseDown = (e: MouseEvent) => {
+      const el = countryRegionDropdownRef.current;
+      if (!el) return;
+      if (e.target instanceof Node && !el.contains(e.target)) setIsCountryRegionOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsCountryRegionOpen(false);
+    };
+
+    if (isCountryRegionOpen) {
+      document.addEventListener('mousedown', onMouseDown);
+      document.addEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isCountryRegionOpen]);
+
+  useEffect(() => {
     const profileTz = (profile as any)?.timezone;
     if (typeof profileTz !== 'string' || !profileTz.trim()) return;
     if (profileTz !== selectedTimeZone) setSelectedTimeZone(profileTz);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [(profile as any)?.timezone]);
+
+  useEffect(() => {
+    const cc = (profile as any)?.country_code || (profile as any)?.countryCode;
+    if (typeof cc !== 'string' || !cc.trim()) return;
+    const upper = cc.trim().toUpperCase();
+    if (upper !== selectedCountryRegion) setSelectedCountryRegion(upper);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [(profile as any)?.country_code, (profile as any)?.countryCode]);
 
   // Popular icons for profile avatar (same as IconPickerMini)
   const popularIcons: { icon?: any; name: string; id: number | null; isClear?: boolean }[] = [
@@ -506,6 +821,33 @@ const MySettings: React.FC = () => {
     },
     onError: (error: any) => {
       console.error('Failed to update timezone:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
+  const updateCountryCodeMutation = useMutation({
+    mutationFn: async (countryCode: string) => {
+      console.log('Calling API to update country_code:', countryCode);
+      const response = await api.patch(`/profile/country-code?country_code=${encodeURIComponent(countryCode)}`);
+      console.log('API response:', response.data);
+      return { countryCode, data: response.data };
+    },
+    onSuccess: async ({ countryCode }) => {
+      console.log('Country code updated successfully:', countryCode);
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            country_code: countryCode,
+          },
+        };
+      });
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update country_code:', error);
       console.error('Error response:', error.response?.data);
     },
   });
@@ -1370,6 +1712,166 @@ const MySettings: React.FC = () => {
                             setIsTimeZoneOpen(false);
                             setTimeZoneQuery('');
                             updateTimeZoneMutation.mutate(tz);
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent';
+                          }}
+                          style={{
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '10px 12px',
+                            border: 'none',
+                            backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
+                            color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontFamily: 'Work Sans, sans-serif',
+                            lineHeight: '1.2',
+                            outline: 'none',
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Country or region */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '500px', marginTop: '16px' }}>
+          <label
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              userSelect: 'none',
+            }}
+          >
+            Country or region
+          </label>
+
+          <div
+            ref={countryRegionDropdownRef}
+            style={{
+              position: 'relative',
+              userSelect: 'none',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setIsCountryRegionOpen((v) => !v)}
+              onBlur={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.border}`;
+              }}
+              onFocus={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+              }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 12px',
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                backgroundColor: theme.background,
+                color: theme.text,
+                height: '40px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Work Sans, sans-serif',
+                outline: 'none',
+                userSelect: 'none',
+              }}
+            >
+              <MapPin style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.8, flexShrink: 0 }} />
+              <span style={{ flex: 1, textAlign: 'left', color: theme.text, opacity: selectedCountryRegion ? 1 : 0.7 }}>
+                {(() => {
+                  const selected = countryRegionDisplayOptions.find((c) => c.regionCode === selectedCountryRegion);
+                  return selected ? selected.label : selectedCountryRegion || 'Select a country or region';
+                })()}
+              </span>
+              <ChevronDown style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.7, flexShrink: 0 }} />
+            </button>
+
+            {isCountryRegionOpen && (
+              <div
+                role="group"
+                aria-label="Country or region options"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 'calc(100% + 8px)',
+                  backgroundColor: theme.background,
+                  border: `1px solid ${theme.border}`,
+                  borderRadius: '10px',
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+                  overflow: 'hidden',
+                  zIndex: 50,
+                }}
+              >
+                <div style={{ padding: '10px', borderBottom: `1px solid ${theme.border}` }}>
+                  <input
+                    ref={countryRegionSearchRef}
+                    value={countryRegionQuery}
+                    onChange={(e) => setCountryRegionQuery(e.target.value)}
+                    placeholder="Search"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      fontSize: '14px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: theme.background,
+                      color: theme.text,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.border}`;
+                    }}
+                  />
+                </div>
+
+                <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                  {filteredCountryRegionOptions.length === 0 ? (
+                    <div
+                      style={{
+                        padding: '12px',
+                        fontSize: '14px',
+                        fontFamily: 'Work Sans, sans-serif',
+                        color: theme.text,
+                        opacity: 0.7,
+                      }}
+                    >
+                      No results
+                    </div>
+                  ) : (
+                    filteredCountryRegionOptions.map(({ regionCode, dialCode, label }) => {
+                      const isSelected = regionCode === selectedCountryRegion;
+                      return (
+                        <button
+                          key={`${regionCode}-${dialCode}`}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCountryRegion(regionCode);
+                            setIsCountryRegionOpen(false);
+                            setCountryRegionQuery('');
+                            updateCountryCodeMutation.mutate(regionCode);
                           }}
                           onMouseEnter={(e) => {
                             if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
