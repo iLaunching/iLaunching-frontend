@@ -852,6 +852,45 @@ const MySettings: React.FC = () => {
     },
   });
 
+  const [e164Value, setE164Value] = useState<string>(() => {
+    const v = (profile as any)?.e164;
+    return typeof v === 'string' ? v : '';
+  });
+
+  useEffect(() => {
+    const v = (profile as any)?.e164;
+    if (typeof v !== 'string') return;
+    if (v !== e164Value) setE164Value(v);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [(profile as any)?.e164]);
+
+  const updateE164Mutation = useMutation({
+    mutationFn: async (e164: string) => {
+      console.log('Calling API to update e164:', e164);
+      const response = await api.patch(`/profile/e164?e164=${encodeURIComponent(e164)}`);
+      console.log('API response:', response.data);
+      return { e164, data: response.data };
+    },
+    onSuccess: async ({ e164 }) => {
+      console.log('E.164 updated successfully:', e164);
+      queryClient.setQueryData(['current-smart-hub'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          profile: {
+            ...oldData.profile,
+            e164,
+          },
+        };
+      });
+      await queryClient.invalidateQueries({ queryKey: ['current-smart-hub'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update e164:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+
   return (
     <div className="flex flex-col" style={{ 
         width: '80%',
@@ -1745,6 +1784,46 @@ const MySettings: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* E.164 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '500px', marginTop: '16px' }}>
+          <label
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              userSelect: 'none',
+            }}
+          >
+            E.164
+          </label>
+          <input
+            type="text"
+            placeholder="+14155552671"
+            value={e164Value}
+            onChange={(e) => setE164Value(e.target.value)}
+            onBlur={(e) => {
+              e.target.style.border = `1px solid ${theme.border}`;
+              updateE164Mutation.mutate(e.target.value.trim());
+            }}
+            onFocus={(e) => {
+              e.target.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+            }}
+            style={{
+              padding: '10px 12px',
+              fontSize: '14px',
+              fontFamily: 'Work Sans, sans-serif',
+              border: `1px solid ${theme.border}`,
+              borderRadius: '6px',
+              backgroundColor: theme.background,
+              color: theme.text,
+              outline: 'none',
+              userSelect: 'none',
+              height: '40px',
+            }}
+          />
         </div>
       </div>
 
