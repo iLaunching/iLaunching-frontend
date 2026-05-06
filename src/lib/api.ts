@@ -56,20 +56,26 @@ api.interceptors.request.use(
       config.url?.startsWith('/templates/');
 
     if (isApiRequest) {
-      // Get token from localStorage (Zustand persist middleware stores it there)
-      const authState = localStorage.getItem('auth-storage');
+      // Prefer Zustand persisted auth (auth-storage), but also support legacy storage
+      // used by other parts of the app (access_token).
+      let token: string | null = null;
 
+      const authState = localStorage.getItem('auth-storage');
       if (authState) {
         try {
           const { state } = JSON.parse(authState);
-          const token = state?.accessToken;
-
-          if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-          }
+          token = state?.accessToken || null;
         } catch (error) {
           console.error('Error parsing auth state:', error);
         }
+      }
+
+      if (!token) {
+        token = localStorage.getItem('access_token');
+      }
+
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
     }
 
