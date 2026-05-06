@@ -1469,6 +1469,200 @@ const MySettings: React.FC = () => {
         </div>
       </div>
 
+      {/* Active Chat Section */}
+      <div
+        style={{
+          marginBottom: '30px',
+          borderBottom: `1px solid ${theme.border}`,
+          paddingBottom: '40px',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '16px',
+            fontWeight: 400,
+            marginBottom: '5px',
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+          }}
+        >
+          Active Chat
+        </h2>
+        <p
+          style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: theme.text,
+            fontFamily: 'Work Sans, sans-serif',
+            opacity: 0.7,
+            lineHeight: '1.5',
+            marginBottom: '20px',
+          }}
+        >
+          Manage active chat settings.
+        </p>
+
+        {/* Country or region */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '500px' }}>
+          <label
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: theme.text,
+              fontFamily: 'Work Sans, sans-serif',
+              userSelect: 'none',
+            }}
+          >
+            Country or region
+          </label>
+
+          <div
+            ref={countryRegionDropdownRef}
+            style={{
+              position: 'relative',
+              userSelect: 'none',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setIsCountryRegionOpen((v) => !v)}
+              onBlur={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.border}`;
+              }}
+              onFocus={(e) => {
+                const container = e.currentTarget;
+                container.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+              }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 12px',
+                border: `1px solid ${theme.border}`,
+                borderRadius: '6px',
+                backgroundColor: theme.background,
+                color: theme.text,
+                height: '40px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontFamily: 'Work Sans, sans-serif',
+                outline: 'none',
+                userSelect: 'none',
+              }}
+            >
+              <MapPin style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.8, flexShrink: 0 }} />
+              <span style={{ flex: 1, textAlign: 'left', color: theme.text, opacity: selectedCountryRegion ? 1 : 0.7 }}>
+                {(() => {
+                  const selected = countryRegionDisplayOptions.find((c) => c.regionCode === selectedCountryRegion);
+                  return selected ? selected.label : selectedCountryRegion || 'Select a country or region';
+                })()}
+              </span>
+              <ChevronDown style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.7, flexShrink: 0 }} />
+            </button>
+
+            {isCountryRegionOpen && (
+              <div
+                role="group"
+                aria-label="Country or region options"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 'calc(100% + 8px)',
+                  backgroundColor: theme.background,
+                  border: `1px solid ${theme.border}`,
+                  borderRadius: '10px',
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+                  overflow: 'hidden',
+                  zIndex: 50,
+                }}
+              >
+                <div style={{ padding: '10px', borderBottom: `1px solid ${theme.border}` }}>
+                  <input
+                    ref={countryRegionSearchRef}
+                    value={countryRegionQuery}
+                    onChange={(e) => setCountryRegionQuery(e.target.value)}
+                    placeholder="Search"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      fontSize: '14px',
+                      fontFamily: 'Work Sans, sans-serif',
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: theme.background,
+                      color: theme.text,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.border = `1px solid ${theme.border}`;
+                    }}
+                  />
+                </div>
+
+                <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                  {filteredCountryRegionOptions.length === 0 ? (
+                    <div
+                      style={{
+                        padding: '12px',
+                        fontSize: '14px',
+                        fontFamily: 'Work Sans, sans-serif',
+                        color: theme.text,
+                        opacity: 0.7,
+                      }}
+                    >
+                      No results
+                    </div>
+                  ) : (
+                    filteredCountryRegionOptions.map(({ regionCode, dialCode, label }) => {
+                      const isSelected = regionCode === selectedCountryRegion;
+                      return (
+                        <button
+                          key={`${regionCode}-${dialCode}`}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCountryRegion(regionCode);
+                            setIsCountryRegionOpen(false);
+                            setCountryRegionQuery('');
+                            updateCountryCodeMutation.mutate(regionCode);
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent';
+                          }}
+                          style={{
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '10px 12px',
+                            border: 'none',
+                            backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
+                            color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontFamily: 'Work Sans, sans-serif',
+                            lineHeight: '1.2',
+                            outline: 'none',
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
 
       {/* Appearance Section */}
       <div style={{ 
@@ -1712,166 +1906,6 @@ const MySettings: React.FC = () => {
                             setIsTimeZoneOpen(false);
                             setTimeZoneQuery('');
                             updateTimeZoneMutation.mutate(tz);
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent';
-                          }}
-                          style={{
-                            width: '100%',
-                            textAlign: 'left',
-                            padding: '10px 12px',
-                            border: 'none',
-                            backgroundColor: isSelected ? (theme.tone_button_bk_color || theme.global_button_hover) : 'transparent',
-                            color: isSelected ? (theme.tone_button_text_color || theme.text) : theme.text,
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontFamily: 'Work Sans, sans-serif',
-                            lineHeight: '1.2',
-                            outline: 'none',
-                          }}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Country or region */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '500px', marginTop: '16px' }}>
-          <label
-            style={{
-              fontSize: '13px',
-              fontWeight: 500,
-              color: theme.text,
-              fontFamily: 'Work Sans, sans-serif',
-              userSelect: 'none',
-            }}
-          >
-            Country or region
-          </label>
-
-          <div
-            ref={countryRegionDropdownRef}
-            style={{
-              position: 'relative',
-              userSelect: 'none',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setIsCountryRegionOpen((v) => !v)}
-              onBlur={(e) => {
-                const container = e.currentTarget;
-                container.style.border = `1px solid ${theme.border}`;
-              }}
-              onFocus={(e) => {
-                const container = e.currentTarget;
-                container.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
-              }}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 12px',
-                border: `1px solid ${theme.border}`,
-                borderRadius: '6px',
-                backgroundColor: theme.background,
-                color: theme.text,
-                height: '40px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontFamily: 'Work Sans, sans-serif',
-                outline: 'none',
-                userSelect: 'none',
-              }}
-            >
-              <MapPin style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.8, flexShrink: 0 }} />
-              <span style={{ flex: 1, textAlign: 'left', color: theme.text, opacity: selectedCountryRegion ? 1 : 0.7 }}>
-                {(() => {
-                  const selected = countryRegionDisplayOptions.find((c) => c.regionCode === selectedCountryRegion);
-                  return selected ? selected.label : selectedCountryRegion || 'Select a country or region';
-                })()}
-              </span>
-              <ChevronDown style={{ width: '16px', height: '16px', color: theme.text, opacity: 0.7, flexShrink: 0 }} />
-            </button>
-
-            {isCountryRegionOpen && (
-              <div
-                role="group"
-                aria-label="Country or region options"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: 'calc(100% + 8px)',
-                  backgroundColor: theme.background,
-                  border: `1px solid ${theme.border}`,
-                  borderRadius: '10px',
-                  boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
-                  overflow: 'hidden',
-                  zIndex: 50,
-                }}
-              >
-                <div style={{ padding: '10px', borderBottom: `1px solid ${theme.border}` }}>
-                  <input
-                    ref={countryRegionSearchRef}
-                    value={countryRegionQuery}
-                    onChange={(e) => setCountryRegionQuery(e.target.value)}
-                    placeholder="Search"
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      fontSize: '14px',
-                      fontFamily: 'Work Sans, sans-serif',
-                      border: `1px solid ${theme.border}`,
-                      borderRadius: '8px',
-                      backgroundColor: theme.background,
-                      color: theme.text,
-                      outline: 'none',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.border = `1px solid ${theme.tone_button_bk_color || theme.border}`;
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.border = `1px solid ${theme.border}`;
-                    }}
-                  />
-                </div>
-
-                <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                  {filteredCountryRegionOptions.length === 0 ? (
-                    <div
-                      style={{
-                        padding: '12px',
-                        fontSize: '14px',
-                        fontFamily: 'Work Sans, sans-serif',
-                        color: theme.text,
-                        opacity: 0.7,
-                      }}
-                    >
-                      No results
-                    </div>
-                  ) : (
-                    filteredCountryRegionOptions.map(({ regionCode, dialCode, label }) => {
-                      const isSelected = regionCode === selectedCountryRegion;
-                      return (
-                        <button
-                          key={`${regionCode}-${dialCode}`}
-                          type="button"
-                          onClick={() => {
-                            setSelectedCountryRegion(regionCode);
-                            setIsCountryRegionOpen(false);
-                            setCountryRegionQuery('');
-                            updateCountryCodeMutation.mutate(regionCode);
                           }}
                           onMouseEnter={(e) => {
                             if (!isSelected) e.currentTarget.style.backgroundColor = theme.global_button_hover_color || theme.global_button_hover || 'rgba(0,0,0,0.06)';
