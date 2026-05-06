@@ -1469,6 +1469,91 @@ const MySettings: React.FC = () => {
         </div>
       </div>
 
+      {/* Appearance Section */}
+      <div style={{ 
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        
+        }}
+        >
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          Appearance
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Personalise your iLaunching experience by selecting your preferred appearance
+        </p>
+
+        {/* AppearanceSelector Component */}
+        <AppearanceSelector
+          currentAppearanceId={profile?.appearance?.id ?? null}
+          onAppearanceChange={handleAppearanceChange}
+          textColor={theme.text}
+          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        />
+      </div>
+
+
+      {/* itheme  Section */}
+      <div
+        style={{
+        marginBottom: '30px',
+        borderBottom: `1px solid ${theme.border}`,
+        paddingBottom: '40px',
+        }}
+        > 
+        <h2 style={{ 
+          fontSize: '16px', 
+          fontWeight: 400, 
+          marginBottom: '5px',
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif'
+        }}>
+          iTheme
+        </h2>
+        <p
+        style={{
+          fontSize: '14px',
+          fontWeight: 300,
+          color: theme.text,
+          fontFamily: 'Work Sans, sans-serif',
+          opacity: 0.7,
+          lineHeight: '1.5',
+          marginBottom: '20px'
+        }}
+        
+        >
+          Personalise your iLaunching experience by selecting your preferred iTheme
+        </p>
+
+        {/* IThemeSelector Component */}
+        <IThemeSelector
+          currentIthemeId={profile?.itheme?.id ?? null}
+          onIthemeChange={handleIthemeChange}
+          textColor={theme.text}
+          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
+          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
+        />
+      </div>
+
       {/* Active Chat Section */}
       <div
         style={{
@@ -1661,92 +1746,6 @@ const MySettings: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
-
-
-      {/* Appearance Section */}
-      <div style={{ 
-        marginBottom: '30px',
-        borderBottom: `1px solid ${theme.border}`,
-        paddingBottom: '40px',
-        
-        }}
-        >
-        <h2 style={{ 
-          fontSize: '16px', 
-          fontWeight: 400, 
-          marginBottom: '5px',
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif'
-        }}>
-          Appearance
-        </h2>
-        <p
-        style={{
-          fontSize: '14px',
-          fontWeight: 300,
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif',
-          opacity: 0.7,
-          lineHeight: '1.5',
-          marginBottom: '20px'
-        }}
-        
-        >
-          Personalise your iLaunching experience by selecting your preferred appearance
-        </p>
-
-        {/* AppearanceSelector Component */}
-        <AppearanceSelector
-          currentAppearanceId={profile?.appearance?.id ?? null}
-          onAppearanceChange={handleAppearanceChange}
-          textColor={theme.text}
-          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
-          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
-        />
-      </div>
-
-
-      {/* itheme  Section */}
-      <div
-        style={{
-        marginBottom: '30px',
-        borderBottom: `1px solid ${theme.border}`,
-        paddingBottom: '40px',
-        }}
-        > 
-        <h2 style={{ 
-          fontSize: '16px', 
-          fontWeight: 400, 
-          marginBottom: '5px',
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif'
-        }}>
-          iTheme
-        </h2>
-        <p
-        style={{
-          fontSize: '14px',
-          fontWeight: 300,
-          color: theme.text,
-          fontFamily: 'Work Sans, sans-serif',
-          opacity: 0.7,
-          lineHeight: '1.5',
-          marginBottom: '20px'
-        }}
-        
-        >
-          Personalise your iLaunching experience by selecting your preferred iTheme
-        </p>
-
-        {/* IThemeSelector Component */}
-        <IThemeSelector
-          currentIthemeId={profile?.itheme?.id ?? null}
-          onIthemeChange={handleIthemeChange}
-          textColor={theme.text}
-          borderLineColor={theme.border || 'rgba(255, 255, 255, 0.1)'}
-          globalHoverColor={theme.global_button_hover || 'rgba(127, 119, 241, 0.1)'}
-        />
       </div>
 
       <div
